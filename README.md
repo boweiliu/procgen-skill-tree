@@ -4,6 +4,7 @@ How we set this up:
 
 * Creat-react-app --typescript
 * https://github.com/dmayala/CrossTodo/blob/d924d34ca5d542a5f0c5dc6bc9371f781e266f48/.eslintrc.json
+* yarn add --dev prettier
 
 Requirements:
 
