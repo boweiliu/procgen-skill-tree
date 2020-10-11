@@ -14,21 +14,21 @@ import "./Area.css";
  * @param props
  */
 
-import { createApplication, drawCircle } from "../pixi/Application";
-const app = createApplication();
+import { Application } from "../pixi/Application";
+const application = new Application();
 
 export function Area(props: { data: string }) {
   let { data } = props;
   const container = useRef<any>(null);
 
   useEffect(() => {
-    container.current?.appendChild(app.view);
+    container.current?.appendChild(application.app.view);
   }, []);
 
   return (
     <>
       <div ref={container} />
-      <button onClick={() => drawCircle()}>text</button>
+      <button onClick={() => application.drawCircle()}>text</button>
     </>
   );
 }
