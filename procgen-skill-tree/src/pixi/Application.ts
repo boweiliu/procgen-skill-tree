@@ -12,9 +12,9 @@ export class Application {
 
   public drawCircle() {
     const graphics = new Pixi.Graphics();
-    graphics.lineStyle(2, 0xfeeb77, 1);
-    graphics.beginFill(0x650a5a, 1);
-    graphics.drawCircle(250, 250, 50);
+    graphics.lineStyle(2, 0x000000, 1);
+    graphics.beginFill(0xdddddd, 1);
+    graphics.drawCircle(1000 * Math.random(), 1000 * Math.random(), 50);
     graphics.endFill();
     this.app.stage.addChild(graphics);
   }
