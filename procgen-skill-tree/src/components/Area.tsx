@@ -24,7 +24,7 @@ export function Area(props: { data: string }) {
   useEffect(() => {
     container.current?.appendChild(application.app.view);
 
-    application.drawRectangle();
+    application.drawStart();
   }, []);
 
   return (
