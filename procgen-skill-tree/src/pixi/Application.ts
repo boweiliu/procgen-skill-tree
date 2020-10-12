@@ -3,7 +3,7 @@ import * as Pixi from "pixi.js";
 export type Config = {
   canvasWidth: number;
   canvasHeight: number;
-  aspectRatio: number;
+  canvasAspectRatio: number;
   nodeSize: number;
   recursiveDownscale: number;
   recursiveOffset: number;
@@ -12,10 +12,10 @@ export type Config = {
 const defaultConfig: Config = {
   canvasWidth: 1600,
   canvasHeight: 900,
-  aspectRatio: 1.5,
+  canvasAspectRatio: 1.5,
   nodeSize: 3.5,
   recursiveDownscale: 0.65,
-  recursiveOffset: 0.210,
+  recursiveOffset: 0.21,
 };
 
 export type Point = number[];
@@ -25,6 +25,9 @@ export class Application {
 
   public config!: Config;
 
+  /**
+   * Need to provide config to set up the pixi canvas
+   */
   constructor(config?: Config) {
     this.config = Object.assign({}, defaultConfig, config);
 
@@ -36,10 +39,29 @@ export class Application {
     });
   }
 
+  /**
+   * Please only call once!!
+   */
+  public register(curr: HTMLDivElement) {
+    curr.appendChild(this.app.view);
+  }
+
+  /**
+   * Draws a full skill tree at the default zoom level.
+   */
+  public drawAll() {}
+
+  /**
+   * Used for panning/zooming.
+   */
+  public moveViewport(center: Point) {
+
+  }
+
   private renderRecursion(center: Point, height: number, width: number) {
     if (height < width) {
       const newHeight = this.config.recursiveDownscale * height;
-      const newWidth = newHeight / this.config.aspectRatio;
+      const newWidth = newHeight / this.config.canvasAspectRatio;
       const leftCenter = [
         center[0] - width * this.config.recursiveOffset,
         center[1],
@@ -55,7 +77,7 @@ export class Application {
       };
     } else {
       const newWidth = this.config.recursiveDownscale * width;
-      const newHeight = newWidth / this.config.aspectRatio;
+      const newHeight = newWidth / this.config.canvasAspectRatio;
       const topCenter = [
         center[0],
         center[1] - height * this.config.recursiveOffset,
@@ -102,7 +124,7 @@ export class Application {
   public drawRectangle(
     center: Point = [this.config.canvasWidth / 2, this.config.canvasHeight / 2],
     height = 0.95 * this.config.canvasHeight,
-    width = height * this.config.aspectRatio
+    width = height * this.config.canvasAspectRatio
   ) {
     const startingHeight = height;
     const rectWidth = width;
@@ -159,10 +181,9 @@ export class Application {
   ) {
     const graphics = new Pixi.Graphics();
     if (Math.random() < 0.5) {
-    graphics.lineStyle(1, 0x000000, 1);
+      graphics.lineStyle(1, 0x000000, 1);
     } else {
-
-    graphics.lineStyle(1, 0xc0c0c0, 1);
+      graphics.lineStyle(1, 0xc0c0c0, 1);
     }
     graphics.beginFill(0xdddddd, 1);
     graphics.drawCircle(point[0], point[1], this.config.nodeSize);
