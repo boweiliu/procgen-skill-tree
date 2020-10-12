@@ -1,4 +1,5 @@
 import * as Pixi from "pixi.js";
+import { Rect } from "../johnfn_library/geometry/rect";
 
 export type Config = {
   canvasWidth: number;
@@ -49,12 +50,26 @@ export class Application {
   /**
    * Draws a full skill tree at the default zoom level.
    */
-  public drawAll() {}
+  public drawAll() {
+    // get the first 3 layers' configurations
+
+    // render the top layer points
+    // renderLayerPoints(layer[0], { rect: null })
+
+    // render the next layer 
+
+    // render the intermediate connections
+
+    // render the final layer
+
+    // render the intermediate connections
+
+  }
 
   /**
    * Used for panning/zooming.
    */
-  public moveViewport(center: Point) {
+  public moveViewport(viewport: Rect) {
 
   }
 
