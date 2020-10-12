@@ -5,7 +5,7 @@ import { getUniqueID } from "./util";
 import { RectGroup } from "./geometry/rect_group";
 import { BaseGameState } from "./base_state";
 import { GameReference, FixedStageName, StageName, ParallaxStageName } from "./base_game";
-import { CoroutineId, GameCoroutine } from "./coroutine_manager";
+// import { CoroutineId, GameCoroutine } from "./coroutine_manager";
 import { IGameState, Mode } from "Library";
 import { HitInfo } from "./collision_handler";
 import { serialized } from "./serializer";
@@ -88,13 +88,13 @@ export class Entity {
     this.sprite.removeChild(child.sprite);
   }
 
-  startCoroutine(name: string, coroutine: GameCoroutine): CoroutineId {
-    return GameReference.coroutineManager.startCoroutine(name, coroutine, this);
-  }
+  // startCoroutine(name: string, coroutine: GameCoroutine): CoroutineId {
+  //   return GameReference.coroutineManager.startCoroutine(name, coroutine, this);
+  // }
 
-  stopCoroutine(id: CoroutineId): void {
-    GameReference.coroutineManager.stopCoroutine(id);
-  }
+  // stopCoroutine(id: CoroutineId): void {
+  //   GameReference.coroutineManager.stopCoroutine(id);
+  // }
 
   startUpdating() {
     GameReference.state.entities.put(this);
