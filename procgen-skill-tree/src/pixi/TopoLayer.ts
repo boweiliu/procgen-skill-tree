@@ -61,6 +61,8 @@ export class TopoTemplate {
     }
   }
 }
+function connectCorner(x: any, y: any) {}
+function connectMiddleCorner(x: any, y: any) {}
 
 export type FrameOrientation = "=" | "0";
 export class TopoFrame {
