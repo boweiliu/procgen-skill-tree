@@ -5,7 +5,7 @@ import { TextureCache } from '../texture_cache';
 import { Entity } from '../entity';
 import { TiledTilemapObjects, TilemapCustomObjects, ObjectInfo } from './tilemap_objects'
 import { TilemapData, TilemapRegion } from './tilemap_data';
-import { Assets } from '../../game/assets';
+// import { Assets } from '../../game/assets';
 import { TypesafeLoader } from '../typesafe_loader';
 
 export type MapLayer = {
@@ -43,7 +43,7 @@ export class TiledTilemap {
       layers: this._data.getAllObjectLayers(),
       customObjects: customObjects,
       map: this,
-      assets: Assets,
+      assets: null as any,
     });
   }
 
