@@ -32,11 +32,7 @@ export class CollisionGrid {
   private _cells: DefaultGrid<Cell>;
   private _renderLines: Graphics | null = null;
 
-  constructor(props: {
-    width: number;
-    height: number;
-    cellSize: number;
-  }) {
+  constructor(props: { width: number; height: number; cellSize: number }) {
     const { width, height, cellSize } = props;
 
     this._width = width;
@@ -46,10 +42,10 @@ export class CollisionGrid {
     this._numCellsPerRow = Math.ceil(width / cellSize);
     this._numCellsPerCol = Math.ceil(height / cellSize);
 
-    this._cells = new DefaultGrid<Cell>((x, y) => new Cell(
-      new Vector2({ x: x * cellSize, y: y * cellSize }),
-      cellSize
-    ));
+    this._cells = new DefaultGrid<Cell>(
+      (x, y) =>
+        new Cell(new Vector2({ x: x * cellSize, y: y * cellSize }), cellSize)
+    );
   }
 
   debug() {
@@ -57,12 +53,17 @@ export class CollisionGrid {
       for (let y = 0; y < 10; y++) {
         // Draw cell
 
-        Debug.DrawRect(new Rect({
-          x: x * this._cellSize,
-          y: y * this._cellSize,
-          width: this._cellSize,
-          height: this._cellSize,
-        }), 0xff0000, true, "fixed");
+        Debug.DrawRect(
+          new Rect({
+            x: x * this._cellSize,
+            y: y * this._cellSize,
+            width: this._cellSize,
+            height: this._cellSize,
+          }),
+          0xff0000,
+          true,
+          "fixed"
+        );
 
         for (const obj of this._cells.get(x, y).colliders) {
           Debug.DrawRect(obj.rect, 0xff0000, true, "fixed");
@@ -76,15 +77,18 @@ export class CollisionGrid {
   }
 
   public get center() {
-    return this._position.add({ x: this._width / 2, y: this._height / 2 })
+    return this._position.add({ x: this._width / 2, y: this._height / 2 });
   }
 
-  /** 
+  /**
    * Checks if the provided rect would collide with anything on the grid. If an
    * entity is passed in, ignores that entity when checking for collisions.
    * (Does not add the rect to the grid.)
    */
-  getRectCollisions = (rect: Rect, skipEntity?: Entity): CollisionResultRect[] => {
+  getRectCollisions = (
+    rect: Rect,
+    skipEntity?: Entity
+  ): CollisionResultRect[] => {
     const cells: Cell[] = [];
 
     const lowX = Math.floor(rect.x / this._cellSize);
@@ -126,28 +130,30 @@ export class CollisionGrid {
     return collisions;
   };
 
-  getRectGroupCollisions = (group: RectGroup, entity?: Entity): CollisionResultRect[] => {
+  getRectGroupCollisions = (
+    group: RectGroup,
+    entity?: Entity
+  ): CollisionResultRect[] => {
     let collisions: CollisionResultRect[] = [];
 
     for (const rect of group.getRects()) {
-      collisions = [
-        ...collisions,
-        ...this.getRectCollisions(rect, entity),
-      ];
+      collisions = [...collisions, ...this.getRectCollisions(rect, entity)];
     }
 
     return collisions;
-  }
+  };
 
-  /** 
+  /**
    * Same as collidesRect but immediately returns true if there's a collision.
    */
   collidesRectFast = (rect: Rect, entity?: Entity): boolean => {
     const corners = rect.getCorners();
-    const cells = corners.map(corner => this._cells.get(
-      Math.floor(corner.x / this._cellSize),
-      Math.floor(corner.y / this._cellSize),
-    ));
+    const cells = corners.map((corner) =>
+      this._cells.get(
+        Math.floor(corner.x / this._cellSize),
+        Math.floor(corner.y / this._cellSize)
+      )
+    );
 
     const uniqueCells: { [key: string]: Cell } = {};
 
@@ -174,10 +180,13 @@ export class CollisionGrid {
     return false;
   };
 
-  collidesPoint = (point: Vector2, takeFirst = false): CollisionResultPoint[] => {
+  collidesPoint = (
+    point: Vector2,
+    takeFirst = false
+  ): CollisionResultPoint[] => {
     const cell = this._cells.get(
       Math.floor(point.x / this._cellSize),
-      Math.floor(point.y / this._cellSize),
+      Math.floor(point.y / this._cellSize)
     );
     const collisions: CollisionResultPoint[] = [];
 
@@ -220,7 +229,10 @@ export class CollisionGrid {
           const collider1 = cellRects[i];
           const collider2 = cellRects[j];
 
-          const intersection = collider1.rect.getIntersection(collider2.rect, false);
+          const intersection = collider1.rect.getIntersection(
+            collider2.rect,
+            false
+          );
 
           if (intersection !== undefined) {
             result.push({
@@ -229,14 +241,14 @@ export class CollisionGrid {
               otherEntity: collider1.entity,
               thisEntity: collider2.entity,
               overlap: intersection,
-            })
+            });
           }
         }
       }
     }
 
     return result;
-  }
+  };
 
   public get cells(): Cell[] {
     return this._cells.values();
@@ -267,7 +279,7 @@ export class CollisionGrid {
     for (const rect of group.getRects()) {
       this.add(rect, associatedEntity);
     }
-  }
+  };
 }
 
 type CellItem = {
