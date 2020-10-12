@@ -14,8 +14,8 @@ const defaultConfig: Config = {
   canvasHeight: 900,
   aspectRatio: 1.5,
   nodeSize: 3.5,
-  recursiveDownscale: 0.50,
-  recursiveOffset: 0.225,
+  recursiveDownscale: 0.65,
+  recursiveOffset: 0.210,
 };
 
 export type Point = number[];
