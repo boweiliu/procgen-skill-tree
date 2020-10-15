@@ -32,7 +32,7 @@ export class RenderRects {
   private config: RenderRectsConfig = {
     containerHeightProportion: 0.9,
     aspectRatio1: 1.6,
-    aspectRatio3: 1.2,
+    aspectRatio3: 1.6,
     downscaleRatio12: 0.75,
     downscaleRatio23: 0.35,
     circleSize: 6,
