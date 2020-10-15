@@ -215,10 +215,10 @@ export class RenderRects {
   ) {
     const corners = rect.withScale({
       width:
-        rect.width - cornerCompressionRatio * Math.min(rect.width, rect.height),
+        rect.width - cornerCompressionRatio * (3 * rect.width + rect.height)/4,
       height:
         rect.height -
-        cornerCompressionRatio * Math.min(rect.width, rect.height),
+        cornerCompressionRatio * (rect.width + 3 * rect.height)/4,
     });
     const midpoints = {
       left: new Vector2(rect.left, rect.centerY),
