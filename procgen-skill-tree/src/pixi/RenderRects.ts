@@ -16,7 +16,8 @@ export type RenderRectsConfig = {
   circleOnColor: number;
   circleHoverColor: number;
   circleFillColor: number;
-  borderColor: number;
+  borderOffColor: number;
+  borderOnColor: number;
   centerToEdgeBorderRatio2: number;
   centerToEdgeBorderRatio3?: number;
   cornerCompression1?: number;
@@ -34,11 +35,12 @@ export class RenderRects {
     downscaleRatio12: 0.75,
     downscaleRatio23: 0.35,
     circleSize: 6,
-    circleOffColor: 0x030303,
-    circleOnColor: 0xcecece,
+    circleOnColor: 0x030303,
+    circleOffColor: 0xcecece,
     circleHoverColor: 0x000000,
     circleFillColor: 0xd3d3d3,
-    borderColor: 0xefefef,
+    borderOffColor: 0xefefef,
+    borderOnColor: 0x353535,
     centerToEdgeBorderRatio2: 1.2,
     centerToEdgeBorderRatio3: 1.0,
     cornerCompression1: 0.08,
@@ -225,7 +227,7 @@ export class RenderRects {
 
     if (hasBorder) {
       const graphics = new Pixi.Graphics();
-      graphics.lineStyle(2, this.config.borderColor, 1);
+      graphics.lineStyle(2, this.config.borderOffColor, 1);
       graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
       this.stage.addChild(graphics);
     }
@@ -252,7 +254,11 @@ export class RenderRects {
   public drawLine(p1: IVector2, p2: IVector2) {
     const graphics = new Pixi.Graphics();
     // graphics.position.set(p1.x, p1.y);
-    graphics.lineStyle(2, this.config.borderColor, 1);
+    if (this.config.debugRandomOn && Math.random() < 0.5) {
+    graphics.lineStyle(2, this.config.borderOnColor, 1);
+    } else {
+    graphics.lineStyle(2, this.config.borderOffColor, 1);
+    }
     graphics.moveTo(p1.x, p1.y);
     graphics.lineTo(p2.x, p2.y);
     this.stage.addChild(graphics);
