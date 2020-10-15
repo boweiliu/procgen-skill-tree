@@ -23,6 +23,7 @@ export type RenderRectsConfig = {
   cornerCompression2?: number;
   cornerCompression3?: number;
   debugHasRectBorder: boolean;
+  debugRandomOn: boolean;
 };
 
 export class RenderRects {
@@ -41,9 +42,10 @@ export class RenderRects {
     centerToEdgeBorderRatio2: 1.2,
     centerToEdgeBorderRatio3: 1.0,
     cornerCompression1: 0.08,
-    cornerCompression2: 0.20,
-    cornerCompression3: 0.30,
+    cornerCompression2: 0.2,
+    cornerCompression3: 0.3,
     debugHasRectBorder: false,
+    debugRandomOn: false,
   };
   private containerRect!: Rect;
   private stage!: Container;
@@ -259,7 +261,7 @@ export class RenderRects {
   public drawCircleAt(point: IVector2): IVector2 {
     const graphics = new Pixi.Graphics();
 
-    if (Math.random() < 0.5) {
+    if (this.config.debugRandomOn && Math.random() < 0.5) {
       graphics.lineStyle(1, this.config.circleOnColor, 1);
     } else {
       graphics.lineStyle(1, this.config.circleOffColor, 1);
