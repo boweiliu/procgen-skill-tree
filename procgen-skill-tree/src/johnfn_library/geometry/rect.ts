@@ -166,6 +166,27 @@ export class Rect {
     return Rect.FromPoints(bottomLeft, this.topRight);
   }
 
+  public withCenter(center: IVector2): Rect {
+    return new Rect({
+      x: center.x - this.width/2,
+      y: center.y - this.height/2,
+      width: this.width,
+      height: this.height
+    })
+  }
+
+  /**
+   * center is held constant
+   */
+  public withScale(props: {width?: number, height?: number}): Rect {
+    return new Rect({
+      x: this.centerX - (props.width || this.width) /2,
+      y: this.centerY - (props.height || this.height) /2,
+      width: (props.width || this.width),
+      height: (props.height || this.height)
+    })
+  }
+
   public get topLeft(): Vector2 {
     return new Vector2({
       x: this.x,
