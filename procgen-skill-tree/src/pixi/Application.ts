@@ -1,5 +1,6 @@
 import * as Pixi from "pixi.js";
 import { Rect } from "../johnfn_library/geometry/rect";
+import { RenderRects } from "./RenderRects";
 
 export type Config = {
   canvasWidth: number;
@@ -110,30 +111,33 @@ export class Application {
   }
 
   public drawStart() {
-    const { center, height, width } = this.drawRectangle();
+    const renderRects = new RenderRects(this.app.stage, new Rect({x:0, y:0, width: this.config.canvasWidth, height: this.config.canvasHeight})
+    )
+    renderRects.drawFirst();
+    // const { center, height, width } = this.drawRectangle();
 
-    const {
-      centers: newCenters,
-      height: newHeight,
-      width: newWidth,
-    } = this.renderRecursion(center, height, width);
-    this.drawRectangle(newCenters[0], newHeight, newWidth);
-    this.drawRectangle(newCenters[1], newHeight, newWidth);
+    // const {
+    //   centers: newCenters,
+    //   height: newHeight,
+    //   width: newWidth,
+    // } = this.renderRecursion(center, height, width);
+    // this.drawRectangle(newCenters[0], newHeight, newWidth);
+    // this.drawRectangle(newCenters[1], newHeight, newWidth);
 
-    let {
-      centers: newNewCenters,
-      height: newNewHeight,
-      width: newNewWidth,
-    } = this.renderRecursion(newCenters[0], newHeight, newWidth);
-    this.drawRectangle(newNewCenters[0], newNewHeight, newNewWidth);
-    this.drawRectangle(newNewCenters[1], newNewHeight, newNewWidth);
-    let { centers: newNewCenters2 } = this.renderRecursion(
-      newCenters[1],
-      newHeight,
-      newWidth
-    );
-    this.drawRectangle(newNewCenters2[0], newNewHeight, newNewWidth);
-    this.drawRectangle(newNewCenters2[1], newNewHeight, newNewWidth);
+    // let {
+    //   centers: newNewCenters,
+    //   height: newNewHeight,
+    //   width: newNewWidth,
+    // } = this.renderRecursion(newCenters[0], newHeight, newWidth);
+    // this.drawRectangle(newNewCenters[0], newNewHeight, newNewWidth);
+    // this.drawRectangle(newNewCenters[1], newNewHeight, newNewWidth);
+    // let { centers: newNewCenters2 } = this.renderRecursion(
+    //   newCenters[1],
+    //   newHeight,
+    //   newWidth
+    // );
+    // this.drawRectangle(newNewCenters2[0], newNewHeight, newNewWidth);
+    // this.drawRectangle(newNewCenters2[1], newNewHeight, newNewWidth);
   }
 
   public drawRectangle(

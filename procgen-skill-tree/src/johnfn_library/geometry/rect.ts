@@ -5,9 +5,9 @@ import { Vector2, IVector2 } from "./vector2";
  * Immutable rectangle class.
  */
 export class Rect {
-  private _x     : number;
-  private _y     : number;
-  private _width : number;
+  private _x: number;
+  private _y: number;
+  private _width: number;
   private _height: number;
 
   public get x(): number {
@@ -51,7 +51,10 @@ export class Rect {
   }
 
   public get center(): Vector2 {
-    return new Vector2({ x: this.x + this.width / 2, y: this.y + this.height / 2 });
+    return new Vector2({
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
+    });
   }
 
   public get dimensions(): Vector2 {
@@ -63,7 +66,7 @@ export class Rect {
       x: point.x,
       y: point.y,
       width: size,
-      height: size
+      height: size,
     });
   }
 
@@ -72,7 +75,19 @@ export class Rect {
       x: Math.min(p1.x, p2.x),
       y: Math.min(p1.y, p2.y),
       width: Math.abs(p1.x - p2.x),
-      height: Math.abs(p1.y - p2.y)
+      height: Math.abs(p1.y - p2.y),
+    });
+  }
+
+  public static FromCenter(props: {
+    center: IVector2;
+    dimensions: IVector2;
+  }): Rect {
+    return new Rect({
+      x: props.center.x - props.dimensions.x / 2,
+      y: props.center.y - props.dimensions.y / 2,
+      width: props.dimensions.x,
+      height: props.dimensions.y,
     });
   }
 
@@ -81,7 +96,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: value - this.x,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -90,7 +105,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: value,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -99,7 +114,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: this.width,
-      height: value
+      height: value,
     });
   }
 
@@ -108,7 +123,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: this.width,
-      height: value - this.y
+      height: value - this.y,
     });
   }
 
@@ -117,7 +132,7 @@ export class Rect {
       x: value,
       y: this.y,
       width: this.width,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -126,7 +141,7 @@ export class Rect {
       x: this.x,
       y: value,
       width: this.width,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -168,62 +183,62 @@ export class Rect {
 
   public withCenter(center: IVector2): Rect {
     return new Rect({
-      x: center.x - this.width/2,
-      y: center.y - this.height/2,
+      x: center.x - this.width / 2,
+      y: center.y - this.height / 2,
       width: this.width,
-      height: this.height
-    })
+      height: this.height,
+    });
   }
 
   /**
    * center is held constant
    */
-  public withScale(props: {width?: number, height?: number}): Rect {
+  public withScale(props: { width?: number; height?: number }): Rect {
     return new Rect({
-      x: this.centerX - (props.width || this.width) /2,
-      y: this.centerY - (props.height || this.height) /2,
-      width: (props.width || this.width),
-      height: (props.height || this.height)
-    })
+      x: this.centerX - (props.width || this.width) / 2,
+      y: this.centerY - (props.height || this.height) / 2,
+      width: props.width || this.width,
+      height: props.height || this.height,
+    });
   }
 
   public get topLeft(): Vector2 {
     return new Vector2({
       x: this.x,
-      y: this.y
+      y: this.y,
     });
   }
 
   public get topRight(): Vector2 {
     return new Vector2({
       x: this.right,
-      y: this.y
+      y: this.y,
     });
   }
 
   public get bottomRight(): Vector2 {
     return new Vector2({
       x: this.right,
-      y: this.bottom
+      y: this.bottom,
     });
   }
 
   public get bottomLeft(): Vector2 {
     return new Vector2({
       x: this.x,
-      y: this.bottom
+      y: this.bottom,
     });
   }
 
   constructor(props: { x: number; y: number; width: number; height: number }) {
-    this._x      = props.x;
-    this._y      = props.y;
-    this._width  = props.width;
+    this._x = props.x;
+    this._y = props.y;
+    this._width = props.width;
     this._height = props.height;
   }
 
   static DeserializeRect(s: string): Rect {
-    const [x, y, w, h] = s.split("|").map(x => Number(x));
+    const [x, y, w, h] = s.split("|").map((x) => Number(x));
 
     return new Rect({ x, y, width: w, height: h });
   }
@@ -234,19 +249,24 @@ export class Rect {
   getLinesFromRect(): Line[] {
     return [
       new Line({ x1: this.x, y1: this.y, x2: this.x + this.width, y2: this.y }),
-      new Line({ x1: this.x, y1: this.y, x2: this.x, y2: this.y + this.height }),
+      new Line({
+        x1: this.x,
+        y1: this.y,
+        x2: this.x,
+        y2: this.y + this.height,
+      }),
       new Line({
         x1: this.x + this.width,
         y1: this.y + this.height,
         x2: this.x + this.width,
-        y2: this.y
+        y2: this.y,
       }),
       new Line({
         x1: this.x + this.width,
         y1: this.y + this.height,
         x2: this.x,
-        y2: this.y + this.height
-      })
+        y2: this.y + this.height,
+      }),
     ];
   }
 
@@ -258,7 +278,7 @@ export class Rect {
       new Vector2({ x: this.x, y: this.y }),
       new Vector2({ x: this.x + this.width, y: this.y }),
       new Vector2({ x: this.x, y: this.y + this.height }),
-      new Vector2({ x: this.x + this.width, y: this.y + this.height })
+      new Vector2({ x: this.x + this.width, y: this.y + this.height }),
     ];
   }
 
@@ -269,12 +289,16 @@ export class Rect {
   // consider overlapping edges as intersection, but not overlapping corners.
   intersects(
     other: Rect,
-    props: { edgesOnlyIsAnIntersection: boolean } = { edgesOnlyIsAnIntersection: false }
+    props: { edgesOnlyIsAnIntersection: boolean } = {
+      edgesOnlyIsAnIntersection: false,
+    }
   ): boolean {
     const intersection = this.getIntersection(other, true);
 
     if (props.edgesOnlyIsAnIntersection) {
-      return !!intersection && (intersection.width > 0 || intersection.height > 0);
+      return (
+        !!intersection && (intersection.width > 0 || intersection.height > 0)
+      );
     } else {
       return !!intersection && intersection.width * intersection.height > 0;
     }
@@ -309,7 +333,7 @@ export class Rect {
           x: xmin,
           y: ymin,
           width: xmax - xmin,
-          height: ymax - ymin
+          height: ymax - ymin,
         });
       }
     }
@@ -327,7 +351,12 @@ export class Rect {
   }
 
   clone(): Rect {
-    return new Rect({ x: this.x, y: this.y, width: this.width, height: this.height });
+    return new Rect({
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    });
   }
 
   add(p: IVector2): Rect {
@@ -338,13 +367,12 @@ export class Rect {
     return this.translate({ x: -p.x, y: -p.y });
   }
 
-
   translate(p: IVector2): Rect {
     return new Rect({
       x: this.x + p.x,
       y: this.y + p.y,
       width: this.width,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -353,7 +381,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: this.width * p.x,
-      height: this.height * p.y
+      height: this.height * p.y,
     });
   }
 
@@ -362,7 +390,7 @@ export class Rect {
       x: -this.width / 2,
       y: -this.height / 2,
       width: this.width,
-      height: this.height
+      height: this.height,
     });
   }
 
@@ -371,7 +399,12 @@ export class Rect {
       return false;
     }
 
-    return this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height;
+    return (
+      this.x === o.x &&
+      this.y === o.y &&
+      this.width === o.width &&
+      this.height === o.height
+    );
   }
 
   toJSON(): any {
@@ -380,8 +413,12 @@ export class Rect {
       y: this.y,
       w: this.width,
       h: this.height,
-      reviver: "Rect"
+      reviver: "Rect",
     };
+  }
+
+  hash(): string {
+    return this.toString();
   }
 
   /**
@@ -392,7 +429,7 @@ export class Rect {
       x: this.x,
       y: this.y,
       width: this.width + amount,
-      height: this.height + amount
+      height: this.height + amount,
     });
   }
 
@@ -401,7 +438,7 @@ export class Rect {
       x: this.x + amount,
       y: this.y + amount,
       width: Math.max(this.width - amount * 2, 0),
-      height: Math.max(this.height - amount * 2, 0)
+      height: Math.max(this.height - amount * 2, 0),
     });
   }
 
@@ -410,7 +447,7 @@ export class Rect {
       x: Math.floor(this.x),
       y: Math.floor(this.y),
       width: Math.floor(this.width),
-      height: Math.floor(this.height)
+      height: Math.floor(this.height),
     });
   }
 
@@ -429,7 +466,7 @@ export class Rect {
       x: topLeft.x,
       y: topLeft.y,
       width: botRight.x - topLeft.x,
-      height: botRight.y - topLeft.y
+      height: botRight.y - topLeft.y,
     });
   }
 
@@ -447,7 +484,7 @@ export class Rect {
       x: obj.x,
       y: obj.y,
       width: obj.w,
-      height: obj.h
+      height: obj.h,
     });
   }
 
@@ -456,7 +493,7 @@ export class Rect {
       x: r.x,
       y: r.y,
       w: r.width,
-      h: r.height
+      h: r.height,
     });
   }
 
