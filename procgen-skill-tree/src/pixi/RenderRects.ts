@@ -27,8 +27,9 @@ export type RenderRectsConfig = {
 
 export class RenderRects {
   private config: RenderRectsConfig = {
-    containerHeightProportion: 0.90,
+    containerHeightProportion: 0.9,
     aspectRatio1: 1.6,
+    aspectRatio3: 1.2,
     downscaleRatio12: 0.75,
     downscaleRatio23: 0.35,
     circleSize: 6,
@@ -40,9 +41,9 @@ export class RenderRects {
     centerToEdgeBorderRatio2: 1.2,
     centerToEdgeBorderRatio3: 1.0,
     cornerCompression1: 0.08,
-    cornerCompression2: 0.25,
-    cornerCompression3: 0.35,
-  debugHasRectBorder: true
+    cornerCompression2: 0.20,
+    cornerCompression3: 0.30,
+    debugHasRectBorder: false,
   };
   private containerRect!: Rect;
   private stage!: Container;
@@ -61,7 +62,7 @@ export class RenderRects {
    * Draws a '=' oriented rectangle, 2 'O' oriented nested, and then 4 '=' further-nested.
    */
   public drawFirst() {
-    const hasBorder = this.config.debugHasRectBorder
+    const hasBorder = this.config.debugHasRectBorder;
     const newHeight =
       this.containerRect.height * this.config.containerHeightProportion;
     const newRect = this.containerRect.withScale({
@@ -207,8 +208,11 @@ export class RenderRects {
     cornerCompressionRatio: number
   ) {
     const corners = rect.withScale({
-      width: rect.width - cornerCompressionRatio * Math.min(rect.width, rect.height),
-      height: rect.height - cornerCompressionRatio * Math.min(rect.width, rect.height),
+      width:
+        rect.width - cornerCompressionRatio * Math.min(rect.width, rect.height),
+      height:
+        rect.height -
+        cornerCompressionRatio * Math.min(rect.width, rect.height),
     });
     const midpoints = {
       left: new Vector2(rect.left, rect.centerY),
@@ -223,15 +227,15 @@ export class RenderRects {
       graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
       this.stage.addChild(graphics);
     }
-      this.drawLine(corners.topLeft, midpoints.left);
-      this.drawLine(corners.topLeft, midpoints.top);
-      this.drawLine(corners.topRight, midpoints.right);
-      this.drawLine(corners.topRight, midpoints.top);
-      this.drawLine(corners.bottomLeft, midpoints.left);
-      this.drawLine(corners.bottomLeft, midpoints.bottom);
-      this.drawLine(corners.bottomRight, midpoints.right);
-      this.drawLine(corners.bottomRight, midpoints.bottom);
-  
+    this.drawLine(corners.topLeft, midpoints.left);
+    this.drawLine(corners.topLeft, midpoints.top);
+    this.drawLine(corners.topRight, midpoints.right);
+    this.drawLine(corners.topRight, midpoints.top);
+    this.drawLine(corners.bottomLeft, midpoints.left);
+    this.drawLine(corners.bottomLeft, midpoints.bottom);
+    this.drawLine(corners.bottomRight, midpoints.right);
+    this.drawLine(corners.bottomRight, midpoints.bottom);
+
     this.drawCorners(corners);
     Object.values(midpoints).map((p) => this.drawCircleAt(p));
   }
@@ -244,12 +248,12 @@ export class RenderRects {
   }
 
   public drawLine(p1: IVector2, p2: IVector2) {
-      const graphics = new Pixi.Graphics();
-      // graphics.position.set(p1.x, p1.y);
-      graphics.lineStyle(2, this.config.borderColor, 1);
-      graphics.moveTo(p1.x, p1.y);
-      graphics.lineTo(p2.x, p2.y);
-      this.stage.addChild(graphics);
+    const graphics = new Pixi.Graphics();
+    // graphics.position.set(p1.x, p1.y);
+    graphics.lineStyle(2, this.config.borderColor, 1);
+    graphics.moveTo(p1.x, p1.y);
+    graphics.lineTo(p2.x, p2.y);
+    this.stage.addChild(graphics);
   }
 
   public drawCircleAt(point: IVector2): IVector2 {
