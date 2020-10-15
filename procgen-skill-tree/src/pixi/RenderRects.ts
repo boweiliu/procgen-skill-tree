@@ -27,12 +27,12 @@ export class RenderRects {
     aspectRatio1: 1.6,
     downscaleRatio12: 0.7,
     downscaleRatio23: 0.4,
-    circleSize: 3.5,
-    circleOffColor: 0x00000,
-    circleOnColor: 0xc0c0c0,
-    circleHoverColor: 0x00000,
-    circleFillColor: 0xddddd,
-    borderColor: 0xeeeeee,
+    circleSize: 10,
+    circleOffColor: 0x030303,
+    circleOnColor: 0xcecece,
+    circleHoverColor: 0x000000,
+    circleFillColor: 0xd3d3d3,
+    borderColor: 0xefefef,
     centerToEdgeBorderRatio2: 1.0,
   };
   private containerRect!: Rect;
@@ -175,7 +175,7 @@ export class RenderRects {
     this.drawCircleAt(new Vector2(rect.centerX, rect.bottom));
   }
 
-  private drawCircleAt(point: IVector2) {
+  public drawCircleAt(point: IVector2) {
     const graphics = new Pixi.Graphics();
 
     if (Math.random() < 0.5) {
