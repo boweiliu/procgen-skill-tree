@@ -31,7 +31,7 @@ jobs:
     - name: Deploy
       run: |
         cd procgen-skill-tree
-        echo 'sha=${sha},ref=${ref}'
+        echo "sha=${sha},ref=${ref}"
         git config --global user.name ${user_name}-${sha}
         git config --global user.email ${user_email}
         git remote set-url origin https://${github_token}@github.com/${repository}
