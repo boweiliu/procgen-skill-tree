@@ -6,19 +6,11 @@ import { RenderRects, RenderRectsConfig } from "./RenderRects";
 export type Config = {
   canvasWidth: number;
   canvasHeight: number;
-  canvasAspectRatio: number;
-  nodeSize: number;
-  recursiveDownscale: number;
-  recursiveOffset: number;
 };
 
 const defaultConfig: Config = {
-  canvasWidth: 1600,
-  canvasHeight: 900,
-  canvasAspectRatio: 1.5,
-  nodeSize: 3.5,
-  recursiveDownscale: 0.65,
-  recursiveOffset: 0.21,
+  canvasWidth: 800,
+  canvasHeight: 800,
 };
 
 export type Point = number[];
