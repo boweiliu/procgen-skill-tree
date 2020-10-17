@@ -34,7 +34,6 @@ jobs:
         git config --global user.name gha
         git config --global user.email gha
         git remote set-url origin https://${github_token}@github.com/${repository}
-        CI=false npm run build
         npm run deploy
       env:
         user_name: 'github-actions[bot]'
