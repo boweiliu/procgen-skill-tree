@@ -20,6 +20,7 @@ export type GameArgs = {
   canvasHeight: number;
   tileHeight: number;
   tileWidth: number;
+  backgroundColor: number;
   debugFlags: DebugFlagsType;
   state: Omit<IGameState, keyof BaseGameState>;
   assets: TypesafeLoader<any>;
@@ -88,7 +89,7 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
       transparent: false,
       resolution: window.devicePixelRatio,
       autoDensity: true,
-      backgroundColor: 0x4e5759,
+      backgroundColor: props.backgroundColor,
       view: view as HTMLCanvasElement,
     });
 

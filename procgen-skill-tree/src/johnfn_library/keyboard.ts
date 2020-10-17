@@ -108,6 +108,7 @@ export class KeyboardState {
     }
 
     for (const queuedEvent of this._queuedEvents) {
+      console.log("got queuedEvent" , queuedEvent);
       const key = this.eventToKey(queuedEvent.event);
 
       if (queuedEvent.isDown) {
