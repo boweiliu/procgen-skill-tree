@@ -25,10 +25,10 @@ export class Application {
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(config?: Config) {
+  constructor(config?: Config, app?: Pixi.Application) {
     this.config = Object.assign({}, defaultConfig, config);
 
-    this.app = new Pixi.Application({
+    this.app = app || new Pixi.Application({
       width: this.config.canvasWidth,
       height: this.config.canvasHeight,
       antialias: true,

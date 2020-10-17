@@ -70,7 +70,7 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
     const view = document.getElementById('canvas');
 
     if (!view) {
-      throw new Error("I couldn't find an element named #canvas on initialization. Giving up!")
+      // throw new Error("I couldn't find an element named #canvas on initialization. Giving up!")
     }
 
     this.collisionHandler = new CollisionHandler({
@@ -124,7 +124,7 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
 
     this.state.camera = this.camera;
 
-    ReactMountGame(this, props.debugFlags);
+    // ReactMountGame(this, props.debugFlags);
 
     this.stage.sprite.sortableChildren = true;
     this.fixedCameraStage.sprite.sortableChildren = true;

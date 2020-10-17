@@ -1,8 +1,9 @@
 import { Loader, Texture } from 'pixi.js'
 // import { AssetsToLoad } from '../game/assets';
-const AssetsToLoad = {} as {never: any};
 import { TilemapData } from './tilemap/tilemap_data';
 import { TiledJSON } from './tilemap/tilemap_types';
+
+const AssetsToLoad = {} as {never: any};
 
 type AnimationResource = {
   type : "Animation";
