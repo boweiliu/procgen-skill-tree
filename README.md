@@ -19,6 +19,11 @@ Ubuntu setup
 
 TODO:
 
+* Build on github pages: https://medium.com/mobile-web-dev/how-to-build-and-deploy-a-react-app-to-github-pages-in-less-than-5-minutes-d6c4ffd30f14
+https://boweiliu.github.io/procgen-skill-tree/procgen-skill-tree/
+https://docs.github.com/en/free-pro-team@latest/github/working-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+https://create-react-app.dev/docs/deployment/
+
 * http://sigmajs.org/ ?
 
 
