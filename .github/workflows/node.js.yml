@@ -25,12 +25,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: ls
-    - run: cd procgen-skill-tree
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: cd procgen-skill-tree && npm ci
+    - run: cd procgen-skill-tree && npm run build --if-present
+    - run: cd procgen-skill-tree && npm test
     - name: Deploy
       run: |
+        cd procgen-skill-tree
         git config --global user.name gha
         git config --global user.email gha
         git remote set-url origin https://${github_token}@github.com/${repository}
