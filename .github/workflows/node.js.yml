@@ -31,8 +31,9 @@ jobs:
     - name: Deploy
       run: |
         cd procgen-skill-tree
-        git config --global user.name gha-${sha}
-        git config --global user.email gha
+        echo 'sha=${sha},ref=${ref}'
+        git config --global user.name ${user_name}-${sha}
+        git config --global user.email ${user_email}
         git remote set-url origin https://${github_token}@github.com/${repository}
         npm run deploy
       env:
@@ -41,3 +42,4 @@ jobs:
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
         sha: ${{ github.sha }}
+        ref: ${{ github.ref }}
