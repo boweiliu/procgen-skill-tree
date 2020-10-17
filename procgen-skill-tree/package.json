@@ -2,6 +2,7 @@
   "name": "procgen-skill-tree",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/procgen-skill-tree",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -19,6 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "lintfix": "prettier src/* --write",
     "eject": "react-scripts eject"
@@ -40,6 +42,7 @@
   },
   "devDependencies": {
     "@types/pixi.js": "^5.0.0",
+    "gh-pages": "^3.1.0",
     "prettier": "^2.1.2"
   }
 }
