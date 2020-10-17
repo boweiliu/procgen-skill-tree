@@ -9,8 +9,8 @@ export type Config = {
 };
 
 const defaultConfig: Config = {
-  canvasWidth: 960,
-  canvasHeight: 960,
+  canvasWidth: 800,
+  canvasHeight: 800,
 };
 
 export type Point = number[];

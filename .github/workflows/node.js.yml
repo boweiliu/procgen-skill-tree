@@ -31,7 +31,7 @@ jobs:
     - name: Deploy
       run: |
         cd procgen-skill-tree
-        git config --global user.name gha
+        git config --global user.name gha-${sha}
         git config --global user.email gha
         git remote set-url origin https://${github_token}@github.com/${repository}
         npm run deploy
