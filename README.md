@@ -56,5 +56,5 @@ https://create-react-app.dev/docs/deployment/
 1. The player can allocate nodes on the monster skill tree, which does 3 things:
 * Each node increases monster stats
 * Somehow allocating more nodes increases drop rate that monsters give character tree skill points (aka "monster level")
-* Allocating nodes reveals the fog of war on the character skill tree
+* Allocating more nodes reveals the fog of war on the character skill tree.
 
