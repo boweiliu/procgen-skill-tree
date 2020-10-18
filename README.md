@@ -52,5 +52,5 @@ Gameplay plan - high level principles
 2. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree.
 3. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
 4. Character skill tree is not fully visible - there is a fog of war on the character skill tree
-5. Monster stats and generation is goverened by a monster skill tree which is also controlled by the player
+5. Monster stats and generation is governed by a monster skill tree which is also controlled by the player
 
