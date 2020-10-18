@@ -56,8 +56,8 @@ https://create-react-app.dev/docs/deployment/
 1. The player can allocate nodes on the monster skill tree, which does 3 things:
 * Each node increases monster stats
 * Somehow allocating more nodes increases "monster level", aka drop rate that monsters give skill points 
-* Allocating more nodes reveals the fog of war on the character skill tree.
-1. Monster skill points drop at roughly the same rate as character skill points, but players may choose not to allocate them; if their character is strong enough, though, it's pretty advantageous to do soo because finding increased "monster level" or "juice" in the tree leads to faster progression of the character skill tree.
+* Allocating more nodes reveals the fog of war on the character skill tree - e.g. outside a certain graph distance from the allocated monster tree, character tree points cannot be allocated; a little further, character tree point stats are obscured but the general type of node is still visible; a little further, and even the flavor of the node is hidden and the only visible structure is the topological skeleton of connections.
+1. Monster skill points drop at roughly the same rate as character skill points, but players may choose not to allocate them; if their character is strong enough, though, it's pretty advantageous to do so because finding increased "monster level" or "juice" in the tree leads to faster progression of the character skill tree.
 
 As a result:
 * Player has to work with a skill tree budget to optimize their character skill tree pursuant to fog-of-war restrictions and tree topological structure, but otherwise has full agency over how to build their character, and can take advantage of various synergies on the character skill tree.
