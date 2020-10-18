@@ -29,22 +29,22 @@ https://create-react-app.dev/docs/deployment/
 
 -----
 
-Graph Generation Plan v0
+### Graph Generation Plan v0
 
 1. Name all template layers by path from initial layer
-2. name all corners in a particular layer
-3. generate corner-to-corner connection graphs
-4. plot the graphs w. coordinates on canvas
+1. name all corners in a particular layer
+1. generate corner-to-corner connection graphs
+1. plot the graphs w. coordinates on canvas
 
-Flavor assignment
+### Flavor assignment
 
 1. Generate voronoi centers based on hashing node names
-2. determine flavor of each center
-3. write BFS double-flow algorithm to determine flavor of non-centers
-4. re-weight highway connections (approxmiately 5x, some random variation)
-5. based on the type of node (highway vs local vs deadend) assign actual stats
-6. render a user's stats and stat formula
-7. allow user to allocate points and update their stats
+1. determine flavor of each center
+1. write BFS double-flow algorithm to determine flavor of non-centers
+1. re-weight highway connections (approxmiately 5x, some random variation)
+1. based on the type of node (highway vs local vs deadend) assign actual stats
+1. render a user's stats and stat formula
+1. allow user to allocate points and update their stats
 
 ### Gameplay plan - high level principles
 
@@ -53,5 +53,4 @@ Flavor assignment
 1. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
 1. Character skill tree is not fully visible - there is a fog of war on the character skill tree
 1. Monster stats and generation is governed by a monster skill tree which is also controlled by the player
-6. 
 
