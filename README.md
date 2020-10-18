@@ -46,11 +46,12 @@ Flavor assignment
 6. render a user's stats and stat formula
 7. allow user to allocate points and update their stats
 
-Gameplay plan - high level principles
+### Gameplay plan - high level principles
 
 1. Player has a character who battles enemy monsters in an idle manner. Player character and monsters have HP and various other stats (to be determined - e.g. elemental resistances? weapon classes?)
-2. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree.
-3. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
-4. Character skill tree is not fully visible - there is a fog of war on the character skill tree
-5. Monster stats and generation is governed by a monster skill tree which is also controlled by the player
+1. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree.
+1. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
+1. Character skill tree is not fully visible - there is a fog of war on the character skill tree
+1. Monster stats and generation is governed by a monster skill tree which is also controlled by the player
+6. 
 
