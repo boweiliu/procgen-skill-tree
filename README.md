@@ -47,3 +47,5 @@ Flavor assignment
 7. allow user to allocate points and update their stats
 
 Gameplay plan - high level principles
+
+1. Player has a character who battles enemy monsters in an idle manner. 
