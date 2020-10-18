@@ -42,7 +42,7 @@ Flavor assignment
 2. determine flavor of each center
 3. write BFS double-flow algorithm to determine flavor of non-centers
 4. re-weight highway connections (approxmiately 5x, some random variation)
-5. based on the type of node, assign actual stats
+5. based on the type of node (highway vs local vs deadend) assign actual stats
 6. render a user's stats and stat formula
 7. allow user to allocate points and update their stats
 
@@ -51,5 +51,6 @@ Gameplay plan - high level principles
 1. Player has a character who battles enemy monsters in an idle manner. Player character and monsters have HP and various other stats (to be determined - e.g. elemental resistances? weapon classes?)
 2. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree.
 3. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
-4. 
+4. Character skill tree is not fully visible - there is a fog of war on the character skill tree
+5. Monster stats and generation is goverened by a monster skill tree which is also controlled by the player
 
