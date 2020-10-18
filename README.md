@@ -57,10 +57,13 @@ https://create-react-app.dev/docs/deployment/
 * Each node increases monster stats
 * Somehow allocating more nodes increases "monster level", aka drop rate that monsters give skill points 
 * Allocating more nodes reveals the fog of war on the character skill tree.
-1. 
+1. Monster skill points drop at roughly the same rate as character skill points, but players may choose not to allocate them; if their character is strong enough, though, it's pretty advantageous to do soo because finding increased "monster level" or "juice" in the tree leads to faster progression of the character skill tree.
 
 As a result:
 * Player has to work with a skill tree budget to optimize their character skill tree pursuant to fog-of-war restrictions and tree topological structure, but otherwise has full agency over how to build their character, and can take advantage of various synergies on the character skill tree.
 * As player character skill points increases, player character gains gradually in power, with certain keystone nodes resulting in significant power spikes which are noticeable in combat.
-* The monster 
+* Character power increases results in killing monsters faster/more juiced monsters which increases skill points rewards which then allows faster character power growth. This is the core game loop.
+* The monster skill tree also has a skill point budget, and players are encouraged to juice up their monsters as much as their characters can handle so as to increase drop rate.
+* If the monsters outscale the player at any point, the player can simply wait for more pity skill points to drop and catch up their character power accordingly.
+* Game will need significant balancing around drop rate formula - how monster power compares to character power. In initial prototype playtesting we may want to increase the pity point drop rate relative to skill point
 
