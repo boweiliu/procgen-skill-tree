@@ -52,6 +52,9 @@ https://create-react-app.dev/docs/deployment/
 1. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree as they acquire character skill points.
 1. Player gains character skill points upon defeating sufficiently powerful monsters, and also gains pity points slowly on a regular interval. (e.g. 2/hr or something)
 1. Character skill tree is not fully visible - there is a fog of war on the character skill tree
-1. Monster stats and generation is governed by a monster skill tree which is also controlled by the player
-1. The player can allocate nodes on the monster skill tree, which does 3 things: increases monster stats, increases drop rate that monsters give character tree skill points (aka "monster level", but we can't call it that because we haven't defined "character level" in a meaningful way yet), and reveals the fog of war on the character skill tree
+1. Monster stats and generation is governed by a monster skill tree which is also controlled by the player. The monster skill tree has the same skeletal/topological structure as the character skill tree.
+1. The player can allocate nodes on the monster skill tree, which does 3 things:
+* Each node increases monster stats
+* Somehow allocating more nodes increases drop rate that monsters give character tree skill points (aka "monster level")
+* Allocating nodes reveals the fog of war on the character skill tree
 
