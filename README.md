@@ -55,6 +55,12 @@ https://create-react-app.dev/docs/deployment/
 1. Monster stats and generation is governed by a monster skill tree which is also controlled by the player. The monster skill tree has the same skeletal/topological structure as the character skill tree.
 1. The player can allocate nodes on the monster skill tree, which does 3 things:
 * Each node increases monster stats
-* Somehow allocating more nodes increases drop rate that monsters give character tree skill points (aka "monster level")
+* Somehow allocating more nodes increases "monster level", aka drop rate that monsters give skill points 
 * Allocating more nodes reveals the fog of war on the character skill tree.
+1. 
+
+As a result:
+* Player has to work with a skill tree budget to optimize their character skill tree pursuant to fog-of-war restrictions and tree topological structure, but otherwise has full agency over how to build their character, and can take advantage of various synergies on the character skill tree.
+* As player character skill points increases, player character gains gradually in power, with certain keystone nodes resulting in significant power spikes which are noticeable in combat.
+* The monster 
 
