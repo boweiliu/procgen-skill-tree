@@ -29,7 +29,7 @@ https://create-react-app.dev/docs/deployment/
 
 -----
 
-### Graph Generation Plan v0
+## Graph Generation Plan v0
 
 1. Name all template layers by path from initial layer
 1. name all corners in a particular layer
