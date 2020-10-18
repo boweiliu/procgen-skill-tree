@@ -74,3 +74,11 @@ https://create-react-app.dev/docs/deployment/
 - Prestige and meta-prestige idle mechanics
 - Meta-skill-tree mechanics, e.g. "fog of war research"
 
+----
+## MISC
+
+https://github.com/pixijs/pixi-layers/wiki
+
+https://gamedevbeginner.com/the-right-way-to-lerp-in-unity-with-examples/
+
+
