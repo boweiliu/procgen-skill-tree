@@ -66,4 +66,8 @@ As a result:
 * The monster skill tree also has a skill point budget, and players are encouraged to juice up their monsters as much as their characters can handle so as to increase drop rate.
 * If the monsters outscale the player at any point, the player can simply wait for more pity skill points to drop and catch up their character power accordingly.
 * Game will need significant balancing around drop rate formula - how monster power compares to character power. In initial prototype playtesting we may want to increase the pity point drop rate relative to monster skill point drops if we simply want to test skill tree or stats table UX.
-
+* Further ideas once the core game loop is finished:
+- Gear drops that interact with either of the skill trees
+- Monster-chracter cross-skill-tree interaction
+- Player controls multiple characters that have different builds and can exchange gear in a mutually beneficial way
+- Prestige and meta-prestige idle mechanics
