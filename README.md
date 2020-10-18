@@ -46,7 +46,7 @@ https://create-react-app.dev/docs/deployment/
 1. render a user's stats and stat formula
 1. allow user to allocate points and update their stats
 
-### Gameplay plan - high level principles
+## Gameplay plan - high level principles
 
 1. Player has a character who battles enemy monsters in an idle manner. Player character and monsters have HP and various other stats (to be determined - e.g. elemental resistances? weapon classes?)
 1. Player character has a skill tree with nodes that give the player character combat stats. Player can (conditionally) allocate skill points on the skill tree as they acquire character skill points.
@@ -59,7 +59,7 @@ https://create-react-app.dev/docs/deployment/
 * Allocating more nodes reveals the fog of war on the character skill tree - e.g. outside a certain graph distance from the allocated monster tree, character tree points cannot be allocated; a little further, character tree point stats are obscured but the general type of node is still visible; a little further, and even the flavor of the node is hidden and the only visible structure is the topological skeleton of connections.
 1. Monster skill points drop at roughly the same rate as character skill points, but players may choose not to allocate them; if their character is strong enough, though, it's pretty advantageous to do so because finding increased "monster level" or "juice" in the tree leads to faster progression of the character skill tree.
 
-As a result:
+### As a result:
 * Player has to work with a skill tree budget to optimize their character skill tree pursuant to fog-of-war restrictions and tree topological structure, but otherwise has full agency over how to build their character, and can take advantage of various synergies on the character skill tree.
 * As player character skill points increases, player character gains gradually in power, with certain keystone nodes resulting in significant power spikes which are noticeable in combat.
 * Character power increases results in killing monsters faster/more juiced monsters which increases skill points rewards which then allows faster character power growth. This is the core game loop.
@@ -67,7 +67,7 @@ As a result:
 * If the monsters outscale the player at any point, the player can simply wait for more pity skill points to drop and catch up their character power accordingly.
 * Game will need significant balancing around drop rate formula - how monster power compares to character power. In initial prototype playtesting we may want to increase the pity point drop rate relative to monster skill point drops if we simply want to test skill tree or stats table UX.
 
-### Further ideas once the core game loop is finished:
+## Further ideas once the core game loop is finished:
 - Gear drops that interact with either of the skill trees
 - Monster-chracter cross-skill-tree interaction
 - Player controls multiple characters that have different builds and can exchange gear in a mutually beneficial way
