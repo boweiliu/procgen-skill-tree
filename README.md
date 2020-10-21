@@ -28,6 +28,19 @@ https://create-react-app.dev/docs/deployment/
 
 
 -----
+## Procedural Rendering
+* Approach A
+    * We have 3 tiers of octagonal frames 
+    * generate 2 tiers of templates per zoom level
+    * generating the base physical layout concurrently with the topological structure
+    * displayed physical layout is dependent on the zoom level
+* Approach B
+    * We have 2 tiers of square frames
+    * generate 3 tiers of templates per zoom level
+    * render 1 tier and partially render the parent and children tiers
+    * each template's physical layout is generated independently of the zoom level
+
+-----
 
 ## Graph Generation Plan v0
 
