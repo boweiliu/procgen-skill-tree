@@ -2,6 +2,7 @@ import * as Pixi from "pixi.js";
 import { Rect } from "../johnfn_library/geometry/rect";
 import { Vector2 } from "../johnfn_library/geometry/vector2";
 import { RenderRects, RenderRectsConfig } from "./RenderRects";
+import bunny from "../bunny.png";
 
 export type Config = {
   canvasWidth: number;
@@ -75,6 +76,7 @@ export class Application {
 
   public drawStart() {
     // this.renderRects.drawFirst();
+    this.pixiExample();
   }
 
   public drawCircle() {
@@ -88,14 +90,18 @@ export class Application {
 
   public pixiExample() {
     // Taken from  https://pixijs.io/examples/#/demos-basic/container.js
-    const container = new PIXI.Container();
+    const container = new Pixi.Container();
+
+    this.app.stage.addChild(container);
 
     // Create a new texture
-    const texture = PIXI.Texture.from("examples/assets/bunny.png");
+    const texture = Pixi.Texture.from(bunny);
+
+    window.alert("doing bunny stuff")
 
     // Create a 5x5 grid of bunnies
     for (let i = 0; i < 25; i++) {
-      const bunny = new PIXI.Sprite(texture);
+      const bunny = new Pixi.Sprite(texture);
       bunny.anchor.set(0.5);
       bunny.x = (i % 5) * 40;
       bunny.y = Math.floor(i / 5) * 40;
