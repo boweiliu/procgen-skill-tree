@@ -9,7 +9,7 @@ import { DebugFlagsType } from "./react/debug_flag_buttons";
 import { CollisionHandler } from "./collision_handler";
 import { Rect } from "./geometry/rect";
 // import { CoroutineManager } from "./coroutine_manager";
-import { IGameState } from 'Library';
+import { IGameState } from "Library";
 import { BaseGameState } from "./base_state";
 
 export let GameReference: BaseGame<any>;
@@ -35,7 +35,7 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
 
   state: IGameState;
 
-  /** 
+  /**
    * The root of the display hierarchy for the game. Everything that exists in
    * the game that isn't fixed as the camera moves should be under this.
    */
@@ -64,11 +64,11 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
 
     // this.coroutineManager = new CoroutineManager(this);
     this.state = {
-      ...(new BaseGameState()),
+      ...new BaseGameState(),
       ...props.state,
-    }
+    };
 
-    const view = document.getElementById('canvas');
+    const view = document.getElementById("canvas");
 
     if (!view) {
       // throw new Error("I couldn't find an element named #canvas on initialization. Giving up!")
@@ -134,9 +134,7 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
   /**
    * Called after resources are finished loading.
    */
-  initialize() {
-
-  }
+  initialize() {}
 
   startGameLoop = () => {
     this.app.ticker.add(() => this.gameLoop());
@@ -164,7 +162,9 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
       entity.baseUpdate(this.state);
     }
 
-    this.state.entities = new HashSet(entities.values().filter(ent => !this.state.toBeDestroyed.includes(ent)));
+    this.state.entities = new HashSet(
+      entities.values().filter((ent) => !this.state.toBeDestroyed.includes(ent))
+    );
 
     for (const entity of this.state.toBeDestroyed) {
       if (entity.sprite.parent) {
@@ -176,7 +176,11 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
 
     this.state.toBeDestroyed = [];
 
-    const activeEntities = new HashSet(this.state.entities.values().filter(e => e.activeModes.includes(this.state.mode)));
+    const activeEntities = new HashSet(
+      this.state.entities
+        .values()
+        .filter((e) => e.activeModes.includes(this.state.mode))
+    );
 
     const grid = this.collisionHandler.buildCollisionGrid({
       bounds: this.camera.getBounds(),
@@ -198,8 +202,8 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
 
     // for (const f of Debug.GetDrawnObjects()) {
     //   if (f instanceof AugmentedSprite) {
-    //     if (f.width > 1024) { 
-    //       f.visible = false; 
+    //     if (f.width > 1024) {
+    //       f.visible = false;
     //     }
     //   }
     // }
@@ -207,5 +211,5 @@ export class BaseGame<TResources extends AllResourcesType = {}> {
     // let foo = Debug.GetDrawn();
 
     Debug.ResetDrawCount();
-  };
+  }
 }

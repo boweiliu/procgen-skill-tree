@@ -1,7 +1,3 @@
+export type HighwayConfig = {};
 
-
-export type HighwayConfig = {
-};
-
-const defaultConfig: HighwayConfig = {
-}
+const defaultConfig: HighwayConfig = {};

@@ -10,13 +10,20 @@ export class Vector2 {
   private _x: number;
   private _y: number;
 
-  public get x(): number { return this._x; }
-  public get y(): number { return this._y; }
+  public get x(): number {
+    return this._x;
+  }
+  public get y(): number {
+    return this._y;
+  }
 
   constructor();
   constructor(x: number, y: number);
-  constructor(props: { x: number, y: number });
-  constructor(propsOrX: { x: number, y: number } | number = { x: 0, y: 0 }, y?: number) {
+  constructor(props: { x: number; y: number });
+  constructor(
+    propsOrX: { x: number; y: number } | number = { x: 0, y: 0 },
+    y?: number
+  ) {
     if (typeof propsOrX === "number") {
       this._x = propsOrX;
       this._y = y!;
@@ -88,21 +95,21 @@ export class Vector2 {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  translate(p: { x: number, y: number }): Vector2 {
+  translate(p: { x: number; y: number }): Vector2 {
     return new Vector2({
       x: this.x + p.x,
       y: this.y + p.y,
     });
   }
 
-  subtract(p: { x: number, y: number }): Vector2 {
+  subtract(p: { x: number; y: number }): Vector2 {
     return new Vector2({
       x: this.x - p.x,
       y: this.y - p.y,
     });
   }
 
-  add(p: { x: number, y: number }): Vector2 {
+  add(p: { x: number; y: number }): Vector2 {
     return new Vector2({
       x: this.x + p.x,
       y: this.y + p.y,
@@ -126,8 +133,12 @@ export class Vector2 {
   clampY(low: number, high: number): Vector2 {
     let newY = this.y;
 
-    if (newY < low) { newY = low; }
-    if (newY > high) { newY = high; }
+    if (newY < low) {
+      newY = low;
+    }
+    if (newY > high) {
+      newY = high;
+    }
 
     return new Vector2({
       x: this.x,
@@ -135,7 +146,10 @@ export class Vector2 {
     });
   }
 
-  scale(about: { x: number; y: number }, amount: { x: number; y: number }): Vector2 {
+  scale(
+    about: { x: number; y: number },
+    amount: { x: number; y: number }
+  ): Vector2 {
     return new Vector2({
       x: (this.x - about.x) * amount.x + about.x,
       y: (this.y - about.y) * amount.y + about.y,
@@ -146,8 +160,14 @@ export class Vector2 {
     angle = angle / (180 / Math.PI);
 
     return new Vector2({
-      x: Math.cos(angle) * (this.x - origin.x) - Math.sin(angle) * (this.y - origin.y) + origin.x,
-      y: Math.sin(angle) * (this.x - origin.x) + Math.cos(angle) * (this.y - origin.y) + origin.y,
+      x:
+        Math.cos(angle) * (this.x - origin.x) -
+        Math.sin(angle) * (this.y - origin.y) +
+        origin.x,
+      y:
+        Math.sin(angle) * (this.x - origin.x) +
+        Math.cos(angle) * (this.y - origin.y) +
+        origin.y,
     });
   }
 
@@ -195,7 +215,7 @@ export class Vector2 {
       __type: "Vector2",
       x: this.x,
       y: this.y,
-    }
+    };
   }
 
   transform(trans: Vector2, scale: number): Vector2 {
@@ -214,7 +234,7 @@ export class Vector2 {
 
     return new Vector2({
       x: this.x / length,
-      y: this.y / length
+      y: this.y / length,
     });
   }
 
@@ -240,16 +260,24 @@ export class Vector2 {
   }
 
   lerp(other: Vector2, t: number): Vector2 {
-    if (t > 1 || t < 0) { console.error("Lerp t must be between 0 and 1."); }
+    if (t > 1 || t < 0) {
+      console.error("Lerp t must be between 0 and 1.");
+    }
     if (t === 0) return this;
     if (t === 1) return other;
 
-    return this.scale({ x: 0, y: 0 }, { x: 1 - t, y: 1 - t }).add(other.scale({ x: 0, y: 0 }, { x: t, y: t }))
+    return this.scale({ x: 0, y: 0 }, { x: 1 - t, y: 1 - t }).add(
+      other.scale({ x: 0, y: 0 }, { x: t, y: t })
+    );
   }
 
   lerp2D(other: Vector2, tx: number, ty: number): Vector2 {
-    if (tx > 1 || tx < 0 || ty > 1 || ty < 0) { console.error("Lerp t must be between 0 and 1."); }
-    return this.scale({ x: 0, y: 0 }, { x: 1 - tx, y: 1 - ty }).add(other.scale({ x: 0, y: 0 }, { x: tx, y: ty }))
+    if (tx > 1 || tx < 0 || ty > 1 || ty < 0) {
+      console.error("Lerp t must be between 0 and 1.");
+    }
+    return this.scale({ x: 0, y: 0 }, { x: 1 - tx, y: 1 - ty }).add(
+      other.scale({ x: 0, y: 0 }, { x: tx, y: ty })
+    );
   }
 
   coserp(other: Vector2, t: number): Vector2 {

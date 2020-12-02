@@ -28,12 +28,14 @@ export class Application {
   constructor(config?: Config, app?: Pixi.Application) {
     this.config = Object.assign({}, defaultConfig, config);
 
-    this.app = app || new Pixi.Application({
-      width: this.config.canvasWidth,
-      height: this.config.canvasHeight,
-      antialias: true,
-      backgroundColor: 0xffffff,
-    });
+    this.app =
+      app ||
+      new Pixi.Application({
+        width: this.config.canvasWidth,
+        height: this.config.canvasHeight,
+        antialias: true,
+        backgroundColor: 0xffffff,
+      });
 
     this.renderRects = new RenderRects(
       this.app.stage,
@@ -72,7 +74,7 @@ export class Application {
   public moveViewport(viewport: Rect) {}
 
   public drawStart() {
-    this.renderRects.drawFirst();
+    // this.renderRects.drawFirst();
   }
 
   public drawCircle() {
@@ -82,5 +84,37 @@ export class Application {
         Math.random() * this.config.canvasHeight
       )
     );
+  }
+
+  public pixiExample() {
+    // Taken from  https://pixijs.io/examples/#/demos-basic/container.js
+    const container = new PIXI.Container();
+
+    // Create a new texture
+    const texture = PIXI.Texture.from("examples/assets/bunny.png");
+
+    // Create a 5x5 grid of bunnies
+    for (let i = 0; i < 25; i++) {
+      const bunny = new PIXI.Sprite(texture);
+      bunny.anchor.set(0.5);
+      bunny.x = (i % 5) * 40;
+      bunny.y = Math.floor(i / 5) * 40;
+      container.addChild(bunny);
+    }
+
+    // Move container to the center
+    container.x = this.app.screen.width / 2;
+    container.y = this.app.screen.height / 2;
+
+    // Center bunny sprite in local container coordinates
+    container.pivot.x = container.width / 2;
+    container.pivot.y = container.height / 2;
+
+    // Listen for animate update
+    this.app.ticker.add((delta) => {
+      // rotate the container!
+      // use delta to create frame-independent transform
+      container.rotation -= 0.01 * delta;
+    });
   }
 }

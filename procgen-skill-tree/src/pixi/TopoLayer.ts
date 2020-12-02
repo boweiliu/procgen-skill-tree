@@ -41,7 +41,6 @@ export class TopoTemplate {
     // in1.SD, out.LD
     // out.IL, in0.IS, in1.IS
     // out.SD, in0.LD, in1.LD
-
   }
 }
 function connectCorner(x: any, y: any) {}
@@ -59,13 +58,13 @@ export class TopoFrame {
   };
 
   /**
-   * 
+   *
    * I -----   L       I  -  S
    * |         |       |     |
    * S  -----  D  or   |     |
    *                   |     |
    *                   L  -  D
-   * 
+   *
    */
   constructor(id: string, orientation: FrameOrientation) {
     this.id = id;

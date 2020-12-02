@@ -18,7 +18,7 @@ export type RenderRectsConfig = {
   circleFillColor: number;
   borderOffColor: number;
   borderOnColor: number;
-    borderThickness: number,
+  borderThickness: number;
   centerToEdgeBorderRatio2: number;
   centerToEdgeBorderRatio3?: number;
   cornerCompression1?: number;
@@ -215,10 +215,11 @@ export class RenderRects {
   ) {
     const corners = rect.withScale({
       width:
-        rect.width - cornerCompressionRatio * (3 * rect.width + rect.height)/4,
+        rect.width -
+        (cornerCompressionRatio * (3 * rect.width + rect.height)) / 4,
       height:
         rect.height -
-        cornerCompressionRatio * (rect.width + 3 * rect.height)/4,
+        (cornerCompressionRatio * (rect.width + 3 * rect.height)) / 4,
     });
     const midpoints = {
       left: new Vector2(rect.left, rect.centerY),
@@ -229,7 +230,11 @@ export class RenderRects {
 
     if (hasBorder) {
       const graphics = new Pixi.Graphics();
-      graphics.lineStyle(this.config.borderThickness, this.config.borderOffColor, 1);
+      graphics.lineStyle(
+        this.config.borderThickness,
+        this.config.borderOffColor,
+        1
+      );
       graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
       this.stage.addChild(graphics);
     }
@@ -257,9 +262,17 @@ export class RenderRects {
     const graphics = new Pixi.Graphics();
     // graphics.position.set(p1.x, p1.y);
     if (this.config.debugRandomOn && Math.random() < 0.5) {
-      graphics.lineStyle(this.config.borderThickness, this.config.borderOnColor, 1);
+      graphics.lineStyle(
+        this.config.borderThickness,
+        this.config.borderOnColor,
+        1
+      );
     } else {
-      graphics.lineStyle(this.config.borderThickness, this.config.borderOffColor, 1);
+      graphics.lineStyle(
+        this.config.borderThickness,
+        this.config.borderOffColor,
+        1
+      );
     }
     graphics.moveTo(p1.x, p1.y);
     graphics.lineTo(p2.x, p2.y);

@@ -1,12 +1,12 @@
-import { Loader, Texture } from 'pixi.js'
+import { Loader, Texture } from "pixi.js";
 // import { AssetsToLoad } from '../game/assets';
-import { TilemapData } from './tilemap/tilemap_data';
-import { TiledJSON } from './tilemap/tilemap_types';
+import { TilemapData } from "./tilemap/tilemap_data";
+import { TiledJSON } from "./tilemap/tilemap_types";
 
-const AssetsToLoad = {} as {never: any};
+const AssetsToLoad = {} as { never: any };
 
 type AnimationResource = {
-  type : "Animation";
+  type: "Animation";
   paths: string[];
 };
 
@@ -17,18 +17,23 @@ type NormalResource = {
 
 type IndividualResourceObj = AnimationResource | NormalResource;
 
-type ResourceReturn<T extends string> =
-  T extends "Image"       ? Texture :
-  T extends "Audio"       ? HTMLAudioElement :
-  T extends "TileMap"     ? TiledJSON :
-  T extends "TileWorld"   ? object :
-  T extends "Spritesheet" ? unknown :
-  T extends "Animation"   ? Texture[] :
-  never
+type ResourceReturn<T extends string> = T extends "Image"
+  ? Texture
+  : T extends "Audio"
+  ? HTMLAudioElement
+  : T extends "TileMap"
+  ? TiledJSON
+  : T extends "TileWorld"
+  ? object
+  : T extends "Spritesheet"
+  ? unknown
+  : T extends "Animation"
+  ? Texture[]
+  : never;
 
-export type AllResourcesType = { [key: string]: IndividualResourceObj; };
+export type AllResourcesType = { [key: string]: IndividualResourceObj };
 
-/** 
+/**
  * TypeSafe loader is intended to be a wrapper around PIXI.Loader which gives a
  * type-checked getResource() check.
  */
@@ -60,7 +65,7 @@ export class TypesafeLoader<Resources extends AllResourcesType> {
     }
 
     this.loader.load(this.startStageTwoLoading);
-  }
+  };
 
   // Stage 2: Load all assets required by tilemaps - mostly tilesets, I hope!.
   private startStageTwoLoading = () => {
@@ -68,16 +73,18 @@ export class TypesafeLoader<Resources extends AllResourcesType> {
 
     for (const resource of Object.keys(AssetsToLoad)) {
       const castedResource = resource as keyof typeof AssetsToLoad;
-      const pathToTilemap = resource.substring(0, resource.lastIndexOf("/"))
+      const pathToTilemap = resource.substring(0, resource.lastIndexOf("/"));
 
       if (AssetsToLoad[castedResource].type === "TileMap") {
-        const tilemapData = new TilemapData({ 
-          data: this.getResource(castedResource) as TiledJSON, 
-          pathToTilemap, 
+        const tilemapData = new TilemapData({
+          data: this.getResource(castedResource) as TiledJSON,
+          pathToTilemap,
         });
 
         allTilemapDependencyPaths = allTilemapDependencyPaths.concat(
-          tilemapData.getTilesets().map(tileset => tileset.imageUrlRelativeToGame)
+          tilemapData
+            .getTilesets()
+            .map((tileset) => tileset.imageUrlRelativeToGame)
         );
       }
     }
@@ -89,15 +96,19 @@ export class TypesafeLoader<Resources extends AllResourcesType> {
     }
 
     this.loader.load(this.finishLoading);
-  }
+  };
 
-  getResource<T extends keyof typeof AssetsToLoad>(resourceName: T): ResourceReturn<(typeof AssetsToLoad)[T]['type']> {
+  getResource<T extends keyof typeof AssetsToLoad>(
+    resourceName: T
+  ): ResourceReturn<typeof AssetsToLoad[T]["type"]> {
     const resource = AssetsToLoad[resourceName] as IndividualResourceObj;
 
     if (resource.type === "Audio") {
       return new Audio(resource.path) as any;
     } else if (resource.type === "Animation") {
-      return resource.paths.map(path => this.loader.resources[path].texture) as any;
+      return resource.paths.map(
+        (path) => this.loader.resources[path].texture
+      ) as any;
     } else if (resource.type === "Image") {
       return this.loader.resources[resource.path].texture as any;
     } else if (resource.type === "Spritesheet") {
@@ -119,7 +130,7 @@ export class TypesafeLoader<Resources extends AllResourcesType> {
     }
 
     this.loadCompleteCallbacks = [];
-  }
+  };
 
   onLoadComplete(callback: () => void) {
     if (this.loadComplete) {

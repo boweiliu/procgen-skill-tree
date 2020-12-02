@@ -9,7 +9,14 @@ export function serialized(constructor: Function) {
 }
 
 type GenericJSON = {
-  [key: string]: string | number | boolean | null | undefined | GenericJSON[] | GenericJSON
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | GenericJSON[]
+    | GenericJSON;
 };
 
 type SerializeJSON = {
@@ -26,7 +33,7 @@ export const once = (fn: () => void) => {
 
     run[fn.toString()] = true;
   }
-}
+};
 
 export class Serializer<T extends AllResourcesType> {
   game: BaseGame<T>;
@@ -47,11 +54,7 @@ export class Serializer<T extends AllResourcesType> {
     let result: Entity[] = [];
 
     for (const e of list) {
-      result = [
-        ...result,
-        e,
-        ...this.getAllEntities(e.children()),
-      ];
+      result = [...result, e, ...this.getAllEntities(e.children())];
     }
 
     return result;
@@ -66,26 +69,23 @@ export class Serializer<T extends AllResourcesType> {
       if (val instanceof AugmentedSprite) {
         result[key] = {
           __type: "AugmentedSprite",
-        }
+        };
       } else if (val instanceof Entity) {
         result[key] = {
           __type: "NestedEntity",
           __subtype: val.constructor.name,
           __id: val.id,
         };
-      } else if (
-        typeof (val) === "object" &&
-        val !== null &&
-        'toJSON' in val
-      ) {
+      } else if (typeof val === "object" && val !== null && "toJSON" in val) {
         result[key] = (val as any).toJSON();
       } else {
         result[key] = val;
       }
     }
 
-    const getters = Object.entries(Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this)))
-      .filter(([key, descriptor]) => typeof descriptor.get === 'function');
+    const getters = Object.entries(
+      Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this))
+    ).filter(([key, descriptor]) => typeof descriptor.get === "function");
     // .map(([key]) => key)
 
     for (const [name, descriptor] of getters) {
@@ -103,7 +103,9 @@ export class Serializer<T extends AllResourcesType> {
   }
 
   serialize(): string {
-    const allEntities = new HashSet(this.getAllEntities(this.game.state.entities));
+    const allEntities = new HashSet(
+      this.getAllEntities(this.game.state.entities)
+    );
     const idToEntity: { [key: string]: Entity } = {};
 
     for (const e of allEntities.values()) idToEntity[e.id] = e;
@@ -121,7 +123,8 @@ export class Serializer<T extends AllResourcesType> {
           typeof value === "number" ||
           typeof value === "string" ||
           typeof value === "boolean" ||
-          typeof value === "undefined") {
+          typeof value === "undefined"
+        ) {
           return JSON.stringify(value);
         } else {
           console.log("Unhandled:", value);

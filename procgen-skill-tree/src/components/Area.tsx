@@ -41,7 +41,7 @@ export function Area(props: { whatever?: any }) {
       <div ref={container} />
       <button onClick={() => application.drawCircle()}>draw circle</button>
       <button onClick={() => application.drawStart()}>rerender all</button>
-      <GameReactWrapper game={game} debugFlags={{bowei: true}}/>
+      <GameReactWrapper game={game} debugFlags={{ bowei: true }} />
     </>
   );
 }

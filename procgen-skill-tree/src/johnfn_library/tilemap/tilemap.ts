@@ -1,12 +1,16 @@
-import { Sprite, Renderer, RenderTexture } from 'pixi.js'
-import { Rect } from '../geometry/rect'
-import { TiledJSON } from './tilemap_types';
-import { TextureCache } from '../texture_cache';
-import { Entity } from '../entity';
-import { TiledTilemapObjects, TilemapCustomObjects, ObjectInfo } from './tilemap_objects'
-import { TilemapData, TilemapRegion } from './tilemap_data';
+import { Sprite, Renderer, RenderTexture } from "pixi.js";
+import { Rect } from "../geometry/rect";
+import { TiledJSON } from "./tilemap_types";
+import { TextureCache } from "../texture_cache";
+import { Entity } from "../entity";
+import {
+  TiledTilemapObjects,
+  TilemapCustomObjects,
+  ObjectInfo,
+} from "./tilemap_objects";
+import { TilemapData, TilemapRegion } from "./tilemap_data";
 // import { Assets } from '../../game/assets';
-import { TypesafeLoader } from '../typesafe_loader';
+import { TypesafeLoader } from "../typesafe_loader";
 
 export type MapLayer = {
   layerName: string;
@@ -25,7 +29,13 @@ export class TiledTilemap {
 
   _data: TilemapData;
 
-  constructor({ json: data, renderer, pathToTilemap, customObjects, assets }: {
+  constructor({
+    json: data,
+    renderer,
+    pathToTilemap,
+    customObjects,
+    assets,
+  }: {
     // this is required to calculate the relative paths of the tileset images.
     json: TiledJSON;
     renderer: Renderer;
@@ -93,7 +103,9 @@ export class TiledTilemap {
 
     for (const layerName of this._data.getLayerNames()) {
       const layer = this._data.getLayer(layerName);
-      if (layer.type !== "tiles") { continue; }
+      if (layer.type !== "tiles") {
+        continue;
+      }
 
       const renderTexture = RenderTexture.create({
         width: Math.ceil(region.width),
@@ -107,23 +119,34 @@ export class TiledTilemap {
       const jStart = region.y / tileHeight;
 
       if (iStart !== Math.floor(iStart) || jStart !== Math.floor(jStart)) {
-        throw new Error("x and y of passed in region aren't divisible by tileWidth/height")
+        throw new Error(
+          "x and y of passed in region aren't divisible by tileWidth/height"
+        );
       }
 
       for (let i = region.x / tileWidth; i < region.right / tileWidth; i++) {
-        for (let j = region.y / tileHeight; j < region.bottom / tileHeight; j++) {
+        for (
+          let j = region.y / tileHeight;
+          j < region.bottom / tileHeight;
+          j++
+        ) {
           const tile = layer.grid.get(i, j);
 
-          if (!tile) { continue; }
+          if (!tile) {
+            continue;
+          }
 
-          const tex = TextureCache.GetTextureForTile({ assets: this._assets, tile });
+          const tex = TextureCache.GetTextureForTile({
+            assets: this._assets,
+            tile,
+          });
           const sprite = new Sprite(tex);
 
           // We have to offset here because we'd be drawing outside of the
           // bounds of the RenderTexture otherwise.
 
-          sprite.x = (tile.x - region.x - layer.offset.x);
-          sprite.y = (tile.y - region.y - layer.offset.y);
+          sprite.x = tile.x - region.x - layer.offset.x;
+          sprite.y = tile.y - region.y - layer.offset.y;
 
           this._renderer.render(sprite, renderTexture, false);
         }
@@ -172,7 +195,9 @@ export class TiledTilemap {
     return this._objects.getAllObjects();
   }
 
-  public static ParseTiledProperties(properties: { name: string; type: string; value: string }[] | undefined): { [key: string]: string } {
+  public static ParseTiledProperties(
+    properties: { name: string; type: string; value: string }[] | undefined
+  ): { [key: string]: string } {
     const result: { [key: string]: string } = {};
 
     if (properties === undefined) {

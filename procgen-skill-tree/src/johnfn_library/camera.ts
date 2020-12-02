@@ -8,7 +8,6 @@ export class Camera {
   private static LERP_SPEED_X = 0.03;
   private static LERP_SPEED_Y = 0.4;
 
-
   /**
    * Top left coordinate of the camera.
    */
@@ -32,10 +31,12 @@ export class Camera {
     this._canvasHeight = props.canvasHeight / props.scale;
     this._currentBounds = props.bounds;
 
-    this._immediatelyCenterOn(new Vector2({
-      x: this._canvasWidth / 2,
-      y: this._canvasHeight / 2
-    }));
+    this._immediatelyCenterOn(
+      new Vector2({
+        x: this._canvasWidth / 2,
+        y: this._canvasHeight / 2,
+      })
+    );
 
     this._desiredPosition = this._position;
   }
@@ -43,7 +44,7 @@ export class Camera {
   public get center(): Vector2 {
     return new Vector2({
       x: this._position.x + this._canvasWidth / 2,
-      y: this._position.y + this._canvasHeight / 2
+      y: this._position.y + this._canvasHeight / 2,
     });
   }
 
@@ -67,7 +68,7 @@ export class Camera {
   private halfDimensions(): Vector2 {
     return new Vector2({
       x: this._canvasWidth / 2,
-      y: this._canvasHeight / 2
+      y: this._canvasHeight / 2,
     });
   }
 
@@ -79,7 +80,9 @@ export class Camera {
     if (immediate) {
       this._immediatelyCenterOn(position);
     } else {
-      this._desiredPosition = new Vector2(position).subtract(this.halfDimensions());
+      this._desiredPosition = new Vector2(position).subtract(
+        this.halfDimensions()
+      );
     }
   };
 
@@ -94,8 +97,13 @@ export class Camera {
       return desiredPosition;
     }
 
-    if (currentBounds.width < this._canvasWidth || currentBounds.height < this._canvasHeight) {
-      throw new Error(`There is a region on the map which is too small for the camera at x: ${currentBounds.x} y: ${currentBounds.y}.`);
+    if (
+      currentBounds.width < this._canvasWidth ||
+      currentBounds.height < this._canvasHeight
+    ) {
+      throw new Error(
+        `There is a region on the map which is too small for the camera at x: ${currentBounds.x} y: ${currentBounds.y}.`
+      );
     }
 
     // fit the camera rect into the regions rect
@@ -105,7 +113,9 @@ export class Camera {
     }
 
     if (desiredPosition.x + this.cameraFrame().width > currentBounds.right) {
-      desiredPosition = desiredPosition.withX(currentBounds.right - this._canvasWidth);
+      desiredPosition = desiredPosition.withX(
+        currentBounds.right - this._canvasWidth
+      );
     }
 
     if (desiredPosition.y < currentBounds.top) {
@@ -113,7 +123,9 @@ export class Camera {
     }
 
     if (desiredPosition.y + this.cameraFrame().height > currentBounds.bottom) {
-      desiredPosition = desiredPosition.withY(currentBounds.bottom - this._canvasHeight);
+      desiredPosition = desiredPosition.withY(
+        currentBounds.bottom - this._canvasHeight
+      );
     }
 
     return desiredPosition;
@@ -126,7 +138,11 @@ export class Camera {
 
     const desiredPosition = this.calculateDesiredPosition();
 
-    this._position = this._position.lerp2D(desiredPosition, Camera.LERP_SPEED_X, Camera.LERP_SPEED_Y);
+    this._position = this._position.lerp2D(
+      desiredPosition,
+      Camera.LERP_SPEED_X,
+      Camera.LERP_SPEED_Y
+    );
 
     this._position = new Vector2(
       Math.floor(this._position.x / 4) * 4,

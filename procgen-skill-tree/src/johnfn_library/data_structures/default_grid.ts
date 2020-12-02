@@ -1,6 +1,6 @@
 // 2D array that allows for negative indices
 export class DefaultGrid<T> {
-  private _data: { [key: number]: { [key: number]: T} } = {};
+  private _data: { [key: number]: { [key: number]: T } } = {};
   private _makeDefault: (x: number, y: number) => T;
   private _count = 0;
 
@@ -12,15 +12,15 @@ export class DefaultGrid<T> {
     return this._count;
   }
 
-  keys(): { x: number, y: number }[] {
-    const result: { x: number, y: number }[] = [];
+  keys(): { x: number; y: number }[] {
+    const result: { x: number; y: number }[] = [];
 
     for (const x of Object.keys(this._data)) {
       const inner = this._data[Number(x)];
 
       for (const y of Object.keys(inner)) {
-        result.push({ 
-          x: Number(x), 
+        result.push({
+          x: Number(x),
           y: Number(y),
         });
       }
@@ -41,7 +41,6 @@ export class DefaultGrid<T> {
     }
 
     return result;
-
   }
 
   set(x: number, y: number, value: T) {

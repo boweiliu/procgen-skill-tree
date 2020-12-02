@@ -42,7 +42,7 @@ export class HashMap<K extends { hash(): string }, V> {
   }
 
   values(): V[] {
-    return Object.keys(this._values).map(key => this._values[key]);
+    return Object.keys(this._values).map((key) => this._values[key]);
   }
 }
 
@@ -61,9 +61,8 @@ export class DefaultHashMap<K extends { hash(): string }, V> {
   get(key: K): V {
     if (this._values[key.hash()] === undefined) {
       this._values[key.hash()] = this._makeDefault();
-    } 
+    }
 
     return this._values[key.hash()];
   }
 }
-

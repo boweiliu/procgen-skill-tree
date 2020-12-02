@@ -26,16 +26,20 @@ export class Debug {
     Debug.DebugGraphicStack = [];
   }
 
-  /** 
+  /**
    * Draw a point on the canvas.
-   * 
+   *
    * We expect this function to be called every tick in an update() function.
-   * Debug graphics drawn in the previous tick are removed in the game loop. 
+   * Debug graphics drawn in the previous tick are removed in the game loop.
    * If that's not what you want, pass persistent = true.
    */
-  public static DrawPoint(point: IVector2, color = 0xff0000, persistent = false): Graphics {
+  public static DrawPoint(
+    point: IVector2,
+    color = 0xff0000,
+    persistent = false
+  ): Graphics {
     if (IS_PRODUCTION) {
-      console.error("SHOULD NOT HAPPEN")
+      console.error("SHOULD NOT HAPPEN");
     }
 
     const graphics = new Graphics();
@@ -72,33 +76,43 @@ export class Debug {
     return graphics;
   }
 
-  /** 
+  /**
    * Draw a line from start to end on the canvas, for debugging.
-   * 
+   *
    * We expect this function to be called every tick in an update() function.
    * Debug graphics drawn in the previous tick are removed in the game loop.
-   * 
+   *
    * If that's not what you want, pass persistent = true.
    */
-  public static DrawLineV2(start: Vector2, end: Vector2, color = 0xff0000, persistent = false): Graphics {
+  public static DrawLineV2(
+    start: Vector2,
+    end: Vector2,
+    color = 0xff0000,
+    persistent = false
+  ): Graphics {
     if (IS_PRODUCTION) {
-      console.error("SHOULD NOT HAPPEN")
+      console.error("SHOULD NOT HAPPEN");
     }
 
     return Debug.DrawLine(new Line({ start, end }), color, persistent);
   }
 
-  /** 
+  /**
    * Draw a line on the canvas, for debugging.
-   * 
+   *
    * We expect this function to be called every tick in an update() function.
    * Debug graphics drawn in the previous tick are removed in the game loop.
-   * 
+   *
    * If that's not what you want, pass persistent = true.
    */
-  public static DrawLine(line: Line, color = 0xff0000, persistent = false, target: "stage" | "fixed" = "fixed"): Graphics {
+  public static DrawLine(
+    line: Line,
+    color = 0xff0000,
+    persistent = false,
+    target: "stage" | "fixed" = "fixed"
+  ): Graphics {
     if (IS_PRODUCTION) {
-      console.error("SHOULD NOT HAPPEN")
+      console.error("SHOULD NOT HAPPEN");
     }
 
     const graphics = new Graphics();
@@ -125,17 +139,22 @@ export class Debug {
     return graphics;
   }
 
-  /** 
+  /**
    * Draw a rectangle from start to end on the canvas, for debugging.
-   * 
+   *
    * We expect this function to be called every tick in an update() function.
    * Debug graphics drawn in the previous tick are removed in the game loop.
-   * 
+   *
    * If that's not what you want, pass persistent = true.
    */
-  public static DrawRect(rect: Rect, color = 0xff0000, persistent = false, target: "stage" | "fixed" = "fixed"): Graphics[] {
+  public static DrawRect(
+    rect: Rect,
+    color = 0xff0000,
+    persistent = false,
+    target: "stage" | "fixed" = "fixed"
+  ): Graphics[] {
     if (IS_PRODUCTION) {
-      console.error("SHOULD NOT HAPPEN")
+      console.error("SHOULD NOT HAPPEN");
     }
 
     const lines: Graphics[] = [];
@@ -147,30 +166,28 @@ export class Debug {
     return lines;
   }
 
-  /** 
+  /**
    * Draw the bounds of a game object on the canvas, for debugging.
-   * 
+   *
    * We expect this function to be called every tick in an update() function.
    * Debug graphics drawn in the previous tick are removed in the game loop.
-   * 
+   *
    * If that's not what you want, pass persistent = true.
    */
   public static DrawBounds(
-    entity: Entity | Sprite | Graphics | RectGroup | Container | Rect, 
-    color = 0xff0000, 
+    entity: Entity | Sprite | Graphics | RectGroup | Container | Rect,
+    color = 0xff0000,
     persistent = false,
     target: "stage" | "fixed" = "stage"
   ): Graphics[] {
     if (IS_PRODUCTION) {
-      console.error("SHOULD NOT HAPPEN")
+      console.error("SHOULD NOT HAPPEN");
     }
 
     if (entity instanceof Entity) {
-      entity = entity.collisionBounds()
-        .add(entity.positionAbsolute())
-        ;
-    } 
-    
+      entity = entity.collisionBounds().add(entity.positionAbsolute());
+    }
+
     if (entity instanceof RectGroup) {
       const results: Graphics[] = [];
 
@@ -184,12 +201,17 @@ export class Debug {
 
       return results;
     } else {
-      return Debug.DrawRect(new Rect({
-        x     : entity.x,
-        y     : entity.y,
-        width : entity.width,
-        height: entity.height,
-      }), color, persistent, target);
+      return Debug.DrawRect(
+        new Rect({
+          x: entity.x,
+          y: entity.y,
+          width: entity.width,
+          height: entity.height,
+        }),
+        color,
+        persistent,
+        target
+      );
     }
   }
 
@@ -203,7 +225,7 @@ export class Debug {
 
     const start = window.performance.now();
 
-    cb(); 
+    cb();
 
     const end = window.performance.now();
 
@@ -215,7 +237,7 @@ export class Debug {
 
       Debug.profiles[name] = [];
 
-      console.log(`${ name }: ${ rounded }ms`);
+      console.log(`${name}: ${rounded}ms`);
     }
   }
 
@@ -230,10 +252,7 @@ export class Debug {
   }
 
   static GetDrawCount() {
-    return (
-      (Sprite as any).drawCount + 
-      (Container as any).drawCount
-    );
+    return (Sprite as any).drawCount + (Container as any).drawCount;
   }
 
   public static DebugStuff(state: BaseGameState) {
@@ -288,14 +307,12 @@ if (IS_DEBUG) {
     drawn.push(this);
   };
 
-
   (Sprite.prototype as any).__renderCanvas = (Sprite.prototype as any)._renderCanvas;
   (Sprite.prototype as any)._renderCanvas = function (renderer: any) {
     (Sprite as any).drawCount++;
     this.__renderCanvas(renderer);
     drawn.push(this);
   };
-
 
   // PIXI.Container
 
@@ -307,7 +324,6 @@ if (IS_DEBUG) {
     this.__render(renderer);
     drawn.push(this);
   };
-
 
   (Container.prototype as any).__renderCanvas = (Container.prototype as any)._renderCanvas;
   (Container.prototype as any)._renderCanvas = function (renderer: any) {

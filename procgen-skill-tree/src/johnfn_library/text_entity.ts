@@ -7,16 +7,16 @@ export type TextEntityStyle = {
   color: string;
   fontSize: number;
   align?: TextAlignType;
-}
+};
 
 export type TextStyles = {
   [key: string]: TextEntityStyle;
-}
+};
 
 export type TextSegment = {
   text: string;
   style: TextEntityStyle;
-}
+};
 
 export enum TextSegmentState {
   NormalText,
@@ -24,7 +24,9 @@ export enum TextSegmentState {
   StyledText,
 }
 
-export const AdvanceState = (currentState: TextSegmentState): TextSegmentState => {
+export const AdvanceState = (
+  currentState: TextSegmentState
+): TextSegmentState => {
   if (currentState === TextSegmentState.NormalText) {
     return TextSegmentState.IdText;
   } else if (currentState === TextSegmentState.IdText) {
@@ -34,11 +36,11 @@ export const AdvanceState = (currentState: TextSegmentState): TextSegmentState =
   }
 
   return undefined as any; // stupid typechecker
-}
+};
 
 /**
- * Format: 
- * 
+ * Format:
+ *
  * "%1%This is some red text% normal text %2%blue text!%".
  */
 export class TextEntity extends BaseTextEntity<BaseGameState> {
@@ -51,8 +53,8 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
   };
 
   /**
-   * Format: 
-   * 
+   * Format:
+   *
    * "%1%This is some red text% normal text %2%blue text!%".
    */
   constructor({
@@ -63,7 +65,15 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
     color = "white",
     fontSize = 32,
     align = "left",
-  }: { text: string; styles?: TextStyles; width?: number; height?: number; color?: string; fontSize?: number; align?: TextAlignType }) {
+  }: {
+    text: string;
+    styles?: TextStyles;
+    width?: number;
+    height?: number;
+    color?: string;
+    fontSize?: number;
+    align?: TextAlignType;
+  }) {
     super("", width, height);
 
     this.defaultStyle = { color, fontSize, align };
@@ -79,27 +89,28 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
     }
     const textSegments = this.buildTextSegments(text);
 
-    const html = textSegments.map(segment => {
-      return (
-        `<span 
+    const html = textSegments
+      .map((segment) => {
+        return `<span 
           style="
-            color: ${ segment.style.color}; 
+            color: ${segment.style.color}; 
             font-family: FreePixel; 
-            text-align: ${ segment.style.align || "left"};
-            font-size: ${ segment.style.fontSize}px;"
-        >${ segment.text}</span>`
-      );
-    }).join("").replace(/\n/g, "");
+            text-align: ${segment.style.align || "left"};
+            font-size: ${segment.style.fontSize}px;"
+        >${segment.text}</span>`;
+      })
+      .join("")
+      .replace(/\n/g, "");
 
     this.html = html;
   }
 
   set color(color: string) {
-    this.defaultStyle = { ...this.defaultStyle, color: color }
+    this.defaultStyle = { ...this.defaultStyle, color: color };
   }
 
   // TODO: This is a hard function to write properly.
-  // This only works after the CSS has loaded 
+  // This only works after the CSS has loaded
   calculateTextWidth = (text: string) => {
     const canvas = document.getElementById("canvas2d")! as HTMLCanvasElement;
     const context = canvas.getContext("2d")!;
@@ -114,10 +125,12 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
     const readChar = () => text[i++];
     let state = TextSegmentState.NormalText;
 
-    const segments: TextSegment[] = [{
-      text: "",
-      style: this.defaultStyle,
-    }];
+    const segments: TextSegment[] = [
+      {
+        text: "",
+        style: this.defaultStyle,
+      },
+    ];
 
     let id = "";
 
@@ -153,7 +166,7 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
       }
     }
 
-    return segments.filter(segment => segment.text.trim() !== "");
+    return segments.filter((segment) => segment.text.trim() !== "");
   }
 
   // public set width(value: number) {
@@ -165,5 +178,4 @@ export class TextEntity extends BaseTextEntity<BaseGameState> {
   //   this.sprite.width = value;
   //   // this.buildTextGraphic();
   // }
-
 }
