@@ -1,5 +1,7 @@
 # https://boweiliu.github.io/procgen-skill-tree
 
+ALSO SEE:  https://github.com/johnfn/ld-starter-code
+
 How we set this up:
 
 * Creat-react-app --typescript
