@@ -88,9 +88,9 @@ export class BaseGame<
 
     const view = document.getElementById('canvas');
 
-    if (!view) {
-      throw new Error("I couldn't find an element named #canvas on initialization. Giving up!")
-    }
+    // if (!view) {
+    //   throw new Error("I couldn't find an element named #canvas on initialization. Giving up!")
+    // }
 
     this.collisionHandler = new CollisionHandler({
       canvasWidth: props.canvasWidth / props.scale,

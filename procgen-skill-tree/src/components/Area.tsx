@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Area.css";
-import { Application } from "../pixi/Application";
 import { BaseGame } from "../johnfn_library/src/library/base_game";
-import { TypesafeLoader } from "../johnfn_library/src/library/typesafe_loader";
-import { BaseGameState } from "../johnfn_library/src/library/base_state";
+import { Assets } from "../johnfn_library/src/game/assets";
+import { Application } from "../pixi/Application";
 import { GameReactWrapper } from "../johnfn_library/src/library/react/react_root";
 import { IGameState, ModeList } from "Library";
+// import { TypesafeLoader } from "../johnfn_library/src/library/typesafe_loader";
 
 /**
  * Initialize the pixi app
@@ -22,7 +22,8 @@ const game = new BaseGame < {}, ModeList, IGameState<ModeList>>({
     tick: 0,
   },
   // backgroundColor: 0xffffff, // TODO(bowei): fix this
-  assets: new TypesafeLoader({}),
+  // assets: new TypesafeLoader({}),
+  assets: Assets,
 });
 const application = new Application(undefined, game.app);
 
