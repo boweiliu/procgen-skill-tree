@@ -1,7 +1,6 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import { Area } from "./components/Area";
+import { PixiComponent } from "./components/PixiComponent";
 
 function App() {
   return (
@@ -21,7 +20,7 @@ function App() {
           Learn React
         </a>
   </header> */}
-      <Area />
+      <PixiComponent />
     </div>
   );
 }

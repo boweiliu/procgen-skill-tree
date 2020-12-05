@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./Area.css";
+import "./PixiComponent.css";
 import { BaseGame } from "../johnfn_library/src/library/base_game";
 import { Assets } from "../johnfn_library/src/game/assets";
 import { Application } from "../pixi/Application";
@@ -27,7 +27,7 @@ const game = new BaseGame < {}, ModeList, IGameState<ModeList>>({
 });
 const application = new Application(undefined, game.app);
 
-export function Area(props: { whatever?: any }) {
+export function PixiComponent(props: { whatever?: any }) {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
