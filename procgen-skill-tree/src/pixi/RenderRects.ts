@@ -1,8 +1,8 @@
 import * as Pixi from "pixi.js";
 import { Container } from "pixi.js";
-import { Pair } from "../johnfn_library/data_structures/pair";
-import { Rect } from "../johnfn_library/geometry/rect";
-import { IVector2, Vector2 } from "../johnfn_library/geometry/vector2";
+import { Pair } from "../johnfn_library/src/library/data_structures/pair";
+import { Rect } from "../johnfn_library/src/library/geometry/rect";
+import { IVector2, Vector2 } from "../johnfn_library/src/library/geometry/vector2";
 
 export type RenderRectsConfig = {
   containerHeightProportion: number;
