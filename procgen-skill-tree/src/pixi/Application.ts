@@ -1,6 +1,6 @@
 import * as Pixi from "pixi.js";
-import { Rect } from "../johnfn_library/src/library/geometry/rect";
-import { Vector2 } from "../johnfn_library/src/library/geometry/vector2";
+import { Rect } from "../lib/util/geometry/rect";
+import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
 
