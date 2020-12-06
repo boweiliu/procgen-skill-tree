@@ -1,4 +1,4 @@
-import { Util } from '../util';
+import { Util } from '../misc';
 import { Line } from './line';
 import { Rect } from './rect';
 import { Vector2 } from './vector2';
