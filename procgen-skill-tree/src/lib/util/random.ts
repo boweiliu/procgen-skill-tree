@@ -8,10 +8,10 @@ import crypto from "crypto";
  */
 
 function splitmix64(seed: bigint, i: bigint) {
-    let z: bigint = seed + i * 0x9e3779b97f4a7c15;
-    z = ( z ^ ( z >> 30 ) ) * 0xBF58476D1CE4E5B9;
-    z = ( z ^ ( z >> 27 ) ) * 0x94D049BB133111EB;
-    return z ^ ( z >> 31 );
+    let z: bigint = seed + i * BigInt("0x9e3779b97f4a7c15");
+    z = ( z ^ ( z >> BigInt(30) ) ) * BigInt("0xBF58476D1CE4E5B9");
+    z = ( z ^ ( z >> BigInt(27) ) ) * BigInt(0x94D049BB133111EB);
+    return z ^ ( z >> BigInt(31) );
 }
 
 function squirrel3(seed: number, i: number) {
