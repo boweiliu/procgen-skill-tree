@@ -34,6 +34,14 @@ const KeyInfo = () => ({
   Enter   : false,
 });
 
+const KeyInfoMap = (() => {
+  let m = KeyInfo();
+  for (let k of Object.keys(m)) {
+    m[k as keyof KeyInfoType] = true;
+  }
+  return m;
+})();
+
 export type KeyInfoType = ReturnType<typeof KeyInfo>;
 
 interface QueuedKeyboardEvent {
@@ -74,9 +82,30 @@ export class KeyboardState {
     this._queuedEvents.push({ event: e, isDown: true });
   }
 
+  private formatKeyString(str: string): string {
+    if (str === " ") {
+      return "Spacebar";
+    }
+
+    if (str.length === 1) {
+      return str.toUpperCase();
+    }
+    if (str.slice(0, 5) === "Arrow") {
+      return str.slice(5);
+    }
+
+    return str[0].toUpperCase() + str.slice(1);
+  }
+
   private eventToKey(event: KeyboardEvent): string {
+    // prefer event.key
+    let str: string = event.key;
+    str = this.formatKeyString(str);
+    if (str) {
+      return str;
+    }
+    // use keycode or which if they are supported, and convert them to key string
     const number = event.keyCode || event.which;
-    let str: string;
 
     switch (number) {
       case 13: str = "Enter"; break;
@@ -89,16 +118,7 @@ export class KeyboardState {
       /* A-Z */
       default: str = String.fromCharCode(number);
     }
-
-    if (str === " ") {
-      return "Spacebar";
-    }
-
-    if (str.length === 1) {
-      return str.toUpperCase();
-    }
-
-    return str[0].toUpperCase() + str.slice(1);
+    return this.formatKeyString(str);
   }
 
   update(): void {
@@ -109,6 +129,9 @@ export class KeyboardState {
 
     for (const queuedEvent of this._queuedEvents) {
       const key = this.eventToKey(queuedEvent.event);
+      if (!KeyInfoMap[key as keyof KeyInfoType]) {
+        console.log("got unrecognized keypress: [", key,"]", queuedEvent) // DEBUG
+      }
 
       if (queuedEvent.isDown) {
         if (!this.down[key as keyof KeyInfoType]) {

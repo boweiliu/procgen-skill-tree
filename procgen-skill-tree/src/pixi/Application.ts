@@ -3,6 +3,7 @@ import { Rect } from "../lib/util/geometry/rect";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
+import { KeyboardState } from "../lib/pixi/keyboard";
 
 export type Config = {
   canvasWidth: number;
@@ -18,6 +19,10 @@ export type Point = number[];
 
 export class Application {
   public app!: Pixi.Application;
+
+  public stage!: Pixi.Container;
+  public parallaxStage!: Pixi.Container;
+  public fixedCameraStage!: Pixi.Container;
 
   public config!: Config;
 
@@ -47,10 +52,30 @@ export class Application {
         height: this.config.canvasHeight,
       })
     );
+
+    this.stage = new Pixi.Sprite();
+    this.app.stage.addChild(this.stage);
+    this.parallaxStage = new Pixi.Sprite();
+    this.stage.addChild(this.parallaxStage);
+    this.fixedCameraStage = new Pixi.Sprite();
+    this.stage.addChild(this.fixedCameraStage);
+
+
+    const keyboard = new KeyboardState();
+    this.app.ticker.add((delta) => {
+      keyboard.update();
+      if (keyboard.down.Right) {
+        this.parallaxStage.x += 10;
+      }
+      if (keyboard.down.Left) {
+        this.parallaxStage.x -= 10;
+      }
+    })
   }
 
   /**
    * Please only call once!!
+   * Usage: const container = useRef<HTMLDivElement>(null); useEffect(() => { application.register(container.current!); }, []);
    */
   public register(curr: HTMLDivElement) {
     curr.appendChild(this.app.view);
@@ -92,7 +117,7 @@ export class Application {
     // Taken from  https://pixijs.io/examples/#/demos-basic/container.js
     const container = new Pixi.Container();
 
-    this.app.stage.addChild(container);
+    this.parallaxStage.addChild(container);
 
     // Create a new texture
     const texture = Pixi.Texture.from(bunny);
