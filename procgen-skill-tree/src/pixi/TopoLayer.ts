@@ -1,5 +1,4 @@
-import { connect } from "http2";
-import { HashState } from "../library/random";
+import { HashState } from "../lib/util/random";
 
 export type Topo3Frames = {
   out: TopoFrame;

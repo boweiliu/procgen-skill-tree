@@ -1,6 +1,31 @@
 import crypto from "crypto";
 
 /**
+ * NOTE(bowei): we use a hash function that is NOT md5 -
+ * Either https://github.com/sublee/squirrel3-python/blob/master/squirrel3.py or https://github.com/svaarala/duktape/blob/master/misc/splitmix64.c works fine and is much faster
+ * Reference: https://www.youtube.com/watch?v=e4b--cyXEsM or https://www.youtube.com/watch?v=LWFzPP8ZbdU
+ * TODO(bowei): port bigint to wasm for faster 64bit operations
+ */
+
+function splitmix64(seed: bigint, i: bigint) {
+    let z: bigint = seed + i * 0x9e3779b97f4a7c15;
+    z = ( z ^ ( z >> 30 ) ) * 0xBF58476D1CE4E5B9;
+    z = ( z ^ ( z >> 27 ) ) * 0x94D049BB133111EB;
+    return z ^ ( z >> 31 );
+}
+
+function squirrel3(seed: number, i: number) {
+    let n = i * 0xb5297a4d;
+    n += seed;
+    n ^= n >> 8;
+    n += 0x68e31da4;
+    n ^= n << 8;
+    n *= 0x1b56c4e9;
+    n ^= n >> 8;
+    return n % ( 1 << 32 );
+}
+
+/**
  * Md5 is 16 bytes, or max int of 256 ** 16 = 2 ** 128
  */
 export class HashState {
