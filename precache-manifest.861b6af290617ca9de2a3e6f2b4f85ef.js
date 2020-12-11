@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "cda3b4e6889a9cc273c8427466a123a8",
+    "revision": "a3837f458d9f674a13029212a76c54fe",
     "url": "/procgen-skill-tree/index.html"
   },
   {
-    "revision": "740e2b7e269d9116021b",
+    "revision": "f83ca31c77442350d73d",
     "url": "/procgen-skill-tree/static/css/main.8bd503d9.chunk.css"
   },
   {
-    "revision": "0deaeb72dd736ae42771",
-    "url": "/procgen-skill-tree/static/js/2.2e5f6fa8.chunk.js"
+    "revision": "2cd88ae8aafefbee97ee",
+    "url": "/procgen-skill-tree/static/js/2.3deee537.chunk.js"
   },
   {
     "revision": "c121ce5e72fb719a9e20967105042cf6",
-    "url": "/procgen-skill-tree/static/js/2.2e5f6fa8.chunk.js.LICENSE.txt"
+    "url": "/procgen-skill-tree/static/js/2.3deee537.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "740e2b7e269d9116021b",
-    "url": "/procgen-skill-tree/static/js/main.89c07b9a.chunk.js"
+    "revision": "f83ca31c77442350d73d",
+    "url": "/procgen-skill-tree/static/js/main.063e7b49.chunk.js"
   },
   {
     "revision": "d36ddaabfad686859ec4",
