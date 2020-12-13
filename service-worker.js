@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/procgen-skill-tree/precache-manifest.861b6af290617ca9de2a3e6f2b4f85ef.js"
+  "/procgen-skill-tree/precache-manifest.2b8dc473bc905e5c5fa6697dc030ac90.js"
 );
 
 self.addEventListener('message', (event) => {
