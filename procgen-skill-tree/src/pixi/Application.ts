@@ -4,6 +4,7 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
+import { inflate } from "zlib";
 
 export type Config = {
   canvasWidth: number;
@@ -102,6 +103,25 @@ export class Application {
   public drawStart() {
     // this.renderRects.drawFirst();
     this.pixiExample();
+    
+    // add an invisible layer to the entire fixedCameraStage so we can pan and zoom
+    const clickableHud = new Pixi.Graphics();
+    this.fixedCameraStage.addChild(clickableHud);
+    clickableHud.beginFill(0xabcdef, 1);
+    clickableHud.alpha = 0.5;
+    clickableHud.interactive = true;
+    clickableHud.interactiveChildren = true;
+    clickableHud.zIndex = -3;
+    clickableHud.buttonMode = true;
+    // clickableHud.drawRect(0, 0, this.config.canvasWidth, this.config.canvasHeight);
+    clickableHud.drawRect(-10000, -10000, 20000, 20000);
+    clickableHud.addListener('pointerupoutside', e => {
+      console.log('clickable hud', e)
+    })
+    clickableHud.addListener('pointerup', (e) => {
+      window.alert('up from clickable hud');
+      console.log('clickable hud', e)
+    })
   }
 
   public drawCircle() {
@@ -131,6 +151,10 @@ export class Application {
       bunny.x = (i % 5) * 40;
       bunny.y = Math.floor(i / 5) * 40;
       container.addChild(bunny);
+      bunny.interactive = true;
+      bunny.addListener('pointerdown', () => {
+        window.alert('clicked bunny #' + i);
+      });
     }
 
     // Move container to the center
