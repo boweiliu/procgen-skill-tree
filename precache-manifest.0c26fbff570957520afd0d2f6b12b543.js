@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d308d4470c62a858ff1c501eb7c47403",
+    "revision": "6384fe6e7537a91c3ba00291eb175fa8",
     "url": "/procgen-skill-tree/index.html"
   },
   {
-    "revision": "801b12e1f0de5486997b",
+    "revision": "ea07a80af428684ee6eb",
     "url": "/procgen-skill-tree/static/css/main.8bd503d9.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/procgen-skill-tree/static/js/2.d91acdd0.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "801b12e1f0de5486997b",
-    "url": "/procgen-skill-tree/static/js/main.3d9ffe83.chunk.js"
+    "revision": "ea07a80af428684ee6eb",
+    "url": "/procgen-skill-tree/static/js/main.976002c8.chunk.js"
   },
   {
     "revision": "d36ddaabfad686859ec4",
