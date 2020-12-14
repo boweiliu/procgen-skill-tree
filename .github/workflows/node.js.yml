@@ -25,12 +25,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: ls
-    - run: cd procgen-skill-tree && npm ci
-    - run: cd procgen-skill-tree && CI=false npm run build --if-present # set CI=false to avoid halting build on typescript warnings
-    #- run: cd procgen-skill-tree && npm test
+    - run: cd frontend && npm ci
+    - run: cd frontend && CI=false npm run build --if-present # set CI=false to avoid halting build on typescript warnings
+    #- run: cd frontend && npm test
     - name: Deploy
       run: |
-        cd procgen-skill-tree
+        cd frontend
         echo "sha=${sha},ref=${ref}"
         git config --global user.name ${user_name}-${sha}
         git config --global user.email ${user_email}
