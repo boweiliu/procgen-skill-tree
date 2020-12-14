@@ -1,6 +1,13 @@
 import { InteractionData } from "pixi.js";
 
 
+/**
+ * NOTE: on mobile multitouch, runs into issues when:
+ * 1. hold 1 finger down and move it around (works)
+ * 2. put down another finger (note that the newest finger controls the drag)
+ * 3. release the second finger
+ * 4. the first finger (which is the only "down" finger) no longer controls drag!!! bad!!!
+ */
 export class DraggableHelper {
   private sourceContainer!: PIXI.Container
   private targetContainer!: PIXI.Container

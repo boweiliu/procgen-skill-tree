@@ -1,11 +1,9 @@
 import * as Pixi from "pixi.js";
 import { Rect } from "../lib/util/geometry/rect";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
 import { FpsTracker } from "../lib/util/fpsTracker";
-import { DraggableHelper, registerDraggable } from "../lib/pixi/DraggableHelper";
+import { registerDraggable } from "../lib/pixi/DraggableHelper";
 
 export type Config = {
   canvasWidth: number;
