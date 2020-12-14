@@ -4,7 +4,7 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
-import { inflate } from "zlib";
+import { FpsTracker } from "../lib/util/fpsTracker";
 
 export type Config = {
   canvasWidth: number;
@@ -32,7 +32,7 @@ export class Application {
 
   public config!: Config;
 
-  public renderRects: RenderRects;
+  public fpsTracker: FpsTracker;
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -46,18 +46,8 @@ export class Application {
         width: this.config.canvasWidth,
         height: this.config.canvasHeight,
         antialias: true,
-        backgroundColor: 0xffffff,
+        backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
       });
-
-    this.renderRects = new RenderRects(
-      this.app.stage,
-      new Rect({
-        x: 0,
-        y: 0,
-        width: this.config.canvasWidth,
-        height: this.config.canvasHeight,
-      })
-    );
 
     this.stage = this.app.stage;
     this.stage.sortableChildren = true;
@@ -66,32 +56,49 @@ export class Application {
     this.fixedCameraStage.zIndex = 1;
     this.fixedCameraStage.sortableChildren = true;
     this.stage.addChild(this.fixedCameraStage);
+
     this.actionStage = new Pixi.Sprite();
     this.actionStage.zIndex = 0;
     this.actionStage.sortableChildren = true;
     this.stage.addChild(this.actionStage);
+
     this.backdropStage = new Pixi.Sprite();
     this.backdropStage.zIndex = -1;
     this.backdropStage.sortableChildren = true;
     this.stage.addChild(this.backdropStage);
 
-
     const keyboard = new KeyboardState();
     this.app.ticker.add((delta) => {
       keyboard.update();
       if (keyboard.down.Right) {
-        this.actionStage.x -= 10;
+        this.actionStage.x -= 10 * delta;
       }
       if (keyboard.down.Left) {
-        this.actionStage.x += 10;
+        this.actionStage.x += 10 * delta;
       }
       if (keyboard.down.Up) {
-        this.actionStage.y += 10;
+        this.actionStage.y += 10 * delta;
       }
       if (keyboard.down.Down) {
-        this.actionStage.y -= 10;
+        this.actionStage.y -= 10 * delta;
       }
+    });
+
+    this.fpsTracker = new FpsTracker();
+    this.app.ticker.add((delta) => {
+      // delta should be approximately equal to 1
+      this.fpsTracker.tick(delta);
     })
+
+    // put a text thingy in the top right
+    let textFpsHud = new Pixi.Text('');
+    this.app.ticker.add(() => {
+      textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS";
+    })
+    textFpsHud.x = 600;
+    textFpsHud.y = 200;
+    this.fixedCameraStage.addChild(textFpsHud);
+
   }
 
   /**
@@ -152,12 +159,6 @@ export class Application {
   }
 
   public drawCircle() {
-    this.renderRects.drawCircleAt(
-      new Vector2(
-        Math.random() * this.config.canvasWidth,
-        Math.random() * this.config.canvasHeight
-      )
-    );
   }
 
   public pixiExample() {
