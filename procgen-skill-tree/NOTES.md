@@ -67,3 +67,14 @@ https://github.com/pixijs/pixi.js/issues/3999
 https://github.com/pixijs/pixi-projection
 
 
+https://www.dafont.com/free-pixel.font
+
+http://www.fontsaddict.com/font/free-pixel-regular.html
+
+https://www.dafont.com/pixelmix.font
+
+https://www.dafont.com/bitmap.php
+
+https://www.dafont.com/04b-03.font
+
+
