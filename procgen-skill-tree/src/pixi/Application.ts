@@ -5,6 +5,7 @@ import { RenderRects, RenderRectsConfig } from "./RenderRects";
 import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
 import { FpsTracker } from "../lib/util/fpsTracker";
+import { DraggableHelper, registerDraggable } from "../lib/pixi/DraggableHelper";
 
 export type Config = {
   canvasWidth: number;
@@ -66,6 +67,11 @@ export class Application {
     this.backdropStage.zIndex = -1;
     this.backdropStage.sortableChildren = true;
     this.stage.addChild(this.backdropStage);
+    registerDraggable({
+      source: this.backdropStage,
+      // dragging backdrop stage should move action stage in the reverse direction -- we're dragging the backdrop, not an entity
+      target: this.actionStage,
+    });
 
     const keyboard = new KeyboardState();
     this.app.ticker.add((delta) => {
@@ -132,23 +138,23 @@ export class Application {
     this.pixiExample();
     
     // add an invisible layer to the entire fixedCameraStage so we can pan and zoom
-    const clickableHud = new Pixi.Graphics();
-    this.backdropStage.addChild(clickableHud);
-    clickableHud.beginFill(0xabcdef, 1);
-    // clickableHud.alpha = 0.5;
-    clickableHud.interactive = true;
-    // clickableHud.interactiveChildren = true;
-    // clickableHud.zIndex = 31;
-    // clickableHud.buttonMode = true;
-    // clickableHud.drawRect(0, 0, this.config.canvasWidth, this.config.canvasHeight);
-    clickableHud.drawRect(-10000, -10000, 20000, 20000);
-    clickableHud.addListener('pointerupoutside', e => {
-      console.log('clickable hud', e)
-    })
-    clickableHud.addListener('pointerup', (e) => {
-      window.alert('up from clickable hud');
-      console.log('clickable hud', e)
-    })
+    const backdrop = new Pixi.Graphics();
+    this.backdropStage.addChild(backdrop);
+    backdrop.beginFill(0xabcdef, 1);
+    // backdrop.alpha = 0.5;
+    backdrop.interactive = true;
+    // backdrop.interactiveChildren = true;
+    // backdrop.zIndex = 31;
+    // backdrop.buttonMode = true;
+    // backdrop.drawRect(0, 0, this.config.canvasWidth, this.config.canvasHeight);
+    backdrop.drawRect(-10000, -10000, 20000, 20000);
+    // backdrop.addListener('pointerupoutside', e => {
+    //   console.log('clickable hud', e)
+    // })
+    // backdrop.addListener('pointerup', (e) => {
+    //   // window.alert('up from clickable hud');
+    //   console.log('clickable hud', e)
+    // })
 
     const reticle = new Pixi.Graphics();
     this.fixedCameraStage.addChild(reticle);
