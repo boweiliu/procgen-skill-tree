@@ -21,9 +21,14 @@ export type Point = number[];
 export class Application {
   public app!: Pixi.Application;
 
+  // root container
   public stage!: Pixi.Container;
-  public parallaxStage!: Pixi.Container;
+  // Contains HUD, and other entities that don't move when game camera moves
   public fixedCameraStage!: Pixi.Container;
+  // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
+  public actionStage!: Pixi.Container;
+  // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
+  public backdropStage!: Pixi.Container;
 
   public config!: Config;
 
@@ -54,22 +59,37 @@ export class Application {
       })
     );
 
-    this.stage = new Pixi.Sprite();
-    this.app.stage.addChild(this.stage);
-    this.parallaxStage = new Pixi.Sprite();
-    this.stage.addChild(this.parallaxStage);
+    this.stage = this.app.stage;
+    this.stage.sortableChildren = true;
+
     this.fixedCameraStage = new Pixi.Sprite();
+    this.fixedCameraStage.zIndex = 1;
+    this.fixedCameraStage.sortableChildren = true;
     this.stage.addChild(this.fixedCameraStage);
+    this.actionStage = new Pixi.Sprite();
+    this.actionStage.zIndex = 0;
+    this.actionStage.sortableChildren = true;
+    this.stage.addChild(this.actionStage);
+    this.backdropStage = new Pixi.Sprite();
+    this.backdropStage.zIndex = -1;
+    this.backdropStage.sortableChildren = true;
+    this.stage.addChild(this.backdropStage);
 
 
     const keyboard = new KeyboardState();
     this.app.ticker.add((delta) => {
       keyboard.update();
       if (keyboard.down.Right) {
-        this.parallaxStage.x += 10;
+        this.actionStage.x -= 10;
       }
       if (keyboard.down.Left) {
-        this.parallaxStage.x -= 10;
+        this.actionStage.x += 10;
+      }
+      if (keyboard.down.Up) {
+        this.actionStage.y += 10;
+      }
+      if (keyboard.down.Down) {
+        this.actionStage.y -= 10;
       }
     })
   }
@@ -106,13 +126,13 @@ export class Application {
     
     // add an invisible layer to the entire fixedCameraStage so we can pan and zoom
     const clickableHud = new Pixi.Graphics();
-    this.fixedCameraStage.addChild(clickableHud);
+    this.backdropStage.addChild(clickableHud);
     clickableHud.beginFill(0xabcdef, 1);
-    clickableHud.alpha = 0.5;
+    // clickableHud.alpha = 0.5;
     clickableHud.interactive = true;
-    clickableHud.interactiveChildren = true;
-    clickableHud.zIndex = -3;
-    clickableHud.buttonMode = true;
+    // clickableHud.interactiveChildren = true;
+    // clickableHud.zIndex = 31;
+    // clickableHud.buttonMode = true;
     // clickableHud.drawRect(0, 0, this.config.canvasWidth, this.config.canvasHeight);
     clickableHud.drawRect(-10000, -10000, 20000, 20000);
     clickableHud.addListener('pointerupoutside', e => {
@@ -122,6 +142,13 @@ export class Application {
       window.alert('up from clickable hud');
       console.log('clickable hud', e)
     })
+
+    const reticle = new Pixi.Graphics();
+    this.fixedCameraStage.addChild(reticle);
+
+    reticle.lineStyle(2, 0x999999);
+    reticle.drawCircle(this.config.canvasWidth / 2, this.config.canvasHeight / 2, 10);
+    reticle.interactive = true;
   }
 
   public drawCircle() {
@@ -137,7 +164,7 @@ export class Application {
     // Taken from  https://pixijs.io/examples/#/demos-basic/container.js
     const container = new Pixi.Container();
 
-    this.parallaxStage.addChild(container);
+    this.actionStage.addChild(container);
 
     // Create a new texture
     const texture = Pixi.Texture.from(bunny);
@@ -152,9 +179,9 @@ export class Application {
       bunny.y = Math.floor(i / 5) * 40;
       container.addChild(bunny);
       bunny.interactive = true;
-      bunny.addListener('pointerdown', () => {
-        window.alert('clicked bunny #' + i);
-      });
+      // bunny.addListener('pointerdown', () => {
+      //   window.alert('clicked bunny #' + i);
+      // });
     }
 
     // Move container to the center

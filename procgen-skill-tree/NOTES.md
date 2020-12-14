@@ -53,3 +53,14 @@ https://stackoverflow.com/questions/24852588/how-to-interact-with-shapes-in-pixi
 
 
 
+https://www.google.com/search?client=firefox-b-1-d&q=pixi+what+is+button+mode
+
+https://github.com/pixijs/pixi-layers
+
+https://developer.aliyun.com/mirror/npm/package/pixi-layers
+
+https://pixijs.io/examples/#/plugin-layers/zorder.js
+
+https://github.com/pixijs/pixi.js/issues/3999
+
+
