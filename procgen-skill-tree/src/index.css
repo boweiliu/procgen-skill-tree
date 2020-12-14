@@ -1,6 +1,15 @@
+@font-face {
+  font-family: 'PixelMix';
+  src: local('PixelMix'), url('./assets/pixelmix.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'PixelMix';
+  src: local('PixelMix'), url('./assets/pixelmix_bold.ttf') format('truetype');
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  font-family: "PixelMix", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;

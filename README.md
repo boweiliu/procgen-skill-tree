@@ -97,3 +97,15 @@ https://github.com/pixijs/pixi-layers/wiki
 https://gamedevbeginner.com/the-right-way-to-lerp-in-unity-with-examples/
 
 
+----
+## Font References
+
+
+https://stackoverflow.com/questions/41676054/how-to-add-fonts-to-create-react-app-based-projects
+
+MDN Documentation:
+https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
+
+Google Fonts as example:
+https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap
+
