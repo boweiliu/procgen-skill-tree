@@ -26,8 +26,8 @@ export function PixiComponent(props: { whatever?: any }) {
   useEffect(() => {
     // application.register(container.current!);
     container.current!.appendChild(application.app.view)
-    container.current!.appendChild(application.app.view)
-    console.log(container.current!)
+    // container.current!.appendChild(application.app.view)
+    // console.log(container.current!)
 
     application.drawStart();
   }, []);

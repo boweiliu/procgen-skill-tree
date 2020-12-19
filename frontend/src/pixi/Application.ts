@@ -192,8 +192,8 @@ export class Application {
       chunksContainer.x = this.app.screen.width/2;
       chunksContainer.y = this.app.screen.height/2;
     })
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
+    for (let i = -3; i <= 3; i++) {
+      for (let j = -3; j <= 3; j++) {
         chunksContainer.addChild((new RenderedChunk(new Chunk(this.randomSeed, new Vector2(i, j)), this.app.ticker)).container);
       }
     }

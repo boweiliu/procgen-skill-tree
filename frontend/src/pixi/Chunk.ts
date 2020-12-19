@@ -39,8 +39,8 @@ export class RenderedChunk {
   public container: Pixi.Container;
 
   public spacingPx: number = 24;
-  public chunkSpacingPx: number = 15 * this.spacingPx;
-  public nodeSizePx: number = 16;
+  public chunkSpacingPx: number = 8 * this.spacingPx;
+  public nodeSizePx: number = 14;
   public nodeRoundedPx: number = 4;
 
   constructor(chunk: Chunk, ticker: Pixi.Ticker) {
@@ -63,6 +63,12 @@ export class RenderedChunk {
         this.nodeSizePx,
         this.nodeRoundedPx
       );
+      g.interactive = true;
+      g.addListener('pointerdown', () => {
+        console.log(`clicked chunk ${chunk.id} node ${node.x}, ${node.y}`);
+        g.tint = 0x0000FF;
+        g.alpha = 0.5;
+      })
       this.container.addChild(g);
     }
 
