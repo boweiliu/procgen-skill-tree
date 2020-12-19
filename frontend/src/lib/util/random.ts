@@ -14,16 +14,18 @@ function splitmix64(seed: bigint, i: bigint) {
     return z ^ ( z >> BigInt(31) );
 }
 
-function squirrel3(seed: number, i: number) {
-    let n = i * 0xb5297a4d;
-    n += seed;
-    n ^= n >> 8;
+export const INTMAX32 = 2 ** 32;
+export function squirrel3(i: number) {
+  let n = (i + INTMAX32) % INTMAX32;
+    n = Math.imul(n, 0xb5297a4d);
+    n ^= n >>> 8;
     n += 0x68e31da4;
     n ^= n << 8;
-    n *= 0x1b56c4e9;
-    n ^= n >> 8;
-    return n % ( 1 << 32 );
+    n = Math.imul(n, 0x1b56c4e9);
+    n ^= n >>> 8;
+    return (n + INTMAX32) % INTMAX32;
 }
+export const PRIME32 = 0x3233f2cd; // not used ; useful for hashing integers; a 32 bit prime
 
 /**
  * Md5 is 16 bytes, or max int of 256 ** 16 = 2 ** 128

@@ -3,6 +3,8 @@ import { KeyboardState } from "../lib/pixi/keyboard";
 import { FpsTracker } from "../lib/util/fpsTracker";
 import { registerDraggable } from "../lib/pixi/DraggableHelper";
 import createBunnyExample from "./BunnyExample";
+import { Chunk, RenderedChunk } from "./Chunk";
+import { Vector2 } from "../lib/util/geometry/vector2";
 
 export type Config = {
   originalWindowWidth: number;
@@ -35,12 +37,14 @@ export class Application {
   onResize: (() => void)[] = [];
   originalAppWidth: number = 1280;
   originalAppHeight: number = 720;
+  randomSeed!: number;
 
   /**
    * Need to provide config to set up the pixi canvas
    */
   constructor(config?: Config, app?: Pixi.Application) {
     this.config = Object.assign({}, defaultConfig, config);
+    this.randomSeed = 0xcafebabe;
 
     this.originalAppWidth = Math.min(1280, this.config.originalWindowWidth - 8);
     this.originalAppHeight = Math.min(720, this.config.originalWindowHeight - 8);
@@ -178,6 +182,20 @@ export class Application {
     this.fixedCameraStage.addChild(reticle);
 
 
-    createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+    // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+
+    let chunksContainer = new Pixi.Container();
+    this.actionStage.addChild(chunksContainer);
+    chunksContainer.x = this.app.screen.width/2;
+    chunksContainer.y = this.app.screen.height/2;
+    this.onResize.push(() => {
+      chunksContainer.x = this.app.screen.width/2;
+      chunksContainer.y = this.app.screen.height/2;
+    })
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        chunksContainer.addChild((new RenderedChunk(new Chunk(this.randomSeed, new Vector2(i, j)), this.app.ticker)).container);
+      }
+    }
   }
 }
