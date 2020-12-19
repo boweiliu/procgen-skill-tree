@@ -17,14 +17,16 @@ import { Application } from "../pixi/Application";
 //   },
 //   backgroundColor: 0xffffff, // TODO(bowei): fix this
 // });
-const application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
+let application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
 
 export function PixiComponent(props: { whatever?: any }) {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    application.register(container.current!);
-    // container.current!.appendChild(application.app.view)
+    // application.register(container.current!);
+    container.current!.appendChild(application.app.view)
+    container.current!.appendChild(application.app.view)
+    console.log(container.current!)
 
     application.drawStart();
   }, []);
@@ -37,7 +39,12 @@ export function PixiComponent(props: { whatever?: any }) {
     <>
       <div ref={container} />
       <button onClick={() => { }}>draw circle</button>
-      <button onClick={() => application.drawStart()}>rerender all</button>
+      <button onClick={() => {
+        container.current!.removeChild(application.app.view);
+        application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
+        container.current!.appendChild(application.app.view);
+        application.drawStart();
+      }}>[DEBUG] reset and rerender</button>
     </>
   );
 }
