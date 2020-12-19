@@ -108,7 +108,8 @@ export class Application {
 
   public resize(windowWidth: number, windowHeight: number) {
     // we dont want to take up the whole window
-    this.app.renderer.resize(windowHeight * 0.75, windowHeight * 0.75);
+    // this.app.renderer.resize(windowHeight * 0.75, windowHeight * 0.75);
+    this.app.renderer.resize(windowWidth - 16, windowHeight - 16);
     // causes the game to be rescaled when window is resized
     // this.app.stage.width = windowHeight * 0.75;
     // this.app.stage.height = windowHeight * 0.75;

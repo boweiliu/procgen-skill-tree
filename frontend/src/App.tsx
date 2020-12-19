@@ -5,7 +5,6 @@ import { PixiComponent } from "./components/PixiComponent";
 function App() {
   return (
     <div className="App">
-      Hi stuff is here
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
