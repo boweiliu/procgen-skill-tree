@@ -17,7 +17,7 @@ import { Application } from "../pixi/Application";
 //   },
 //   backgroundColor: 0xffffff, // TODO(bowei): fix this
 // });
-const application = new Application();
+const application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
 
 export function PixiComponent(props: { whatever?: any }) {
   const container = useRef<HTMLDivElement>(null);
@@ -29,10 +29,14 @@ export function PixiComponent(props: { whatever?: any }) {
     application.drawStart();
   }, []);
 
+  window.onresize = () => {
+    application.resize(window.innerWidth, window.innerHeight);
+  }
+
   return (
     <>
       <div ref={container} />
-      <button onClick={() => application.drawCircle()}>draw circle</button>
+      <button onClick={() => { }}>draw circle</button>
       <button onClick={() => application.drawStart()}>rerender all</button>
     </>
   );

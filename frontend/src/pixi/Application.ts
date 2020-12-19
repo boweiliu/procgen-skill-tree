@@ -1,18 +1,18 @@
 import * as Pixi from "pixi.js";
-import { Rect } from "../lib/util/geometry/rect";
 import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
 import { FpsTracker } from "../lib/util/fpsTracker";
 import { registerDraggable } from "../lib/pixi/DraggableHelper";
+import createBunnyExample from "./BunnyExample";
 
 export type Config = {
-  canvasWidth: number;
-  canvasHeight: number;
+  originalWidth: number;
+  originalHeight: number;
 };
 
 const defaultConfig: Config = {
-  canvasWidth: 800,
-  canvasHeight: 800,
+  originalWidth: 800,
+  originalHeight: 800,
 };
 
 export type Point = number[];
@@ -33,6 +33,8 @@ export class Application {
 
   public fpsTracker: FpsTracker;
 
+  onResize: (() => void)[] = [];
+
   /**
    * Need to provide config to set up the pixi canvas
    */
@@ -41,9 +43,9 @@ export class Application {
 
     this.app =
       app ||
-      new Pixi.Application({
-        width: this.config.canvasWidth,
-        height: this.config.canvasHeight,
+    new Pixi.Application({
+        width: this.config.originalWidth,
+        height: this.config.originalHeight,
         antialias: true,
         backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
       });
@@ -94,15 +96,6 @@ export class Application {
       this.fpsTracker.tick(delta);
     })
 
-    // put a text thingy in the top right
-    let textFpsHud = new Pixi.Text('');
-    this.app.ticker.add(() => {
-      textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS";
-    })
-    textFpsHud.x = 600;
-    textFpsHud.y = 200;
-    this.fixedCameraStage.addChild(textFpsHud);
-
   }
 
   /**
@@ -113,95 +106,64 @@ export class Application {
     curr.appendChild(this.app.view);
   }
 
-  /**
-   * Draws a full skill tree at the default zoom level.
-   */
-  public drawAll() {
-    // get the first 3 layers' configurations
-    // render the top layer points
-    // renderLayerPoints(layer[0], { rect: null })
-    // render the next layer
-    // render the intermediate connections
-    // render the final layer
-    // render the intermediate connections
+  public resize(windowWidth: number, windowHeight: number) {
+    // we dont want to take up the whole window
+    this.app.renderer.resize(windowHeight * 0.75, windowHeight * 0.75);
+    // causes the game to be rescaled when window is resized
+    // this.app.stage.width = windowHeight * 0.75;
+    // this.app.stage.height = windowHeight * 0.75;
+    // this.app.stage.x = windowHeight * 0.375;
+    this.actionStage.pivot.x = (this.app.screen.width - this.config.originalWidth) * -0.5;
+    this.actionStage.pivot.y = (this.app.screen.height - this.config.originalHeight) * -0.5;
+    this.onResize.map(fn => fn());
+    // this.app.stage.pivot.x = 0;
   }
 
-  /**
-   * Used for panning/zooming.
-   */
-  public moveViewport(viewport: Rect) {}
-
   public drawStart() {
-    // this.renderRects.drawFirst();
-    this.pixiExample();
+    // put a text thingy in the top right
+    let textFpsHud = new Pixi.Text('', {
+      fontFamily: 'PixelMix',
+      // align: 'right'
+    });
+    this.app.ticker.add(() => {
+      textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS";
+    })
+    textFpsHud.x = this.app.screen.width;
+    this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
+    textFpsHud.y = 0;
+    textFpsHud.anchor.x = 1; // right justify
+    this.fixedCameraStage.addChild(textFpsHud);
+
     
     // add an invisible layer to the entire fixedCameraStage so we can pan and zoom
     const backdrop = new Pixi.Graphics();
     this.backdropStage.addChild(backdrop);
     backdrop.beginFill(0xabcdef, 1);
-    // backdrop.alpha = 0.5;
+    // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
     backdrop.interactive = true;
-    // backdrop.interactiveChildren = true;
-    // backdrop.zIndex = 31;
-    // backdrop.buttonMode = true;
-    // backdrop.drawRect(0, 0, this.config.canvasWidth, this.config.canvasHeight);
-    backdrop.drawRect(-10000, -10000, 20000, 20000);
-    // backdrop.addListener('pointerupoutside', e => {
-    //   console.log('clickable hud', e)
-    // })
-    // backdrop.addListener('pointerup', (e) => {
-    //   // window.alert('up from clickable hud');
-    //   console.log('clickable hud', e)
-    // })
+    // backdrop.interactiveChildren = true; // not sure what this does
+    // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
+    backdrop.drawRect(0, 0, this.app.screen.width, this.app.screen.height);
+    this.onResize.push(() => {
+      backdrop.width = this.app.screen.width;
+      backdrop.height = this.app.screen.height;
+    });
+    // backdrop.drawRect(-10000, -10000, 30000, 30000);
 
+    // Add a reticle in the hud at the midpoint
     const reticle = new Pixi.Graphics();
+    reticle.lineStyle(2, 0x999999);
+    reticle.drawCircle(0, 0, 6);
+    reticle.x = this.app.screen.width / 2;
+    reticle.y = this.app.screen.height / 2;
+    this.onResize.push(() => {
+    reticle.x = this.app.screen.width / 2;
+    reticle.y = this.app.screen.height / 2;
+    })
+    reticle.interactive = true;
     this.fixedCameraStage.addChild(reticle);
 
-    reticle.lineStyle(2, 0x999999);
-    reticle.drawCircle(this.config.canvasWidth / 2, this.config.canvasHeight / 2, 10);
-    reticle.interactive = true;
-  }
 
-  public drawCircle() {
-  }
-
-  public pixiExample() {
-    // Taken from  https://pixijs.io/examples/#/demos-basic/container.js
-    const container = new Pixi.Container();
-
-    this.actionStage.addChild(container);
-
-    // Create a new texture
-    const texture = Pixi.Texture.from(bunny);
-
-    window.alert("doing bunny stuff")
-
-    // Create a 5x5 grid of bunnies
-    for (let i = 0; i < 25; i++) {
-      const bunny = new Pixi.Sprite(texture);
-      bunny.anchor.set(0.5);
-      bunny.x = (i % 5) * 40;
-      bunny.y = Math.floor(i / 5) * 40;
-      container.addChild(bunny);
-      bunny.interactive = true;
-      // bunny.addListener('pointerdown', () => {
-      //   window.alert('clicked bunny #' + i);
-      // });
-    }
-
-    // Move container to the center
-    container.x = this.app.screen.width / 2;
-    container.y = this.app.screen.height / 2;
-
-    // Center bunny sprite in local container coordinates
-    container.pivot.x = container.width / 2;
-    container.pivot.y = container.height / 2;
-
-    // Listen for animate update
-    this.app.ticker.add((delta) => {
-      // rotate the container!
-      // use delta to create frame-independent transform
-      container.rotation -= 0.01 * delta;
-    });
+    createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
   }
 }
