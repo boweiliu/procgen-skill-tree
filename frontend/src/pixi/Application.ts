@@ -42,6 +42,8 @@ export class Application {
   constructor(config?: Config, app?: Pixi.Application) {
     this.config = Object.assign({}, defaultConfig, config);
 
+    this.originalAppWidth = Math.min(1280, this.config.originalWindowWidth - 8);
+    this.originalAppHeight = Math.min(720, this.config.originalWindowHeight - 8);
     this.app =
       app ||
     new Pixi.Application({
