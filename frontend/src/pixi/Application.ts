@@ -46,7 +46,12 @@ export class Application {
     new Pixi.Application({
         width: this.config.originalWidth,
         height: this.config.originalHeight,
-        antialias: true,
+      antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
+      transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
+      resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
+      // resolution: 0.5,
+      autoDensity: true,
+      powerPreference: "low-power", // the only valid one for webgl
         backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
       });
 
@@ -124,10 +129,12 @@ export class Application {
     // put a text thingy in the top right
     let textFpsHud = new Pixi.Text('', {
       fontFamily: 'PixelMix',
+      fontSize: 12,
       // align: 'right'
     });
     this.app.ticker.add(() => {
-      textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS";
+      textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS\n" + 
+      this.app.screen.width + "x" + this.app.screen.height;
     })
     textFpsHud.x = this.app.screen.width;
     this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
