@@ -1,6 +1,9 @@
 
 const logRowsToKeep: number = 60; // last 1 seconds, at 60 fps
 
+/**
+ * See https://www.npmjs.com/package/pixi-fps https://github.com/jkanchelov/pixi-fps
+ */
 export class FpsTracker {
   private frameTimestampsInTicks: any[] = [];
   private frameTimestampsInTime: any[] = [];
