@@ -1,18 +1,17 @@
 import * as Pixi from "pixi.js";
-import bunny from "../bunny.png";
 import { KeyboardState } from "../lib/pixi/keyboard";
 import { FpsTracker } from "../lib/util/fpsTracker";
 import { registerDraggable } from "../lib/pixi/DraggableHelper";
 import createBunnyExample from "./BunnyExample";
 
 export type Config = {
-  originalWidth: number;
-  originalHeight: number;
+  originalWindowWidth: number;
+  originalWindowHeight: number;
 };
 
 const defaultConfig: Config = {
-  originalWidth: 800,
-  originalHeight: 800,
+  originalWindowWidth: 800,
+  originalWindowHeight: 800,
 };
 
 export type Point = number[];
@@ -34,6 +33,8 @@ export class Application {
   public fpsTracker: FpsTracker;
 
   onResize: (() => void)[] = [];
+  originalAppWidth: number = 1280;
+  originalAppHeight: number = 720;
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -44,12 +45,13 @@ export class Application {
     this.app =
       app ||
     new Pixi.Application({
-        width: this.config.originalWidth,
-        height: this.config.originalHeight,
+        width: this.originalAppWidth, // both are ignored - see resize() below
+        height: this.originalAppHeight,
       antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
       transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
       resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
       // resolution: 0.5,
+      // resolution: 2,
       autoDensity: true,
       powerPreference: "low-power", // the only valid one for webgl
         backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
@@ -101,6 +103,8 @@ export class Application {
       this.fpsTracker.tick(delta);
     })
 
+    this.resize(this.config.originalWindowWidth, this.config.originalWindowHeight);
+
   }
 
   /**
@@ -114,13 +118,13 @@ export class Application {
   public resize(windowWidth: number, windowHeight: number) {
     // we dont want to take up the whole window
     // this.app.renderer.resize(windowHeight * 0.75, windowHeight * 0.75);
-    this.app.renderer.resize(windowWidth - 16, windowHeight - 16);
+    this.app.renderer.resize(Math.min(1280, windowWidth  - 8), Math.min(720, windowHeight  - 8));
     // causes the game to be rescaled when window is resized
     // this.app.stage.width = windowHeight * 0.75;
     // this.app.stage.height = windowHeight * 0.75;
     // this.app.stage.x = windowHeight * 0.375;
-    this.actionStage.pivot.x = (this.app.screen.width - this.config.originalWidth) * -0.5;
-    this.actionStage.pivot.y = (this.app.screen.height - this.config.originalHeight) * -0.5;
+    this.actionStage.pivot.x = (this.app.screen.width - this.originalAppWidth) * -0.5;
+    this.actionStage.pivot.y = (this.app.screen.height - this.originalAppHeight) * -0.5;
     this.onResize.map(fn => fn());
     // this.app.stage.pivot.x = 0;
   }

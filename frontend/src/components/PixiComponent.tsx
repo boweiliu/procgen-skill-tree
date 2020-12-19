@@ -17,8 +17,8 @@ import { Application } from "../pixi/Application";
 //   },
 //   backgroundColor: 0xffffff, // TODO(bowei): fix this
 // });
-// let application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
-let application = new Application({ originalWidth: window.innerWidth - 16, originalHeight: window.innerHeight - 16});
+// let application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
+let application = new Application({ originalWindowWidth: window.innerWidth, originalWindowHeight: window.innerHeight });
 
 export function PixiComponent(props: { whatever?: any }) {
   const container = useRef<HTMLDivElement>(null);
@@ -42,8 +42,8 @@ export function PixiComponent(props: { whatever?: any }) {
       <button onClick={() => { }}>draw circle</button>
       <button onClick={() => {
         container.current!.removeChild(application.app.view);
-        // application = new Application({ originalWidth: window.innerHeight * .75, originalHeight: window.innerHeight * .75 });
-        application = new Application({ originalWidth: window.innerWidth - 16, originalHeight: window.innerHeight - 16});
+        // application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
+        application = new Application({ originalWindowWidth: window.innerWidth, originalWindowHeight: window.innerHeight});
         container.current!.appendChild(application.app.view);
         application.drawStart();
       }}>[DEBUG] reset and rerender</button>
