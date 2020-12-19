@@ -2,6 +2,7 @@ import { InteractionData } from "pixi.js";
 
 
 /**
+ * CONSIDER importing: https://www.npmjs.com/package/pixi-viewport https://davidfig.github.io/pixi-viewport/
  * NOTE: on mobile multitouch, runs into issues when:
  * 1. hold 1 finger down and move it around (works)
  * 2. put down another finger (note that the newest finger controls the drag)
