@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/procgen-skill-tree/static/css/main.5d8365ca.chunk.css",
-    "main.js": "/procgen-skill-tree/static/js/main.bfe7822c.chunk.js",
-    "main.js.map": "/procgen-skill-tree/static/js/main.bfe7822c.chunk.js.map",
+    "main.js": "/procgen-skill-tree/static/js/main.8e061145.chunk.js",
+    "main.js.map": "/procgen-skill-tree/static/js/main.8e061145.chunk.js.map",
     "runtime-main.js": "/procgen-skill-tree/static/js/runtime-main.6fabe896.js",
     "runtime-main.js.map": "/procgen-skill-tree/static/js/runtime-main.6fabe896.js.map",
     "static/js/2.1b12bc1a.chunk.js": "/procgen-skill-tree/static/js/2.1b12bc1a.chunk.js",
     "static/js/2.1b12bc1a.chunk.js.map": "/procgen-skill-tree/static/js/2.1b12bc1a.chunk.js.map",
     "index.html": "/procgen-skill-tree/index.html",
-    "precache-manifest.d0433ef32828a989345dc960a112340f.js": "/procgen-skill-tree/precache-manifest.d0433ef32828a989345dc960a112340f.js",
+    "precache-manifest.80fb43911c35b96670fff3cc47df01e5.js": "/procgen-skill-tree/precache-manifest.80fb43911c35b96670fff3cc47df01e5.js",
     "service-worker.js": "/procgen-skill-tree/service-worker.js",
     "static/css/main.5d8365ca.chunk.css.map": "/procgen-skill-tree/static/css/main.5d8365ca.chunk.css.map",
     "static/js/2.1b12bc1a.chunk.js.LICENSE.txt": "/procgen-skill-tree/static/js/2.1b12bc1a.chunk.js.LICENSE.txt",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.6fabe896.js",
     "static/js/2.1b12bc1a.chunk.js",
     "static/css/main.5d8365ca.chunk.css",
-    "static/js/main.bfe7822c.chunk.js"
+    "static/js/main.8e061145.chunk.js"
   ]
 }
