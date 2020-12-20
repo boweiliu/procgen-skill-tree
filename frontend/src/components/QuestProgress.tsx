@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function QuestProgress({ remainingPoints }) {
+export default function QuestProgress({ remainingPoints } : any) {
   return (
     <>
       <h1>Quest Progress</h1>
