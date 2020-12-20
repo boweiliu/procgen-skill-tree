@@ -18,25 +18,35 @@ import { Application } from "../pixi/Application";
 //   backgroundColor: 0xffffff, // TODO(bowei): fix this
 // });
 // let application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
-let application = new Application({ originalWindowWidth: window.innerWidth, originalWindowHeight: window.innerHeight });
 
-export function PixiComponent(props: {
+export function PixiComponent({
+  onFocusedNodeChange,
+}: {
   whatever?: any;
   onFocusedNodeChange: (...x: any) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
+  const [application, setApplication] = useState();
+  function initializeApplication() {
+    const newApp = new Application({
+      originalWindowWidth: window.innerWidth,
+      originalWindowHeight: window.innerHeight,
+      onFocusedNodeChange,
+    });
     // application.register(container.current!);
-    container.current!.appendChild(application.app.view);
+    container.current!.appendChild(newApp.app.view);
     // container.current!.appendChild(application.app.view)
     // console.log(container.current!)
+    newApp.drawStart();
+    setApplication(newApp);
+  }
 
-    application.drawStart();
+  useEffect(() => {
+    return initializeApplication();
   }, []);
 
   window.onresize = () => {
-    application.resize(window.innerWidth, window.innerHeight);
+    application?.resize?.(window.innerWidth, window.innerHeight);
   };
 
   return (
@@ -45,14 +55,8 @@ export function PixiComponent(props: {
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {
-          container.current!.removeChild(application.app.view);
-          // application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
-          application = new Application({
-            originalWindowWidth: window.innerWidth,
-            originalWindowHeight: window.innerHeight,
-          });
-          container.current!.appendChild(application.app.view);
-          application.drawStart();
+          container.current!.removeChild(application?.app?.view);
+          initializeApplication();
         }}
       >
         [DEBUG] reset and rerender
