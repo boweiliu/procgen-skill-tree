@@ -1,4 +1,5 @@
 import * as Pixi from "pixi.js";
+import { HashMap } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { squirrel3 } from "../lib/util/random";
 import { Chunk, RenderedChunk } from "./Chunk";
@@ -27,6 +28,7 @@ export class RenderedZLevel {
   public zLevel!: ZLevel;
 
   public container: Pixi.Container;
+  public renderedChunks: HashMap<Chunk, RenderedChunk> = new HashMap();
 
   constructor(zLevel: ZLevel, onNodeFocus: Function) {
     this.zLevel = zLevel;
@@ -40,9 +42,9 @@ export class RenderedZLevel {
     // })
 
     for (let chunk of this.zLevel.chunks) {
-      this.container.addChild(
-        new RenderedChunk(chunk, onNodeFocus).container
-      )
+      let renderedChunk = new RenderedChunk(chunk, onNodeFocus);
+      this.renderedChunks.put(chunk, renderedChunk)
+      this.container.addChild(renderedChunk.container)
     }
   }
 }

@@ -199,6 +199,13 @@ export class Application {
       new ZLevel(this.randomSeed, 0),
       this.config.onFocusedNodeChange
     );
+    // find the 0th square, and allocate it
+    for (let chunk of zLevel.zLevel.chunks) {
+      if (chunk.location.x === 0 && chunk.location.y === 0) {
+        chunk.allocatedNodes.put(new Vector2(0, 0));
+        zLevel.renderedChunks.get(chunk).renderedNodes.get(new Vector2(0, 0)).tint = 0x00AAFF;
+      }
+    }
     let chunksContainer = zLevel.container;
     this.actionStage.addChild(chunksContainer);
     chunksContainer.x = this.app.screen.width/2;
