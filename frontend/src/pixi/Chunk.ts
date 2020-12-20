@@ -88,20 +88,26 @@ export class RenderedChunk {
         //   RenderedChunk.NODE_ROUNDED_PX
         // );
         // this.renderedNodes.put(node, g);
+        // g.hitArea = new Pixi.Rectangle(
+        //   node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
+        //   node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
+        //   RenderedChunk.NODE_HITAREA_PX,
+        //   RenderedChunk.NODE_HITAREA_PX,
+        // )
       } else {
         g = new Pixi.Sprite(texture);
         g.anchor.x = 0.5;
         g.anchor.y = 0.5;
         g.x = node.x * RenderedChunk.SPACING_PX;
         g.y = node.y * RenderedChunk.SPACING_PX;
+        g.hitArea = new Pixi.Rectangle(
+          - RenderedChunk.NODE_HITAREA_PX / 2,
+          - RenderedChunk.NODE_HITAREA_PX / 2,
+          RenderedChunk.NODE_HITAREA_PX,
+          RenderedChunk.NODE_HITAREA_PX,
+        )
         this.renderedNodes.put(node, g);
       }
-      g.hitArea = new Pixi.Rectangle(
-        node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
-        node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
-        RenderedChunk.NODE_HITAREA_PX,
-        RenderedChunk.NODE_HITAREA_PX,
-      )
       g.interactive = true;
       g.addListener("pointerdown", () => {
         onNodeFocus?.(this.chunk, node);
