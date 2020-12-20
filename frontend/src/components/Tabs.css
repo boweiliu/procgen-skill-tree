@@ -1,0 +1,16 @@
+.tab-label-container {
+  flex: content;
+  flex-direction: row;
+}
+
+.tab-label {
+  flex: 0 1 auto;
+}
+.tab-label:hover {
+  font-weight: 700;
+  color:inherit;
+}
+.inactive {
+ color:rgba(0,0,0,.4)
+}
+
