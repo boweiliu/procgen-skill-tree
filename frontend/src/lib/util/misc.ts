@@ -164,15 +164,14 @@ type Complicated = {
 
 type EmptyComplicated = {
   x: {
-    y: undefined
+    y: any
   }
 }
 
 type Target = {
   x: {
     y: {
-      getUpdater: () => ((prev: boolean, all: Target) => void),
-      getSetter: () => ((neww: boolean) => void),
+      getUpdater: () => ((neww: boolean | ((prev: boolean) => boolean)) => void),
     },
     getUpdater: () => ((prev: { y: boolean }, all: Target) => void),
     getSetter: () => ((neww: { y: boolean }) => void),
