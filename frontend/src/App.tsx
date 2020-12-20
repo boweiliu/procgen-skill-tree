@@ -15,7 +15,10 @@ import { Chunk } from "./pixi/Chunk";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
-if (browser.name === "Mobile Safari") {
+if (
+  browser.name === "Mobile Safari" &&
+  window.innerWidth < window.innerHeight
+) {
   forceRotate = true;
 }
 
