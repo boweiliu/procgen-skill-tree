@@ -10,8 +10,11 @@ import Tabs from "./components/Tabs";
 import { GameContext, UIContext } from "./contexts";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import { Chunk } from "./pixi/Chunk";
-
+import { UAParser } from "ua-parser-js";  
 const tabLabels = ["Node Details", "Quest Progress"];
+console.log(UAParser.getResult());
+UAParser;
+
 
 function App() {
   const [focusedNode, setFocusedNode] = useState<{

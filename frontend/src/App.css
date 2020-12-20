@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+.force-landscape {
+  transform: rotate(90deg);
+}
