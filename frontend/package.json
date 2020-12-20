@@ -4,7 +4,9 @@
   "private": true,
   "homepage": "/procgen-skill-tree",
   "dependencies": {
+    "@types/classnames": "^2.2.11",
     "@types/ua-parser-js": "^0.7.35",
+    "classnames": "^2.2.6",
     "pixi.js": "^5.3.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

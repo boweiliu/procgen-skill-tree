@@ -1,6 +1,8 @@
 import "./App.css";
 
+import classnames from "classnames";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import UAParser from "ua-parser-js";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
 import QuestProgress from "./components/QuestProgress";
@@ -10,11 +12,14 @@ import Tabs from "./components/Tabs";
 import { GameContext, UIContext } from "./contexts";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import { Chunk } from "./pixi/Chunk";
-import { UAParser } from "ua-parser-js";  
-const tabLabels = ["Node Details", "Quest Progress"];
-console.log(UAParser.getResult());
-UAParser;
 
+const browser = new UAParser().getBrowser();
+let forceRotate = false;
+if (browser.name === "Mobile Safari") {
+  forceRotate = true;
+}
+
+const tabLabels = ["Node Details", "Quest Progress"];
 
 function App() {
   const [focusedNode, setFocusedNode] = useState<{
@@ -53,7 +58,7 @@ function App() {
   }, [focusedNode]);
 
   return (
-    <div className="App">
+    <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <GameContext.Provider value={game}>
         <UIContext.Provider value={uiState}>
           <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
