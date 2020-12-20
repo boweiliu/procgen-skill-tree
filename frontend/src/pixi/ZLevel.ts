@@ -30,7 +30,7 @@ export class RenderedZLevel {
   public container: Pixi.Container;
   public renderedChunks: HashMap<Chunk, RenderedChunk> = new HashMap();
 
-  constructor(zLevel: ZLevel, onNodeFocus: Function) {
+  constructor(zLevel: ZLevel, onNodeFocus: Function, texture?: Pixi.Texture) {
     this.zLevel = zLevel;
     this.container = new Pixi.Container();
     // this.actionStage.addChild(chunksContainer);
@@ -42,7 +42,7 @@ export class RenderedZLevel {
     // })
 
     for (let chunk of this.zLevel.chunks) {
-      let renderedChunk = new RenderedChunk(chunk, onNodeFocus);
+      let renderedChunk = new RenderedChunk(chunk, onNodeFocus, texture);
       this.renderedChunks.put(chunk, renderedChunk)
       this.container.addChild(renderedChunk.container)
     }

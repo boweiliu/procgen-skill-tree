@@ -58,7 +58,7 @@ export class Chunk {
 export class RenderedChunk {
   public chunk!: Chunk;
   public container: Pixi.Container;
-  public renderedNodes: HashMap<Vector2, Pixi.Graphics> = new HashMap();
+  public renderedNodes: HashMap<Vector2, Pixi.Graphics | Pixi.Sprite> = new HashMap();
 
   public static SPACING_PX: number = 24;
   public static CHUNK_SPACING_PX: number = (Chunk.CHUNK_DIM + 0.5) * RenderedChunk.SPACING_PX;
@@ -66,7 +66,7 @@ export class RenderedChunk {
   public static NODE_HITAREA_PX: number = 18;
   public static NODE_ROUNDED_PX: number = 4;
 
-  constructor(chunk: Chunk, onNodeFocus?: Function) {
+  constructor(chunk: Chunk, onNodeFocus?: Function, texture?: Pixi.Texture) {
     this.chunk = chunk;
     // this.parentContainer = parent;
 
@@ -74,26 +74,47 @@ export class RenderedChunk {
     this.container = new Pixi.Container();
 
     for (let node of chunk.nodes) {
-      let g = new Pixi.Graphics();
-      this.renderedNodes.put(node, g);
-      g.beginFill(0xff8080);
-      if (node.x == 0 && node.y == 0) {
-        g.beginFill(0xff0000);
+      let g: Pixi.Graphics | Pixi.Sprite = new Pixi.Graphics();
+      if (!texture) {
+        // g.beginFill(0xff8080);
+        // // if (node.x == 0 && node.y == 0) {
+        // //   g.beginFill(0xff0000);
+        // // }
+        // g.drawRoundedRect(
+        //   node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
+        //   node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
+        //   RenderedChunk.NODE_SIZE_PX,
+        //   RenderedChunk.NODE_SIZE_PX,
+        //   RenderedChunk.NODE_ROUNDED_PX
+        // );
+        // this.renderedNodes.put(node, g);
+        // g.hitArea = new Pixi.Rectangle(
+        //   node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
+        //   node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
+        //   RenderedChunk.NODE_HITAREA_PX,
+        //   RenderedChunk.NODE_HITAREA_PX,
+        // )
+      } else {
+        g = new Pixi.Sprite(texture);
+        g.anchor.x = 0.5;
+        g.anchor.y = 0.5;
+        g.x = node.x * RenderedChunk.SPACING_PX;
+        g.y = node.y * RenderedChunk.SPACING_PX;
+        g.hitArea = new Pixi.Rectangle(
+          - RenderedChunk.NODE_HITAREA_PX / 2,
+          - RenderedChunk.NODE_HITAREA_PX / 2,
+          RenderedChunk.NODE_HITAREA_PX,
+          RenderedChunk.NODE_HITAREA_PX,
+        )
+        this.renderedNodes.put(node, g);
       }
-      g.drawRoundedRect(
-        node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
-        node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
-        RenderedChunk.NODE_SIZE_PX,
-        RenderedChunk.NODE_SIZE_PX,
-        RenderedChunk.NODE_ROUNDED_PX
-      );
-      g.hitArea = new Pixi.Rectangle(
-        node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
-        node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_HITAREA_PX / 2,
-        RenderedChunk.NODE_HITAREA_PX,
-        RenderedChunk.NODE_HITAREA_PX,
-      )
       g.interactive = true;
+
+      if (this.chunk.allocatedNodes.get(node)) {
+        g.tint = 0x00aaff;
+      } else if (this.chunk.selectedNodes.get(node)) {
+        g.tint = 0xBBBBBB;
+      }
       g.addListener("pointerdown", () => {
         onNodeFocus?.(this.chunk, node);
         console.log(`clicked chunk ${this.chunk.location.x} ${this.chunk.location.y} node ${node.x}, ${node.y}`);

@@ -6,6 +6,7 @@ import createBunnyExample from "./BunnyExample";
 import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderedZLevel, ZLevel } from "./ZLevel";
+import { HashMap } from "../lib/util/data_structures/hash";
 
 export type Config = {
   originalWindowWidth: number;
@@ -194,11 +195,35 @@ export class Application {
     // test
     // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
 
+
+    // TODO(bowei): move this code outta here!!
+    // generate a texture
+    let g = new Pixi.Graphics();
+    g.beginFill(0xff8080);
+    g.drawRoundedRect(
+      - RenderedChunk.NODE_SIZE_PX / 2,
+      - RenderedChunk.NODE_SIZE_PX / 2,
+      RenderedChunk.NODE_SIZE_PX,
+      RenderedChunk.NODE_SIZE_PX,
+      RenderedChunk.NODE_ROUNDED_PX
+    );
+    // g.x = 200;
+    // g.y = 200;
+    // this.app.stage.addChild(g);
+    let texture = this.app.renderer.generateTexture(g, Pixi.SCALE_MODES.NEAREST, 1);
+    // const sprite = new Pixi.Sprite(texture);
+    // sprite.x = 300;
+    // sprite.y = 300;
+    // this.app.stage.addChild(sprite);
+
     // create the world
     let zLevel = new RenderedZLevel(
       new ZLevel(this.randomSeed, 0),
-      this.config.onFocusedNodeChange
+      this.config.onFocusedNodeChange,
+      texture
     );
+    let zLevelPersistence: { [i: number]: ZLevel } = {};
+    zLevelPersistence[0] = zLevel.zLevel;
     // find the 0th square, and allocate it
     for (let chunk of zLevel.zLevel.chunks) {
       if (chunk.location.x === 0 && chunk.location.y === 0) {
@@ -218,10 +243,12 @@ export class Application {
     
     // let preloadedZLevelDown = new RenderedZLevel(
     //   new ZLevel(this.randomSeed, -1),
-    //   this.config.onFocusedNodeChange
+    //   this.config.onFocusedNodeChange,
+    //   texture
     // )
     let chunkOriginalWidth = chunksContainer.width;
     let chunkOriginalHeight = chunksContainer.height;
+
     this.app.ticker.add((delta) => {
       if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
         // reset
@@ -242,14 +269,21 @@ export class Application {
           backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
           setTimeout(() => {
+            let newZIndex = zLevel.zLevel.z - 1;
+            // prefer cached persistence data if it is available
+            if (!zLevelPersistence[newZIndex]) {
+              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+            }
             zLevel = new RenderedZLevel(
-              new ZLevel(this.randomSeed, zLevel.zLevel.z - 1),
-              this.config.onFocusedNodeChange
+              zLevelPersistence[newZIndex],
+              this.config.onFocusedNodeChange,
+              texture
             );
             // zLevel = preloadedZLevelDown;
             // preloadedZLevelDown = new RenderedZLevel(
             //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-            //   this.config.onFocusedNodeChange
+            //   this.config.onFocusedNodeChange,
+            //   texture
             // );
             chunksContainer = zLevel.container;
             this.actionStage.addChild(chunksContainer);
@@ -271,14 +305,21 @@ export class Application {
           backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
           setTimeout(() => {
+            let newZIndex = zLevel.zLevel.z + 1;
+            // prefer cached persistence data if it is available
+            if (!zLevelPersistence[newZIndex]) {
+              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+            }
             zLevel = new RenderedZLevel(
-              new ZLevel(this.randomSeed, zLevel.zLevel.z + 1),
-              this.config.onFocusedNodeChange
+              zLevelPersistence[newZIndex],
+              this.config.onFocusedNodeChange,
+              texture
             );
             // zLevel = preloadedZLevelDown;
             // preloadedZLevelDown = new RenderedZLevel(
             //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-            //   this.config.onFocusedNodeChange
+            //   this.config.onFocusedNodeChange,
+            //   texture
             // );
             chunksContainer = zLevel.container;
             this.actionStage.addChild(chunksContainer);
