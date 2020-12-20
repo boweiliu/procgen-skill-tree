@@ -3,8 +3,10 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { INTMAX32, squirrel3 } from "../lib/util/random";
 import * as Pixi from "pixi.js";
 
-
 export class Chunk {
+  public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
+  public static CHUNK_HALF_DIM = (Chunk.CHUNK_DIM - 1) / 2;
+
   public id!: number;
 
   public nodes: Vector2[] = [];
@@ -17,10 +19,10 @@ export class Chunk {
 
     this.id = squirrel3(seed + squirrel3(seed + this.location.x) + this.location.y);
 
-    // 15x15 grid?
+    // determine which nodes we want to throw out - 
     let allNodes: Vector2[] = [];
-    for (let i = -3; i <= 3; i++) {
-      for (let j = -3; j <= 3; j++) {
+    for (let i = -Chunk.CHUNK_HALF_DIM; i <= Chunk.CHUNK_HALF_DIM; i++) {
+      for (let j = -Chunk.CHUNK_HALF_DIM; j <= Chunk.CHUNK_HALF_DIM; j++) {
         allNodes.push(new Vector2(i, j))
       }
     }
@@ -38,10 +40,10 @@ export class RenderedChunk {
   public chunk!: Chunk;
   public container: Pixi.Container;
 
-  public spacingPx: number = 24;
-  public chunkSpacingPx: number = 8 * this.spacingPx;
-  public nodeSizePx: number = 14;
-  public nodeRoundedPx: number = 4;
+  public static SPACING_PX: number = 24;
+  public static CHUNK_SPACING_PX: number = (Chunk.CHUNK_DIM + 1) * RenderedChunk.SPACING_PX;
+  public static NODE_SIZE_PX: number = 14;
+  public static NODE_ROUNDED_PX: number = 4;
 
   constructor(chunk: Chunk, ticker: Pixi.Ticker, onNodeFocus?: Function) {
     this.chunk = chunk;
@@ -57,11 +59,11 @@ export class RenderedChunk {
         g.beginFill(0xff0000);
       }
       g.drawRoundedRect(
-        node.x * this.spacingPx - this.nodeSizePx / 2,
-        node.y * this.spacingPx - this.nodeSizePx / 2,
-        this.nodeSizePx,
-        this.nodeSizePx,
-        this.nodeRoundedPx
+        node.x * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
+        node.y * RenderedChunk.SPACING_PX - RenderedChunk.NODE_SIZE_PX / 2,
+        RenderedChunk.NODE_SIZE_PX,
+        RenderedChunk.NODE_SIZE_PX,
+        RenderedChunk.NODE_ROUNDED_PX
       );
       g.interactive = true;
       g.addListener("pointerdown", () => {
@@ -73,7 +75,7 @@ export class RenderedChunk {
       this.container.addChild(g);
     }
 
-    this.container.x = this.chunk.location.x * this.chunkSpacingPx;
-    this.container.y = this.chunk.location.y * this.chunkSpacingPx;
+    this.container.x = this.chunk.location.x * RenderedChunk.CHUNK_SPACING_PX;
+    this.container.y = this.chunk.location.y * RenderedChunk.CHUNK_SPACING_PX;
   }
 }
