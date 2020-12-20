@@ -6,6 +6,7 @@ import createBunnyExample from "./BunnyExample";
 import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderedZLevel, ZLevel } from "./ZLevel";
+import { HashMap } from "../lib/util/data_structures/hash";
 
 export type Config = {
   originalWindowWidth: number;
@@ -221,6 +222,8 @@ export class Application {
       this.config.onFocusedNodeChange,
       texture
     );
+    let zLevelPersistence: { [i: number]: ZLevel } = {};
+    zLevelPersistence[0] = zLevel.zLevel;
     // find the 0th square, and allocate it
     for (let chunk of zLevel.zLevel.chunks) {
       if (chunk.location.x === 0 && chunk.location.y === 0) {
@@ -245,6 +248,7 @@ export class Application {
     // )
     let chunkOriginalWidth = chunksContainer.width;
     let chunkOriginalHeight = chunksContainer.height;
+
     this.app.ticker.add((delta) => {
       if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
         // reset
@@ -265,8 +269,13 @@ export class Application {
           backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
           setTimeout(() => {
+            let newZIndex = zLevel.zLevel.z - 1;
+            // prefer cached persistence data if it is available
+            if (!zLevelPersistence[newZIndex]) {
+              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+            }
             zLevel = new RenderedZLevel(
-              new ZLevel(this.randomSeed, zLevel.zLevel.z - 1),
+              zLevelPersistence[newZIndex],
               this.config.onFocusedNodeChange,
               texture
             );
@@ -296,8 +305,13 @@ export class Application {
           backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
           setTimeout(() => {
+            let newZIndex = zLevel.zLevel.z + 1;
+            // prefer cached persistence data if it is available
+            if (!zLevelPersistence[newZIndex]) {
+              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+            }
             zLevel = new RenderedZLevel(
-              new ZLevel(this.randomSeed, zLevel.zLevel.z + 1),
+              zLevelPersistence[newZIndex],
               this.config.onFocusedNodeChange,
               texture
             );

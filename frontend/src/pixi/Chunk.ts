@@ -109,6 +109,12 @@ export class RenderedChunk {
         this.renderedNodes.put(node, g);
       }
       g.interactive = true;
+
+      if (this.chunk.allocatedNodes.get(node)) {
+        g.tint = 0x00aaff;
+      } else if (this.chunk.selectedNodes.get(node)) {
+        g.tint = 0xBBBBBB;
+      }
       g.addListener("pointerdown", () => {
         onNodeFocus?.(this.chunk, node);
         console.log(`clicked chunk ${this.chunk.location.x} ${this.chunk.location.y} node ${node.x}, ${node.y}`);
