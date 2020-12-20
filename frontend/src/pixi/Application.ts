@@ -9,6 +9,7 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 export type Config = {
   originalWindowWidth: number;
   originalWindowHeight: number;
+  onFocusedNodeChange?: Function;
 };
 
 const defaultConfig: Config = {
@@ -194,7 +195,13 @@ export class Application {
     })
     for (let i = -3; i <= 3; i++) {
       for (let j = -3; j <= 3; j++) {
-        chunksContainer.addChild((new RenderedChunk(new Chunk(this.randomSeed, new Vector2(i, j)), this.app.ticker)).container);
+        chunksContainer.addChild(
+          new RenderedChunk(
+            new Chunk(this.randomSeed, new Vector2(i, j)),
+            this.app.ticker,
+            this.config.onFocusedNodeChange
+          ).container
+        );
       }
     }
   }

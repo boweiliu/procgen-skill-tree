@@ -1,0 +1,12 @@
+.layout {
+  position:fixed;
+  right:0;
+  left:auto;
+  height:100%;
+  width:30%;
+  top:0;
+  flex:1 0 auto;
+  overflow-y:auto;
+  flex-direction: column;
+  background-color: rgba(30,30,30,.30)
+}

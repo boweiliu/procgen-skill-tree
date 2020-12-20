@@ -35,7 +35,7 @@ export class Chunk {
 }
 
 export class RenderedChunk {
-  public chunk!: Chunk
+  public chunk!: Chunk;
   public container: Pixi.Container;
 
   public spacingPx: number = 24;
@@ -43,10 +43,10 @@ export class RenderedChunk {
   public nodeSizePx: number = 14;
   public nodeRoundedPx: number = 4;
 
-  constructor(chunk: Chunk, ticker: Pixi.Ticker) {
+  constructor(chunk: Chunk, ticker: Pixi.Ticker, onNodeFocus?: Function) {
     this.chunk = chunk;
     // this.parentContainer = parent;
-    
+
     // render the thing
     this.container = new Pixi.Container();
 
@@ -57,18 +57,19 @@ export class RenderedChunk {
         g.beginFill(0xff0000);
       }
       g.drawRoundedRect(
-        node.x * this.spacingPx - this.nodeSizePx/2,
-        node.y * this.spacingPx - this.nodeSizePx/2,
+        node.x * this.spacingPx - this.nodeSizePx / 2,
+        node.y * this.spacingPx - this.nodeSizePx / 2,
         this.nodeSizePx,
         this.nodeSizePx,
         this.nodeRoundedPx
       );
       g.interactive = true;
-      g.addListener('pointerdown', () => {
+      g.addListener("pointerdown", () => {
+        onNodeFocus?.(chunk, node);
         console.log(`clicked chunk ${chunk.id} node ${node.x}, ${node.y}`);
-        g.tint = 0x0000FF;
+        g.tint = 0x0000ff;
         g.alpha = 0.5;
-      })
+      });
       this.container.addChild(g);
     }
 
