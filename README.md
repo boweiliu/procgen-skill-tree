@@ -109,3 +109,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
 Google Fonts as example:
 https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap
 
+
+## GameContext possible issues
+If too many frequent changes, will trigger all components that use the GameContext to re-render.
+https://github.com/facebook/react/issues/15156

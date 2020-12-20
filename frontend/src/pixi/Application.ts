@@ -5,16 +5,18 @@ import { registerDraggable } from "../lib/pixi/DraggableHelper";
 import createBunnyExample from "./BunnyExample";
 import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
+import { RenderedZLevel, ZLevel } from "./ZLevel";
 
 export type Config = {
   originalWindowWidth: number;
   originalWindowHeight: number;
-  onFocusedNodeChange?: Function;
+  onFocusedNodeChange: Function;
 };
 
 const defaultConfig: Config = {
   originalWindowWidth: 800,
   originalWindowHeight: 800,
+  onFocusedNodeChange: () => { }
 };
 
 export type Point = number[];
@@ -30,6 +32,8 @@ export class Application {
   public actionStage!: Pixi.Container;
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
   public backdropStage!: Pixi.Container;
+
+  public keyboard!: KeyboardState;
 
   public config!: Config;
 
@@ -81,28 +85,11 @@ export class Application {
     this.backdropStage.zIndex = -1;
     this.backdropStage.sortableChildren = true;
     this.stage.addChild(this.backdropStage);
-    registerDraggable({
-      source: this.backdropStage,
-      // dragging backdrop stage should move action stage in the reverse direction -- we're dragging the backdrop, not an entity
-      target: this.actionStage,
-    });
 
-    const keyboard = new KeyboardState();
-    this.app.ticker.add((delta) => {
-      keyboard.update();
-      if (keyboard.down.Right) {
-        this.actionStage.x -= 10 * delta;
-      }
-      if (keyboard.down.Left) {
-        this.actionStage.x += 10 * delta;
-      }
-      if (keyboard.down.Up) {
-        this.actionStage.y += 10 * delta;
-      }
-      if (keyboard.down.Down) {
-        this.actionStage.y -= 10 * delta;
-      }
-    });
+    this.keyboard = new KeyboardState();
+    this.app.ticker.add(() => {
+      this.keyboard.update();
+    })
 
     this.fpsTracker = new FpsTracker();
     this.app.ticker.add((delta) => {
@@ -153,8 +140,14 @@ export class Application {
     textFpsHud.anchor.x = 1; // right justify
     this.fixedCameraStage.addChild(textFpsHud);
 
-    
-    // add an invisible layer to the entire fixedCameraStage so we can pan and zoom
+    // Register mouse drag to use for panning
+    registerDraggable({
+      source: this.backdropStage,
+      // dragging backdrop stage should move action stage in the reverse direction -- we're dragging the backdrop, not an entity
+      target: this.actionStage,
+    });
+
+    // populate the backdrop layer with something that captures mouse events
     const backdrop = new Pixi.Graphics();
     this.backdropStage.addChild(backdrop);
     backdrop.beginFill(0xabcdef, 1);
@@ -169,6 +162,22 @@ export class Application {
     });
     // backdrop.drawRect(-10000, -10000, 30000, 30000);
 
+    // Register keyboard to use for panning
+    this.app.ticker.add((delta) => {
+      if (this.keyboard.down.Right) {
+        this.actionStage.x -= 10 * delta;
+      }
+      if (this.keyboard.down.Left) {
+        this.actionStage.x += 10 * delta;
+      }
+      if (this.keyboard.down.Up) {
+        this.actionStage.y += 10 * delta;
+      }
+      if (this.keyboard.down.Down) {
+        this.actionStage.y -= 10 * delta;
+      }
+    });
+
     // Add a reticle in the hud at the midpoint
     const reticle = new Pixi.Graphics();
     reticle.lineStyle(2, 0x999999);
@@ -182,27 +191,103 @@ export class Application {
     reticle.interactive = true;
     this.fixedCameraStage.addChild(reticle);
 
-
+    // test
     // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
 
-    let chunksContainer = new Pixi.Container();
+    // create the world
+    let zLevel = new RenderedZLevel(
+      new ZLevel(this.randomSeed, 0),
+      this.config.onFocusedNodeChange
+    );
+    // find the 0th square, and allocate it
+    for (let chunk of zLevel.zLevel.chunks) {
+      if (chunk.location.x === 0 && chunk.location.y === 0) {
+        chunk.allocatedNodes.put(new Vector2(0, 0));
+        zLevel.renderedChunks.get(chunk).renderedNodes.get(new Vector2(0, 0)).tint = 0x00AAFF;
+      }
+    }
+    let chunksContainer = zLevel.container;
     this.actionStage.addChild(chunksContainer);
     chunksContainer.x = this.app.screen.width/2;
     chunksContainer.y = this.app.screen.height/2;
     this.onResize.push(() => {
-      chunksContainer.x = this.app.screen.width/2;
-      chunksContainer.y = this.app.screen.height/2;
-    })
-    for (let i = -3; i <= 3; i++) {
-      for (let j = -3; j <= 3; j++) {
-        chunksContainer.addChild(
-          new RenderedChunk(
-            new Chunk(this.randomSeed, new Vector2(i, j)),
-            this.app.ticker,
-            this.config.onFocusedNodeChange
-          ).container
-        );
+      chunksContainer.x = this.app.screen.width / 2;
+      chunksContainer.y = this.app.screen.height / 2;
+    });
+
+    
+    // let preloadedZLevelDown = new RenderedZLevel(
+    //   new ZLevel(this.randomSeed, -1),
+    //   this.config.onFocusedNodeChange
+    // )
+    let chunkOriginalWidth = chunksContainer.width;
+    let chunkOriginalHeight = chunksContainer.height;
+    this.app.ticker.add((delta) => {
+      if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
+        // reset
+        chunksContainer.alpha = 1;
+        chunksContainer.width = chunkOriginalWidth;
+        chunksContainer.height = chunkOriginalHeight;
       }
-    }
+
+      if (this.keyboard.down[">"]) {
+        // phase out the current z level and go to another one
+        chunksContainer.alpha -= 0.1;
+        chunksContainer.width *= 1.03;
+        chunksContainer.height *= 1.03;
+        // this.actionStage.removeChild(chunksContainer);
+        if (chunksContainer.alpha <= 0) {
+          chunksContainer.alpha = 1;
+          // start the process to render next z level
+          backdrop.tint = 0xDDAADD;
+          this.actionStage.removeChild(chunksContainer);
+          setTimeout(() => {
+            zLevel = new RenderedZLevel(
+              new ZLevel(this.randomSeed, zLevel.zLevel.z - 1),
+              this.config.onFocusedNodeChange
+            );
+            // zLevel = preloadedZLevelDown;
+            // preloadedZLevelDown = new RenderedZLevel(
+            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+            //   this.config.onFocusedNodeChange
+            // );
+            chunksContainer = zLevel.container;
+            this.actionStage.addChild(chunksContainer);
+            chunksContainer.x = this.app.screen.width / 2;
+            chunksContainer.y = this.app.screen.height / 2;
+            backdrop.tint = 0xFFFFFF;
+          });
+        }
+      }
+      if (this.keyboard.down["<"]) {
+        // phase out the current z level and go to another one
+        chunksContainer.alpha -= 0.1;
+        chunksContainer.width *= 1/1.03;
+        chunksContainer.height *= 1/1.03;
+        // this.actionStage.removeChild(chunksContainer);
+        if (chunksContainer.alpha <= 0) {
+          // start the process to render next z level
+          chunksContainer.alpha = 1;
+          backdrop.tint = 0xDDAADD;
+          this.actionStage.removeChild(chunksContainer);
+          setTimeout(() => {
+            zLevel = new RenderedZLevel(
+              new ZLevel(this.randomSeed, zLevel.zLevel.z + 1),
+              this.config.onFocusedNodeChange
+            );
+            // zLevel = preloadedZLevelDown;
+            // preloadedZLevelDown = new RenderedZLevel(
+            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+            //   this.config.onFocusedNodeChange
+            // );
+            chunksContainer = zLevel.container;
+            this.actionStage.addChild(chunksContainer);
+            chunksContainer.x = this.app.screen.width / 2;
+            chunksContainer.y = this.app.screen.height / 2;
+            backdrop.tint = 0xFFFFFF;
+          });
+        }
+      }
+    });
   }
 }

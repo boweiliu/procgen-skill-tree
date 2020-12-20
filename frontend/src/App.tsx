@@ -1,36 +1,30 @@
 import "./App.css";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
+import { GameContext, UIContext } from "./contexts";
+import { Chunk } from "./pixi/Chunk";
+import { Vector2 } from "./lib/util/geometry/vector2";
 
 function App() {
-  const [focusedNode, setFocusedNode] = useState({ chunk: null, node: null });
+  const [focusedNode, setFocusedNode] = useState < { chunk: Chunk, node: Vector2 }>();
+  const uiState = useMemo(() => ({ focusedNode }), [focusedNode]);
+  const game = useMemo(() => ({}),[])
   const handleFocusedNodeChange = useCallback(
     (chunk, node) => {
-      console.log("asdf");
       setFocusedNode({ chunk, node });
     },
     [setFocusedNode]
   );
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-  </header> */}
-      <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
-      <NodeDetail focusedNode={focusedNode} />
+      <GameContext.Provider value={game}>
+        <UIContext.Provider value={uiState}>
+            <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
+            <NodeDetail focusedNode={focusedNode} />
+        </UIContext.Provider>
+      </GameContext.Provider>
     </div>
   );
 }
