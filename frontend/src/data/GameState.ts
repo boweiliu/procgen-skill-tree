@@ -52,7 +52,7 @@ export type PlayerSaveState = {
 }
 
 export type PlayerUIState = {
-  selectedPointNode?: PointNodeRef,
+  selectedPointNode: PointNodeRef | undefined,
 }
 
 export class PointNodeRef {

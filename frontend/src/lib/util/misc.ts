@@ -143,19 +143,31 @@ export class Util {
   }
 }
 
-export function updaterGenerator(dataObject: any, dataUpdater: any): any {
-  const updaters: any = {};
+type UpdaterFnParam<T> = T | ((prev: T) => T);
+type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;
+
+type UpdaterGeneratorType<T> = {
+  [k in keyof T]: T[k] extends { [kkt: string]: any }
+  ? (UpdaterGeneratorType<T[k]> & { getUpdater: () => UpdaterFn<T[k]> })
+  : { getUpdater: () => UpdaterFn<T[k]> }
+} & { getUpdater: () => UpdaterFn<T> }
+
+export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType<T> {
+  const updaters: UpdaterGeneratorType<T> = {} as any;
   updaters.getUpdater = () => dataUpdater;
   if (typeof dataObject !== "object") return updaters;
-  const keys = Object.keys(dataObject);
-  keys.forEach((key) => {
-    function keyUpdater(newValueOrCallback) {
+  const keys : (keyof T)[] = Object.keys(dataObject) as any as (keyof T)[];
+  keys.forEach((key: (keyof T)) => {
+    const asdfaf: T[typeof key] = dataObject[key];
+    // function keyUpdater(newValueOrCallback: (T[typeof key] | ((prev: T[typeof key]) => T[typeof key]) )) {
+    function keyUpdater(newValueOrCallback: UpdaterFnParam<T[typeof key]>) {
       // console.log(newValueOrCallback);
       if (typeof newValueOrCallback === "function") {
+      // if (newValueOrCallback is "function") {
         dataUpdater((oldData) => {
           const newData = {
             ...oldData,
-            [key]: newValueOrCallback(oldData[key]),
+            [key]: (newValueOrCallback as Function)(oldData[key]),
           };
           // console.log({ newData });
           return newData;
@@ -164,8 +176,9 @@ export function updaterGenerator(dataObject: any, dataUpdater: any): any {
         dataUpdater((oldData) => ({ ...oldData, [key]: newValueOrCallback }));
       }
     }
-    updaters[key] = updaterGenerator(dataObject[key], keyUpdater);
+    updaters[key] = updaterGenerator(dataObject[key], keyUpdater) as any;
     // updaters[key].getUpdater = () => keyUpdater;
   });
   return updaters;
 }
+
