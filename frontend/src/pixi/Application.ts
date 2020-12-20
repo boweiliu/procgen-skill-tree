@@ -213,27 +213,14 @@ export class Application {
     //   new ZLevel(this.randomSeed, -1),
     //   this.config.onFocusedNodeChange
     // )
-    let goingZDirection = 0;
+    let chunkOriginalWidth = chunksContainer.width;
+    let chunkOriginalHeight = chunksContainer.height;
     this.app.ticker.add((delta) => {
-      if (this.keyboard.justUp[">"]) {
-        goingZDirection = 0;
+      if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
+        // reset
         chunksContainer.alpha = 1;
-      }
-      if (this.keyboard.justUp["<"]) {
-        goingZDirection = 0;
-        chunksContainer.alpha = 1;
-      }
-      if (this.keyboard.justDown[">"]) {
-        if (goingZDirection != -1) {
-          chunksContainer.alpha = 1;
-          goingZDirection = -1;
-        }
-      }
-      if (this.keyboard.justDown["<"]) {
-        if (goingZDirection != 1) {
-          chunksContainer.alpha = 1;
-          goingZDirection = 1;
-        }
+        chunksContainer.width = chunkOriginalWidth;
+        chunksContainer.height = chunkOriginalHeight;
       }
 
       if (this.keyboard.down[">"]) {
@@ -243,20 +230,26 @@ export class Application {
         chunksContainer.height *= 1.03;
         // this.actionStage.removeChild(chunksContainer);
         if (chunksContainer.alpha <= 0) {
+          chunksContainer.alpha = 1;
+          // start the process to render next z level
+          backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
-          zLevel = new RenderedZLevel(
-            new ZLevel(this.randomSeed, zLevel.zLevel.z - 1),
-            this.config.onFocusedNodeChange
-          );
-          // zLevel = preloadedZLevelDown;
-          // preloadedZLevelDown = new RenderedZLevel(
-          //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-          //   this.config.onFocusedNodeChange
-          // );
-          chunksContainer = zLevel.container;
-          this.actionStage.addChild(chunksContainer);
-          chunksContainer.x = this.app.screen.width/2;
-          chunksContainer.y = this.app.screen.height/2;
+          setTimeout(() => {
+            zLevel = new RenderedZLevel(
+              new ZLevel(this.randomSeed, zLevel.zLevel.z - 1),
+              this.config.onFocusedNodeChange
+            );
+            // zLevel = preloadedZLevelDown;
+            // preloadedZLevelDown = new RenderedZLevel(
+            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+            //   this.config.onFocusedNodeChange
+            // );
+            chunksContainer = zLevel.container;
+            this.actionStage.addChild(chunksContainer);
+            chunksContainer.x = this.app.screen.width / 2;
+            chunksContainer.y = this.app.screen.height / 2;
+            backdrop.tint = 0xFFFFFF;
+          });
         }
       }
       if (this.keyboard.down["<"]) {
@@ -266,20 +259,26 @@ export class Application {
         chunksContainer.height *= 1/1.03;
         // this.actionStage.removeChild(chunksContainer);
         if (chunksContainer.alpha <= 0) {
+          // start the process to render next z level
+          chunksContainer.alpha = 1;
+          backdrop.tint = 0xDDAADD;
           this.actionStage.removeChild(chunksContainer);
-          zLevel = new RenderedZLevel(
-            new ZLevel(this.randomSeed, zLevel.zLevel.z + 1),
-            this.config.onFocusedNodeChange
-          );
-          // zLevel = preloadedZLevelDown;
-          // preloadedZLevelDown = new RenderedZLevel(
-          //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-          //   this.config.onFocusedNodeChange
-          // );
-          chunksContainer = zLevel.container;
-          this.actionStage.addChild(chunksContainer);
-          chunksContainer.x = this.app.screen.width/2;
-          chunksContainer.y = this.app.screen.height/2;
+          setTimeout(() => {
+            zLevel = new RenderedZLevel(
+              new ZLevel(this.randomSeed, zLevel.zLevel.z + 1),
+              this.config.onFocusedNodeChange
+            );
+            // zLevel = preloadedZLevelDown;
+            // preloadedZLevelDown = new RenderedZLevel(
+            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+            //   this.config.onFocusedNodeChange
+            // );
+            chunksContainer = zLevel.container;
+            this.actionStage.addChild(chunksContainer);
+            chunksContainer.x = this.app.screen.width / 2;
+            chunksContainer.y = this.app.screen.height / 2;
+            backdrop.tint = 0xFFFFFF;
+          });
         }
       }
     });
