@@ -2,12 +2,14 @@ import { Line } from "../lib/util/geometry/line";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { INTMAX32, squirrel3 } from "../lib/util/random";
 import * as Pixi from "pixi.js";
+import { HashSet } from "../lib/util/data_structures/hash";
 
 export class Chunk {
   public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
   public static CHUNK_HALF_DIM = (Chunk.CHUNK_DIM - 1) / 2;
+  public static DROP_NODES_CHANCE = 0.3; // before generating edges, how many of the nodes to throw out
 
-  public id!: number;
+  private id!: number;
 
   public nodes: Vector2[] = [];
   public edges: Line[] = [];
@@ -19,18 +21,28 @@ export class Chunk {
 
     this.id = squirrel3(seed + squirrel3(seed + this.location.x) + this.location.y);
 
-    // determine which nodes we want to throw out - 
-    let allNodes: Vector2[] = [];
+    // determine which nodes we want to throw out - also keep 4way rotational symmetry
+    let droppedNodes: HashSet<Vector2> = new HashSet();
     for (let i = -Chunk.CHUNK_HALF_DIM; i <= Chunk.CHUNK_HALF_DIM; i++) {
       for (let j = -Chunk.CHUNK_HALF_DIM; j <= Chunk.CHUNK_HALF_DIM; j++) {
-        allNodes.push(new Vector2(i, j))
+        if (i === 0 && j === 0) {
+          continue;
+        }
+        if (squirrel3(this.id + i * Chunk.CHUNK_DIM + j) / INTMAX32 < Chunk.DROP_NODES_CHANCE / 4) {
+          droppedNodes.put(new Vector2(i, j));
+          droppedNodes.put(new Vector2(j, -i));
+          droppedNodes.put(new Vector2(-i, -j));
+          droppedNodes.put(new Vector2(-j, i));
+        }
       }
     }
 
-    // drop some of them...?
-    for (let i = 0; i < allNodes.length; i++) {
-      if (squirrel3(this.id + i) / INTMAX32 < 0.9 || allNodes[i].x == 0 && allNodes[i].y == 0) {
-        this.nodes.push(allNodes[i]);
+    for (let i = -Chunk.CHUNK_HALF_DIM; i <= Chunk.CHUNK_HALF_DIM; i++) {
+      for (let j = -Chunk.CHUNK_HALF_DIM; j <= Chunk.CHUNK_HALF_DIM; j++) {
+        let loc = new Vector2(i, j);
+        if (!droppedNodes.get(loc)) {
+          this.nodes.push(new Vector2(i, j));
+        }
       }
     }
   }
@@ -41,11 +53,11 @@ export class RenderedChunk {
   public container: Pixi.Container;
 
   public static SPACING_PX: number = 24;
-  public static CHUNK_SPACING_PX: number = (Chunk.CHUNK_DIM + 1) * RenderedChunk.SPACING_PX;
+  public static CHUNK_SPACING_PX: number = (Chunk.CHUNK_DIM + 0.5) * RenderedChunk.SPACING_PX;
   public static NODE_SIZE_PX: number = 14;
   public static NODE_ROUNDED_PX: number = 4;
 
-  constructor(chunk: Chunk, ticker: Pixi.Ticker, onNodeFocus?: Function) {
+  constructor(chunk: Chunk, onNodeFocus?: Function) {
     this.chunk = chunk;
     // this.parentContainer = parent;
 
@@ -68,7 +80,7 @@ export class RenderedChunk {
       g.interactive = true;
       g.addListener("pointerdown", () => {
         onNodeFocus?.(chunk, node);
-        console.log(`clicked chunk ${chunk.id} node ${node.x}, ${node.y}`);
+        console.log(`clicked chunk ${chunk.location.x} ${chunk.location.y} node ${node.x}, ${node.y}`);
         g.tint = 0x0000ff;
         g.alpha = 0.5;
       });

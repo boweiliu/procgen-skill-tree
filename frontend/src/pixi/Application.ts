@@ -198,7 +198,6 @@ export class Application {
         chunksContainer.addChild(
           new RenderedChunk(
             new Chunk(this.randomSeed, new Vector2(i, j)),
-            this.app.ticker,
             this.config.onFocusedNodeChange
           ).container
         );
