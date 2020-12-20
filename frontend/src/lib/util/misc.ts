@@ -162,6 +162,12 @@ type Complicated = {
   // }
 }
 
+type EmptyComplicated = {
+  x: {
+    y: undefined
+  }
+}
+
 type Target = {
   x: {
     y: {

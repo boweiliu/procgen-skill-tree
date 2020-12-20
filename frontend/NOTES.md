@@ -78,3 +78,16 @@ https://www.dafont.com/bitmap.php
 https://www.dafont.com/04b-03.font
 
 
+
+useCallback/useMemo:
+
+https://medium.com/@infinitypaul/reactjs-useeffect-usecallback-simplified-91e69fb0e7a3
+
+https://medium.com/@jan.hesters/usecallback-vs-usememo-c23ad1dc60
+
+https://kentcdodds.com/blog/usememo-and-usecallback
+
+
+typescript: 
+
+https://github.com/microsoft/TypeScript/issues/7648
