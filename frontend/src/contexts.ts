@@ -1,11 +1,5 @@
 import React from "react";
-import { Vector2 } from "./lib/util/geometry/vector2";
-import { Chunk } from "./pixi/Chunk";
+import { GameState } from "./data/GameState";
 
-export const GameContext = React.createContext<{
-  [k: string]: any;
-}>({});
-
-export const UIContext = React.createContext<{
-  focusedNode?: { chunk: Chunk; node: Vector2 };
-}>({});
+// should be OK, just remember to populate the context
+export const GameContext = React.createContext<GameState>(null as any);

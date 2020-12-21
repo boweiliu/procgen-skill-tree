@@ -16,11 +16,13 @@ export class GameStateFactory {
         seed: 0xcafebabe,
         zLevels: []
       },
-      player: {
-        selectedPointNode: undefined,
+      playerSave: {
         selectedPointNodeHistory: [],
         allocatedPointNodeSet: new HashSet(),
         allocatedPointNodeHistory: []
+      },
+      playerUI: {
+        selectedPointNode: undefined,
       }
     }
   }

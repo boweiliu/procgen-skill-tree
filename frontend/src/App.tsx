@@ -9,9 +9,10 @@ import QuestProgress from "./components/QuestProgress";
 import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
 import Tabs from "./components/Tabs";
-import { GameContext, UIContext } from "./contexts";
+import { GameContext } from "./contexts";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import { Chunk } from "./pixi/Chunk";
+import { GameStateFactory } from "./dataFactory/GameStateFactory";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -31,8 +32,11 @@ function App() {
   }>();
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
+  // const uiState = { focusedNode }; // recomputes every rerender
   const uiState = useMemo(() => ({ focusedNode }), [focusedNode]);
-  const game = useMemo(() => ({}), []);
+  const game = useMemo(() => {
+    return new GameStateFactory({}).create();
+  }, []);
   const handleFocusedNodeChange = useCallback(
     (chunk, node) => {
       setBatchContents((n) => n - 1);
@@ -63,23 +67,21 @@ function App() {
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <GameContext.Provider value={game}>
-        <UIContext.Provider value={uiState}>
-          <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
-          <Sidebar>
-            <Tabs
-              value={activeTab}
-              labels={tabLabels}
-              onChange={handleActiveTabChange}
-            />
-            {tabViews.map((component, i) => {
-              return (
-                <TabContent key={i} showContent={activeTab === i}>
-                  {component}
-                </TabContent>
-              );
-            })}
-          </Sidebar>
-        </UIContext.Provider>
+        <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
+        <Sidebar>
+          <Tabs
+            value={activeTab}
+            labels={tabLabels}
+            onChange={handleActiveTabChange}
+          />
+          {tabViews.map((component, i) => {
+            return (
+              <TabContent key={i} showContent={activeTab === i}>
+                {component}
+              </TabContent>
+            );
+          })}
+        </Sidebar>
       </GameContext.Provider>
     </div>
   );
