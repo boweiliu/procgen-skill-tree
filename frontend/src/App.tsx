@@ -30,12 +30,6 @@ function App() {
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
-  // const uiState = { focusedNode }; // recomputes every rerender
-  // const uiState = useMemo(() => ({ focusedNode }), [focusedNode]);
-
-  // const game = useMemo(() => {
-  //   return new GameStateFactory({}).create();
-  // }, []);
   const [game, setGame] = useState<GameState>(
     new GameStateFactory({}).create()
   );
@@ -51,13 +45,6 @@ function App() {
     [setGame]
   );
 
-  // const handleFocusedNodeChange = useCallback(
-  //   (chunk, node) => {
-  //     setBatchContents((n) => n - 1);
-  //     setFocusedNode({ chunk, node });
-  //   },
-  //   [setFocusedNode]
-  // );
   const handleActiveTabChange = useCallback(
     (activeTabIndex) => {
       setActiveTab(activeTabIndex);

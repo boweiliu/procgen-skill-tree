@@ -6,11 +6,11 @@ export function NodeDetail({
 }: {
   selectedPointNode?: PointNodeRef
 }) {
-  // const [history, setHistory] = useState<{ chunk: any; node: any }[]>([]);
-  // useEffect(() => {
-  //   if (!focusedNode || focusedNode?.chunk === null) return;
-  //   setHistory((history) => [...history, focusedNode]);
-  // }, [focusedNode]);
+  const [history, setHistory] = useState<PointNodeRef[]>([]);
+  useEffect(() => {
+    if (!selectedPointNode) return;
+    setHistory((history) => [...history, selectedPointNode]);
+  }, [selectedPointNode]);
   console.log("in nodedetail, ", selectedPointNode);
   return (
     <>
@@ -23,17 +23,17 @@ export function NodeDetail({
           <h3>X: {selectedPointNode.pointNodeCoord.x}</h3>
           <h3>Y: {selectedPointNode.pointNodeCoord.y}</h3>
           <h2>Previous</h2>
-          {/* ([] as any)
+          {history
             .slice(0, -1)
-            .map(({ chunk, node }, i) => {
+            .map((pointNodeRef: PointNodeRef, i) => {
               return (
                 <div key={i}>
-                  Chunk ({chunk.location.x},{chunk.location.y}) at ({node.x},
-                  {node.y})
+                  Chunk ({pointNodeRef.chunkCoord.x},{pointNodeRef.chunkCoord.y}) at ({pointNodeRef.pointNodeCoord.x},
+                  {pointNodeRef.pointNodeCoord.y})
                 </div>
               );
             })
-          .reverse() */}
+          .reverse()}
         </>
       )}
     </>

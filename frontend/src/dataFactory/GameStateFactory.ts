@@ -18,7 +18,7 @@ export class GameStateFactory {
         zLevels: []
       },
       playerSave: {
-        selectedPointNodeHistory: [],
+        // selectedPointNodeHistory: [],
         allocatedPointNodeSet: new HashSet(),
         allocatedPointNodeHistory: []
       },
