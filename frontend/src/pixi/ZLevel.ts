@@ -1,4 +1,5 @@
 import * as Pixi from "pixi.js";
+import { PointNodeRef } from "../data/GameState";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { squirrel3 } from "../lib/util/random";
@@ -30,7 +31,7 @@ export class RenderedZLevel {
   public container: Pixi.Container;
   public renderedChunks: HashMap<Chunk, RenderedChunk> = new HashMap();
 
-  constructor(zLevel: ZLevel, onNodeFocus: Function, texture?: Pixi.Texture) {
+  constructor(zLevel: ZLevel, onNodeFocus: (selection: PointNodeRef) => void, texture?: Pixi.Texture) {
     this.zLevel = zLevel;
     this.container = new Pixi.Container();
     // this.actionStage.addChild(chunksContainer);

@@ -11,6 +11,7 @@ export class GameStateFactory {
   }
 
   public create(): GameState {
+    console.log("BOWEI CREATING GAME STATE, should only run once!!")
     return {
       worldGen: {
         seed: 0xcafebabe,

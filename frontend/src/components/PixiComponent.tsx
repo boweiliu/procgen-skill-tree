@@ -1,32 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./PixiComponent.css";
 import { Application } from "../pixi/Application";
-
-/**
- * Initialize the pixi app
- */
-// const game = new BaseGame({
-//   scale: 1,
-//   canvasWidth: 800,
-//   canvasHeight: 800,
-//   tileHeight: 16,
-//   tileWidth: 16,
-//   debugFlags: {},
-//   state: {
-//     tick: 0,
-//   },
-//   backgroundColor: 0xffffff, // TODO(bowei): fix this
-// });
-// let application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
+import { PointNodeRef } from "../data/GameState";
 
 export function PixiComponent({
   onFocusedNodeChange,
 }: {
   whatever?: any;
-  onFocusedNodeChange: (...x: any) => void;
+  onFocusedNodeChange: (selection: PointNodeRef) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
-  const [application, setApplication] = useState();
+  const [application, setApplication] = useState<Application>();
   function initializeApplication() {
     const newApp = new Application({
       originalWindowWidth: window.innerWidth,
@@ -55,7 +39,9 @@ export function PixiComponent({
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {
-          container.current!.removeChild(application?.app?.view);
+          if (application) {
+            container.current!.removeChild(application.app.view);
+          }
           initializeApplication();
         }}
       >

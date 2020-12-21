@@ -3,6 +3,7 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { INTMAX32, squirrel3 } from "../lib/util/random";
 import * as Pixi from "pixi.js";
 import { HashMap, HashSet } from "../lib/util/data_structures/hash";
+import { PointNodeRef } from "../data/GameState";
 
 export class Chunk {
   public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
@@ -66,7 +67,7 @@ export class RenderedChunk {
   public static NODE_HITAREA_PX: number = 18;
   public static NODE_ROUNDED_PX: number = 4;
 
-  constructor(chunk: Chunk, onNodeFocus?: Function, texture?: Pixi.Texture) {
+  constructor(chunk: Chunk, onNodeFocus: (selection: PointNodeRef) => void, texture?: Pixi.Texture) {
     this.chunk = chunk;
     // this.parentContainer = parent;
 
@@ -116,7 +117,12 @@ export class RenderedChunk {
         g.tint = 0xBBBBBB;
       }
       g.addListener("pointerdown", () => {
-        onNodeFocus?.(this.chunk, node);
+        onNodeFocus(new PointNodeRef({
+          z: 0, // TODO(bowei): fix
+          chunkCoord: this.chunk.location,
+          pointNodeCoord: node,
+          pointNodeId: 0, // TODO(bowei): fix
+        }));
         console.log(`clicked chunk ${this.chunk.location.x} ${this.chunk.location.y} node ${node.x}, ${node.y}`);
 
         // if nothing is selected

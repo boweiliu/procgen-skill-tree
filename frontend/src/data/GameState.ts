@@ -59,11 +59,11 @@ export class PointNodeRef {
   public pointNodeCoord!: Vector2;
   public pointNodeId!: number;
 
-  constructor(z: number, chunkCoord: Vector2, pointNodeCoord: Vector2, pointNodeId: number) {
-    this.z = z;
-    this.chunkCoord = chunkCoord;
-    this.pointNodeCoord = pointNodeCoord;
-    this.pointNodeId = pointNodeId;
+  constructor(args: { z: number, chunkCoord: Vector2, pointNodeCoord: Vector2, pointNodeId: number }) {
+    this.z = args.z;
+    this.chunkCoord = args.chunkCoord;
+    this.pointNodeCoord = args.pointNodeCoord;
+    this.pointNodeId = args.pointNodeId;
   }
 
   public hash(): string {

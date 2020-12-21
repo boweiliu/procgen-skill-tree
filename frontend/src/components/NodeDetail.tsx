@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from "react";
+import { PointNodeRef } from "../data/GameState";
 
 export function NodeDetail({
-  focusedNode,
+  selectedPointNode,
 }: {
-  focusedNode?: { chunk: any; node: any };
+  selectedPointNode?: PointNodeRef
 }) {
-  const [history, setHistory] = useState<{ chunk: any; node: any }[]>([]);
-  useEffect(() => {
-    if (!focusedNode || focusedNode?.chunk === null) return;
-    setHistory((history) => [...history, focusedNode]);
-  }, [focusedNode]);
+  // const [history, setHistory] = useState<{ chunk: any; node: any }[]>([]);
+  // useEffect(() => {
+  //   if (!focusedNode || focusedNode?.chunk === null) return;
+  //   setHistory((history) => [...history, focusedNode]);
+  // }, [focusedNode]);
+  console.log("in nodedetail, ", selectedPointNode);
   return (
     <>
-      {focusedNode && focusedNode.chunk && (
+      {selectedPointNode && (
         <>
           <h1>Current</h1>
           <h3>
-            Chunk: {focusedNode.chunk.location.x},{focusedNode.chunk.location.y}
+            Chunk: {selectedPointNode.chunkCoord.x},{selectedPointNode.chunkCoord.y}
           </h3>
-          <h3>X: {focusedNode.node.x}</h3>
-          <h3>Y: {focusedNode.node.y}</h3>
+          <h3>X: {selectedPointNode.pointNodeCoord.x}</h3>
+          <h3>Y: {selectedPointNode.pointNodeCoord.y}</h3>
           <h2>Previous</h2>
-          {history
+          {/* ([] as any)
             .slice(0, -1)
             .map(({ chunk, node }, i) => {
               return (
@@ -31,7 +33,7 @@ export function NodeDetail({
                 </div>
               );
             })
-            .reverse()}
+          .reverse() */}
         </>
       )}
     </>

@@ -7,11 +7,12 @@ import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderedZLevel, ZLevel } from "./ZLevel";
 import { HashMap } from "../lib/util/data_structures/hash";
+import { PointNodeRef } from "../data/GameState";
 
 export type Config = {
   originalWindowWidth: number;
   originalWindowHeight: number;
-  onFocusedNodeChange: Function;
+  onFocusedNodeChange: (selection: PointNodeRef) => void;
 };
 
 const defaultConfig: Config = {

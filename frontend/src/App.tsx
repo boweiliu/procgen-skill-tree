@@ -13,6 +13,7 @@ import { GameContext } from "./contexts";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import { Chunk } from "./pixi/Chunk";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
+import { GameState, PointNodeRef } from "./data/GameState";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -32,18 +33,33 @@ function App() {
   }>();
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
+
   // const uiState = { focusedNode }; // recomputes every rerender
-  const uiState = useMemo(() => ({ focusedNode }), [focusedNode]);
-  const game = useMemo(() => {
-    return new GameStateFactory({}).create();
-  }, []);
+  // const uiState = useMemo(() => ({ focusedNode }), [focusedNode]);
+
+  // const game = useMemo(() => {
+  //   return new GameStateFactory({}).create();
+  // }, []);
+  const [game, setGame] = useState<GameState>(new GameStateFactory({}).create());
+
   const handleFocusedNodeChange = useCallback(
-    (chunk, node) => {
-      setBatchContents((n) => n - 1);
-      setFocusedNode({ chunk, node });
+    (selection: PointNodeRef) => {
+      console.log("GOT TO on node change callback ", selection);
+      setGame(game => {
+        game.playerUI.selectedPointNode = selection;
+        return game;
+      })
     },
-    [setFocusedNode]
+    [setGame]
   );
+
+  // const handleFocusedNodeChange = useCallback(
+  //   (chunk, node) => {
+  //     setBatchContents((n) => n - 1);
+  //     setFocusedNode({ chunk, node });
+  //   },
+  //   [setFocusedNode]
+  // );
   const handleActiveTabChange = useCallback(
     (activeTabIndex) => {
       setActiveTab(activeTabIndex);
@@ -59,7 +75,7 @@ function App() {
 
   const tabViews = useMemo(() => {
     return [
-      <NodeDetail focusedNode={focusedNode} />,
+      <NodeDetail selectedPointNode={game.playerUI.selectedPointNode} />,
       <QuestProgress remainingPoints={batchContents} />,
     ];
   }, [focusedNode]);
