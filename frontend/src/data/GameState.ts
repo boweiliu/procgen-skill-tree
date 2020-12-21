@@ -18,30 +18,36 @@ export type ZLevelGen = {
 
 export type ChunkGen = {
   id: number,
-  nodes: HashMap<Vector2, NodeGen>
+  pointNodes: HashMap<Vector2, PointNodeGen>
 }
 
-export type NodeGen = {
+export type PointNodeGen = {
   id: number
 
   // more data to be generated here - size, color, etc.
 }
 
 export type PlayerState = {
-  selectedNode: NodeRef,
-  selectedNodeHistory: NodeRef[],
-  allocatedNodeSet: HashSet<NodeRef>,
-  allocatedNodeHistory: NodeRef[],
+  selectedPointNode?: PointNodeRef,
+  selectedPointNodeHistory: PointNodeRef[],
+  allocatedPointNodeSet: HashSet<PointNodeRef>,
+  allocatedPointNodeHistory: PointNodeRef[],
 }
 
-// class, so it can be hashed
-export class NodeRef {
-  public z: number;
-  public chunkCoord: Vector2;
-  public nodeCoord: Vector2;
-  public nodeId: number;
+export class PointNodeRef {
+  public z!: number;
+  public chunkCoord!: Vector2;
+  public pointNodeCoord!: Vector2;
+  public pointNodeId!: number;
+
+  constructor(z: number, chunkCoord: Vector2, pointNodeCoord: Vector2, pointNodeId: number) {
+    this.z = z;
+    this.chunkCoord = chunkCoord;
+    this.pointNodeCoord = pointNodeCoord;
+    this.pointNodeId = pointNodeId;
+  }
 
   public hash(): string {
-    return this.nodeId.toString();
+    return this.pointNodeId.toString();
   }
 }

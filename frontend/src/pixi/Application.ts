@@ -135,10 +135,11 @@ export class Application {
       textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS\n" + 
       this.app.screen.width + "x" + this.app.screen.height;
     })
-    textFpsHud.x = this.app.screen.width;
-    this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
+    // textFpsHud.x = this.app.screen.width;
+    // this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
+    // textFpsHud.anchor.x = 1; // right justify
+    textFpsHud.x = 0;
     textFpsHud.y = 0;
-    textFpsHud.anchor.x = 1; // right justify
     this.fixedCameraStage.addChild(textFpsHud);
 
     // Register mouse drag to use for panning
