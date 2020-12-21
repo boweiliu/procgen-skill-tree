@@ -27,10 +27,6 @@ if (
 const tabLabels = ["Node Details", "Quest Progress"];
 
 function App() {
-  const [focusedNode, setFocusedNode] = useState<{
-    chunk: Chunk;
-    node: Vector2;
-  }>();
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -40,15 +36,17 @@ function App() {
   // const game = useMemo(() => {
   //   return new GameStateFactory({}).create();
   // }, []);
-  const [game, setGame] = useState<GameState>(new GameStateFactory({}).create());
+  const [game, setGame] = useState<GameState>(
+    new GameStateFactory({}).create()
+  );
 
   const handleFocusedNodeChange = useCallback(
     (selection: PointNodeRef) => {
       console.log("GOT TO on node change callback ", selection);
-      setGame(game => {
+      setGame((game) => {
         game.playerUI.selectedPointNode = selection;
-        return game;
-      })
+        return { ...game };
+      });
     },
     [setGame]
   );
@@ -78,7 +76,7 @@ function App() {
       <NodeDetail selectedPointNode={game.playerUI.selectedPointNode} />,
       <QuestProgress remainingPoints={batchContents} />,
     ];
-  }, [focusedNode]);
+  }, [game.playerUI.selectedPointNode, batchContents]);
 
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
