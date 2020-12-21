@@ -34,16 +34,25 @@ function App() {
     new GameStateFactory({}).create()
   );
 
-  const handleFocusedNodeChange = useCallback(
-    (selection: PointNodeRef) => {
-      console.log("GOT TO on node change callback ", selection);
-      setGame((game) => {
-        game.playerUI.selectedPointNode = selection;
-        return { ...game };
+  const updateGameState = useCallback(
+    (updater: (oldGameState: GameState) => GameState) => {
+      console.log("fancy update");
+      setGame((oldGameState) => {
+        let newGameState = updater(oldGameState);
+        return { ...newGameState };
       });
-    },
-    [setGame]
-  );
+    }, [setGame]);
+  
+  const updateSelectedPointNode = (updater: (old: PointNodeRef | undefined, oldState: GameState) => PointNodeRef) => {
+    updateGameState(oldGameState => {
+      oldGameState.playerUI.selectedPointNode =
+        updater(oldGameState.playerUI.selectedPointNode, oldGameState);
+      return oldGameState;
+    })
+  }
+  const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) => updateSelectedPointNode(() => newSelectedPointNode);
+
+  const handleFocusedNodeChange = setSelectedPointNode;
 
   const handleActiveTabChange = useCallback(
     (activeTabIndex) => {
