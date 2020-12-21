@@ -142,3 +142,30 @@ export class Util {
     return string + intersperse + character.repeat(length - string.length);
   }
 }
+
+export function updaterGenerator(dataObject: any, dataUpdater: any): any {
+  const updaters: any = {};
+  updaters.getUpdater = () => dataUpdater;
+  if (typeof dataObject !== "object") return updaters;
+  const keys = Object.keys(dataObject);
+  keys.forEach((key) => {
+    function keyUpdater(newValueOrCallback) {
+      // console.log(newValueOrCallback);
+      if (typeof newValueOrCallback === "function") {
+        dataUpdater((oldData) => {
+          const newData = {
+            ...oldData,
+            [key]: newValueOrCallback(oldData[key]),
+          };
+          // console.log({ newData });
+          return newData;
+        });
+      } else {
+        dataUpdater((oldData) => ({ ...oldData, [key]: newValueOrCallback }));
+      }
+    }
+    updaters[key] = updaterGenerator(dataObject[key], keyUpdater);
+    // updaters[key].getUpdater = () => keyUpdater;
+  });
+  return updaters;
+}

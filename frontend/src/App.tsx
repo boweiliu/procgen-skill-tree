@@ -10,10 +10,11 @@ import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
 import Tabs from "./components/Tabs";
 import { GameContext } from "./contexts";
-import { Vector2 } from "./lib/util/geometry/vector2";
-import { Chunk } from "./pixi/Chunk";
-import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { GameState, PointNodeRef } from "./data/GameState";
+import { GameStateFactory } from "./dataFactory/GameStateFactory";
+import { Vector2 } from "./lib/util/geometry/vector2";
+import { updaterGenerator } from "./lib/util/misc";
+import { Chunk } from "./pixi/Chunk";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -27,6 +28,14 @@ if (
 const tabLabels = ["Node Details", "Quest Progress"];
 
 function App() {
+  // const [forceUpdate, setForceUpdate] = useState(0);
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     console.log('a')
+  //     setForceUpdate(a => a + 1)
+  //   }, 1000);
+
+  // }, [setForceUpdate])
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -34,28 +43,15 @@ function App() {
     new GameStateFactory({}).create()
   );
 
-  const updateGameState = useCallback(
-    (updater: (oldGameState: GameState) => GameState) => {
-      setGame((oldGameState) => {
-        let newGameState = updater(oldGameState);
-        return { ...newGameState };
-      });
-    }, [setGame]);
-  // updateGameState(oldGame => { oldGame.s = y; return oldGame } )
-  
-  const updateSelectedPointNode = (updater: (old: PointNodeRef | undefined, oldState: GameState) => PointNodeRef) => {
-    updateGameState(oldGameState => {
-      oldGameState.playerUI.selectedPointNode = updater(oldGameState.playerUI.selectedPointNode, oldGameState);
-      return oldGameState;
-    })
-  };
-  const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) => updateSelectedPointNode(() => newSelectedPointNode);
+  useEffect(() => {
+    console.log("game updated:");
+    console.log(game);
+  }, [game]);
+  const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) =>
+    updateSelectedPointNode(() => newSelectedPointNode);
 
-  // TODO
-  // let updaters = doMagic();
-  // updateSelectedPointNode = updaters.playerUI.selectedPointNode.getUpdater();
-  // setSelectedPointNode = updaters.playerUI.selectedPointNode.getSetter();
-  // updateSelectedPointNode = updaters.playerUI.fn()
+  let updaters = updaterGenerator(game, setGame);
+  const updateSelectedPointNode = updaters.playerUI.selectedPointNode.getUpdater();
 
   const handleFocusedNodeChange = setSelectedPointNode;
 
