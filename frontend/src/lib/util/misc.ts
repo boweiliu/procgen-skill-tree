@@ -1,3 +1,6 @@
+import { HashMap, HashSet } from "./data_structures/hash";
+import { Vector2 } from "./geometry/vector2";
+
 let lastUsedId = 0;
 
 export const getUniqueID = () => {
@@ -142,3 +145,32 @@ export class Util {
     return string + intersperse + character.repeat(length - string.length);
   }
 }
+
+
+
+type Complicated = {
+  x: {
+    y: boolean
+  },
+  // foo: {
+  //   a: number,
+  //   b: string[],
+  //   c?: string | { f: boolean }
+  // },
+  // bar: {
+  //   baz?: HashMap<Vector2, string>;
+  // }
+}
+
+type Target = {
+  x: {
+    y: {
+      getUpdater: () => ((prev: boolean, all: Target) => void),
+      getSetter: () => ((neww: boolean) => void),
+    },
+    getUpdater: () => ((prev: { y: boolean }, all: Target) => void),
+    getSetter: () => ((neww: { y: boolean }) => void),
+  }
+}
+
+
