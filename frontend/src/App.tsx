@@ -36,21 +36,26 @@ function App() {
 
   const updateGameState = useCallback(
     (updater: (oldGameState: GameState) => GameState) => {
-      console.log("fancy update");
       setGame((oldGameState) => {
         let newGameState = updater(oldGameState);
         return { ...newGameState };
       });
     }, [setGame]);
+  // updateGameState(oldGame => { oldGame.s = y; return oldGame } )
   
   const updateSelectedPointNode = (updater: (old: PointNodeRef | undefined, oldState: GameState) => PointNodeRef) => {
     updateGameState(oldGameState => {
-      oldGameState.playerUI.selectedPointNode =
-        updater(oldGameState.playerUI.selectedPointNode, oldGameState);
+      oldGameState.playerUI.selectedPointNode = updater(oldGameState.playerUI.selectedPointNode, oldGameState);
       return oldGameState;
     })
-  }
+  };
   const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) => updateSelectedPointNode(() => newSelectedPointNode);
+
+  // TODO
+  // let updaters = doMagic();
+  // updateSelectedPointNode = updaters.playerUI.selectedPointNode.getUpdater();
+  // setSelectedPointNode = updaters.playerUI.selectedPointNode.getSetter();
+  // updateSelectedPointNode = updaters.playerUI.fn()
 
   const handleFocusedNodeChange = setSelectedPointNode;
 
