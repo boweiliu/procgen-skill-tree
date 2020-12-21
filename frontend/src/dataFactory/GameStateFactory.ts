@@ -1,6 +1,8 @@
-import { GameState } from "../data/GameState";
+import { GameState, WorldGenState } from "../data/GameState";
+import { HashSet } from "../lib/util/data_structures/hash";
 
-export type  GameStateConfig = any;
+export type GameStateConfig = any;
+
 export class GameStateFactory {
   public config: GameStateConfig;
 
@@ -10,8 +12,16 @@ export class GameStateFactory {
 
   public create(): GameState {
     return {
-      worldGen: null,
-      player: null
+      worldGen: {
+        seed: 0xcafebabe,
+        zLevels: []
+      },
+      player: {
+        selectedPointNode: undefined,
+        selectedPointNodeHistory: [],
+        allocatedPointNodeSet: new HashSet(),
+        allocatedPointNodeHistory: []
+      }
     }
   }
 }
