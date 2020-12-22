@@ -36,6 +36,12 @@ export type ChunkGen = {
   pointNodes: HashMap<Vector2, PointNodeGen>
 }
 
+export class ChunkGenConstants {
+  public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
+  public static CHUNK_HALF_DIM = (ChunkGenConstants.CHUNK_DIM - 1) / 2;
+  public static DROP_NODES_CHANCE = 0.3; // before generating edges, how many of the nodes to throw out
+}
+
 export type PointNodeGen = {
   id: number
 

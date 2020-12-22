@@ -1,3 +1,5 @@
+import { ForOfStatement } from "typescript";
+
 let lastUsedId = 0;
 
 export const getUniqueID = () => {
@@ -144,13 +146,25 @@ export class Util {
 }
 
 type UpdaterFnParam<T> = T | ((prev: T) => T);
-type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;
+export type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;
 
-type UpdaterGeneratorType<T> = {
+export type UpdaterGeneratorType<T> = {
   [k in keyof T]: T[k] extends { [kkt: string]: any }
-  ? (UpdaterGeneratorType<T[k]> & { getUpdater: () => UpdaterFn<T[k]> })
-  : { getUpdater: () => UpdaterFn<T[k]> }
-} & { getUpdater: () => UpdaterFn<T> }
+  ? (UpdaterGeneratorType<T[k]> & {
+    getUpdater: () => UpdaterFn<T[k]>,
+    set: UpdaterFn<T[k]>,
+    update: UpdaterFn<T[k]>,
+  })
+  : {
+    getUpdater: () => UpdaterFn<T[k]>,
+    set: UpdaterFn<T[k]>,
+    update: UpdaterFn<T[k]>,
+  }
+} & {
+  getUpdater: () => UpdaterFn<T>,
+  set: UpdaterFn<T>,
+  update: UpdaterFn<T>,
+}
 
 /**
  * Convenience method for generating setState<FancyObject.sub.component>() from setState<FancyObject> callbacks.
@@ -160,12 +174,20 @@ type UpdaterGeneratorType<T> = {
  * @param dataObject ANY instance of T, used only for its keys. MUST have all keys present
  * @param dataUpdater an updater function, which can be called as: dataUpdater(newT) or
  *   dataUpdater((oldT) => { return newTFromOldT(oldT) }) ; e.g. react setState() function.
- * @return a deep object that has the same keys as T, except each key also has a getUpdater() function;
+ * @return a deep object that has the same keys as T, except each key also has a getUpdater()/set/update member;
  *   the getUpdater() on a subobject of T acts similarly to the dataUpdater<T> but to the subobject rather than the whole object.
+ * e.g. :
+ *   let gameStateUpdater = updaterGenerator(skeletonObject, setGameState);
+ *   let setName = gameStateUpdater.player.name.getUpdater();
+ *   gameStateUpdater.player.name.set(newName);
+ *   gameStateUpdater.player.name.update(oldName => oldName + " ");
+ * 
  */
 export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType<T> {
   const updaters: UpdaterGeneratorType<T> = {} as any;
   updaters.getUpdater = () => dataUpdater;
+  updaters.set = dataUpdater;
+  updaters.update = dataUpdater;
   if (typeof dataObject !== "object") return updaters;
   const keys : (keyof T)[] = Object.keys(dataObject) as any as (keyof T)[];
   keys.forEach((key: (keyof T)) => {
@@ -188,3 +210,6 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
   return updaters;
 }
 
+export type DeepReadonly<T> = T extends Function ? T : {
+  readonly [P in keyof T]: T[P] extends { [k: string]: any } ? DeepReadonly<T[P]> : T[P];
+}
