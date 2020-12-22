@@ -8,6 +8,8 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { RenderedZLevel, ZLevel } from "./ZLevel";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { PointNodeRef } from "../data/GameState";
+import { generatePointNodeTexture } from "./textures/PointNodeTexture";
+import { Reticle } from "./Reticle";
 
 export type Config = {
   originalWindowWidth: number;
@@ -182,41 +184,24 @@ export class Application {
     });
 
     // Add a reticle in the hud at the midpoint
-    const reticle = new Pixi.Graphics();
-    reticle.lineStyle(2, 0x999999);
-    reticle.drawCircle(0, 0, 6);
-    reticle.x = this.app.screen.width / 2;
-    reticle.y = this.app.screen.height / 2;
+    const reticle = new Reticle({});
+    this.fixedCameraStage.addChild(reticle.container);
+    reticle.container.x = this.app.screen.width / 2;
+    reticle.container.y = this.app.screen.height / 2;
     this.onResize.push(() => {
-    reticle.x = this.app.screen.width / 2;
-    reticle.y = this.app.screen.height / 2;
+      reticle.rerender({
+        width: this.app.screen.width / 2,
+        height: this.app.screen.height / 2,
+      });
     })
-    reticle.interactive = true;
-    this.fixedCameraStage.addChild(reticle);
 
     // test
     // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
 
+    let texture = generatePointNodeTexture(this.app.renderer);
 
-    // TODO(bowei): move this code outta here!!
-    // generate a texture
-    let g = new Pixi.Graphics();
-    g.beginFill(0xff8080);
-    g.drawRoundedRect(
-      - RenderedChunk.NODE_SIZE_PX / 2,
-      - RenderedChunk.NODE_SIZE_PX / 2,
-      RenderedChunk.NODE_SIZE_PX,
-      RenderedChunk.NODE_SIZE_PX,
-      RenderedChunk.NODE_ROUNDED_PX
-    );
-    // g.x = 200;
-    // g.y = 200;
-    // this.app.stage.addChild(g);
-    let texture = this.app.renderer.generateTexture(g, Pixi.SCALE_MODES.NEAREST, 1);
-    // const sprite = new Pixi.Sprite(texture);
-    // sprite.x = 300;
-    // sprite.y = 300;
-    // this.app.stage.addChild(sprite);
+
+    return;
 
     // create the world
     let zLevel = new RenderedZLevel(
