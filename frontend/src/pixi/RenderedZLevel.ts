@@ -1,10 +1,7 @@
 import * as Pixi from "pixi.js";
 import { ChunkRef, PointNodeRef, ZLevelGen } from "../data/GameState";
 import { KeyedHashMap, HashSet } from "../lib/util/data_structures/hash";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { squirrel3 } from "../lib/util/random";
 import { RenderedChunk, RenderedChunkConstants } from "./RenderedChunk";
-
 
 export class RenderedZLevel {
   public container: Pixi.Container;

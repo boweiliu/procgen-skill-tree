@@ -1,4 +1,4 @@
-import { GameState, WorldGenState } from "../data/GameState";
+import { GameState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 
 export type GameStateConfig = any;

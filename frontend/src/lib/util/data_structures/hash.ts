@@ -66,15 +66,6 @@ export class HashMap<K extends { hash(): string }, V> {
   }
 }
 
-// Hash a string to a number. source: https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
-function hashCode(s: string): number {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
-  }
-  return h;
-}
-
 export class HashableHashMap<K extends { hash(): string }, V extends { hash(): string }> extends HashMap<K, V> {
   hash(): string {
     const hashes: number[] = Object.entries(this._values).map(([s, v]) => hashCode(s) + hashCode(v.hash()));
@@ -147,3 +138,42 @@ export class DefaultHashMap<K extends { hash(): string }, V> {
   }
 }
 
+// Hash a string to a number. source: https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
+export function hashCode(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  }
+  return h;
+}
+
+// declare global {
+//   interface Array<T extends { hash(): string }> {
+//     hash(): string
+//   }
+// 
+//   interface Number {
+//     hash(): string
+//   }
+// 
+//   interface String {
+//     hash(): String
+//   }
+// }
+// 
+// Array.prototype.hash = function () {
+//   return hashArray(this);
+// }
+// 
+// Number.prototype.hash = function () {
+//   return this.toString();
+// }
+// 
+// String.prototype.hash = function () {
+//   return this;
+// }
+// 
+// function hashArray<T extends { hash(): string }>(arr: T[]): string {
+//   return arr.map(elt => hashCode(elt.hash())).reduce((pv, cv) => 31 * pv + cv).hash();
+// }
+// 

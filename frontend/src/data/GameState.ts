@@ -1,4 +1,4 @@
-import { HashMap, HashSet, KeyedHashMap } from "../lib/util/data_structures/hash"
+import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash"
 import { Vector2 } from "../lib/util/geometry/vector2"
 
 /**

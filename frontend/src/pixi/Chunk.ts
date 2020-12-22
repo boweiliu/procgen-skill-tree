@@ -126,7 +126,7 @@ export class RenderedChunk {
         console.log(`clicked chunk ${this.chunk.location.x} ${this.chunk.location.y} node ${node.x}, ${node.y}`);
 
         // if nothing is selected
-        if (this.chunk.selectedNodes.values().length == 0) {
+        if (this.chunk.selectedNodes.values().length === 0) {
           // select it
           this.chunk.selectedNodes.put(node);
           g.tint = 0xBBBBBB;

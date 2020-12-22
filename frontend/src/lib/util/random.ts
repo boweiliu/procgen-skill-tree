@@ -7,7 +7,8 @@ import crypto from "crypto";
  * TODO(bowei): port bigint to wasm for faster 64bit operations
  */
 
-function splitmix64(seed: bigint, i: bigint) {
+// NOTE(bowei): untested
+export function splitmix64(seed: bigint, i: bigint) {
     let z: bigint = seed + i * BigInt("0x9e3779b97f4a7c15");
     z = ( z ^ ( z >> BigInt(30) ) ) * BigInt("0xBF58476D1CE4E5B9");
     z = ( z ^ ( z >> BigInt(27) ) ) * BigInt(0x94D049BB133111EB);

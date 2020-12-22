@@ -1,11 +1,7 @@
-import { Line } from "../lib/util/geometry/line";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { INTMAX32, squirrel3 } from "../lib/util/random";
 import * as Pixi from "pixi.js";
-import { HashMap, HashSet } from "../lib/util/data_structures/hash";
-import { ChunkGenConstants, GameState, PointNodeRef } from "../data/GameState";
 import { RenderedChunkConstants } from "./RenderedChunk";
-import { DeepReadonly, updaterGenerator, UpdaterGeneratorType } from "../lib/util/misc";
+import { DeepReadonly, UpdaterGeneratorType } from "../lib/util/misc";
+import { GameState, PointNodeRef } from "../data/GameState";
 
 
 /**
@@ -75,7 +71,7 @@ export class RenderedPointNode {
 
   public onClick(args: { gameState: GameState, gameStateUpdater: UpdaterGeneratorType<GameState>, entityUpdaterQueue: [any] }) {
     // 1. update the state(s)
-    if (args.gameState.playerUI.selectedPointNode?.pointNodeId == this.selfPointNodeRef.pointNodeId) {
+    if (args.gameState.playerUI.selectedPointNode?.pointNodeId === this.selfPointNodeRef.pointNodeId) {
       // if we were already selected, allocate us
       // TODO(bowei): this code block should be somewhere else????
       args.gameStateUpdater.playerSave.allocatedPointNodeSet.update(set => {
@@ -120,7 +116,7 @@ export class RenderedPointNode {
   }
 
  public isSelected(gameState: DeepReadonly<GameState>): boolean {
-   return gameState.playerUI.selectedPointNode?.pointNodeId == this.selfPointNodeRef.pointNodeId;
+   return gameState.playerUI.selectedPointNode?.pointNodeId === this.selfPointNodeRef.pointNodeId;
  }
 
  public isAllocated(gameState: DeepReadonly<GameState>): boolean {
@@ -144,7 +140,7 @@ export class RenderedPointNode {
 //         this.setTint({ isSelected, isAllocated });
 //         gameStateUpdater.playerUI.selectedPointNode.set(this.selfPointNodeRef);
 // 
-//       } else if (gameState.playerUI.selectedPointNode.pointNodeId == this.selfPointNodeRef.pointNodeId) {
+//       } else if (gameState.playerUI.selectedPointNode.pointNodeId === this.selfPointNodeRef.pointNodeId) {
 //         // if we were already selected, try to allocate ourselves
 // 
 //         if (!isAllocated) {

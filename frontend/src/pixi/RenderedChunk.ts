@@ -1,8 +1,5 @@
-import { Line } from "../lib/util/geometry/line";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { INTMAX32, squirrel3 } from "../lib/util/random";
 import * as Pixi from "pixi.js";
-import { HashMap, HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
+import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
 import { ChunkGen, ChunkGenConstants, ChunkRef, PointNodeRef } from "../data/GameState";
 import { RenderedPointNode } from "./RenderedPointNode";
 
@@ -73,7 +70,7 @@ export class RenderedChunk {
   }) {
     for (let child of this.renderedPointNodes.values()) {
       child.rerender({
-        isSelected: props.selectedPointNode?.pointNodeId == child.selfPointNodeRef.pointNodeId,
+        isSelected: props.selectedPointNode?.pointNodeId === child.selfPointNodeRef.pointNodeId,
         isAllocated: props.allocatedPointNodeSubset.contains(child.selfPointNodeRef),
       })
     }

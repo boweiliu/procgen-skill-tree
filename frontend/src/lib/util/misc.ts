@@ -1,5 +1,3 @@
-import { ForOfStatement } from "typescript";
-
 let lastUsedId = 0;
 
 export const getUniqueID = () => {
@@ -191,7 +189,6 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
   if (typeof dataObject !== "object") return updaters;
   const keys : (keyof T)[] = Object.keys(dataObject) as any as (keyof T)[];
   keys.forEach((key: (keyof T)) => {
-    const asdfaf: T[typeof key] = dataObject[key];
     function keyUpdater(newValueOrCallback: UpdaterFnParam<T[typeof key]>) {
       if (typeof newValueOrCallback === "function") {
         dataUpdater((oldData) => {
