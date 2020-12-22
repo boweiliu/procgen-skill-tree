@@ -106,6 +106,7 @@ export class Application {
 
     this.resize(this.config.originalWindowWidth, this.config.originalWindowHeight);
 
+    this.drawStart();
   }
 
   /**
@@ -130,7 +131,7 @@ export class Application {
     // this.app.stage.pivot.x = 0;
   }
 
-  public drawStart() {
+  private drawStart() {
     // put a text thingy in the top right
     let textFpsHud = new Pixi.Text('', {
       fontFamily: 'PixelMix',

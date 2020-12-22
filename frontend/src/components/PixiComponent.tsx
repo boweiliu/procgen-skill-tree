@@ -15,27 +15,15 @@ export function PixiComponent(props: {
   // gameStateUpdaters: UpdaterGeneratorType<GameState>,
   onFocusedNodeChange: (selection: PointNodeRef) => void;
 }) {
-  const container = useRef<HTMLDivElement>(null);
   const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({ innerHeight: 0, innerWidth: 0});
 
-  const [application, setApplication] = useState<Application>();
-  function initializeApplication() {
-    const newApp = new Application({
+  const [application, setApplication] = useState<Application>(
+    new Application({
       originalWindowWidth: window.innerWidth,
       originalWindowHeight: window.innerHeight,
       ...props
-    });
-    // // application.register(container.current!);
-    // container.current!.appendChild(newApp.app.view);
-    // // container.current!.appendChild(application.app.view)
-    // // console.log(container.current!)
-    newApp.drawStart();
-    setApplication(newApp);
-  }
-
-  useEffect(() => {
-    return initializeApplication();
-  }, []);
+    })
+  );
 
   window.onresize = () => {
     setPixiComponentState(old => {
@@ -44,13 +32,8 @@ export function PixiComponent(props: {
       return { ...old };
     })
 
-    application?.resize?.(window.innerWidth, window.innerHeight);
+    // application?.resize?.(window.innerWidth, window.innerHeight);
   };
-
-  // application.rerender({
-  //   gameState,
-  //   pixiComponentState
-  // })
 
   return (
     <>
@@ -58,10 +41,11 @@ export function PixiComponent(props: {
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {
-          if (application) {
-            container.current!.removeChild(application.app.view);
-          }
-          initializeApplication();
+          setApplication(new Application({
+            originalWindowWidth: window.innerWidth,
+            originalWindowHeight: window.innerHeight,
+            ...props
+          }))
         }}
       >
         [DEBUG] reset and rerender
