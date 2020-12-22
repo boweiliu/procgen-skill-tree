@@ -8,10 +8,11 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { ZLevel } from "./ZLevel";
 import { RenderedZLevel } from "./RenderedZLevel";
 import { HashMap } from "../lib/util/data_structures/hash";
-import { PointNodeRef } from "../data/GameState";
+import { GameState, PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
+import { DeepReadonly } from "../lib/util/misc";
 
 export type Config = {
   originalWindowWidth: number;
@@ -329,5 +330,11 @@ export class Application {
 //         }
 //       }
 //     });
+  }
+
+  public rerender(props: {
+    gameState: DeepReadonly<GameState>
+  }) {
+
   }
 }

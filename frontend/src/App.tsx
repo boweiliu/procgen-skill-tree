@@ -9,7 +9,7 @@ import QuestProgress from "./components/QuestProgress";
 import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
 import Tabs from "./components/Tabs";
-import { GameContext } from "./contexts";
+import { UseGameStateContext } from "./contexts";
 import { GameState, PointNodeRef } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { updaterGenerator } from "./lib/util/misc";
@@ -37,18 +37,18 @@ function App() {
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
-  const [game, setGame] = useState<GameState>(
+  const [gameState, setGameState] = useState<GameState>(
     new GameStateFactory({}).create()
   );
 
   useEffect(() => {
     console.log("game updated:");
-    console.log(game);
-  }, [game]);
+    console.log(gameState);
+  }, [gameState]);
   const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) =>
     updateSelectedPointNode(() => newSelectedPointNode);
 
-  let updaters = updaterGenerator(game, setGame);
+  let updaters = updaterGenerator(gameState, setGameState);
   const updateSelectedPointNode = updaters.playerUI.selectedPointNode.getUpdater();
 
   const handleFocusedNodeChange = setSelectedPointNode;
@@ -68,14 +68,14 @@ function App() {
 
   const tabViews = useMemo(() => {
     return [
-      <NodeDetail selectedPointNode={game.playerUI.selectedPointNode} />,
+      <NodeDetail selectedPointNode={gameState.playerUI.selectedPointNode} />,
       <QuestProgress remainingPoints={batchContents} />,
     ];
-  }, [game.playerUI.selectedPointNode, batchContents]);
+  }, [gameState.playerUI.selectedPointNode, batchContents]);
 
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
-      <GameContext.Provider value={game}>
+      <UseGameStateContext.Provider value={[gameState, updaters]}>
         <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
         <Sidebar>
           <Tabs
@@ -91,7 +91,7 @@ function App() {
             );
           })}
         </Sidebar>
-      </GameContext.Provider>
+      </UseGameStateContext.Provider>
     </div>
   );
 }
