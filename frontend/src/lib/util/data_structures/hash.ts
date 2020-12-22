@@ -88,35 +88,41 @@ export class HashableHashMap<K extends { hash(): string }, V extends { hash(): s
  * Allows iteration over the full key-value pair set.
  */
 export class KeyedHashMap<K extends { hash(): string }, V>{
-  private _values: { [key: string]: [K, V] } = {};
+  private _kvalues: { [key: string]: [K, V] } = {};
 
   put(key: K, value: V) {
-    this._values[key.hash()] = [key, value];
+    this._kvalues[key.hash()] = [key, value];
   }
 
   remove(key: K): void {
-    delete this._values[key.hash()];
+    delete this._kvalues[key.hash()];
   }
 
   get(key: K): V {
-    return this._values[key.hash()][1];
+    return this._kvalues[key.hash()][1];
   }
 
   contains(key: K): boolean {
     // V may be an undefined type
-    return this.get(key) !== undefined && key.hash() in this._values;
+    return this.get(key) !== undefined && key.hash() in this._kvalues;
   }
 
   keys(): K[] {
-    return Object.keys(this._values).map(key => this._values[key][0]);
+    return Object.keys(this._kvalues).map(key => this._kvalues[key][0]);
   }
 
   entries(): ([K, V])[] {
-    return Object.keys(this._values).map(key => this._values[key]);
+    return Object.keys(this._kvalues).map(key => this._kvalues[key]);
   }
 
   values(): V[] {
-    return Object.keys(this._values).map(key => this._values[key][1]);
+    return Object.keys(this._kvalues).map(key => this._kvalues[key][1]);
+  }
+
+  hashKeyset(): string {
+    const hashes: number[] = Object.keys(this._kvalues).map(s => hashCode(s));
+    let code: number = hashes.reduce((pv, cv) => pv + cv);
+    return code.toString();
   }
 }
 
