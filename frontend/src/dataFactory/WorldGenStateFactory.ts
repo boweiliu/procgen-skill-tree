@@ -1,4 +1,3 @@
-import { exception } from "console";
 import { WorldGenState, ChunkGen, PointNodeGen, ChunkGenConstants, ZLevelGen } from "../data/GameState";
 import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
@@ -14,7 +13,7 @@ export class WorldGenStateFactory {
   }
 
   public create(): WorldGenState {
-    throw exception();
+    throw Error();
   }
 }
 
