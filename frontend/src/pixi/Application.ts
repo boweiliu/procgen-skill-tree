@@ -5,11 +5,13 @@ import { registerDraggable } from "../lib/pixi/DraggableHelper";
 import createBunnyExample from "./BunnyExample";
 import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
-import { RenderedZLevel, ZLevel } from "./ZLevel";
+import { ZLevel } from "./ZLevel";
+import { RenderedZLevel } from "./RenderedZLevel";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
+import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
 
 export type Config = {
   originalWindowWidth: number;
@@ -198,124 +200,134 @@ export class Application {
     // test
     // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
 
-    let texture = generatePointNodeTexture(this.app.renderer);
+    let pointNodeTexture = generatePointNodeTexture(this.app.renderer);
 
+    let zLevel = new RenderedZLevel({
+      pointNodeTexture,
+      z: 0,
+      zLevelGen: (new ZLevelGenFactory({}).create({ seed: this.randomSeed, z: 0})),
+      stateUpdaterQueue: [] as any,
+      ticker: this.app.ticker
+    })
+    this.actionStage.addChild(zLevel.container);
+    zLevel.container.x = this.app.screen.width / 2;
+    zLevel.container.y = this.app.screen.height / 2;
 
     return;
 
-    // create the world
-    let zLevel = new RenderedZLevel(
-      new ZLevel(this.randomSeed, 0),
-      this.config.onFocusedNodeChange,
-      texture
-    );
-    let zLevelPersistence: { [i: number]: ZLevel } = {};
-    zLevelPersistence[0] = zLevel.zLevel;
-    // find the 0th square, and allocate it
-    for (let chunk of zLevel.zLevel.chunks) {
-      if (chunk.location.x === 0 && chunk.location.y === 0) {
-        chunk.allocatedNodes.put(new Vector2(0, 0));
-        zLevel.renderedChunks.get(chunk).renderedNodes.get(new Vector2(0, 0)).tint = 0x00AAFF;
-      }
-    }
-    let chunksContainer = zLevel.container;
-    this.actionStage.addChild(chunksContainer);
-    chunksContainer.x = this.app.screen.width/2;
-    chunksContainer.y = this.app.screen.height/2;
-    this.onResize.push(() => {
-      chunksContainer.x = this.app.screen.width / 2;
-      chunksContainer.y = this.app.screen.height / 2;
-    });
-
-    
-    // let preloadedZLevelDown = new RenderedZLevel(
-    //   new ZLevel(this.randomSeed, -1),
-    //   this.config.onFocusedNodeChange,
-    //   texture
-    // )
-    let chunkOriginalWidth = chunksContainer.width;
-    let chunkOriginalHeight = chunksContainer.height;
-
-    this.app.ticker.add((delta) => {
-      if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
-        // reset
-        chunksContainer.alpha = 1;
-        chunksContainer.width = chunkOriginalWidth;
-        chunksContainer.height = chunkOriginalHeight;
-      }
-
-      if (this.keyboard.down[">"]) {
-        // phase out the current z level and go to another one
-        chunksContainer.alpha -= 0.1;
-        chunksContainer.width *= 1.03;
-        chunksContainer.height *= 1.03;
-        // this.actionStage.removeChild(chunksContainer);
-        if (chunksContainer.alpha <= 0) {
-          chunksContainer.alpha = 1;
-          // start the process to render next z level
-          backdrop.tint = 0xDDAADD;
-          this.actionStage.removeChild(chunksContainer);
-          setTimeout(() => {
-            let newZIndex = zLevel.zLevel.z - 1;
-            // prefer cached persistence data if it is available
-            if (!zLevelPersistence[newZIndex]) {
-              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
-            }
-            zLevel = new RenderedZLevel(
-              zLevelPersistence[newZIndex],
-              this.config.onFocusedNodeChange,
-              texture
-            );
-            // zLevel = preloadedZLevelDown;
-            // preloadedZLevelDown = new RenderedZLevel(
-            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-            //   this.config.onFocusedNodeChange,
-            //   texture
-            // );
-            chunksContainer = zLevel.container;
-            this.actionStage.addChild(chunksContainer);
-            chunksContainer.x = this.app.screen.width / 2;
-            chunksContainer.y = this.app.screen.height / 2;
-            backdrop.tint = 0xFFFFFF;
-          });
-        }
-      }
-      if (this.keyboard.down["<"]) {
-        // phase out the current z level and go to another one
-        chunksContainer.alpha -= 0.1;
-        chunksContainer.width *= 1/1.03;
-        chunksContainer.height *= 1/1.03;
-        // this.actionStage.removeChild(chunksContainer);
-        if (chunksContainer.alpha <= 0) {
-          // start the process to render next z level
-          chunksContainer.alpha = 1;
-          backdrop.tint = 0xDDAADD;
-          this.actionStage.removeChild(chunksContainer);
-          setTimeout(() => {
-            let newZIndex = zLevel.zLevel.z + 1;
-            // prefer cached persistence data if it is available
-            if (!zLevelPersistence[newZIndex]) {
-              zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
-            }
-            zLevel = new RenderedZLevel(
-              zLevelPersistence[newZIndex],
-              this.config.onFocusedNodeChange,
-              texture
-            );
-            // zLevel = preloadedZLevelDown;
-            // preloadedZLevelDown = new RenderedZLevel(
-            //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
-            //   this.config.onFocusedNodeChange,
-            //   texture
-            // );
-            chunksContainer = zLevel.container;
-            this.actionStage.addChild(chunksContainer);
-            chunksContainer.x = this.app.screen.width / 2;
-            chunksContainer.y = this.app.screen.height / 2;
-            backdrop.tint = 0xFFFFFF;
-          });
-        }
-      }
-    });
+//     // create the world
+//     let zLevel = new RenderedZLevel(
+//       new ZLevel(this.randomSeed, 0),
+//       this.config.onFocusedNodeChange,
+//       texture
+//     );
+//     let zLevelPersistence: { [i: number]: ZLevel } = {};
+//     zLevelPersistence[0] = zLevel.zLevel;
+//     // find the 0th square, and allocate it
+//     for (let chunk of zLevel.zLevel.chunks) {
+//       if (chunk.location.x === 0 && chunk.location.y === 0) {
+//         chunk.allocatedNodes.put(new Vector2(0, 0));
+//         zLevel.renderedChunks.get(chunk).renderedNodes.get(new Vector2(0, 0)).tint = 0x00AAFF;
+//       }
+//     }
+//     let chunksContainer = zLevel.container;
+//     this.actionStage.addChild(chunksContainer);
+//     chunksContainer.x = this.app.screen.width/2;
+//     chunksContainer.y = this.app.screen.height/2;
+//     this.onResize.push(() => {
+//       chunksContainer.x = this.app.screen.width / 2;
+//       chunksContainer.y = this.app.screen.height / 2;
+//     });
+// 
+//     
+//     // let preloadedZLevelDown = new RenderedZLevel(
+//     //   new ZLevel(this.randomSeed, -1),
+//     //   this.config.onFocusedNodeChange,
+//     //   texture
+//     // )
+//     let chunkOriginalWidth = chunksContainer.width;
+//     let chunkOriginalHeight = chunksContainer.height;
+// 
+//     this.app.ticker.add((delta) => {
+//       if (this.keyboard.justUp[">"] || this.keyboard.justUp["<"]) {
+//         // reset
+//         chunksContainer.alpha = 1;
+//         chunksContainer.width = chunkOriginalWidth;
+//         chunksContainer.height = chunkOriginalHeight;
+//       }
+// 
+//       if (this.keyboard.down[">"]) {
+//         // phase out the current z level and go to another one
+//         chunksContainer.alpha -= 0.1;
+//         chunksContainer.width *= 1.03;
+//         chunksContainer.height *= 1.03;
+//         // this.actionStage.removeChild(chunksContainer);
+//         if (chunksContainer.alpha <= 0) {
+//           chunksContainer.alpha = 1;
+//           // start the process to render next z level
+//           backdrop.tint = 0xDDAADD;
+//           this.actionStage.removeChild(chunksContainer);
+//           setTimeout(() => {
+//             let newZIndex = zLevel.zLevel.z - 1;
+//             // prefer cached persistence data if it is available
+//             if (!zLevelPersistence[newZIndex]) {
+//               zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+//             }
+//             zLevel = new RenderedZLevel(
+//               zLevelPersistence[newZIndex],
+//               this.config.onFocusedNodeChange,
+//               texture
+//             );
+//             // zLevel = preloadedZLevelDown;
+//             // preloadedZLevelDown = new RenderedZLevel(
+//             //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+//             //   this.config.onFocusedNodeChange,
+//             //   texture
+//             // );
+//             chunksContainer = zLevel.container;
+//             this.actionStage.addChild(chunksContainer);
+//             chunksContainer.x = this.app.screen.width / 2;
+//             chunksContainer.y = this.app.screen.height / 2;
+//             backdrop.tint = 0xFFFFFF;
+//           });
+//         }
+//       }
+//       if (this.keyboard.down["<"]) {
+//         // phase out the current z level and go to another one
+//         chunksContainer.alpha -= 0.1;
+//         chunksContainer.width *= 1/1.03;
+//         chunksContainer.height *= 1/1.03;
+//         // this.actionStage.removeChild(chunksContainer);
+//         if (chunksContainer.alpha <= 0) {
+//           // start the process to render next z level
+//           chunksContainer.alpha = 1;
+//           backdrop.tint = 0xDDAADD;
+//           this.actionStage.removeChild(chunksContainer);
+//           setTimeout(() => {
+//             let newZIndex = zLevel.zLevel.z + 1;
+//             // prefer cached persistence data if it is available
+//             if (!zLevelPersistence[newZIndex]) {
+//               zLevelPersistence[newZIndex] = new ZLevel(this.randomSeed, newZIndex);
+//             }
+//             zLevel = new RenderedZLevel(
+//               zLevelPersistence[newZIndex],
+//               this.config.onFocusedNodeChange,
+//               texture
+//             );
+//             // zLevel = preloadedZLevelDown;
+//             // preloadedZLevelDown = new RenderedZLevel(
+//             //   new ZLevel(this.randomSeed, preloadedZLevelDown.zLevel.z - 1),
+//             //   this.config.onFocusedNodeChange,
+//             //   texture
+//             // );
+//             chunksContainer = zLevel.container;
+//             this.actionStage.addChild(chunksContainer);
+//             chunksContainer.x = this.app.screen.width / 2;
+//             chunksContainer.y = this.app.screen.height / 2;
+//             backdrop.tint = 0xFFFFFF;
+//           });
+//         }
+//       }
+//     });
   }
 }
