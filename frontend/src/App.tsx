@@ -12,9 +12,7 @@ import Tabs from "./components/Tabs";
 import { GameContext } from "./contexts";
 import { GameState, PointNodeRef } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { Vector2 } from "./lib/util/geometry/vector2";
 import { updaterGenerator } from "./lib/util/misc";
-import { Chunk } from "./pixi/Chunk";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
