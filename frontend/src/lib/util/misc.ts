@@ -159,17 +159,13 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
   const keys : (keyof T)[] = Object.keys(dataObject) as any as (keyof T)[];
   keys.forEach((key: (keyof T)) => {
     const asdfaf: T[typeof key] = dataObject[key];
-    // function keyUpdater(newValueOrCallback: (T[typeof key] | ((prev: T[typeof key]) => T[typeof key]) )) {
     function keyUpdater(newValueOrCallback: UpdaterFnParam<T[typeof key]>) {
-      // console.log(newValueOrCallback);
       if (typeof newValueOrCallback === "function") {
-      // if (newValueOrCallback is "function") {
         dataUpdater((oldData) => {
           const newData = {
             ...oldData,
             [key]: (newValueOrCallback as Function)(oldData[key]),
           };
-          // console.log({ newData });
           return newData;
         });
       } else {
@@ -177,7 +173,6 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
       }
     }
     updaters[key] = updaterGenerator(dataObject[key], keyUpdater) as any;
-    // updaters[key].getUpdater = () => keyUpdater;
   });
   return updaters;
 }
