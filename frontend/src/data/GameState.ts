@@ -1,4 +1,4 @@
-import { HashMap, HashSet } from "../lib/util/data_structures/hash"
+import { HashMap, HashSet, KeyedHashMap } from "../lib/util/data_structures/hash"
 import { Vector2 } from "../lib/util/geometry/vector2"
 
 /**
@@ -28,12 +28,12 @@ export type WorldGenState = {
 
 export type ZLevelGen = {
   id: number,
-  chunks: HashMap<Vector2, ChunkGen>
+  chunks: KeyedHashMap<Vector2, ChunkGen>
 }
 
 export type ChunkGen = {
   id: number,
-  pointNodes: HashMap<Vector2, PointNodeGen>
+  pointNodes: KeyedHashMap<Vector2, PointNodeGen>
 }
 
 export class ChunkGenConstants {
@@ -62,10 +62,10 @@ export type PlayerUIState = {
 }
 
 export class PointNodeRef {
-  public z!: number;
-  public chunkCoord!: Vector2;
-  public pointNodeCoord!: Vector2;
-  public pointNodeId!: number;
+  public z: number;
+  public chunkCoord: Vector2;
+  public pointNodeCoord: Vector2;
+  public pointNodeId: number;
 
   constructor(args: { z: number, chunkCoord: Vector2, pointNodeCoord: Vector2, pointNodeId: number }) {
     this.z = args.z;
@@ -76,5 +76,21 @@ export class PointNodeRef {
 
   public hash(): string {
     return this.pointNodeId.toString();
+  }
+}
+
+export class ChunkRef {
+  public z: number;
+  public chunkCoord: Vector2;
+  public chunkId: number;
+
+  constructor(args: { z: number, chunkCoord: Vector2, chunkId: number }) {
+    this.z = args.z;
+    this.chunkCoord = args.chunkCoord;
+    this.chunkId = args.chunkId;
+  }
+
+  public hash(): string {
+    return this.chunkId.toString();
   }
 }

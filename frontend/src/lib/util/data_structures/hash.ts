@@ -21,13 +21,21 @@ export class HashSet<K extends { hash(): string }> {
     return this._values.get(key) !== undefined;
   }
 
+  contains(key: K): boolean {
+    return this.contains(key);
+  }
+
   values(): K[] {
     return this._values.values();
+  }
+
+  hash(): string {
+    return this._values.hashKeyset();
   }
 }
 
 export class HashMap<K extends { hash(): string }, V> {
-  private _values: { [key: string]: V } = {};
+  protected _values: { [key: string]: V } = {};
 
   put(key: K, value: V) {
     this._values[key.hash()] = value;
@@ -41,8 +49,74 @@ export class HashMap<K extends { hash(): string }, V> {
     return this._values[key.hash()];
   }
 
+  contains(key: K): boolean {
+    // V may be an undefined type
+    return this.get(key) !== undefined && key.hash() in this._values;
+  }
+
   values(): V[] {
     return Object.keys(this._values).map(key => this._values[key]);
+  }
+
+  // hashes only the keys - use HashableHashMap if you know that the value type here is also hashable
+  hashKeyset(): string {
+    const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
+    let code: number = hashes.reduce((pv, cv) => pv + cv);
+    return code.toString();
+  }
+}
+
+// Hash a string to a number. source: https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
+function hashCode(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  }
+  return h;
+}
+
+export class HashableHashMap<K extends { hash(): string }, V extends { hash(): string }> extends HashMap<K, V> {
+  hash(): string {
+    const hashes: number[] = Object.entries(this._values).map(([s, v]) => hashCode(s) + hashCode(v.hash()));
+    let code: number = hashes.reduce((pv, cv) => pv + cv);
+    return code.toString();
+  }
+}
+
+/**
+ * Same as HashMap, but actually stores the keys used to key the hashmap, instead of just their hashes.
+ * Allows iteration over the full key-value pair set.
+ */
+export class KeyedHashMap<K extends { hash(): string }, V>{
+  private _values: { [key: string]: [K, V] } = {};
+
+  put(key: K, value: V) {
+    this._values[key.hash()] = [key, value];
+  }
+
+  remove(key: K): void {
+    delete this._values[key.hash()];
+  }
+
+  get(key: K): V {
+    return this._values[key.hash()][1];
+  }
+
+  contains(key: K): boolean {
+    // V may be an undefined type
+    return this.get(key) !== undefined && key.hash() in this._values;
+  }
+
+  keys(): K[] {
+    return Object.keys(this._values).map(key => this._values[key][0]);
+  }
+
+  entries(): ([K, V])[] {
+    return Object.keys(this._values).map(key => this._values[key]);
+  }
+
+  values(): V[] {
+    return Object.keys(this._values).map(key => this._values[key][1]);
   }
 }
 

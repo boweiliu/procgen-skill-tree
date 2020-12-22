@@ -27,17 +27,17 @@ export class RenderedPointNode {
   public selfPointNodeRef: PointNodeRef; // which node we are
 
   // local state
-  public justClicked: boolean = false;
+  // public justClicked: boolean = false;
 
   // args here will never change, and changing this will NOT force a rerender
   constructor(args: {
-    texture: Pixi.Texture,
+    pointNodeTexture: Pixi.Texture,
     selfPointNodeRef: PointNodeRef,
     stateUpdaterQueue: [Function],
     ticker: Pixi.Ticker
   }) {
     this.selfPointNodeRef = args.selfPointNodeRef;
-    this.sprite = new Pixi.Sprite(args.texture);
+    this.sprite = new Pixi.Sprite(args.pointNodeTexture);
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 0.5;
     // this.sprite.x = node.x * RenderedChunkConstants.SPACING_PX;
@@ -62,8 +62,15 @@ export class RenderedPointNode {
     args.ticker.add(this.animate.bind(this));
   }
 
-  public animate(delta: number) {      
+  public setLocation(node: PointNodeRef = this.selfPointNodeRef) : this {
+    this.sprite.x = node.pointNodeCoord.x * RenderedChunkConstants.SPACING_PX;
+    this.sprite.y = node.pointNodeCoord.y * RenderedChunkConstants.SPACING_PX;
+    return this;
+  }
+
+  public animate(delta: number) : this {
     // TODO(bowei): make the (0,0) node in a chunk shimmer? or somehow visually distinguish it
+    return this;
   }
 
   public onClick(args: { gameState: GameState, gameStateUpdater: UpdaterGeneratorType<GameState>, entityUpdaterQueue: [any] }) {
@@ -88,8 +95,9 @@ export class RenderedPointNode {
     // 3. do the rerenders (someone else handles this...)
   }
 
-  public rerender(props: { isSelected: boolean, isAllocated: boolean }) {
+  public rerender(props: { isSelected: boolean, isAllocated: boolean }) : this {
     this.setTint(props);
+    return this;
   }
 
   // public rerenderFromState(gameState: DeepReadonly<GameState>) {
@@ -111,13 +119,13 @@ export class RenderedPointNode {
     }
   }
 
-//  public isSelected(gameState: DeepReadonly<GameState>): boolean {
-//    return gameState.playerUI.selectedPointNode?.pointNodeId == this.selfPointNodeRef.pointNodeId;
-//  }
-//
-//  public isAllocated(gameState: DeepReadonly<GameState>): boolean {
-//    return gameState.playerSave.allocatedPointNodeSet.get(this.selfPointNodeRef)
-//  }
+ public isSelected(gameState: DeepReadonly<GameState>): boolean {
+   return gameState.playerUI.selectedPointNode?.pointNodeId == this.selfPointNodeRef.pointNodeId;
+ }
+
+ public isAllocated(gameState: DeepReadonly<GameState>): boolean {
+   return gameState.playerSave.allocatedPointNodeSet.get(this.selfPointNodeRef)
+ }
 // 
 //   public update(args: {
 //     gameState: DeepReadonly<GameState>, gameStateUpdater: UpdaterGeneratorType<GameState>,
