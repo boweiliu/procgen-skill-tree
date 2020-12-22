@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { UseGameStateContext } from "../contexts";
 import { Application } from "../pixi/Application";
+import { PixiComponentState } from "./PixiComponent";
 
 export function PixiWrapperComponent(props: {
-  application: Application | undefined
+  application: Application,
+  pixiComponentState: PixiComponentState,
 }) {
+  const { application, pixiComponentState } = props;
   const container = useRef<HTMLDivElement>(null);
   const [gameState]  = useContext(UseGameStateContext);
 
@@ -14,14 +17,14 @@ export function PixiWrapperComponent(props: {
     for (let i = container.current!.childNodes.length - 1; i >= 0; i--) {
       container.current!.removeChild(container.current!.childNodes[i]);
     }
-    if (props.application) {
-      container.current!.appendChild(props.application.app.view);
-    }
-  }, [props.application]);
+    // add the application
+    container.current!.appendChild(application.app.view);
+  }, [application.app.view]);
 
   // Trigger component rerender when game state is updated
-  props.application?.rerender({
-    gameState
+  application.rerender({
+    gameState,
+    pixiComponentState
   })
 
   return (

@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./PixiComponent.css";
 import { Application } from "../pixi/Application";
-import { GameState, PointNodeRef } from "../data/GameState";
+import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
-import { DeepReadonly, UpdaterGeneratorType } from "../lib/util/misc";
 
 export type PixiComponentState = {
+  orientation: "original" | "rotated",
   innerWidth: number,
   innerHeight: number,
 }
@@ -15,7 +15,11 @@ export function PixiComponent(props: {
   // gameStateUpdaters: UpdaterGeneratorType<GameState>,
   onFocusedNodeChange: (selection: PointNodeRef) => void;
 }) {
-  const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({ innerHeight: 0, innerWidth: 0});
+  const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({
+    orientation: "original",
+    innerHeight: window.innerHeight,
+    innerWidth: window.innerWidth,
+  });
 
   const [application, setApplication] = useState<Application>(
     new Application({
@@ -37,7 +41,7 @@ export function PixiComponent(props: {
 
   return (
     <>
-      <PixiWrapperComponent application={application}/>
+      <PixiWrapperComponent application={application} pixiComponentState={pixiComponentState}/>
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {

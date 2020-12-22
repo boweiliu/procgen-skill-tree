@@ -13,6 +13,7 @@ import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
 import { DeepReadonly } from "../lib/util/misc";
+import { PixiComponentState } from "../components/PixiComponent";
 
 export type Config = {
   originalWindowWidth: number;
@@ -334,7 +335,8 @@ export class Application {
   }
 
   public rerender(props: {
-    gameState: DeepReadonly<GameState>
+    gameState: DeepReadonly<GameState>,
+    pixiComponentState: PixiComponentState,
   }) {
 
   }
