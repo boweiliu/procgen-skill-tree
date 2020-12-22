@@ -152,6 +152,17 @@ type UpdaterGeneratorType<T> = {
   : { getUpdater: () => UpdaterFn<T[k]> }
 } & { getUpdater: () => UpdaterFn<T> }
 
+/**
+ * Convenience method for generating setState<FancyObject.sub.component>() from setState<FancyObject> callbacks.
+ * If used in react, recommended that this be memoized.
+ * 
+ * @generic T should be a data-only object - nested objects are allowed but arrays, sets not supported
+ * @param dataObject ANY instance of T, used only for its keys. MUST have all keys present
+ * @param dataUpdater an updater function, which can be called as: dataUpdater(newT) or
+ *   dataUpdater((oldT) => { return newTFromOldT(oldT) }) ; e.g. react setState() function.
+ * @return a deep object that has the same keys as T, except each key also has a getUpdater() function;
+ *   the getUpdater() on a subobject of T acts similarly to the dataUpdater<T> but to the subobject rather than the whole object.
+ */
 export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType<T> {
   const updaters: UpdaterGeneratorType<T> = {} as any;
   updaters.getUpdater = () => dataUpdater;
