@@ -5,14 +5,12 @@ import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 
 export type PixiComponentState = {
-  orientation: "original" | "rotated",
+  orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
   innerWidth: number,
   innerHeight: number,
 }
 
 export function PixiComponent(props: {
-  // gameState: DeepReadonly<GameState>,
-  // gameStateUpdaters: UpdaterGeneratorType<GameState>,
   onFocusedNodeChange: (selection: PointNodeRef) => void;
 }) {
   const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({
@@ -25,7 +23,6 @@ export function PixiComponent(props: {
     new Application({
       originalWindowWidth: window.innerWidth,
       originalWindowHeight: window.innerHeight,
-      ...props
     })
   );
 
@@ -48,7 +45,6 @@ export function PixiComponent(props: {
           setApplication(new Application({
             originalWindowWidth: window.innerWidth,
             originalWindowHeight: window.innerHeight,
-            ...props
           }))
         }}
       >

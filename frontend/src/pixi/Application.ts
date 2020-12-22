@@ -27,8 +27,6 @@ const defaultConfig: Config = {
   onFocusedNodeChange: () => { }
 };
 
-export type Point = number[];
-
 export class Application {
   public app!: Pixi.Application;
 
@@ -55,17 +53,15 @@ export class Application {
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(config?: Config, app?: Pixi.Application) {
+  constructor(config?: Partial<Config>, app?: Pixi.Application) {
     this.config = Object.assign({}, defaultConfig, config);
     this.randomSeed = 0xcafebabe;
 
     this.originalAppWidth = Math.min(1280, this.config.originalWindowWidth - 8);
     this.originalAppHeight = Math.min(720, this.config.originalWindowHeight - 8);
-    this.app =
-      app ||
-    new Pixi.Application({
-        width: this.originalAppWidth, // both are ignored - see resize() below
-        height: this.originalAppHeight,
+    this.app = app || new Pixi.Application({
+      width: this.originalAppWidth, // both are ignored - see resize() below
+      height: this.originalAppHeight,
       antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
       transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
       resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
@@ -73,8 +69,8 @@ export class Application {
       // resolution: 2,
       autoDensity: true,
       powerPreference: "low-power", // the only valid one for webgl
-        backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
-      });
+      backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
+    });
 
     this.stage = this.app.stage;
     this.stage.sortableChildren = true;
