@@ -10,7 +10,7 @@ import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
 import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
-import { GameState, PointNodeRef } from "./data/GameState";
+import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { Lazy, updaterGenerator } from "./lib/util/misc";
 
@@ -34,21 +34,7 @@ function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
-
-  const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) =>
-    updateSelectedPointNode(() => newSelectedPointNode);
-
   let updaters = updaterGenerator(gameState, setGameState);
-  const updateSelectedPointNode = updaters.playerUI.selectedPointNode.getUpdater();
-
-  const handleFocusedNodeChange = setSelectedPointNode;
-
-  const handleActiveTabChange = useCallback(
-    (activeTabIndex) => {
-      setActiveTab(activeTabIndex);
-    },
-    [setActiveTab]
-  );
 
   useEffect(() => {
     if (batchContents === 0) {
@@ -66,12 +52,12 @@ function App() {
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters]}>
-        <PixiComponent onFocusedNodeChange={handleFocusedNodeChange} />
+        <PixiComponent onFocusedNodeChange={updaters.playerUI.selectedPointNode.getUpdater()} />
         <Sidebar>
           <Tabs
             value={activeTab}
             labels={tabLabels}
-            onChange={handleActiveTabChange}
+            onChange={setActiveTab}
           />
           {tabViews.map((component, i) => {
             return (
