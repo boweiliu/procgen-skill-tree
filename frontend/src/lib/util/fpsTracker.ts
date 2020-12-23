@@ -13,6 +13,9 @@ export class FpsTracker {
     // this.frameTimestampsInTime.push((new Date()).getTime());
   }
 
+  /**
+   * @param ticksSinceLastUpdate should be the delta in ticks since the last update - will probably be a decimal close to 1
+   */
   public tick(ticksSinceLastUpdate: number) {
     let lastFrameTime = this.frameTimestampsInTicks[this.frameTimestampsInTicks.length - 1];
     this.frameTimestampsInTicks.push(lastFrameTime + ticksSinceLastUpdate);
