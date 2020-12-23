@@ -1,7 +1,7 @@
 import "./App.css";
 
 import classnames from "classnames";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import UAParser from "ua-parser-js";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
@@ -14,6 +14,11 @@ import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { Lazy, updaterGenerator } from "./lib/util/misc";
 
+// TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
+// experience - similar to a native app which is landscape locked.
+// (on mobile in already landscape orientation, and in all desktop, serve ordinary orientation.)
+// also note that android webapp supports manifest.json setting orientation, but not in the browser
+// FOR NOW - ignore this
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
 if (
