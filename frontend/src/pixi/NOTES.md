@@ -21,19 +21,27 @@ should instantiate its own pixi container and add the children as child containe
 then asks all children to perform their state & upwards-props updates, then recomputes props for its children and triggers (pure) renders on
 itself and all changed children.
 
-proposal:
+proposal: (note that args, updaters are strict subsets of props in terms of usage; they are a bit more idiomatic/clearer naming)
 * constructor(args, props) // args - things that the component doesn't have to listen for changes. both are passed down from parent
 * this.queuedEvents // used for onEvent listeners, to delay action until the next tick
-* this.state // local state only accessible to this entity and its children.
+* this.state, this.setState // local state only accessible to this entity and its children.
 * update(delta, props, updaters) { // edits this.state and sends parent state updates upwards. typically looks like:
+// OPEN QUESTION: props will be stale if updaters() gets called here?? queued events have race conditions?? what if update causes other components to need updates - is there a long dependency tree there?
+    if (!this.shouldUpdate()) { return }  // this should be library code
     this.children.map((it) => it.update(...));
-    this.children.map((it) => it.render(...));
     updateSelf();
   }
-* render(delta, props) // pure, only accesses this.state. delta == ticksSinceLastRender is so common that we explicitly have a param for it.
-* shouldUpdate(props) // optional, default implementation is true, also allows returning a priority/timestamp
+* render(delta, props) // pure, only accesses this.state. delta == ticksSinceLastRender is so common that we explicitly have a param for it. this would also be a good place to create new children if necessary. sample implementation: {
+    this.children.map((it) => it.render(...));
+    renderSelf();
+  }
+* shouldUpdate(props) // optional, default true if missing, also allows returning a priority/timestamp. library boilerplate here to shallow check props
 * shouldRender(props) // optional, default implementation is true, contains logic for skipping the render
 * this.children // some data about my children and how to compute child props, updaters from my state, props, updaters
+* this.createChild(ChildComponentClass, args, function propsFactory(myProps, myState) { return childProps }, function updaterFactory(myUpdaters, myProps, myState) { return childUpdaters }) {
+    // should essentially do new ChildComponentClass(args, propsFactory(this.props, this.state))
+    // also needs to store the factories so the factories can be re-called with updated myprops and mystate when in the update loop
+    // this.updateChild(child) { child.get().update(delta, propsFactory(this), updaterFactory(this) }
 
 * TODO: think about coroutines and destroying/deactivating: (https://github.com/johnfn/ld-starter-code/blob/master/src/library/entity.ts, https://github.com/johnfn/ld-starter-code/blob/master/src/library/base_game.ts)
 
