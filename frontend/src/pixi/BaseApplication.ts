@@ -46,21 +46,30 @@ export class BaseApplication {
   public fpsTracker: FpsTracker;
 
   onResize: (() => void)[] = [];
-  originalAppWidth: number = 1280;
-  originalAppHeight: number = 720;
-  randomSeed!: number;
+  originalAppWidth: number;
+  originalAppHeight: number;
+
+  public static appSizeFromWindowSize(window: Vector2): Vector2 {
+    return new Vector2({
+      x: Math.min(1280, window.x),
+      y: Math.min(720, window.y),
+    });
+  }
 
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(config?: Partial<Config>, app?: Pixi.Application) {
+  constructor(config?: Partial<Config>) {
     assertOnlyCalledOnce("Application constructor");
     this.config = Object.assign({}, defaultConfig, config);
-    this.randomSeed = 0xcafebabe;
 
-    this.originalAppWidth = Math.min(1280, this.config.originalWindowWidth - 8);
-    this.originalAppHeight = Math.min(720, this.config.originalWindowHeight - 8);
-    this.app = app || new Pixi.Application({
+    const appSize = BaseApplication.appSizeFromWindowSize(new Vector2(
+      this.config.originalWindowWidth, this.config.originalWindowHeight
+    ));
+    this.originalAppWidth = appSize.x;
+    this.originalAppHeight = appSize.y;
+
+    this.app = new Pixi.Application({
       width: this.originalAppWidth, // both are ignored - see resize() below
       height: this.originalAppHeight,
       antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
