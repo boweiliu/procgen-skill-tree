@@ -1,5 +1,3 @@
-import { ZLevelGenFactory } from "../../dataFactory/WorldGenStateFactory";
-
 let lastUsedId = 0;
 
 export const getUniqueID = () => {

@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState, PointNodeRef } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { assertOnlyCalledOnce, Lazy, updaterGenerator } from "./lib/util/misc";
+import { Lazy, updaterGenerator } from "./lib/util/misc";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -28,41 +28,13 @@ const tabLabels = ["Node Details", "Quest Progress"];
 const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}).create());
 
 function App() {
-  // const [forceUpdate, setForceUpdate] = useState(0);
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     console.log('a')
-  //     setForceUpdate(a => a + 1)
-  //   }, 1000);
-
-  // }, [setForceUpdate])
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
-  // const x_initialGameState = useMemo(() => new GameStateFactory({}).create(), []);
-  // const [gameState, setGameState] = useState<GameState>(x_initialGameState);
-
-  // const [gameState, setGameState] = useState<GameState>(initialGameState.get());
   const [gameState, setGameState] = useState<GameState>(function factory() {
-    // assertOnlyCalledOnce("app useGameState"); // this fails!!
-    // return new GameStateFactory({}).create();
-    // return null as any;
     return initialGameState.get();
   });
-  // useEffect(() => {
-  //   setGameState(new GameStateFactory({}).create());
-  // }, []);
-  // if (!gameState) {
-  //   setGameState(new GameStateFactory({}).create());
-  // }
-  // if (gameState === undefined) {
-  //   throw new Error();
-  // }
 
-  useEffect(() => {
-    console.log("game updated:");
-    console.log(gameState);
-  }, [gameState]);
   const setSelectedPointNode = (newSelectedPointNode: PointNodeRef) =>
     updateSelectedPointNode(() => newSelectedPointNode);
 
