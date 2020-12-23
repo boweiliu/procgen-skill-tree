@@ -11,14 +11,15 @@ import { Vector2 } from "../lib/util/geometry/vector2"
  * 3. data about player activity that only influences the UI, e.g. which node was selected, but affects UI across
  *   very far away pixi/react components.
  *   Should be persisted to disk - will help the player "remember their place" in the game, but not a big deal if lost.
+ * 4. data about the window display - should never be persisted to disk.
  * 
  * Does NOT include UI data which is only relevant to a small part of the component hierarchy - e.g. how many seconds since last tap.
  * That data should belong in state owned by subcomponents.
  */
 export type GameState = {
   worldGen: WorldGenState,
-  playerSave: PlayerSaveState
-  playerUI: PlayerUIState
+  playerSave: PlayerSaveState,
+  playerUI: PlayerUIState,
 }
 
 export type WorldGenState = {
@@ -93,4 +94,13 @@ export class ChunkRef {
   public hash(): string {
     return this.chunkId.toString();
   }
+}
+
+/**
+ * current window settings -- allows for dynamic resizing and also rotation on mobile web
+ */
+export type WindowState = {
+  orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
+  innerWidth: number,
+  innerHeight: number,
 }

@@ -335,6 +335,7 @@ export class Application {
   public rerender(props: {
     gameState: DeepReadonly<GameState>,
     pixiComponentState: PixiComponentState,
+    [k: string]: any,
   }) {
 
   }

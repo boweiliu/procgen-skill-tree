@@ -1,37 +1,29 @@
 import * as Pixi from "pixi.js";
-import { KeyboardState } from "../lib/pixi/keyboard";
-import { FpsTracker } from "../lib/util/fpsTracker";
-import { registerDraggable } from "../lib/pixi/DraggableHelper";
-import createBunnyExample from "./BunnyExample";
-import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
-import { ZLevel } from "./ZLevel";
-import { RenderedZLevel } from "./RenderedZLevel";
-import { HashMap } from "../lib/util/data_structures/hash";
-import { GameState, PointNodeRef } from "../data/GameState";
-import { generatePointNodeTexture } from "./textures/PointNodeTexture";
-import { Reticle } from "./Reticle";
-import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { assertOnlyCalledOnce, DeepReadonly, Lazy } from "../lib/util/misc";
-import { PixiComponentState } from "../components/PixiComponent";
-import { render } from "@testing-library/react";
+import { GameState, WindowState } from "../data/GameState";
+import { assertOnlyCalledOnce, DeepReadonly, updaterGenerator, UpdaterGeneratorType } from "../lib/util/misc";
+import { GameStateFactory } from "../dataFactory/GameStateFactory";
 
 export type Config = {
   originalWindowWidth: number;
   originalWindowHeight: number;
-  onFocusedNodeChange: (selection: PointNodeRef) => void;
 };
 
 const defaultConfig: Config = {
   originalWindowWidth: 800,
   originalWindowHeight: 800,
-  onFocusedNodeChange: () => { }
 };
 
-export type BaseApplicationProps = DeepReadonly<{
+export type BaseApplicationProps = DeepReadonly<MutableProps>
+
+type MutableProps = {
   gameState: GameState,
-  windowSize: Vector2,
-}>
+  pixiComponentState: WindowState, // shim
+}
+
+export type BaseApplicationUpdaters = {
+  gameState: UpdaterGeneratorType<GameState>,
+};
 
 export type BaseApplicationState = {
   appSize: Vector2,
@@ -39,11 +31,17 @@ export type BaseApplicationState = {
 
 export class BaseApplication {
   public config!: Config;
-  public app!: Pixi.Application;
-  state!: BaseApplicationState;
-
   originalAppWidth: number;
   originalAppHeight: number;
+  public app!: Pixi.Application;
+
+  public globalEventQueue: ((...args: any[]) => void)[] = [];
+  state!: BaseApplicationState;
+  updaters!: BaseApplicationUpdaters;
+
+  gameState!: GameState;
+  props!: MutableProps;
+  // nextProps!: MutableProps | undefined;
 
   public static appSizeFromWindowSize(window: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
@@ -59,7 +57,7 @@ export class BaseApplication {
     assertOnlyCalledOnce("Base application constructor");
     this.config = Object.assign({}, defaultConfig, args);
 
-    this.state.appSize = BaseApplication.appSizeFromWindowSize(props.windowSize);
+    this.state.appSize = BaseApplication.appSizeFromWindowSize(new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight));
     this.originalAppWidth = this.state.appSize.x;
     this.originalAppHeight = this.state.appSize.y;
 
@@ -90,14 +88,55 @@ export class BaseApplication {
   }
 
   updateState(delta: number, props: BaseApplicationProps) {
-    this.state.appSize = BaseApplication.appSizeFromWindowSize(props.windowSize);
+    this.state.appSize = BaseApplication.appSizeFromWindowSize(new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight));
+  }
+
+  // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
+  rerender(props: {
+    gameStateUpdaters: UpdaterGeneratorType<GameState>,
+    pixiComponentState: DeepReadonly<WindowState>,
+    // needed to avoid double-updates
+    prevGameState: DeepReadonly<GameState>,
+    gameState: DeepReadonly<GameState>,
+  }) {
+    this.globalEventQueue.push(() => {
+      this.props.pixiComponentState = props.pixiComponentState;
+      this.updaters.gameState = props.gameStateUpdaters; // optional
+    })
   }
 
   render(delta: number, props: BaseApplicationProps) {
     this.app.renderer.resize(this.state.appSize.x, this.state.appSize.y);
   }
 
+
+  blockedReactUpdate: { old: GameState, new: GameState } | undefined;
+
   baseGameLoop(delta: number) {
+    // now: read the value of this.gameState
+    let startGameState = this.gameState
+    // generates a new object by shallow copying
+    let setStartGameState = (arg: GameState | ((old: GameState) => GameState)) => {
+      if (typeof arg === 'function') {
+        startGameState = { ...arg(startGameState) };
+      } else {
+        startGameState = { ...arg }
+      }
+    }
+
+    // apply changes to gameState - this should be synchronous, or at least locked
+    let updater = updaterGenerator<GameState>(startGameState, setStartGameState);
+    for (let eventAction of this.globalEventQueue) {
+      eventAction(updater); // includes actions sent down from react
+    }
+
+    // pass the new game state back up
+    this.gameState = startGameState;
+    // note that react will view this as a state change and trigger this.rerender immediately, so we need to block that
+    this.updaters.gameState.update((old: GameState): GameState => {
+      this.blockedReactUpdate = { old, new: this.gameState };
+      return this.gameState;
+    });
 
   }
 }

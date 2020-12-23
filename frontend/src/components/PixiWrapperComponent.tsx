@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { UseGameStateContext } from "../contexts";
+import { GameState } from "../data/GameState";
+import { DeepReadonly } from "../lib/util/misc";
 import { Application } from "../pixi/Application";
 import { PixiComponentState } from "./PixiComponent";
 
@@ -9,7 +11,7 @@ export function PixiWrapperComponent(props: {
 }) {
   const { application, pixiComponentState } = props;
   const container = useRef<HTMLDivElement>(null);
-  const [gameState]  = useContext(UseGameStateContext);
+  const [gameState, gameStateUpdaters]  = useContext(UseGameStateContext);
 
   useEffect(() => {
     // this block only triggers if a new application instance is created.
@@ -21,10 +23,18 @@ export function PixiWrapperComponent(props: {
     container.current!.appendChild(application.app.view);
   }, [application.app.view]);
 
+  const prevRef = useRef<DeepReadonly<GameState>>();
+  useEffect(() => {
+    prevRef.current = gameState;
+  });
+  const prevGameState = prevRef.current;
+
   // Trigger component rerender when game state is updated
   application.rerender({
+    pixiComponentState,
     gameState,
-    pixiComponentState
+    prevGameState,
+    gameStateUpdaters,
   })
 
   return (
