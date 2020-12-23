@@ -190,6 +190,9 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
   if (typeof dataObject !== "object") return updaters;
   const keys : (keyof T)[] = Object.keys(dataObject) as any as (keyof T)[];
   keys.forEach((key: (keyof T)) => {
+    if (key === "set" || key === "getUpdater" || key === "update") {
+      throw Error(`Invalid key in updaterGenerator: ${key} conflicts with reserved keywords set, update, getUpdater.`);
+    }
     function keyUpdater(newValueOrCallback: UpdaterFnParam<T[typeof key]>) {
       if (typeof newValueOrCallback === "function") {
         dataUpdater((oldData) => {

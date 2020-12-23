@@ -39,6 +39,10 @@ function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
+
+  let batchedSetGameState = batchUpdates(setGameState)
+  batchedSetGameState((old: GameState): GameState => old );
+  batchedSetGameState.fireBatch();
   let updaters = useMemo(() => updaterGenerator(initialGameState.get(), setGameState), [setGameState]);
 
   useEffect(() => {
