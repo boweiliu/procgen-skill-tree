@@ -1,3 +1,5 @@
+import { ZLevelGenFactory } from "../../dataFactory/WorldGenStateFactory";
+
 let lastUsedId = 0;
 
 export const getUniqueID = () => {
@@ -209,4 +211,38 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
 
 export type DeepReadonly<T> = T extends Function ? T : {
   readonly [P in keyof T]: T[P] extends { [k: string]: any } ? DeepReadonly<T[P]> : T[P];
+}
+
+
+const assertOnlyCalledOnceData: { [k: string]: string } = {};
+
+export function assertOnlyCalledOnce(id: string | number) {
+  let k = id.toString();
+  if (assertOnlyCalledOnceData[k] !== undefined) {
+    throw new Error("Error, called twice with same id: " + k + " , callback the first time was : " + assertOnlyCalledOnceData[k]);
+  } else {
+    const stacktrace = new Error().stack!
+    assertOnlyCalledOnceData[k] = stacktrace;
+  }
+}
+
+export class Lazy<T> {
+  private _wasConstructed: boolean = false;
+  private _value: T | undefined = undefined;
+  private _factory: () => T
+
+  constructor(factory: () => T) {
+    this._factory = factory;
+  }
+
+  public get(): T {
+    // T might have undefined as a valid value
+    if (this._value !== undefined || this._wasConstructed === true) {
+      return this._value!;
+    } else {
+      this._value = this._factory();
+      this._wasConstructed = true;
+      return this._value;
+    }
+  }
 }

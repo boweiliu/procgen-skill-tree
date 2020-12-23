@@ -12,7 +12,7 @@ import { GameState, PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { DeepReadonly } from "../lib/util/misc";
+import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
 import { PixiComponentState } from "../components/PixiComponent";
 
 export type Config = {
@@ -54,6 +54,7 @@ export class Application {
    * Need to provide config to set up the pixi canvas
    */
   constructor(config?: Partial<Config>, app?: Pixi.Application) {
+    assertOnlyCalledOnce("Application constructor");
     this.config = Object.assign({}, defaultConfig, config);
     this.randomSeed = 0xcafebabe;
 
@@ -129,6 +130,7 @@ export class Application {
   }
 
   private drawStart() {
+    assertOnlyCalledOnce("Application.drawStart");
     // put a text thingy in the top right
     let textFpsHud = new Pixi.Text('', {
       fontFamily: 'PixelMix',

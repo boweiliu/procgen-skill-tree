@@ -3,12 +3,18 @@ import "./PixiComponent.css";
 import { Application } from "../pixi/Application";
 import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
+import { Lazy } from "../lib/util/misc";
 
 export type PixiComponentState = {
   orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
   innerWidth: number,
   innerHeight: number,
 }
+
+const initialApplication = new Lazy(() => new Application({
+  originalWindowWidth: window.innerWidth,
+  originalWindowHeight: window.innerHeight,
+}));
 
 export function PixiComponent(props: {
   onFocusedNodeChange: (selection: PointNodeRef) => void;
@@ -19,12 +25,7 @@ export function PixiComponent(props: {
     innerWidth: window.innerWidth,
   });
 
-  const [application, setApplication] = useState<Application>(
-    new Application({
-      originalWindowWidth: window.innerWidth,
-      originalWindowHeight: window.innerHeight,
-    })
-  );
+  const [application, setApplication] = useState<Application>(initialApplication.get());
 
   window.onresize = () => {
     setPixiComponentState(old => {

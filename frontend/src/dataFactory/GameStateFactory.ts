@@ -1,5 +1,6 @@
 import { GameState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
+import { assertOnlyCalledOnce } from "../lib/util/misc";
 
 export type GameStateConfig = any;
 
@@ -11,7 +12,7 @@ export class GameStateFactory {
   }
 
   public create(): GameState {
-    console.log("BOWEI CREATING GAME STATE, should only run once!!")
+    assertOnlyCalledOnce("GameStateFactory.create");
     return {
       worldGen: {
         seed: 0xcafebabe,

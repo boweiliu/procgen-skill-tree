@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState, PointNodeRef } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { updaterGenerator } from "./lib/util/misc";
+import { Lazy, updaterGenerator } from "./lib/util/misc";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -24,6 +24,8 @@ if (
 }
 
 const tabLabels = ["Node Details", "Quest Progress"];
+
+const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}).create());
 
 function App() {
   // const [forceUpdate, setForceUpdate] = useState(0);
@@ -37,9 +39,20 @@ function App() {
   const [batchContents, setBatchContents] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
-  const [gameState, setGameState] = useState<GameState>(
-    new GameStateFactory({}).create()
-  );
+  // const x_initialGameState = useMemo(() => new GameStateFactory({}).create(), []);
+  // const [gameState, setGameState] = useState<GameState>(x_initialGameState);
+
+  const [gameState, setGameState] = useState<GameState>(initialGameState.get());
+  // const [gameState, setGameState] = useState<GameState>(() => new GameStateFactory({}).create());
+  // useEffect(() => {
+  //   setGameState(new GameStateFactory({}).create());
+  // }, []);
+  // if (!gameState) {
+  //   setGameState(new GameStateFactory({}).create());
+  // }
+  // if (gameState === undefined) {
+  //   throw new Error();
+  // }
 
   useEffect(() => {
     console.log("game updated:");
