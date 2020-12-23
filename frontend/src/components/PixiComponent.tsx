@@ -10,6 +10,19 @@ export type PixiComponentState = {
   innerHeight: number,
 }
 
+  function initializeApplication(setApplication: any) {
+    const newApp = new Application({
+      originalWindowWidth: window.innerWidth,
+      originalWindowHeight: window.innerHeight,
+    } as any);
+    // // application.register(container.current!);
+    // container.current!.appendChild(newApp.app.view);
+    // // container.current!.appendChild(application.app.view)
+    // // console.log(container.current!)
+    // newApp.drawStart(); // uncommenting this line is very bad
+    setApplication(newApp);
+  }
+
 export function PixiComponent(props: {
   // gameState: DeepReadonly<GameState>,
   // gameStateUpdaters: UpdaterGeneratorType<GameState>,
@@ -19,22 +32,9 @@ export function PixiComponent(props: {
   const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({ innerHeight: 0, innerWidth: 0});
 
   const [application, setApplication] = useState<Application>();
-  function initializeApplication() {
-    const newApp = new Application({
-      originalWindowWidth: window.innerWidth,
-      originalWindowHeight: window.innerHeight,
-      ...props
-    });
-    // // application.register(container.current!);
-    // container.current!.appendChild(newApp.app.view);
-    // // container.current!.appendChild(application.app.view)
-    // // console.log(container.current!)
-    newApp.drawStart();
-    setApplication(newApp);
-  }
 
   useEffect(() => {
-    return initializeApplication();
+    return initializeApplication(setApplication);
   }, []);
 
   window.onresize = () => {
@@ -61,7 +61,7 @@ export function PixiComponent(props: {
           if (application) {
             container.current!.removeChild(application.app.view);
           }
-          initializeApplication();
+          initializeApplication(setApplication);
         }}
       >
         [DEBUG] reset and rerender

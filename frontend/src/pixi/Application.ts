@@ -106,6 +106,7 @@ export class Application {
 
     this.resize(this.config.originalWindowWidth, this.config.originalWindowHeight);
 
+    this.drawStart();
   }
 
   /**
