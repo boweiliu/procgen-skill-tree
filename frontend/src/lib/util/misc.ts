@@ -144,6 +144,7 @@ export class Util {
 }
 
 type UpdaterFnParam<T> = T | ((prev: T) => T);
+// type UpdaterFnParam<T> = ((prev: T) => T);
 export type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;
 
 export type UpdaterGeneratorType<T> = {

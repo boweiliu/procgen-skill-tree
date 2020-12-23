@@ -39,7 +39,7 @@ function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
-  let updaters = useMemo(() => updaterGenerator(gameState, setGameState), [setGameState]);
+  let updaters = useMemo(() => updaterGenerator(initialGameState.get(), setGameState), [setGameState]);
 
   useEffect(() => {
     if (batchContents === 0) {
