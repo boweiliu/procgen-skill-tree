@@ -33,6 +33,7 @@ proposal:
 * render(delta, props) // pure, only accesses this.state. delta == ticksSinceLastRender is so common that we explicitly have a param for it.
 * shouldUpdate(props) // optional, default implementation is true, also allows returning a priority/timestamp
 * shouldRender(props) // optional, default implementation is true, contains logic for skipping the render
+* this.children // some data about my children and how to compute child props, updaters from my state, props, updaters
 
 * TODO: think about coroutines and destroying/deactivating: (https://github.com/johnfn/ld-starter-code/blob/master/src/library/entity.ts, https://github.com/johnfn/ld-starter-code/blob/master/src/library/base_game.ts)
 
