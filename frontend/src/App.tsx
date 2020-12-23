@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState, PointNodeRef } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { Lazy, updaterGenerator } from "./lib/util/misc";
+import { assertOnlyCalledOnce, Lazy, updaterGenerator } from "./lib/util/misc";
 
 const browser = new UAParser().getBrowser();
 let forceRotate = false;
@@ -42,8 +42,13 @@ function App() {
   // const x_initialGameState = useMemo(() => new GameStateFactory({}).create(), []);
   // const [gameState, setGameState] = useState<GameState>(x_initialGameState);
 
-  const [gameState, setGameState] = useState<GameState>(initialGameState.get());
-  // const [gameState, setGameState] = useState<GameState>(() => new GameStateFactory({}).create());
+  // const [gameState, setGameState] = useState<GameState>(initialGameState.get());
+  const [gameState, setGameState] = useState<GameState>(function factory() {
+    // assertOnlyCalledOnce("app useGameState"); // this fails!!
+    // return new GameStateFactory({}).create();
+    // return null as any;
+    return initialGameState.get();
+  });
   // useEffect(() => {
   //   setGameState(new GameStateFactory({}).create());
   // }, []);
