@@ -210,7 +210,7 @@ export function updaterGenerator<T>(dataObject: T, dataUpdater: UpdaterFn<T>): U
 export type DeepReadonly<T> = T extends Function ? T : {
   readonly [P in keyof T]: T[P] extends { [k: string]: any } ? DeepReadonly<T[P]> : T[P];
 }
-
+export type Const<T> = DeepReadonly<T>;
 
 const assertOnlyCalledOnceData: { [k: string]: string } = {};
 
@@ -232,7 +232,6 @@ export class Lazy<T> {
   constructor(factory: () => T) {
     this._factory = factory;
   }
-
   public get(): T {
     // T might have undefined as a valid value
     if (this._value !== undefined || this._wasConstructed === true) {
@@ -243,4 +242,15 @@ export class Lazy<T> {
       return this._value;
     }
   }
+  // public async getAsync(): Promise<T> {
+  //   if (this._value !== undefined || this._wasConstructed === true) {
+  //     return Promise.resolve(this._value!);
+  //   } else {
+  //     return new Promise<T>((resolve, reject) => {
+  //       this._value = this._factory();
+  //       this._wasConstructed = true;
+  //       resolve(this._value);
+  //     });
+  //   }
+  // }
 }

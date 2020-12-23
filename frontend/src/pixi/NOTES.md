@@ -23,18 +23,23 @@ itself and all changed children.
 
 proposal: (note that args, updaters are strict subsets of props in terms of usage; they are a bit more idiomatic/clearer naming)
 * constructor(args, props) // args - things that the component doesn't have to listen for changes. both are passed down from parent
-* this.queuedEvents // used for onEvent listeners, to delay action until the next tick
+* this.queuedEvents // used for onEvent listeners, to delay action until the next tick; perhaps this should interact with the global event queue?
+* globalEventQueue.push(eventAction: (delta, prevProps, prevState, updaters) => void)
+  and then in the root component, every tick:
+  globalEventQueue.map((eventAction) => eventAction(
 * this.state, this.setState // local state only accessible to this entity and its children.
-* update(delta, props, updaters) { // edits this.state and sends parent state updates upwards. typically looks like:
+* updateState(delta, props) { // component is given new props which should be stored; also edits this.state . typically looks like:
 // OPEN QUESTION: props will be stale if updaters() gets called here?? queued events have race conditions?? what if update causes other components to need updates - is there a long dependency tree there?
     if (!this.shouldUpdate()) { return }  // this should be library code
+    updateSelf(); // update self state based on props
     this.children.map((it) => it.update(...));
-    updateSelf();
   }
 * render(delta, props) // pure, only accesses this.state. delta == ticksSinceLastRender is so common that we explicitly have a param for it. this would also be a good place to create new children if necessary. sample implementation: {
     this.children.map((it) => it.render(...));
     renderSelf();
   }
+* componentDidUpdate(props, updaters) { // sends state updates upwards
+
 * shouldUpdate(props) // optional, default true if missing, also allows returning a priority/timestamp. library boilerplate here to shallow check props
 * shouldRender(props) // optional, default implementation is true, contains logic for skipping the render
 * this.children // some data about my children and how to compute child props, updaters from my state, props, updaters
@@ -44,6 +49,22 @@ proposal: (note that args, updaters are strict subsets of props in terms of usag
     // this.updateChild(child) { child.get().update(delta, propsFactory(this), updaterFactory(this) }
 
 * TODO: think about coroutines and destroying/deactivating: (https://github.com/johnfn/ld-starter-code/blob/master/src/library/entity.ts, https://github.com/johnfn/ld-starter-code/blob/master/src/library/base_game.ts)
+* TODO: beware of dependency loops; react can detect them but we cannot
+* TODO: some sort of pub-sub to avoid everyone rerendering when not necessary? instead of asking everyone all the time.
+
+* TL;DR the flow is:
+* constructor, initialize state based on const args and initial props
+* immediately after the constructor, first render again with initial props
+* onX => enqueues event actions onto global event queue; event actions can modify state and parent state
+* ticker tick goes off
+* in root component, global event queue fires off callbacks, editing state everywhere
+* shouldUpdateState fires recursively, conditioning: 
+* updateState fires recursively, causing state updates to flow down as props to children // should prevState/prevProps be kept here and in the previous method??
+* shouldRender fires recursively, conditioning:
+* render fires recursively, redrawing everything based on props & state. if new children are constructed, they get constructed, rendered, and then the parent continues its own rendering.
+* componentDidMount for newly created components. actions here are put onto global event queue and delayed until next tick.
+* componentDidUpdate fires recursively, all actions here are put onto global event queue and delayed until next tick
+* componentDidUnmount ??
 
 for comparison: react has
 * render() // reads the current value of this.props and this.state; pure

@@ -12,8 +12,9 @@ import { GameState, PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
+import { assertOnlyCalledOnce, DeepReadonly, Lazy } from "../lib/util/misc";
 import { PixiComponentState } from "../components/PixiComponent";
+import { render } from "@testing-library/react";
 
 export type Config = {
   originalWindowWidth: number;
@@ -27,29 +28,24 @@ const defaultConfig: Config = {
   onFocusedNodeChange: () => { }
 };
 
+export type BaseApplicationProps = DeepReadonly<{
+  gameState: GameState,
+  windowSize: Vector2,
+}>
+
+export type BaseApplicationState = {
+  appSize: Vector2,
+}
+
 export class BaseApplication {
-  public app!: Pixi.Application;
-
-  // root container
-  public stage!: Pixi.Container;
-  // Contains HUD, and other entities that don't move when game camera moves
-  public fixedCameraStage!: Pixi.Container;
-  // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
-  public actionStage!: Pixi.Container;
-  // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
-  public backdropStage!: Pixi.Container;
-
-  public keyboard!: KeyboardState;
-
   public config!: Config;
+  public app!: Pixi.Application;
+  state!: BaseApplicationState;
 
-  public fpsTracker: FpsTracker;
-
-  onResize: (() => void)[] = [];
   originalAppWidth: number;
   originalAppHeight: number;
 
-  public static appSizeFromWindowSize(window: Vector2): Vector2 {
+  public static appSizeFromWindowSize(window: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
       x: Math.min(1280, window.x),
       y: Math.min(720, window.y),
@@ -59,19 +55,17 @@ export class BaseApplication {
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(config?: Partial<Config>) {
-    assertOnlyCalledOnce("Application constructor");
-    this.config = Object.assign({}, defaultConfig, config);
+  constructor(args: Partial<Config> = {}, props: BaseApplicationProps) {
+    assertOnlyCalledOnce("Base application constructor");
+    this.config = Object.assign({}, defaultConfig, args);
 
-    const appSize = BaseApplication.appSizeFromWindowSize(new Vector2(
-      this.config.originalWindowWidth, this.config.originalWindowHeight
-    ));
-    this.originalAppWidth = appSize.x;
-    this.originalAppHeight = appSize.y;
+    this.state.appSize = BaseApplication.appSizeFromWindowSize(props.windowSize);
+    this.originalAppWidth = this.state.appSize.x;
+    this.originalAppHeight = this.state.appSize.y;
 
     this.app = new Pixi.Application({
-      width: this.originalAppWidth, // both are ignored - see resize() below
-      height: this.originalAppHeight,
+      width: this.state.appSize.x,
+      height: this.state.appSize.y,
       antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
       transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
       resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
@@ -82,39 +76,9 @@ export class BaseApplication {
       backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
     });
 
-    this.stage = this.app.stage;
-    this.stage.sortableChildren = true;
-
-    this.fixedCameraStage = new Pixi.Sprite();
-    this.fixedCameraStage.zIndex = 1;
-    this.fixedCameraStage.sortableChildren = true;
-    this.stage.addChild(this.fixedCameraStage);
-
-    this.actionStage = new Pixi.Sprite();
-    this.actionStage.zIndex = 0;
-    this.actionStage.sortableChildren = true;
-    this.stage.addChild(this.actionStage);
-
-    this.backdropStage = new Pixi.Sprite();
-    this.backdropStage.zIndex = -1;
-    this.backdropStage.sortableChildren = true;
-    this.stage.addChild(this.backdropStage);
-
-    this.keyboard = new KeyboardState();
-    this.app.ticker.add(() => {
-      this.keyboard.update();
-    })
-
-    this.fpsTracker = new FpsTracker();
-    this.app.ticker.add((delta) => {
-      // delta should be approximately equal to 1
-      this.fpsTracker.tick(delta);
-    })
-
-    let pointNodeTexture = generatePointNodeTexture(this.app.renderer);
-
     // test
     // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+    this.app.ticker.add((delta) => this.baseGameLoop(delta));
   }
 
   /**
@@ -125,10 +89,15 @@ export class BaseApplication {
     curr.appendChild(this.app.view);
   }
 
-  public rerender(props: {
-    gameState: DeepReadonly<GameState>,
-    pixiComponentState: PixiComponentState,
-  }) {
+  updateState(delta: number, props: BaseApplicationProps) {
+    this.state.appSize = BaseApplication.appSizeFromWindowSize(props.windowSize);
+  }
+
+  render(delta: number, props: BaseApplicationProps) {
+    this.app.renderer.resize(this.state.appSize.x, this.state.appSize.y);
+  }
+
+  baseGameLoop(delta: number) {
 
   }
 }
