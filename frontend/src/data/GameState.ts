@@ -69,14 +69,18 @@ export enum ResourceModifier {
 
 export type PlayerSaveState = {
   availableSp: number,
-  // activeQuest: any | undefined,
-  // batchesSinceQuestStart: number,
+  activeQuest: Quest | undefined,
+  batchesSinceQuestStart: number,
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[],
+}
+
+export type Quest = {
+  description: string
 }
 
 export type PlayerUIState = {

@@ -36,6 +36,8 @@ export class GameStateFactory {
       },
       playerSave: {
         availableSp: 0,
+        activeQuest: undefined,
+        batchesSinceQuestStart: 0,
         allocatedPointNodeSet: new HashSet([pointNodeRef]),
         allocatedPointNodeHistory: [pointNodeRef],
       },

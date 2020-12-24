@@ -7,6 +7,7 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet } from "../../lib/util/data_structures/hash";
 import { multiplyColor } from "../../lib/util/misc";
 import { canAllocate } from "../../game/Neighbors";
+import { afterAppendAllocationHistory } from "../../game/OnAllocation";
 
 type Props = {
   delta: number,
@@ -123,38 +124,32 @@ export class PointNodeComponent {
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
       // event.stopPropagation();
 
-      updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
+      updaters.playerSave.allocatedPointNodeHistory.enqueueUpdate((prev, prevGameState) => {
         // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
-        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId && 
-          canAllocate(
+        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
+          if (canAllocate(
             args.selfPointNodeRef,
             prevGameState.worldGen,
             prevGameState.playerSave.allocatedPointNodeSet,
             prevGameState.playerSave.availableSp
-          ) === 'yes'
-        ) {
-          prev.push(args.selfPointNodeRef);
-          console.log({ prev, actualPrev : [...prev]});
-          return [...prev];
+          ) === 'yes') {
+            prev.push(args.selfPointNodeRef);
+            console.log({ prev, actualPrev: [...prev] });
+            return [...prev];
+          } else {
+            // happens +1 tick afterwards due to nested enqueue, but NBD
+            updaters.playerUI.activeTab.enqueueUpdate((prev) => {
+              return 1;
+            })
+          }
         }
         return prev;
       })
 
-      updaters.playerSave.allocatedPointNodeSet.update((prev: HashSet<PointNodeRef>, prevGameState) => {
-        let history = prevGameState.playerSave.allocatedPointNodeHistory
-        let mostRecent = history[history.length - 1]
-          console.log({ history, actualHistory: [...history] });
-        // if we were already selected, try to allocate us
-        if (!prev.contains(mostRecent)) {
-          const next = prev.clone();
-          next.put(mostRecent);
-          console.log({ prev, next, prevSize: prev.size(), nextSize: next.size(), isEqual: prev === next })
-          return next;
-        }
-        return prev;
-      })
+      afterAppendAllocationHistory(updaters);
 
-      updaters.playerUI.selectedPointNode.update((prev, gameState) => {
+      // update selected to ourselves
+      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
         return args.selfPointNodeRef;
       })
     });
