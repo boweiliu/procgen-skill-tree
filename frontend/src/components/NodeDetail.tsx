@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PointNodeRef, WorldGenState } from "../data/GameState";
+import { PointNodeRef, ResourceModifier, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../pixi/components/PointNodeComponent";
 
@@ -23,18 +23,25 @@ export function NodeDetail({
   if (!selectedPointNode) {
     return (<> </>)
   }
+  const pointNodeGen = worldGen.zLevels[selectedPointNode.z]!.chunks.get(selectedPointNode.chunkCoord)!.pointNodes.get(selectedPointNode.pointNodeCoord)!
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
   const canBeAllocated = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet)
+  let nodeDescription: string = "Nothing (empty node)";
+  if (pointNodeGen.resourceType !== ResourceType.Nothing) {
+    nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`
+  }
   return (
     <>
       <h1>Current</h1>
-      <h3>
-        Chunk: {selectedPointNode.chunkCoord.x},{selectedPointNode.chunkCoord.y}
-      </h3>
-      <h3>X: {selectedPointNode.pointNodeCoord.x}</h3>
-      <h3>Y: {selectedPointNode.pointNodeCoord.y}</h3>
+      <div>
+        Z: {selectedPointNode.z} . Chunk: {selectedPointNode.chunkCoord.x}, {selectedPointNode.chunkCoord.y} . Node: {selectedPointNode.pointNodeCoord.x}, {selectedPointNode.pointNodeCoord.y} .
+      </div>
+      <br></br>
       <div>Allocated? {isAllocated ? "yes" : "no"} </div>
       <div>Can be allocated? {canBeAllocated ? (<>yes</>) : (<b>no</b>)} </div>
+      <br></br>
+      <div> Stats: </div>
+      <div> {nodeDescription} </div>
       <h2>Previous</h2>
       {history
         .slice(0, -1)

@@ -44,9 +44,27 @@ export class ChunkGenConstants {
 }
 
 export type PointNodeGen = {
-  id: number
+  id: number;
 
   // more data to be generated here - size, color, etc.
+  resourceType: ResourceType | null;
+  resourceModifier: ResourceModifier;
+  resourceAmount: number;
+}
+
+export enum ResourceType {
+  Mana0 = "Mana0",
+  Mana1 = "Mana1",
+  Mana2 = "Mana2",
+  Nothing = "Nothing"
+}
+
+export enum ResourceModifier {
+  Flat = "Flat",
+  Increased0 = "% increased",
+  AfterIncreased0 = "added after % increased",
+  Increased1 = "% increased multiplier",
+  AfterIncreased1 = "added after % increased multiplier"
 }
 
 export type PlayerSaveState = {

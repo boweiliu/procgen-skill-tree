@@ -54,6 +54,7 @@ export class ChunkComponent {
           selfPointNodeRef: pointNodeRef,
         },
         updaters: props.updaters,
+        pointNodeGen,
         position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
         isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
         isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
@@ -109,6 +110,7 @@ export class ChunkComponent {
         },
         updaters: props.updaters,
         position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
+        pointNodeGen,
         isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
         isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
       };

@@ -219,3 +219,13 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
     })
   ];
 }
+
+export function multiplyColor(color1: number, color2: number): number {
+  let reds = [color1 & 0xFF0000, color2 & 0xFF0000];
+  let blues = [color1 & 0x0000FF, color2 & 0x0000FF];
+  let greens = [color1 & 0x00FF00, color2 & 0x00FF00];
+  let out = Math.round(reds[0] / (0x010000) * reds[1] / (0xFFFFFF)) * 0x010000;
+  out += Math.round(greens[0] / 0x000100 * greens[1] / 0x00FF00) * 0x000100;
+  out += Math.round(blues[0] * blues[1] / 0x0000FF);
+  return out;
+}

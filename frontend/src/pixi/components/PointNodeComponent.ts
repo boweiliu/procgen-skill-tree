@@ -1,11 +1,12 @@
 import * as Pixi from "pixi.js";
 import { RenderedChunkConstants } from "./ChunkComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { ChunkGenConstants, GameState, PointNodeRef, WorldGenState } from "../../data/GameState";
+import { ChunkGenConstants, GameState, PointNodeGen, PointNodeRef, ResourceType, WorldGenState } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { GameStateFactory } from "../../dataFactory/GameStateFactory";
 import { HashSet } from "../../lib/util/data_structures/hash";
+import { multiplyColor } from "../../lib/util/misc";
 
 type Props = {
   delta: number,
@@ -15,14 +16,20 @@ type Props = {
   },
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
+  pointNodeGen: PointNodeGen,
   isSelected: boolean,
   isAllocated: boolean
 };
 
+type State = {
+
+}
+
 export class PointNodeComponent {
   public container: Pixi.Sprite;
   staleProps!: Props;
-  state!: {};
+  state!: State;
+  public sprite!: Pixi.Sprite
 
   constructor(props: Props) {
     this.staleProps = props;
@@ -45,15 +52,33 @@ export class PointNodeComponent {
 
   renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
+    let tint: number;
     if (props.isAllocated) {
-      this.container.tint = 0x000000;
+      tint = 0x444444;
     } else {
       if (props.isSelected) {
-        this.container.tint = 0xBBBBBB;
+        tint = 0xBBBBBB;
       } else {
-        this.container.tint = 0xFFFFFF;
+        tint = 0xFFFFFF;
       }
     }
+    let baseColor: number = 0;
+    switch (props.pointNodeGen.resourceType) {
+      case ResourceType.Nothing:
+        baseColor = 0x99bbff; // blue that mixes in with bg
+        break;
+      case ResourceType.Mana0:
+        baseColor = 0xeeaaaa; // red
+        break;
+      case ResourceType.Mana1:
+        baseColor = 0xbb7733; // brown?
+        break;
+      case ResourceType.Mana2:
+        baseColor = 0x44aa44; // green
+        break;
+    }
+
+    this.container.tint = multiplyColor(baseColor, tint);
   }
 
   updateSelf(props: Props) { }
