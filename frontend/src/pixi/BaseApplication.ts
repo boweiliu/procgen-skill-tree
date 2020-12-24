@@ -3,6 +3,7 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
 import { assertOnlyCalledOnce, DeepReadonly, updaterGenerator, UpdaterGeneratorType } from "../lib/util/misc";
 import { RootApplication } from "./RootApplication";
+import createBunnyExample from "./BunnyExample";
 
 // temp for backcompatibility
 export type Config = {
@@ -119,6 +120,7 @@ export class BaseApplication {
   rerender(props: BaseApplicationProps) {
     this.props = props;
     if (!this.isMounted) {
+      this.isMounted = true;
       // finish initialization
       this.rootApplication = new RootApplication({
         args: {

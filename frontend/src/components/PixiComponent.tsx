@@ -30,10 +30,8 @@ export function PixiComponent(props: {
 
   const [application, setApplication] = useState<any>(initialApplication.get());
   // const [application, setApplication] = useState<any>(() => new BaseApplication({
-  // originalWindowWidth: window.innerWidth,
-  // originalWindowHeight: window.innerHeight,
-  // }, {
-
+    // originalWindowWidth: window.innerWidth,
+    // originalWindowHeight: window.innerHeight,
   // }));
 
   window.onresize = () => {

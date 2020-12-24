@@ -13,6 +13,7 @@ import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
 import { assertOnlyCalledOnce, Const, DeepReadonly, Lazy, UpdaterGeneratorType } from "../lib/util/misc";
+import { FpsComponent } from "./components/FpsComponent";
 
 type RootApplicationState = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -29,25 +30,28 @@ type RootApplicationProps = {
 }
 
 export class RootApplication {
-  state!: RootApplicationState;
-  staleProps!: RootApplicationProps;
-  container!: Pixi.Container;
+  state: RootApplicationState;
+  staleProps: RootApplicationProps;
+  container: Pixi.Container;
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
-  public fixedCameraStage!: Pixi.Container;
+  public fixedCameraStage: Pixi.Container;
   // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
-  public actionStage!: Pixi.Container;
+  public actionStage: Pixi.Container;
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
-  public backdropStage!: Pixi.Container;
+  public backdropStage: Pixi.Container;
   public keyboard!: KeyboardState;
-  public fpsTracker!: FpsTracker;
+  public fpsTracker: FpsComponent;
 
   /**
    * Need to provide config to set up the pixi canvas
    */
   constructor(props: RootApplicationProps) {
     this.staleProps = props;
+    this.state = {
+      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer))
+    };
     this.container = new Pixi.Container();
 
     this.container.sortableChildren = true;
@@ -78,9 +82,37 @@ export class RootApplication {
     // //   this.fpsTracker.tick(delta);
     // // })
 
-    this.state = {
-      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer))
-    };
+    // let textFpsHud = new Pixi.Text('', {
+    //   fontFamily: 'PixelMix',
+    //   fontSize: 12,
+    //   // align: 'right'
+    // });
+    // this.app.ticker.add(() => {
+    //   textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS\n" + 
+    //   this.app.screen.width + "x" + this.app.screen.height;
+    // })
+    // textFpsHud.x = this.app.screen.width;
+    // this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
+    // textFpsHud.anchor.x = 1; // right justify
+
+    // textFpsHud.x = 0;
+    // textFpsHud.y = 0;
+    // this.fixedCameraStage.addChild(textFpsHud);
+    this.fpsTracker = new FpsComponent({
+      delta: props.delta,
+      position: new Vector2(0, 0),
+      appSize: props.appSize,
+    })
+    this.fixedCameraStage.addChild(this.fpsTracker.container);
+
+    const backdrop = new Pixi.Graphics();
+    this.backdropStage.addChild(backdrop);
+    backdrop.beginFill(0xabcdef, 1);
+    // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
+    backdrop.interactive = true;
+    // backdrop.interactiveChildren = true; // not sure what this does
+    // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
+    backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
     this.renderSelf(props);
     this.didMount(props);
@@ -89,6 +121,11 @@ export class RootApplication {
   public update(props: RootApplicationProps) {
     this.updateSelf(props)
     // this.keyboard.update(props);
+    this.fpsTracker.update({
+      delta: props.delta,
+      position: new Vector2(0, 0),
+      appSize: props.appSize,
+    })
     this.renderSelf(props);
     this.didUpdate(props);
   }
