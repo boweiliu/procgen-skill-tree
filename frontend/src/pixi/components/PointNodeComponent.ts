@@ -55,10 +55,21 @@ export class PointNodeComponent {
   }
 
   updateSelf(props: Props) { }
+  shouldUpdate(prevProps: Props, props: Props): boolean {
+    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+      if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+      if (prevProps[key] !== props[key]) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public update(props: Props) {
+    if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props);
     this.renderSelf(props);
+    this.staleProps = props;
   }
 
   didMount() {

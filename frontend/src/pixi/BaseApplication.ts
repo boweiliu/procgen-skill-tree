@@ -43,8 +43,8 @@ export class BaseApplication {
 
   public static appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
-      x: Math.min(1280, window?.x || Infinity),
-      y: Math.min(720, window?.y || Infinity),
+      x: Math.min(1280, window?.x || Infinity) - 8,
+      y: Math.min(720, window?.y || Infinity) - 8,
     });
   }
 

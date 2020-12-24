@@ -63,6 +63,8 @@ export class ChunkComponent {
       this.children.put(pointNodeRef, childComponent);
       this.container.addChild(childComponent.container);
     }
+
+    this.renderSelf(props);
   }
 
   renderSelf(props: Props) {
@@ -70,8 +72,27 @@ export class ChunkComponent {
   }
 
   updateSelf(props: Props) { }
+  shouldUpdate(prevProps: Props, props: Props): boolean {
+    return true;
+    // for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+    //   if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+    //   if (key === 'allocatedPointNodeSubset') {
+    //     // subsets could be different objects but have the same contents
+    //     if (prevProps[key].hash() !== props[key].hash()) {
+    //       return true;
+    //     } else {
+    //       continue;
+    //     }
+    //   }
+    //   if (prevProps[key] !== props[key]) {
+    //     return true;
+    //   }
+    // }
+    // return false;
+  }
 
   public update(props: Props) {
+    if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props);
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {
       const pointNodeRef = new PointNodeRef({
@@ -96,5 +117,6 @@ export class ChunkComponent {
       childComponent.update(childProps);
     }
     this.renderSelf(props);
+    this.staleProps = props;
   }
 }

@@ -63,6 +63,8 @@ export class ZLevelComponent {
       this.container.addChild(childComponent.container);
 
     }
+
+    this.renderSelf(props);
   }
 
   renderSelf(props: Props) {
@@ -70,8 +72,25 @@ export class ZLevelComponent {
   }
 
   updateSelf(props: Props) { }
+  shouldUpdate(prevProps: Props, props: Props): boolean {
+    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+      if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+      if (key === 'position') {
+        if (!prevProps[key].equals(props[key])) {
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (prevProps[key] !== props[key]) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public update(props: Props) {
+    if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props);
     for (let [chunkCoord, chunkGen] of props.zLevelGen.chunks.entries()) {
       const chunkRef = new ChunkRef({
@@ -102,5 +121,6 @@ export class ZLevelComponent {
       this.children.get(chunkRef).update(childProps);
     }
     this.renderSelf(props);
+    this.staleProps = props;
   }
 }

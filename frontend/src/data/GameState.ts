@@ -60,6 +60,7 @@ export type PlayerSaveState = {
 
 export type PlayerUIState = {
   selectedPointNode: PointNodeRef | undefined,
+  activeTab: number,
 }
 
 export class PointNodeRef {

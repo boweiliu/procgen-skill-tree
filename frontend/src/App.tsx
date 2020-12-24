@@ -35,15 +35,12 @@ const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}
 
 function App() {
   const [batchContents, setBatchContents] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
 
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
 
   let [batchedSetGameState, fireBatch] = useMemo(() => batchify(setGameState), [setGameState]);
-  // batchedSetGameState((old: GameState): GameState => old );
-  // batchedSetGameState.fireBatch();
   let updaters = useMemo(() => updaterGenerator2(initialGameState.get(), batchedSetGameState), [batchedSetGameState]);
 
   useEffect(() => {
@@ -55,9 +52,9 @@ function App() {
   const tabViews = useMemo(() => {
     return [
       <NodeDetail selectedPointNode={gameState.playerUI.selectedPointNode} />,
-      <QuestProgress remainingPoints={batchContents} />,
+      <QuestProgress remainingPoints={batchContents} allocatedPoints={gameState.playerSave.allocatedPointNodeSet.size()} />,
     ];
-  }, [gameState.playerUI.selectedPointNode, batchContents]);
+  }, [gameState.playerUI.selectedPointNode, gameState.playerSave.allocatedPointNodeSet, batchContents]);
 
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
@@ -65,13 +62,13 @@ function App() {
         <PixiComponent onFocusedNodeChange={updaters.playerUI.selectedPointNode.getUpdater()} />
         <Sidebar>
           <Tabs
-            value={activeTab}
+            value={gameState.playerUI.activeTab}
             labels={tabLabels}
-            onChange={setActiveTab}
+            onChange={updaters.playerUI.activeTab.getUpdater()}
           />
           {tabViews.map((component, i) => {
             return (
-              <TabContent key={i} showContent={activeTab === i}>
+              <TabContent key={i} showContent={gameState.playerUI.activeTab === i}>
                 {component}
               </TabContent>
             );

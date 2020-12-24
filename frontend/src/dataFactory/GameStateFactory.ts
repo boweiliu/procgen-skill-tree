@@ -25,6 +25,7 @@ export class GameStateFactory {
       },
       playerUI: {
         selectedPointNode: undefined,
+        activeTab: 0
       }
     }
   }

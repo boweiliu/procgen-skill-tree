@@ -39,6 +39,10 @@ export class HashSet<K extends { hash(): string }> {
     return n;
   }
 
+  size(): number {
+    return this._values.size();
+  }
+
   *[Symbol.iterator]() {
     // construct a new iterator. note that as usual
     for (let key of Object.keys(this._values)) {
@@ -84,6 +88,10 @@ export class HashMap<K extends { hash(): string }, V> {
     const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
     let code: number = hashes.reduce((pv, cv) => pv + cv);
     return code.toString();
+  }
+
+  size(): number {
+    return Object.keys(this._values).length;
   }
 
   clone(): HashMap<K, V> {

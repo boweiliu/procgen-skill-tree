@@ -8,12 +8,13 @@ import { assertOnlyCalledOnce, Const, Lazy } from "../lib/util/misc";
 import { FpsComponent } from "./components/FpsComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./components/ZLevelComponent";
+import { ReticleComponent } from "./components/ReticleComponent";
 
-type RootApplicationState = {
+type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
 }
 
-type RootApplicationProps = {
+type Props = {
   args: {
     renderer: Pixi.Renderer,
   },
@@ -25,8 +26,8 @@ type RootApplicationProps = {
 
 export class RootApplication {
   public container: Pixi.Container;
-  staleProps: RootApplicationProps;
-  state: RootApplicationState;
+  staleProps: Props;
+  state: State;
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
@@ -38,11 +39,12 @@ export class RootApplication {
   public keyboard!: KeyboardState;
   public fpsTracker: FpsComponent;
   public zLevel: ZLevelComponent | undefined;
+  public reticle: ReticleComponent;
 
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(props: RootApplicationProps) {
+  constructor(props: Props) {
     this.staleProps = props;
     this.state = {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer))
@@ -87,27 +89,22 @@ export class RootApplication {
     // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
     backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
-    //   const childProps = {
-    //     delta: 0,
-    //     args: {
-    //       pointNodeTexture: this.state.pointNodeTexture.get(),
-    //       z: 0,
-    //     },
-    //     updaters: props.updaters,
-    //     position: props.appSize.multiply(0.5),
-    //     zLevelGen: new ZLevelGenFactory({}).create({ seed: props.gameState.worldGen.seed, z: 0 }),
-    //     selectedPointNode: props.gameState.playerUI.selectedPointNode,
-    //     allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
-    //   };
-    // this.zLevel = new ZLevelComponent(childProps);
-    // this.actionStage.addChild(this.zLevel.container);
 
+    this.reticle = new ReticleComponent({
+      appSize: props.appSize
+    });
+    this.fixedCameraStage.addChild(this.reticle.container);
 
     this.renderSelf(props);
     this.didMount();
   }
 
-  public update(props: RootApplicationProps) {
+  shouldUpdate(prevProps: Props, props: Props): boolean {
+    return true;
+  }
+
+  public update(props: Props) {
+    if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props)
     // this.keyboard.update(props);
     this.fpsTracker.update({
@@ -136,13 +133,17 @@ export class RootApplication {
         this.zLevel.update(childProps);
       }
     }
+
+    this.reticle.update({
+      appSize: props.appSize
+    })
     this.renderSelf(props);
     this.didUpdate();
   }
 
-  updateSelf(props: RootApplicationProps) {
+  updateSelf(props: Props) {
   }
-  renderSelf(props: RootApplicationProps) {
+  renderSelf(props: Props) {
   }
   didMount() {
     const { updaters } = this.staleProps;
@@ -155,7 +156,7 @@ export class RootApplication {
       return prev;
     })
   }
-  willUnmount(props: RootApplicationProps) {
+  willUnmount(props: Props) {
   }
   didUpdate() {
   }
