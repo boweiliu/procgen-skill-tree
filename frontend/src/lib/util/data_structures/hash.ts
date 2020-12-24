@@ -36,6 +36,13 @@ export class HashSet<K extends { hash(): string }> {
   clone(): HashSet<K> {
     return this.clone();
   }
+
+  *[Symbol.iterator]() {
+    // construct a new iterator. note that as usual
+    for (let key of Object.keys(this._values)) {
+      yield key;
+    }
+  }
 }
 
 export class HashMap<K extends { hash(): string }, V> {
@@ -59,7 +66,15 @@ export class HashMap<K extends { hash(): string }, V> {
   }
 
   values(): V[] {
-    return Object.keys(this._values).map(key => this._values[key]);
+    return Object.values(this._values);
+    // return Object.keys(this._values).map(key => this._values[key]); // why grant???
+  }
+
+  *[Symbol.iterator]() {
+    // construct a new iterator. note that as usual
+    for (let key of Object.keys(this._values)) {
+      yield key;
+    }
   }
 
   // hashes only the keys - use HashableHashMap if you know that the value type here is also hashable
