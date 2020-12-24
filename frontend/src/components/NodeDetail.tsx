@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../game/Neighbors";
@@ -16,12 +16,6 @@ export function NodeDetail({
   worldGen,
   availableSp,
 }: Props) {
-  const [history, setHistory] = useState<PointNodeRef[]>([]);
-  useEffect(() => {
-    if (!selectedPointNode) return;
-    setHistory((history) => [...history, selectedPointNode]);
-  }, [selectedPointNode]);
-
   if (!selectedPointNode) {
     return (<>
       <h1>Stats</h1>

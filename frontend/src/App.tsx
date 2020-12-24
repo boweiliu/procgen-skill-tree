@@ -1,7 +1,7 @@
 import "./App.css";
 
 import classnames from "classnames";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import UAParser from "ua-parser-js";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
