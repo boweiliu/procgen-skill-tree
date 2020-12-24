@@ -1,14 +1,14 @@
 import * as Pixi from "pixi.js";
-import { KeyboardState } from "../lib/pixi/keyboard";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { GameState} from "../data/GameState";
-import { generatePointNodeTexture } from "./textures/PointNodeTexture";
-import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { batchify, Const, Lazy } from "../lib/util/misc";
-import { FpsComponent } from "./components/FpsComponent";
-import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../lib/util/updaterGenerator";
-import { ZLevelComponent } from "./components/ZLevelComponent";
-import { ReticleComponent } from "./components/ReticleComponent";
+import { KeyboardState } from "../../lib/pixi/keyboard";
+import { Vector2 } from "../../lib/util/geometry/vector2";
+import { GameState} from "../../data/GameState";
+import { generatePointNodeTexture } from "../textures/PointNodeTexture";
+import { ZLevelGenFactory } from "../../dataFactory/WorldGenStateFactory";
+import { batchify, Const, Lazy } from "../../lib/util/misc";
+import { FpsComponent } from "./FpsComponent";
+import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/util/updaterGenerator";
+import { ZLevelComponent } from "./ZLevelComponent";
+import { ReticleComponent } from "./ReticleComponent";
 
 export type PlayerIntentState = {
   justDown: boolean;
