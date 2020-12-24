@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { UseGameStateContext } from "../contexts";
 import { PixiReactBridge } from "../pixi/PixiReactBridge";
-import { PixiComponentState } from "./PixiComponent";
+import { WindowState } from "../data/GameState";
 
 export function PixiWrapperComponent(props: {
   application: PixiReactBridge,
-  pixiComponentState: PixiComponentState,
-  fireBatchedSetPixiComponentState: () => void,
+  windowState: WindowState,
+  fireBatchedSetWindowState: () => void,
 }) {
-  const { application, pixiComponentState } = props;
+  const { application, windowState } = props;
   const container = useRef<HTMLDivElement>(null);
   const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
   const fireBatch = () => {
       fireBatchedSetGameState();
-      props.fireBatchedSetPixiComponentState();
+      props.fireBatchedSetWindowState();
     }
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function PixiWrapperComponent(props: {
       isSecondConstructorCall: false,
     },
     updaters: gameStateUpdaters,
-    pixiComponentState,
+    windowState,
     gameState,
   })
 

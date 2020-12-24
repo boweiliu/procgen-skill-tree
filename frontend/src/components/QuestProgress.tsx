@@ -1,3 +1,4 @@
+import "./QuestProgress.css"
 import React, { useState } from "react";
 
 type Props = {
@@ -17,7 +18,9 @@ export default function QuestProgress({
       {(remainingPoints === 0) ? (<div><br></br>(Start a quest first!)</div>) : (<></>) }
       {activeQuest === null ? (<>
         <h2> You have no active quests! </h2>
-        <button onClick={() => {
+        <br></br>
+        <br></br>
+        <button className="button" onClick={() => {
           setActiveQuest("1000 Mana0");
         }}>Get a quest</button>
       </>) : (<>

@@ -1,38 +1,29 @@
 import React, { useContext, useMemo, useState } from "react";
 import "./PixiComponent.css";
-import { GameState } from "../data/GameState";
+import { GameState, WindowState } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
 import { PixiReactBridge } from "../pixi/PixiReactBridge";
 import { UseGameStateContext } from "../contexts";
 import { GameStateFactory } from "../dataFactory/GameStateFactory";
 
-export type PixiComponentState = {
-  orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
-  innerWidth: number,
-  innerHeight: number,
-}
-
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
 export function PixiComponent(props: { originalSetGameState: Function }) {
   const [_, gameStateUpdaters]  = useContext(UseGameStateContext);
-  const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({
+  const [windowState, setWindowState] = useState<WindowState>({
     orientation: "original",
     innerHeight: window.innerHeight,
     innerWidth: window.innerWidth,
   });
-  let [batchedSetPixiComponentState, fireBatchedSetPixiComponentState] =
-    useMemo(() => batchify(setPixiComponentState), [setPixiComponentState]);
+  let [batchedSetWindowState, fireBatchedSetWindowState] =
+    useMemo(() => batchify(setWindowState), [setWindowState]);
 
+  // needed to prevent react double-render for some reason (dev mode??)
   const [application, setApplication] = useState(initialApplication.get());
-  // const [application, setApplication] = useState(() => new PixiReactBridge({
-    // originalWindowWidth: window.innerWidth,
-    // originalWindowHeight: window.innerHeight,
-  // }));
 
   window.onresize = () => {
-    batchedSetPixiComponentState(old => {
+    batchedSetWindowState(old => {
       old.innerWidth = window.innerWidth;
       old.innerHeight = window.innerHeight;
       return { ...old };
@@ -41,7 +32,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
 
   return (
     <>
-      <PixiWrapperComponent application={application} pixiComponentState={pixiComponentState} fireBatchedSetPixiComponentState={fireBatchedSetPixiComponentState}/>
+      <PixiWrapperComponent application={application} windowState={windowState} fireBatchedSetWindowState={fireBatchedSetWindowState}/>
       <button onClick={() => {
         gameStateUpdaters.update((old) => {
           let newGameState = new GameStateFactory({}).create(old.worldGen.seed);

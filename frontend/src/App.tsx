@@ -34,20 +34,12 @@ const tabLabels = ["Quest Progress", "Node Details", ];
 const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}).create());
 
 function App() {
-  const [batchContents, setBatchContents] = useState(0);
-
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
 
   let [batchedSetGameState, fireBatch] = useMemo(() => batchify(setGameState), [setGameState]);
   let updaters = useMemo(() => updaterGenerator2(initialGameState.get(), batchedSetGameState), [batchedSetGameState]);
-
-  useEffect(() => {
-    if (batchContents === 0) {
-      setBatchContents(5);
-    }
-  }, [batchContents]);
 
   let tabViews: JSX.Element[] = []
   tabViews[1] = useMemo(() => {

@@ -11,7 +11,7 @@ type Props = {
     isSecondConstructorCall: boolean
   },
   updaters: UpdaterGeneratorType2<GameState>, // aka updaters
-  pixiComponentState: Const<WindowState>,
+  windowState: Const<WindowState>,
   gameState: Const<GameState>,
 }
 
@@ -47,7 +47,7 @@ export class PixiReactBridge {
     }
 
     // let appSize = appSizeFromWindowSize(
-    //   props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
+    //   props.windowState && new Vector2(props.windowState.innerWidth, props.windowState.innerHeight)
     // );
     let appSize = new Vector2(800, 600);
     this.state = {
@@ -112,7 +112,7 @@ export class PixiReactBridge {
   }
 
   updateSelf(props: Props) {
-    this.state.appSize = appSizeFromWindowSize(new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight));
+    this.state.appSize = appSizeFromWindowSize(new Vector2(props.windowState.innerWidth, props.windowState.innerHeight));
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
