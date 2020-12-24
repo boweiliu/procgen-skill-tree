@@ -24,12 +24,12 @@ type State = {
 
 function appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
   return new Vector2({
-    x: Math.min(1280, window?.x || Infinity - 8),
-    y: Math.min(720, window?.y || Infinity - 8),
+    x: Math.min(1920, (window?.x || Infinity) - 24),
+    y: Math.min(1080, (window?.y || Infinity) - 24),
   });
 }
 
-export class BaseApplication {
+export class PixiReactBridge {
   public app!: Pixi.Application;
 
   state!: State;
@@ -40,7 +40,8 @@ export class BaseApplication {
 
 
   /**
-   * Need to provide config to set up the pixi canvas
+   * NOTE: for lifecycle convenience, we allow initializing with essentially empty props, and to finish the initialization
+   * lazily at the first rerender() call
    */
   constructor(props?: Props, isSecondConstructorCall: boolean = false) {
     // verify that we are not loading this twice when we expect to load it only once -- bad for performance!!
@@ -48,9 +49,9 @@ export class BaseApplication {
       assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now}
     }
 
-    // jlet appSize = appSizeFromWindowSize(
-    // j  props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
-    // j);
+    // let appSize = appSizeFromWindowSize(
+    //   props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
+    // );
     let appSize = new Vector2(800, 600);
     this.state = {
       appSize,

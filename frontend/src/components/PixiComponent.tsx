@@ -3,7 +3,7 @@ import "./PixiComponent.css";
 import { GameState, PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
-import { BaseApplication } from "../pixi/BaseApplication";
+import { PixiReactBridge } from "../pixi/PixiReactBridge";
 import { UseGameStateContext } from "../contexts";
 import { GameStateFactory } from "../dataFactory/GameStateFactory";
 
@@ -13,7 +13,7 @@ export type PixiComponentState = {
   innerHeight: number,
 }
 
-const initialApplication = new Lazy(() => new BaseApplication());
+const initialApplication = new Lazy(() => new PixiReactBridge());
 
 export function PixiComponent(props: { originalSetGameState: Function }) {
   const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
@@ -26,7 +26,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
     useMemo(() => batchify(setPixiComponentState), [setPixiComponentState]);
 
   const [application, setApplication] = useState(initialApplication.get());
-  // const [application, setApplication] = useState(() => new BaseApplication({
+  // const [application, setApplication] = useState(() => new PixiReactBridge({
     // originalWindowWidth: window.innerWidth,
     // originalWindowHeight: window.innerHeight,
   // }));
@@ -54,7 +54,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
       <button onClick={() => {
         application.pause();
         application.destroy();
-        setApplication(new BaseApplication(undefined, true));
+        setApplication(new PixiReactBridge(undefined, true));
 
         let newGameState = new GameStateFactory({}).create(+new Date());
         props.originalSetGameState((old: GameState) => {
@@ -68,7 +68,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
         onClick={() => {
           application.pause();
           application.destroy();
-          setApplication(new BaseApplication(undefined, true));
+          setApplication(new PixiReactBridge(undefined, true));
         }}
       >
         Rerender pixi application

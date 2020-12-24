@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { UseGameStateContext } from "../contexts";
-import { BaseApplication } from "../pixi/BaseApplication";
+import { PixiReactBridge } from "../pixi/PixiReactBridge";
 import { PixiComponentState } from "./PixiComponent";
 
 export function PixiWrapperComponent(props: {
-  application: BaseApplication,
+  application: PixiReactBridge,
   pixiComponentState: PixiComponentState,
   fireBatchedSetPixiComponentState: () => void,
 }) {
