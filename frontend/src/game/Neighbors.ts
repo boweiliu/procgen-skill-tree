@@ -150,7 +150,7 @@ export function canAllocate(
   worldGen: WorldGenState,
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   availableSp: number
-): "yes" | "already allocated" | "not enough sp" | "no" {
+): "yes" | "already allocated" | "not enough sp" | "not connected" {
   if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
     return "already allocated";
   }
@@ -166,5 +166,5 @@ export function canAllocate(
     }
   }
 
-  return "no";
+  return "not connected";
 }

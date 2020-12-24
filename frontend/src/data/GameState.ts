@@ -74,6 +74,7 @@ export type PlayerSaveState = {
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],
+  justAllocated: PointNodeRef | undefined,
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[],

@@ -1,7 +1,7 @@
 import "./App.css";
 
 import classnames from "classnames";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import UAParser from "ua-parser-js";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
@@ -15,6 +15,7 @@ import { GameStateFactory } from "./game/GameStateFactory";
 import { batchify, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { DebugTab } from "./components/DebugTab";
+import { createQuest } from "./game/CreateQuest";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -57,13 +58,16 @@ function App() {
     gameState.worldGen,
     gameState.playerSave.availableSp
   ]);
+  let createQuestCb = useCallback(() => createQuest(updaters), [updaters]);
   tabViews[0] = useMemo(() => {
     return (
       <QuestProgress
         remainingPoints={gameState.playerSave.availableSp}
-        allocatedPoints={gameState.playerSave.allocatedPointNodeSet.size()}
+        createQuestCb={createQuestCb}
+        activeQuest={gameState.playerSave.activeQuest}
+        numBatches={gameState.playerSave.batchesSinceQuestStart}
       />);
-  }, [gameState.playerSave.allocatedPointNodeSet, gameState.playerSave.availableSp]);
+  }, [gameState.playerSave.availableSp, gameState.playerSave.activeQuest, createQuestCb, gameState.playerSave.batchesSinceQuestStart]);
   tabViews[2] = useMemo(() => {
     return (
       <DebugTab

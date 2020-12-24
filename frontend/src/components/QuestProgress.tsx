@@ -1,24 +1,27 @@
 import "./QuestProgress.css"
-import React, { useState } from "react";
+import React from "react";
+import { Quest } from "../data/GameState";
 
 type Props = {
   remainingPoints: number,
-  allocatedPoints: number
+  createQuestCb: () => void,
+  activeQuest: Quest | undefined,
+  numBatches: number,
 }
 export default function QuestProgress({
+  activeQuest,
   remainingPoints,
-  allocatedPoints
+  createQuestCb,
+  numBatches,
 }: Props) {
-  let [activeQuest, setActiveQuest] = useState<string | null>(null);
-
   return (
     <>
-      {activeQuest === null ? (<>
+      {activeQuest === undefined ? (<>
         <h2> You have no active quests! </h2>
         <br></br>
         <br></br>
         <button className="button" onClick={() => {
-          setActiveQuest("1000 Mana0");
+          createQuestCb();
         }}>Get a quest</button>
         <br></br>
         <br></br>
@@ -26,7 +29,7 @@ export default function QuestProgress({
       </>) : (<>
           <h2> Active quest: </h2>
           <h3>Goal:</h3>
-          <div>{activeQuest}</div>
+          <div>{activeQuest.description}</div>
           <br></br>
           <h3>Current:</h3>
           <div>{'[PLACEHOLDER]'}</div>
@@ -34,7 +37,7 @@ export default function QuestProgress({
           <h3>Reward:</h3>
           <div>{'???'}</div>
           <h3>Batches so far: </h3>
-          <div>{3}</div>
+          <div>{numBatches}</div>
           <br></br>
           <div>(Hint: You won't run out of skill points, but they come in batches - try to use the fewest you can!)</div>
         </>)}

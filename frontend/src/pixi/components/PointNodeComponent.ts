@@ -4,7 +4,6 @@ import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { GameState, PointNodeGen, PointNodeRef, ResourceType } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { HashSet } from "../../lib/util/data_structures/hash";
 import { multiplyColor } from "../../lib/util/misc";
 import { canAllocate } from "../../game/Neighbors";
 import { afterAppendAllocationHistory } from "../../game/OnAllocation";
@@ -124,7 +123,7 @@ export class PointNodeComponent {
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
       // event.stopPropagation();
 
-      updaters.playerSave.allocatedPointNodeHistory.enqueueUpdate((prev, prevGameState) => {
+      updaters.playerSave.justAllocated.enqueueUpdate((prev: PointNodeRef | undefined, prevGameState) : PointNodeRef | undefined => {
         // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
           if (canAllocate(
@@ -133,9 +132,7 @@ export class PointNodeComponent {
             prevGameState.playerSave.allocatedPointNodeSet,
             prevGameState.playerSave.availableSp
           ) === 'yes') {
-            prev.push(args.selfPointNodeRef);
-            console.log({ prev, actualPrev: [...prev] });
-            return [...prev];
+            return args.selfPointNodeRef;
           } else {
             // happens +1 tick afterwards due to nested enqueue, but NBD
             updaters.playerUI.activeTab.enqueueUpdate((prev) => {
@@ -144,8 +141,9 @@ export class PointNodeComponent {
           }
         }
         return prev;
-      })
+      });
 
+      // whether or not we successfully allocated, run this just in case
       afterAppendAllocationHistory(updaters);
 
       // update selected to ourselves
