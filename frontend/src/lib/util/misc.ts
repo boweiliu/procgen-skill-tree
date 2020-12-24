@@ -194,7 +194,7 @@ export function updaterGenerator2Helper<T, W>(_dataObject: T, dataUpdater: Updat
   }
 }
 
-export function updaterGenerator2<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType2<T> {
+function updaterGenerator2<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType2<T> {
   const dataUpdater2 = (arg: UpdaterFnParam2<T, T>) => {
     if (typeof arg === 'function') {
       dataUpdater((prev) => {

@@ -22,7 +22,7 @@ export class HashSet<K extends { hash(): string }> {
   }
 
   contains(key: K): boolean {
-    return this.contains(key);
+    return this._values.contains(key);
   }
 
   values(): K[] {

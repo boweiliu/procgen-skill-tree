@@ -4,6 +4,7 @@ import { GameState, WindowState } from "../data/GameState";
 import { assertOnlyCalledOnce, DeepReadonly, updaterGenerator, UpdaterGeneratorType } from "../lib/util/misc";
 import { RootApplication } from "./RootApplication";
 import createBunnyExample from "./BunnyExample";
+import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 // temp for backcompatibility
 export type Config = {
@@ -18,7 +19,7 @@ const defaultConfig: Config = {
 
 export type BaseApplicationProps = {
   args?: Partial<Config>,
-  gameStateUpdaters: UpdaterGeneratorType<GameState>, // aka updaters
+  gameStateUpdaters: UpdaterGeneratorType2<GameState>, // aka updaters
   pixiComponentState: DeepReadonly<WindowState>,
   // // needed to avoid double-updates
   // prevGameState: DeepReadonly<GameState>,

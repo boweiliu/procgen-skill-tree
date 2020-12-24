@@ -3,6 +3,7 @@ import { ChunkRef, GameState, PointNodeRef, ZLevelGen } from "../../data/GameSta
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import { Const } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { RenderedChunkConstants } from "../RenderedChunk";
 import { ChunkComponent } from "./ChunkComponent";
@@ -16,12 +17,12 @@ type Props = {
   },
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
-  zLevelGen: ZLevelGen,
+  zLevelGen: Const<ZLevelGen>,
   selectedPointNode: PointNodeRef | undefined,
-  allocatedPointNodeSubset: HashSet<PointNodeRef>,
+  allocatedPointNodeSubset: Const<HashSet<PointNodeRef>>,
 }
 
-export class RenderedZLevel {
+export class ZLevelComponent {
   public container: Pixi.Container;
   staleProps!: Props;
   state!: {};

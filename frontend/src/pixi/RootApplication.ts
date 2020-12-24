@@ -14,6 +14,8 @@ import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
 import { assertOnlyCalledOnce, Const, DeepReadonly, Lazy, UpdaterGeneratorType } from "../lib/util/misc";
 import { FpsComponent } from "./components/FpsComponent";
+import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import { ZLevelComponent } from "./components/ZLevelComponent";
 
 type RootApplicationState = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -23,16 +25,16 @@ type RootApplicationProps = {
   args: {
     renderer: Pixi.Renderer,
   },
-  updaters: UpdaterGeneratorType<GameState>,
+  updaters: UpdaterGeneratorType2<GameState>,
   delta: number,
   gameState: Const<GameState>,
   appSize: Vector2
 }
 
 export class RootApplication {
-  state: RootApplicationState;
+  public container: Pixi.Container;
   staleProps: RootApplicationProps;
-  container: Pixi.Container;
+  state: RootApplicationState;
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
@@ -43,6 +45,7 @@ export class RootApplication {
   public backdropStage: Pixi.Container;
   public keyboard!: KeyboardState;
   public fpsTracker: FpsComponent;
+  public zLevel: ZLevelComponent | undefined;
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -76,28 +79,6 @@ export class RootApplication {
     // //   this.keyboard.update();
     // // })
 
-    // // this.fpsTracker = new FpsTracker();
-    // // this.app.ticker.add((delta) => {
-    // //   // delta should be approximately equal to 1
-    // //   this.fpsTracker.tick(delta);
-    // // })
-
-    // let textFpsHud = new Pixi.Text('', {
-    //   fontFamily: 'PixelMix',
-    //   fontSize: 12,
-    //   // align: 'right'
-    // });
-    // this.app.ticker.add(() => {
-    //   textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS\n" + 
-    //   this.app.screen.width + "x" + this.app.screen.height;
-    // })
-    // textFpsHud.x = this.app.screen.width;
-    // this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
-    // textFpsHud.anchor.x = 1; // right justify
-
-    // textFpsHud.x = 0;
-    // textFpsHud.y = 0;
-    // this.fixedCameraStage.addChild(textFpsHud);
     this.fpsTracker = new FpsComponent({
       delta: props.delta,
       position: new Vector2(0, 0),
@@ -114,8 +95,24 @@ export class RootApplication {
     // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
     backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
+      const childProps = {
+        delta: 0,
+        args: {
+          pointNodeTexture: this.state.pointNodeTexture.get(),
+          z: 0,
+        },
+        updaters: props.updaters,
+        position: props.appSize.multiply(0.5),
+        zLevelGen: new ZLevelGenFactory({}).create({ seed: props.gameState.worldGen.seed, z: 0 }),
+        selectedPointNode: props.gameState.playerUI.selectedPointNode,
+        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+      };
+    this.zLevel = new ZLevelComponent(childProps);
+    this.actionStage.addChild(this.zLevel.container);
+
+
     this.renderSelf(props);
-    this.didMount(props);
+    this.didMount();
   }
 
   public update(props: RootApplicationProps) {
@@ -126,19 +123,47 @@ export class RootApplication {
       position: new Vector2(0, 0),
       appSize: props.appSize,
     })
+
+    if (props.gameState.worldGen.zLevels[0]) {
+      const childProps = {
+        delta: 0,
+        args: {
+          pointNodeTexture: this.state.pointNodeTexture.get(),
+          z: 0,
+        },
+        updaters: props.updaters,
+        position: props.appSize.multiply(0.5),
+        zLevelGen: props.gameState.worldGen.zLevels[0],
+        selectedPointNode: props.gameState.playerUI.selectedPointNode,
+        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+      };
+      if (!this.zLevel) {
+        this.zLevel = new ZLevelComponent(childProps);
+        this.actionStage.addChild(this.zLevel.container);
+      } else {
+        this.zLevel.update(childProps);
+      }
+    }
     this.renderSelf(props);
-    this.didUpdate(props);
+    this.didUpdate();
   }
 
   updateSelf(props: RootApplicationProps) {
   }
   renderSelf(props: RootApplicationProps) {
   }
-  didMount(props: RootApplicationProps) {
+  didMount() {
+    const { args, updaters } = this.staleProps;
+    updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      if (!prev[0]) {
+        return [new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 })];
+      }
+      return prev;
+    })
   }
   willUnmount(props: RootApplicationProps) {
   }
-  didUpdate(props: RootApplicationProps) {
+  didUpdate() {
   }
 }
 
