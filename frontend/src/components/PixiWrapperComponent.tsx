@@ -38,10 +38,13 @@ export function PixiWrapperComponent(props: {
 
   // Trigger component render on first load and also when game state is updated
   application.rerender({
+    args: {
+      fireBatch, 
+      isSecondConstructorCall: false,
+    },
+    updaters: gameStateUpdaters,
     pixiComponentState,
     gameState,
-    gameStateUpdaters,
-    fireBatch
   })
 
   return (

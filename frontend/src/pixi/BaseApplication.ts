@@ -2,67 +2,56 @@ import * as Pixi from "pixi.js";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
 import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
-import { RootComponent } from "./RootComponent";
+import { RootComponent } from "./components/RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
-// temp for backcompatibility
-export type Config = {
-  originalWindowWidth: number;
-  originalWindowHeight: number;
-};
-
-const defaultConfig: Config = {
-  originalWindowWidth: 800,
-  originalWindowHeight: 800,
-};
-
-export type BaseApplicationProps = {
-  args?: Partial<Config>,
-  gameStateUpdaters: UpdaterGeneratorType2<GameState>, // aka updaters
+type Props = {
+  args: {
+    fireBatch: () => void,
+    isSecondConstructorCall: boolean
+  },
+  updaters: UpdaterGeneratorType2<GameState>, // aka updaters
   pixiComponentState: DeepReadonly<WindowState>,
-  // // needed to avoid double-updates
-  // prevGameState: DeepReadonly<GameState>,
   gameState: DeepReadonly<GameState>,
-  fireBatch: () => void,
 }
 
-export type BaseApplicationState = {
+type State = {
   appSize: Vector2,
   originalAppSize: Vector2,
 }
 
+
+
+function appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
+  return new Vector2({
+    x: Math.min(1280, window?.x || Infinity - 8),
+    y: Math.min(720, window?.y || Infinity - 8),
+  });
+}
+
 export class BaseApplication {
-  public config!: Config; // temp shim
   public app!: Pixi.Application;
 
-  state!: BaseApplicationState;
-  props!: BaseApplicationProps;
+  state!: State;
+  props!: Props;
 
-  RootComponent!: RootComponent;
-  isMounted: boolean;
+  RootComponent: RootComponent | undefined;
   onTick!: (d: number) => void;
 
-  public static appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
-    return new Vector2({
-      x: Math.min(1280, window?.x || Infinity - 8),
-      y: Math.min(720, window?.y || Infinity - 8),
-    });
-  }
 
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}, isSecondTime = false) {
+  constructor(props?: Props, isSecondConstructorCall: boolean = false) {
     // verify that we are not loading this twice when we expect to load it only once -- bad for performance!!
-    if (!isSecondTime) {
+    if (!(props?.args?.isSecondConstructorCall || isSecondConstructorCall)) {
       assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now}
     }
 
-    this.config = Object.assign({}, defaultConfig, args);
-
-    let appSize = BaseApplication.appSizeFromWindowSize(
-      props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
-    );
+    // jlet appSize = appSizeFromWindowSize(
+    // j  props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
+    // j);
+    let appSize = new Vector2(800, 600);
     this.state = {
       appSize,
       originalAppSize: appSize
@@ -81,13 +70,11 @@ export class BaseApplication {
       backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
     });
 
-    this.isMounted = false;
-
     // this.RootComponent = new RootComponent({
     //   args: {
     //     renderer: this.app.renderer,
     //   },
-    //   updaters: this.props.gameStateUpdaters,
+    //   updaters: this.props.updaters,
     //   delta: 0,
     //   gameState: this.props.gameState,
     //   appSize: this.state.appSize,
@@ -122,26 +109,25 @@ export class BaseApplication {
     curr.appendChild(this.app.view);
   }
 
-  public update(props: BaseApplicationProps) {
+  public update(props: Props) {
     this.props = props;
   }
 
-  updateSelf(props: BaseApplicationProps) {
-    this.state.appSize = BaseApplication.appSizeFromWindowSize(new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight));
+  updateSelf(props: Props) {
+    this.state.appSize = appSizeFromWindowSize(new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight));
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
-  rerender(props: BaseApplicationProps) {
+  rerender(props: Props) {
     console.log("base app rerender called", { size: props.gameState.playerSave.allocatedPointNodeSet.size() });
     this.props = props;
-    if (!this.isMounted) {
-      this.isMounted = true;
+    if (!this.RootComponent) {
       // finish initialization
       this.RootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,
         },
-        updaters: this.props.gameStateUpdaters,
+        updaters: this.props.updaters,
         delta: 0,
         gameState: this.props.gameState,
         appSize: this.state.appSize,
@@ -152,26 +138,26 @@ export class BaseApplication {
 
       // test
       // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
-      this.didMount();
     }
+    this.didMount();
   }
 
-  renderSelf(props: BaseApplicationProps) {
+  renderSelf(props: Props) {
     this.app.renderer.resize(this.state.appSize.x, this.state.appSize.y);
   }
 
-  public didUpdate(props: BaseApplicationProps) {
+  public didUpdate(props: Props) {
   }
 
   baseGameLoop(delta: number) {
     // assume props is up to date
     this.updateSelf(this.props);
     // send props downwards
-    this.RootComponent.update({
+    this.RootComponent?.update({
       args: {
         renderer: this.app.renderer,
       },
-      updaters: this.props.gameStateUpdaters,
+      updaters: this.props.updaters,
       delta,
       gameState: this.props.gameState,
       appSize: this.state.appSize,
@@ -179,6 +165,6 @@ export class BaseApplication {
     
     this.renderSelf(this.props);
     this.didUpdate(this.props);
-    this.props.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
+    this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }

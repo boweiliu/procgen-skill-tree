@@ -13,10 +13,7 @@ export type PixiComponentState = {
   innerHeight: number,
 }
 
-const initialApplication = new Lazy(() => new BaseApplication({
-  originalWindowWidth: window.innerWidth,
-  originalWindowHeight: window.innerHeight,
-}));
+const initialApplication = new Lazy(() => new BaseApplication());
 
 export function PixiComponent(props: { originalSetGameState: Function }) {
   const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
@@ -57,10 +54,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
       <button onClick={() => {
         application.pause();
         application.destroy();
-        setApplication(new BaseApplication({
-          originalWindowWidth: window.innerWidth,
-          originalWindowHeight: window.innerHeight,
-        }, {}, true));
+        setApplication(new BaseApplication());
 
         let newGameState = new GameStateFactory({}).create(+new Date());
         props.originalSetGameState((old: GameState) => {
