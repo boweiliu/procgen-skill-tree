@@ -16,6 +16,14 @@ export type PlayerIntentState = {
   down: boolean;
 }
 
+export function createPlayerIntentState() : PlayerIntentState {
+  return {
+    justDown: false,
+    justUp: false,
+    down: false
+  }
+}
+
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -23,6 +31,10 @@ type State = {
   playerIntents: {
     decreaseZLevel: PlayerIntentState
     increaseZLevel: PlayerIntentState
+    panLeft: PlayerIntentState
+    panRight: PlayerIntentState
+    panUp: PlayerIntentState
+    panDown: PlayerIntentState
   }
 }
 
@@ -62,16 +74,12 @@ export class RootApplication {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
       tick: 0,
       playerIntents: {
-        decreaseZLevel: {
-          justDown: false,
-          justUp: false,
-          down: false
-        },
-        increaseZLevel: {
-          justDown: false,
-          justUp: false,
-          down: false
-        },
+        decreaseZLevel: createPlayerIntentState(),
+        increaseZLevel: createPlayerIntentState(),
+        panLeft: createPlayerIntentState(),
+        panRight: createPlayerIntentState(),
+        panUp: createPlayerIntentState(),
+        panDown: createPlayerIntentState(),
       }
     };
     this.container = new Pixi.Container();
