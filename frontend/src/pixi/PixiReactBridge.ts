@@ -20,8 +20,6 @@ type State = {
   originalAppSize: Vector2,
 }
 
-
-
 function appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
   return new Vector2({
     x: Math.min(1920, (window?.x || Infinity) - 24),
@@ -37,7 +35,6 @@ export class PixiReactBridge {
 
   RootComponent: RootComponent | undefined;
   onTick!: (d: number) => void;
-
 
   /**
    * NOTE: for lifecycle convenience, we allow initializing with essentially empty props, and to finish the initialization
@@ -165,7 +162,7 @@ export class PixiReactBridge {
     });
     
     this.renderSelf(this.props);
-    this.didUpdate(this.props);
+    this.didUpdate(this.props); // add updaters to queue if we want them for next cycle
     this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }
