@@ -10,8 +10,20 @@ import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./components/ZLevelComponent";
 import { ReticleComponent } from "./components/ReticleComponent";
 
+export type PlayerIntentState = {
+  justDown: boolean;
+  justUp: boolean;
+  down: boolean;
+}
+
+
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
+  tick: number;
+  playerIntents: {
+    decreaseZLevel: PlayerIntentState
+    increaseZLevel: PlayerIntentState
+  }
 }
 
 type Props = {
@@ -47,7 +59,20 @@ export class RootApplication {
   constructor(props: Props) {
     this.staleProps = props;
     this.state = {
-      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer))
+      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
+      tick: 0,
+      playerIntents: {
+        decreaseZLevel: {
+          justDown: false,
+          justUp: false,
+          down: false
+        },
+        increaseZLevel: {
+          justDown: false,
+          justUp: false,
+          down: false
+        },
+      }
     };
     this.container = new Pixi.Container();
 
@@ -138,27 +163,54 @@ export class RootApplication {
       appSize: props.appSize
     })
     this.renderSelf(props);
-    this.didUpdate();
+    this.didUpdate(this.staleProps, props);
+    this.staleProps = props;
   }
 
   updateSelf(props: Props) {
+    this.state.tick++;
   }
-  renderSelf(props: Props) {
-  }
+
+  renderSelf(props: Props) { }
+
   didMount() {
     const { updaters } = this.staleProps;
     assertOnlyCalledOnce("root application did mount");
     updaters.worldGen.zLevels.update((prev, prevGameState) => {
       assertOnlyCalledOnce("root application callback");
       if (!prev[0]) {
-        return [new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 })];
+        return { 0: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 }) };
       }
       return prev;
     })
   }
+
   willUnmount(props: Props) {
   }
-  didUpdate() {
+
+  didUpdate(prevProps: Props, props: Props) {
+    const { updaters } = this.staleProps;
+    // if we find ourselves a little idle, start pregenerating other layers
+    if (this.state.tick > 60) {
+      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+        if (!prev[-1]) {
+          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 });
+          return {...prev};
+        } else {
+          return prev;
+        }
+      })
+    }
+    if (this.state.tick > 120) {
+      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+        if (!prev[1]) {
+          prev[1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 1 });
+          return {...prev};
+        } else {
+          return prev;
+        }
+      })
+    }
   }
 }
 
