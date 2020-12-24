@@ -7,7 +7,7 @@ type Props = {
 export default function QuestProgress({ remainingPoints, allocatedPoints } : Props) {
   return (
     <>
-      <h1>Quest Progress</h1>
+      <h1>Quests</h1>
       <h3>
         Allocated points so far: {allocatedPoints}
       </h3>

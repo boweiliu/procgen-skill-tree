@@ -4,7 +4,6 @@ import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { ChunkGenConstants, GameState, PointNodeGen, PointNodeRef, ResourceType, WorldGenState } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { GameStateFactory } from "../../dataFactory/GameStateFactory";
 import { HashSet } from "../../lib/util/data_structures/hash";
 import { multiplyColor } from "../../lib/util/misc";
 
@@ -26,17 +25,31 @@ type State = {
 }
 
 export class PointNodeComponent {
-  public container: Pixi.Sprite;
+  public container: Pixi.Container;
   staleProps!: Props;
   state!: State;
-  public sprite!: Pixi.Sprite
+  public sprite: Pixi.Sprite
+  public centerSprite: Pixi.Sprite;
 
   constructor(props: Props) {
     this.staleProps = props;
     this.state = {};
-    this.container = new Pixi.Sprite(props.args.pointNodeTexture);
-    this.container.anchor.x = 0.5;
-    this.container.anchor.y = 0.5;
+    this.container = new Pixi.Container();
+    this.container.sortableChildren = true;
+    this.sprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.sprite.anchor.x = 0.5;
+    this.sprite.anchor.y = 0.5;
+    this.sprite.zIndex = -1;
+    this.container.addChild(this.sprite);
+
+    this.centerSprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.centerSprite.anchor.x = 0.5;
+    this.centerSprite.anchor.y = 0.5;
+    this.centerSprite.scale = PixiPointFrom(new Vector2(0.5, 0.5));
+    this.centerSprite.zIndex = 1;
+    this.container.addChild(this.centerSprite);
+
+    // this.container.mask
 
     this.container.interactive = true;
     this.container.buttonMode = true;
@@ -53,14 +66,17 @@ export class PointNodeComponent {
   renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
     let tint: number;
+    let centerTint: number;
+    if (props.isSelected) {
+      tint = 0xBBBBFF;
+      centerTint = 0xBBBBFF;
+    } else {
+      tint = 0xFFFFFF;
+      centerTint = 0xFFFFFF;
+    }
     if (props.isAllocated) {
       tint = 0x444444;
     } else {
-      if (props.isSelected) {
-        tint = 0xBBBBBB;
-      } else {
-        tint = 0xFFFFFF;
-      }
     }
     let baseColor: number = 0;
     switch (props.pointNodeGen.resourceType) {
@@ -78,7 +94,8 @@ export class PointNodeComponent {
         break;
     }
 
-    this.container.tint = multiplyColor(baseColor, tint);
+    this.sprite.tint = multiplyColor(baseColor, tint);
+    this.centerSprite.tint = multiplyColor(baseColor, centerTint);
   }
 
   updateSelf(props: Props) { }

@@ -23,7 +23,7 @@ export class ReticleComponent{
     };
 
     this.container.lineStyle(2, 0x999999);
-    this.container.drawCircle(0, 0, 6);
+    this.container.drawCircle(0, 0, 10);
     this.container.interactive = true;
     this.container.buttonMode = true;
 

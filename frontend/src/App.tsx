@@ -29,7 +29,7 @@ if (
   forceRotate = true;
 }
 
-const tabLabels = ["Node Details", "Quest Progress"];
+const tabLabels = ["Quest Progress", "Node Details", ];
 
 const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}).create());
 
@@ -50,7 +50,7 @@ function App() {
   }, [batchContents]);
 
   let tabViews: JSX.Element[] = []
-  tabViews[0] = useMemo(() => {
+  tabViews[1] = useMemo(() => {
     return (
       <NodeDetail
         selectedPointNode={gameState.playerUI.selectedPointNode}
@@ -58,7 +58,7 @@ function App() {
         worldGen={gameState.worldGen}
       />);
   }, [gameState.playerUI.selectedPointNode, gameState.playerSave.allocatedPointNodeSet, gameState.worldGen]);
-  tabViews[1] = useMemo(() => {
+  tabViews[0] = useMemo(() => {
     return (
       <QuestProgress
         remainingPoints={batchContents}
