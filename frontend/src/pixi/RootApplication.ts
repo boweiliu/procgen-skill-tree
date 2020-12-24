@@ -4,9 +4,9 @@ import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState} from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { assertOnlyCalledOnce, Const, Lazy } from "../lib/util/misc";
+import { batchify, Const, Lazy } from "../lib/util/misc";
 import { FpsComponent } from "./components/FpsComponent";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./components/ZLevelComponent";
 import { ReticleComponent } from "./components/ReticleComponent";
 
@@ -52,6 +52,8 @@ export class RootApplication {
   public container: Pixi.Container;
   staleProps: Props;
   state: State;
+  stateUpdaters: UpdaterGeneratorType2<State>;
+  fireStateUpdaters: () => void;
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
@@ -69,6 +71,8 @@ export class RootApplication {
    * Need to provide config to set up the pixi canvas
    */
   constructor(props: Props) {
+    this.container = new Pixi.Container();
+    this.container.sortableChildren = true;
     this.staleProps = props;
     this.state = {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
@@ -82,9 +86,16 @@ export class RootApplication {
         panDown: createPlayerIntentState(),
       }
     };
-    this.container = new Pixi.Container();
-
-    this.container.sortableChildren = true;
+    const setState: UpdaterFn<State> = ((valueOrCallback) => {
+      if (typeof valueOrCallback === "function") {
+        this.state = valueOrCallback(this.state);
+      } else {
+        this.state = valueOrCallback;
+      }
+    })
+    let [batchedSetState, fireBatch] = batchify(setState);
+    this.stateUpdaters = updaterGenerator2<State>(this.state, batchedSetState);
+    this.fireStateUpdaters = fireBatch;
 
     this.fixedCameraStage = new Pixi.Sprite();
     this.fixedCameraStage.zIndex = 1;
@@ -128,6 +139,25 @@ export class RootApplication {
     });
     this.fixedCameraStage.addChild(this.reticle.container);
 
+    const childProps = {
+      delta: 0,
+      args: {
+        pointNodeTexture: this.state.pointNodeTexture.get(),
+        z: 0,
+      },
+      updaters: props.updaters,
+      position: props.appSize.multiply(0.5),
+      zLevelGen: props.gameState.worldGen.zLevels[0],
+      selectedPointNode: props.gameState.playerUI.selectedPointNode,
+      allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+    };
+    if (!this.zLevel) {
+      this.zLevel = new ZLevelComponent(childProps);
+      this.actionStage.addChild(this.zLevel.container);
+    } else {
+      this.zLevel.update(childProps);
+    }
+
     this.renderSelf(props);
     this.didMount();
   }
@@ -146,25 +176,23 @@ export class RootApplication {
       appSize: props.appSize,
     })
 
-    if (props.gameState.worldGen.zLevels[0]) {
-      const childProps = {
-        delta: 0,
-        args: {
-          pointNodeTexture: this.state.pointNodeTexture.get(),
-          z: 0,
-        },
-        updaters: props.updaters,
-        position: props.appSize.multiply(0.5),
-        zLevelGen: props.gameState.worldGen.zLevels[0],
-        selectedPointNode: props.gameState.playerUI.selectedPointNode,
-        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
-      };
-      if (!this.zLevel) {
-        this.zLevel = new ZLevelComponent(childProps);
-        this.actionStage.addChild(this.zLevel.container);
-      } else {
-        this.zLevel.update(childProps);
-      }
+    const childProps = {
+      delta: 0,
+      args: {
+        pointNodeTexture: this.state.pointNodeTexture.get(),
+        z: 0,
+      },
+      updaters: props.updaters,
+      position: props.appSize.multiply(0.5),
+      zLevelGen: props.gameState.worldGen.zLevels[0],
+      selectedPointNode: props.gameState.playerUI.selectedPointNode,
+      allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+    };
+    if (!this.zLevel) {
+      this.zLevel = new ZLevelComponent(childProps);
+      this.actionStage.addChild(this.zLevel.container);
+    } else {
+      this.zLevel.update(childProps);
     }
 
     this.reticle.update({
@@ -173,6 +201,7 @@ export class RootApplication {
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
+    this.fireStateUpdaters();
   }
 
   updateSelf(props: Props) {
@@ -182,15 +211,6 @@ export class RootApplication {
   renderSelf(props: Props) { }
 
   didMount() {
-    const { updaters } = this.staleProps;
-    assertOnlyCalledOnce("root application did mount");
-    updaters.worldGen.zLevels.update((prev, prevGameState) => {
-      assertOnlyCalledOnce("root application callback");
-      if (!prev[0]) {
-        return { 0: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 }) };
-      }
-      return prev;
-    })
   }
 
   willUnmount(props: Props) {

@@ -40,6 +40,7 @@ export class BaseApplication {
 
   rootApplication!: RootApplication;
   isMounted: boolean;
+  onTick!: (d: number) => void;
 
   public static appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
@@ -51,8 +52,11 @@ export class BaseApplication {
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}) {
-    assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now
+  constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}, isSecondTime = false) {
+    // verify that we are not loading this twice when we expect to load it only once -- bad for performance!!
+    if (!isSecondTime) {
+      assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now}
+    }
 
     this.config = Object.assign({}, defaultConfig, args);
 
@@ -78,6 +82,7 @@ export class BaseApplication {
     });
 
     this.isMounted = false;
+
     // this.rootApplication = new RootApplication({
     //   args: {
     //     renderer: this.app.renderer,
@@ -96,8 +101,17 @@ export class BaseApplication {
     // this.didMount();
   }
 
+  public pause() {
+    this.app.ticker.remove(this.onTick);
+  }
+  public destroy() {
+    this.app.destroy(true, { children: true, texture: true, baseTexture: true });
+  }
+
   public didMount() {
-    this.app.ticker.add((delta) => this.baseGameLoop(delta));
+    this.onTick = (delta) => this.baseGameLoop(delta);
+    this.onTick = this.onTick.bind(this);
+    this.app.ticker.add(this.onTick);
   }
 
   /**
@@ -164,7 +178,6 @@ export class BaseApplication {
     
     this.renderSelf(this.props);
     this.didUpdate(this.props);
-
     this.props.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }

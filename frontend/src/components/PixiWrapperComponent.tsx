@@ -19,12 +19,16 @@ export function PixiWrapperComponent(props: {
   useEffect(() => {
     // this block only triggers if a new application instance is created.
     // first remove old application
+    // const oldLength = container.current!.childNodes.length;
     for (let i = container.current!.childNodes.length - 1; i >= 0; i--) {
       container.current!.removeChild(container.current!.childNodes[i]);
     }
+    // if (oldLength != 0) {
+    //   return;
+    // }
     // add the application
     container.current!.appendChild(application.app.view);
-  }, [application.app.view]);
+  }, [application]);
 
   // const prevRef = useRef<DeepReadonly<GameState>>();
   // useEffect(() => {

@@ -62,7 +62,7 @@ export class HashMap<K extends { hash(): string }, V> {
     delete this._values[key.hash()];
   }
 
-  get(key: K): V {
+  get(key: K): V | undefined {
     return this._values[key.hash()];
   }
 
@@ -124,8 +124,8 @@ export class KeyedHashMap<K extends { hash(): string }, V>{
     delete this._kvalues[key.hash()];
   }
 
-  get(key: K): V {
-    return this._kvalues[key.hash()][1];
+  get(key: K): V | undefined {
+    return this._kvalues[key.hash()]?.[1];
   }
 
   contains(key: K): boolean {

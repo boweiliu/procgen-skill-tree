@@ -114,7 +114,13 @@ export class ChunkComponent {
       };
 
       let childComponent = this.children.get(pointNodeRef);
-      childComponent.update(childProps);
+      if (childComponent) {
+        childComponent.update(childProps);
+      } else {
+        childComponent = new PointNodeComponent(childProps);
+        this.children.put(pointNodeRef, childComponent);
+        this.container.addChild(childComponent.container);
+      }
     }
     this.renderSelf(props);
     this.staleProps = props;

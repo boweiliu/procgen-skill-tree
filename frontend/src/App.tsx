@@ -59,7 +59,7 @@ function App() {
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-        <PixiComponent onFocusedNodeChange={updaters.playerUI.selectedPointNode.getUpdater()} />
+        <PixiComponent originalSetGameState={setGameState}/>
         <Sidebar>
           <Tabs
             value={gameState.playerUI.activeTab}

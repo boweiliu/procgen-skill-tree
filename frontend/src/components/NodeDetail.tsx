@@ -11,7 +11,6 @@ export function NodeDetail({
     if (!selectedPointNode) return;
     setHistory((history) => [...history, selectedPointNode]);
   }, [selectedPointNode]);
-  console.log("in nodedetail, ", selectedPointNode);
   return (
     <>
       {selectedPointNode && (

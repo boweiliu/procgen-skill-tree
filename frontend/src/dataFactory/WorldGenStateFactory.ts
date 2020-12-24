@@ -28,13 +28,14 @@ export class ZLevelGenFactory {
     this.chunkGenFactory = new ChunkGenFactory({});
   }
 
-  public create(args: { seed: number, z: number }): ZLevelGen {
+  public create(args: { seed: number, z: number, startingChunks?: number }): ZLevelGen {
     const id = squirrel3(args.seed + args.z);
     const chunks: KeyedHashMap<Vector2, ChunkGen> = new KeyedHashMap();
 
+    const max = args.startingChunks || 3;
     // TODO(bowei): generate more chunks??
-    for (let i = -3; i <= 3; i++) {
-      for (let j = -3; j <= 3; j++){
+    for (let i = -max; i <= max; i++) {
+      for (let j = -max; j <= max; j++){
         let location = new Vector2(i, j);
         chunks.put(location, this.chunkGenFactory.create({ seed: id, location }));
       }

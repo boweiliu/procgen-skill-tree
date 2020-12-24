@@ -1,5 +1,6 @@
 import * as Pixi from "pixi.js";
 import { ChunkRef, GameState, PointNodeRef, ZLevelGen } from "../../data/GameState";
+import { ZLevelGenFactory } from "../../dataFactory/WorldGenStateFactory";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { Vector2 } from "../../lib/util/geometry/vector2";
@@ -15,7 +16,7 @@ type Props = {
   },
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
-  zLevelGen: Const<ZLevelGen>,
+  zLevelGen: Const<ZLevelGen> | undefined,
   selectedPointNode: PointNodeRef | undefined,
   allocatedPointNodeSubset: Const<HashSet<PointNodeRef>>,
 }
@@ -32,7 +33,7 @@ export class ZLevelComponent {
     this.state = {};
     this.container = new Pixi.Container();
 
-    for (let [chunkCoord, chunkGen] of props.zLevelGen.chunks.entries()) {
+    for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
         z: props.args.z,
         chunkCoord,
@@ -65,6 +66,7 @@ export class ZLevelComponent {
     }
 
     this.renderSelf(props);
+    this.didMount();
   }
 
   renderSelf(props: Props) {
@@ -92,7 +94,7 @@ export class ZLevelComponent {
   public update(props: Props) {
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props);
-    for (let [chunkCoord, chunkGen] of props.zLevelGen.chunks.entries()) {
+    for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
         z: props.args.z,
         chunkCoord,
@@ -118,9 +120,47 @@ export class ZLevelComponent {
         selectedPointNode: props.selectedPointNode,
         allocatedPointNodeSubset,
       }
-      this.children.get(chunkRef).update(childProps);
+      let childComponent = this.children.get(chunkRef);
+      if (childComponent) {
+        childComponent.update(childProps);
+      } else {
+        childComponent = new ChunkComponent(childProps);
+        this.children.put(chunkRef, childComponent);
+        this.container.addChild(childComponent.container);
+      }
     }
     this.renderSelf(props);
+    this.didUpdate(this.staleProps, props);
     this.staleProps = props;
+  }
+
+  didUpdate(prevProps: Props, props: Props) {
+
+  }
+
+  didMount() {
+    const { args, updaters } = this.staleProps;
+    // if we mounted but our data is not generated, please generate ourselves
+    updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      if (!prev[args.z]) {
+        return { [args.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: args.z }) };
+      }
+      return prev;
+    })
+    // updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
+    //   if (prev.size() === 0) {
+    //     let startNode = prevGameState.worldGen.zLevels[0].chunks.get(new Vector2(0, 0))?.pointNodes.get(new Vector2(0, 0));
+    //     if (startNode) {
+    //       prev.put(new PointNodeRef({
+    //         z: 0,
+    //         chunkCoord: new Vector2(0, 0),
+    //         pointNodeCoord: new Vector2(0, 0),
+    //         pointNodeId: startNode?.id
+    //       }))
+    //       return prev.clone();
+    //     }
+    //   }
+    //   return prev;
+    // })
   }
 }

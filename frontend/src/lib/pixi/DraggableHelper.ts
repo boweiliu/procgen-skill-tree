@@ -47,7 +47,6 @@ export class DraggableHelper {
     this.mouseStartingX = startingPosition.x;
     this.mouseStartingY = startingPosition.y;
 
-    console.log(this);
     this.isDragging = true;
   }
 
