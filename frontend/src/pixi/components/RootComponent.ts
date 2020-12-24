@@ -3,7 +3,7 @@ import { KeyboardState } from "../../lib/pixi/keyboard";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { GameState} from "../../data/GameState";
 import { generatePointNodeTexture } from "../textures/PointNodeTexture";
-import { ZLevelGenFactory } from "../../dataFactory/WorldGenStateFactory";
+import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { batchify, Const, Lazy } from "../../lib/util/misc";
 import { FpsComponent } from "./FpsComponent";
 import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/util/updaterGenerator";

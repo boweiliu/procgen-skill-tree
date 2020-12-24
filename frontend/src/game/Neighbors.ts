@@ -1,7 +1,6 @@
-import { HashSet } from "../../lib/util/data_structures/hash";
-import { enumKeys } from "../../lib/util/misc";
-import { ChunkGenConstants, PointNodeRef, WorldGenState } from "../GameState";
-
+import { HashSet } from "../lib/util/data_structures/hash";
+import { enumKeys } from "../lib/util/misc";
+import { ChunkGenConstants, PointNodeRef, WorldGenState } from "../data/GameState";
 
 enum Direction {
   up = 'up',

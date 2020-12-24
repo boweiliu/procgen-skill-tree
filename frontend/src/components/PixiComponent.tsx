@@ -5,7 +5,7 @@ import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
 import { PixiReactBridge } from "../pixi/PixiReactBridge";
 import { UseGameStateContext } from "../contexts";
-import { GameStateFactory } from "../dataFactory/GameStateFactory";
+import { GameStateFactory } from "../game/GameStateFactory";
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
