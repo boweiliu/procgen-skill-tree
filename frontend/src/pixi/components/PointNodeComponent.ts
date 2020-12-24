@@ -119,11 +119,17 @@ export class PointNodeComponent {
   didMount() {
     const { args, updaters } = this.staleProps; // we assume this will never change
 
-    this.container.addListener("pointerdown", () => {
+    this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
+      event.stopPropagation();
       updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
         // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId && 
-          canAllocate(args.selfPointNodeRef, prevGameState.worldGen, prevGameState.playerSave.allocatedPointNodeSet)
+          canAllocate(
+            args.selfPointNodeRef,
+            prevGameState.worldGen,
+            prevGameState.playerSave.allocatedPointNodeSet,
+            prevGameState.playerSave.availableSp
+          ) === 'yes'
         ) {
           prev.push(args.selfPointNodeRef);
           console.log({ prev, actualPrev : [...prev]});
@@ -151,9 +157,17 @@ export class PointNodeComponent {
   }
 }
 
-export function canAllocate(selfPointNodeRef: PointNodeRef, worldGen: WorldGenState, allocatedPointNodeSet: HashSet<PointNodeRef>): boolean {
+export function canAllocate(
+  selfPointNodeRef: PointNodeRef,
+  worldGen: WorldGenState,
+  allocatedPointNodeSet: HashSet<PointNodeRef>,
+  availableSp: number
+): "yes" | "already allocated" | "not enough sp" | "no" {
   if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
-    return false;
+    return "already allocated";
+  }
+  if (availableSp < 1) {
+    return "not enough sp";
   }
   // check if any of our neighbors are allocated
   let neighbors: { left?: PointNodeRef, right?: PointNodeRef, up?: PointNodeRef, down?: PointNodeRef } = {};
@@ -275,9 +289,9 @@ export function canAllocate(selfPointNodeRef: PointNodeRef, worldGen: WorldGenSt
 
   for (let nbor of Object.values(neighbors)) {
     if (nbor && allocatedPointNodeSet.contains(nbor)) {
-      return true;
+      return "yes";
     }
   }
 
-  return false;
+  return "no";
 }

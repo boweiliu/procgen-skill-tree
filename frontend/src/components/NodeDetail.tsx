@@ -7,12 +7,14 @@ type Props = {
   selectedPointNode?: PointNodeRef
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   worldGen: WorldGenState,
+  availableSp: number,
 }
 
 export function NodeDetail({
   selectedPointNode,
   allocatedPointNodeSet,
-  worldGen
+  worldGen,
+  availableSp,
 }: Props) {
   const [history, setHistory] = useState<PointNodeRef[]>([]);
   useEffect(() => {
@@ -25,7 +27,7 @@ export function NodeDetail({
   }
   const pointNodeGen = worldGen.zLevels[selectedPointNode.z]!.chunks.get(selectedPointNode.chunkCoord)!.pointNodes.get(selectedPointNode.pointNodeCoord)!
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
-  const canBeAllocated = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet)
+  const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, availableSp);
   let nodeDescription: string = "Nothing (empty node)";
   if (pointNodeGen.resourceType !== ResourceType.Nothing) {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`
@@ -38,7 +40,7 @@ export function NodeDetail({
       </div>
       <br></br>
       <div>Allocated? {isAllocated ? "yes" : "no"} </div>
-      <div>Can be allocated? {canBeAllocated ? (<>yes</>) : (<b>no</b>)} </div>
+      <div>Can be allocated? {canBeAllocated} </div>
       <br></br>
       <div> Stats: </div>
       <div> {nodeDescription} </div>

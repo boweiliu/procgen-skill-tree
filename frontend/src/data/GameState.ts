@@ -68,6 +68,7 @@ export enum ResourceModifier {
 }
 
 export type PlayerSaveState = {
+  availableSp: number,
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],

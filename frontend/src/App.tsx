@@ -56,15 +56,21 @@ function App() {
         selectedPointNode={gameState.playerUI.selectedPointNode}
         allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
         worldGen={gameState.worldGen}
+        availableSp={gameState.playerSave.availableSp}
       />);
-  }, [gameState.playerUI.selectedPointNode, gameState.playerSave.allocatedPointNodeSet, gameState.worldGen]);
+  }, [
+    gameState.playerUI.selectedPointNode,
+    gameState.playerSave.allocatedPointNodeSet,
+    gameState.worldGen,
+    gameState.playerSave.availableSp
+  ]);
   tabViews[0] = useMemo(() => {
     return (
       <QuestProgress
-        remainingPoints={batchContents}
+        remainingPoints={gameState.playerSave.availableSp}
         allocatedPoints={gameState.playerSave.allocatedPointNodeSet.size()}
       />);
-  }, [gameState.playerSave.allocatedPointNodeSet, batchContents]);
+  }, [gameState.playerSave.allocatedPointNodeSet,  gameState.playerSave.availableSp]);
 
 
   return (
