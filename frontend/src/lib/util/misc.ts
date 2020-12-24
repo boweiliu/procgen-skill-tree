@@ -208,8 +208,10 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
 
   return [(...args: A) => {
     batch.push(args);
-    console.log({ stack: new Error().stack, batchSize: batch.length });
+    // console.log({ stack: new Error().stack, batchSize: batch.length });
+    console.log({ batchSize: batch.length });
   }, (() => {
+      if (batch.length !== 0) { console.log({ fired: batch.length }); }
       for (let a of batch) {
         fn(...a);
       }

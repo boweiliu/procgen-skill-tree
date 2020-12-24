@@ -163,6 +163,10 @@ export class RootApplication {
   }
 
   shouldUpdate(prevProps: Props, props: Props): boolean {
+
+    let prevSize = prevProps.gameState.playerSave.allocatedPointNodeSet.size()
+    let nextSize = props.gameState.playerSave.allocatedPointNodeSet.size()
+    if (prevSize !== nextSize) { console.log('rootapp shouldUpdate', { prevSize, nextSize }); }
     return true;
   }
 
@@ -219,7 +223,7 @@ export class RootApplication {
   didUpdate(prevProps: Props, props: Props) {
     const { updaters } = this.staleProps;
     // if we find ourselves a little idle, start pregenerating other layers
-    if (this.state.tick > 60) {
+    if (this.state.tick > 60 && !props.gameState.worldGen.zLevels[-1]) {
       updaters.worldGen.zLevels.update((prev, prevGameState) => {
         if (!prev[-1]) {
           prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 });
@@ -229,7 +233,7 @@ export class RootApplication {
         }
       })
     }
-    if (this.state.tick > 120) {
+    if (this.state.tick > 120 && !props.gameState.worldGen.zLevels[1]) {
       updaters.worldGen.zLevels.update((prev, prevGameState) => {
         if (!prev[1]) {
           prev[1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 1 });

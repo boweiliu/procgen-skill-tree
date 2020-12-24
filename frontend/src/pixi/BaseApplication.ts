@@ -44,8 +44,8 @@ export class BaseApplication {
 
   public static appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
-      x: Math.min(1280, window?.x || Infinity) - 8,
-      y: Math.min(720, window?.y || Infinity) - 8,
+      x: Math.min(1280, window?.x || Infinity - 8),
+      y: Math.min(720, window?.y || Infinity - 8),
     });
   }
 
@@ -132,6 +132,7 @@ export class BaseApplication {
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   rerender(props: BaseApplicationProps) {
+    console.log("base app rerender called", { size: props.gameState.playerSave.allocatedPointNodeSet.size() });
     this.props = props;
     if (!this.isMounted) {
       this.isMounted = true;

@@ -84,6 +84,13 @@ export class ZLevelComponent {
           continue;
         }
       }
+      if (key === 'allocatedPointNodeSubset') {
+        if (prevProps[key].hash() !== props[key].hash()) {
+          return true;
+        } else {
+          continue;
+        }
+      }
       if (prevProps[key] !== props[key]) {
         return true;
       }
@@ -132,6 +139,7 @@ export class ZLevelComponent {
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
+    this.staleProps.allocatedPointNodeSubset = this.staleProps.allocatedPointNodeSubset.clone();
   }
 
   didUpdate(prevProps: Props, props: Props) {

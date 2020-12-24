@@ -44,7 +44,7 @@ export class PointNodeComponent {
   renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
     if (props.isAllocated) {
-      this.container.tint = 0x00AAFF;
+      this.container.tint = 0x000000;
     } else {
       if (props.isSelected) {
         this.container.tint = 0xBBBBBB;
@@ -76,19 +76,27 @@ export class PointNodeComponent {
     const { args, updaters } = this.staleProps; // we assume this will never change
 
     this.container.addListener("pointerdown", () => {
-      updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
-        // if we were already selected, allocate us
-        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
-          prev.put(args.selfPointNodeRef);
-          return prev.clone();
+      updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
+        // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
+        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId && 
+          !prevGameState.playerSave.allocatedPointNodeSet.contains(args.selfPointNodeRef)
+        ) {
+          prev.push(args.selfPointNodeRef);
+          console.log({ prev, actualPrev : [...prev]});
+          return [...prev];
         }
         return prev;
       })
-      updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
-        // if we were already selected, allocate us and add to the history (maybe this should be managed elsewhere??)
-        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
-          prev.push(args.selfPointNodeRef);
-          return [...prev];
+      updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
+        let history = prevGameState.playerSave.allocatedPointNodeHistory
+        let mostRecent = history[history.length - 1]
+          console.log({ history, actualHistory: [...history] });
+        // if we were already selected, try to allocate us
+        if (!prev.contains(mostRecent)) {
+          prev.put(mostRecent);
+          const next = prev.clone();
+          console.log({ prev, next, prevSize: prev.size(), nextSize: next.size(), isEqual: prev === next })
+          return next;
         }
         return prev;
       })
