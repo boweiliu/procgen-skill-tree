@@ -1,9 +1,11 @@
 import * as Pixi from "pixi.js";
 import { RenderedChunkConstants } from "./ChunkComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { GameState, PointNodeRef } from "../../data/GameState";
+import { ChunkGenConstants, GameState, PointNodeRef, WorldGenState } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
+import { GameStateFactory } from "../../dataFactory/GameStateFactory";
+import { HashSet } from "../../lib/util/data_structures/hash";
 
 type Props = {
   delta: number,
@@ -79,7 +81,7 @@ export class PointNodeComponent {
       updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
         // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId && 
-          !prevGameState.playerSave.allocatedPointNodeSet.contains(args.selfPointNodeRef)
+          canAllocate(args.selfPointNodeRef, prevGameState.worldGen, prevGameState.playerSave.allocatedPointNodeSet)
         ) {
           prev.push(args.selfPointNodeRef);
           console.log({ prev, actualPrev : [...prev]});
@@ -105,4 +107,135 @@ export class PointNodeComponent {
       })
     });
   }
+}
+
+export function canAllocate(selfPointNodeRef: PointNodeRef, worldGen: WorldGenState, allocatedPointNodeSet: HashSet<PointNodeRef>): boolean {
+  if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
+    return false;
+  }
+  // check if any of our neighbors are allocated
+  let neighbors: { left?: PointNodeRef, right?: PointNodeRef, up?: PointNodeRef, down?: PointNodeRef } = {};
+  
+  let zLevel = worldGen.zLevels[selfPointNodeRef.z]
+  let myChunk = zLevel.chunks.get(selfPointNodeRef.chunkCoord)!;
+  // first, the right neighbor:
+  if (selfPointNodeRef.pointNodeCoord.x === ChunkGenConstants.CHUNK_HALF_DIM) {
+    let chunkCoord = selfPointNodeRef.chunkCoord.addX(1)
+    let chunk = zLevel.chunks.get(chunkCoord);
+    if (chunk) {
+      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withX(-ChunkGenConstants.CHUNK_HALF_DIM)
+      let nbor = chunk.pointNodes.get(pointNodeCoord);
+      if (nbor) {
+        neighbors.right = new PointNodeRef({
+          z: selfPointNodeRef.z,
+          chunkCoord,
+          pointNodeCoord,
+          pointNodeId: nbor.id
+        })
+      }
+    }
+  } else {
+    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addX(1);
+    let nbor = myChunk.pointNodes.get(pointNodeCoord);
+    if (nbor) {
+      neighbors.right = new PointNodeRef({
+        z: selfPointNodeRef.z,
+        chunkCoord: selfPointNodeRef.chunkCoord,
+        pointNodeCoord,
+        pointNodeId: nbor.id
+      })
+    }
+  }
+  // left neighbor
+  if (selfPointNodeRef.pointNodeCoord.x === -ChunkGenConstants.CHUNK_HALF_DIM) {
+    let chunkCoord = selfPointNodeRef.chunkCoord.addX(-1)
+    let chunk = zLevel.chunks.get(chunkCoord);
+    if (chunk) {
+      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withX(ChunkGenConstants.CHUNK_HALF_DIM)
+      let nbor = chunk.pointNodes.get(pointNodeCoord);
+      if (nbor) {
+        neighbors.left = new PointNodeRef({
+          z: selfPointNodeRef.z,
+          chunkCoord,
+          pointNodeCoord,
+          pointNodeId: nbor.id
+        })
+      }
+    }
+  } else {
+    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addX(-1);
+    let nbor = myChunk.pointNodes.get(pointNodeCoord);
+    if (nbor) {
+      neighbors.left = new PointNodeRef({
+        z: selfPointNodeRef.z,
+        chunkCoord: selfPointNodeRef.chunkCoord,
+        pointNodeCoord,
+        pointNodeId: nbor.id
+      })
+    }
+  }
+  // +y is down
+  if (selfPointNodeRef.pointNodeCoord.y === ChunkGenConstants.CHUNK_HALF_DIM) {
+    let chunkCoord = selfPointNodeRef.chunkCoord.addY(1)
+    let chunk = zLevel.chunks.get(chunkCoord);
+    if (chunk) {
+      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(-ChunkGenConstants.CHUNK_HALF_DIM)
+      let nbor = chunk.pointNodes.get(pointNodeCoord);
+      if (nbor) {
+        neighbors.down = new PointNodeRef({
+          z: selfPointNodeRef.z,
+          chunkCoord,
+          pointNodeCoord,
+          pointNodeId: nbor.id
+        })
+      }
+    }
+  } else {
+    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(1);
+    let nbor = myChunk.pointNodes.get(pointNodeCoord);
+    if (nbor) {
+      neighbors.down = new PointNodeRef({
+        z: selfPointNodeRef.z,
+        chunkCoord: selfPointNodeRef.chunkCoord,
+        pointNodeCoord,
+        pointNodeId: nbor.id
+      })
+    }
+  }
+  // -y is up
+  if (selfPointNodeRef.pointNodeCoord.y === -ChunkGenConstants.CHUNK_HALF_DIM) {
+    let chunkCoord = selfPointNodeRef.chunkCoord.addY(-1)
+    let chunk = zLevel.chunks.get(chunkCoord);
+    if (chunk) {
+      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(ChunkGenConstants.CHUNK_HALF_DIM)
+      let nbor = chunk.pointNodes.get(pointNodeCoord);
+      if (nbor) {
+        neighbors.up = new PointNodeRef({
+          z: selfPointNodeRef.z,
+          chunkCoord,
+          pointNodeCoord,
+          pointNodeId: nbor.id
+        })
+      }
+    }
+  } else {
+    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(-1);
+    let nbor = myChunk.pointNodes.get(pointNodeCoord);
+    if (nbor) {
+      neighbors.up = new PointNodeRef({
+        z: selfPointNodeRef.z,
+        chunkCoord: selfPointNodeRef.chunkCoord,
+        pointNodeCoord,
+        pointNodeId: nbor.id
+      })
+    }
+  }
+
+  for (let nbor of Object.values(neighbors)) {
+    if (nbor && allocatedPointNodeSet.contains(nbor)) {
+      return true;
+    }
+  }
+
+  return false;
 }
