@@ -246,3 +246,8 @@ export function multiplyColor(color1: number, color2: number): number {
   out += Math.round(blues[0] * blues[1] / 0x0000FF);
   return out;
 }
+
+
+export function enumKeys<T extends {[k: string]: any}>(enm: T) : (keyof T)[] {
+  return Object.keys(enm);
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PointNodeRef, ResourceModifier, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
-import { canAllocate } from "../pixi/components/PointNodeComponent";
+import { canAllocate } from "../data/lib/Neighbors";
 
 type Props = {
   selectedPointNode?: PointNodeRef
