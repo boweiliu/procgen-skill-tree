@@ -13,6 +13,7 @@ export type UpdaterGeneratorType2<T, W = T> = {
   update: UpdaterFn2<T, W>,
 }
 
+// helper method for the recursion
 function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T, W>): UpdaterGeneratorType2<T, W> {
   const updaters: UpdaterGeneratorType2<T, W> = {} as any;
   updaters.getUpdater = () => dataUpdater;

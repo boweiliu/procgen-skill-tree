@@ -30,7 +30,7 @@ export function PixiWrapperComponent(props: {
     container.current!.appendChild(application.app.view);
   }, [application]);
 
-  // const prevRef = useRef<DeepReadonly<GameState>>();
+  // const prevRef = useRef<Const<GameState>>();
   // useEffect(() => {
   //   prevRef.current = gameState;
   // });

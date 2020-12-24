@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
-import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
+import { assertOnlyCalledOnce, Const } from "../lib/util/misc";
 import { RootComponent } from "./components/RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
@@ -11,8 +11,8 @@ type Props = {
     isSecondConstructorCall: boolean
   },
   updaters: UpdaterGeneratorType2<GameState>, // aka updaters
-  pixiComponentState: DeepReadonly<WindowState>,
-  gameState: DeepReadonly<GameState>,
+  pixiComponentState: Const<WindowState>,
+  gameState: Const<GameState>,
 }
 
 type State = {
@@ -20,7 +20,7 @@ type State = {
   originalAppSize: Vector2,
 }
 
-function appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
+function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   return new Vector2({
     x: Math.min(1920, (window?.x || Infinity) - 24),
     y: Math.min(1080, (window?.y || Infinity) - 24),

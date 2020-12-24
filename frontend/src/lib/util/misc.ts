@@ -143,14 +143,19 @@ export class Util {
   }
 }
 
-export type DeepReadonly<T> = T extends Function ? T : {
-  readonly [P in keyof T]: T[P] extends { [k: string]: any } ? DeepReadonly<T[P]> : T[P];
+/**
+ * A deep readonly type - given an object type, all subobjects and their subobjects are also marked as readonly.
+ */
+export type Const<T> = T extends Function ? T : {
+  readonly [P in keyof T]: T[P] extends { [k: string]: any } ? Const<T[P]> : T[P];
 }
-export type Const<T> = DeepReadonly<T>;
 
 const assertOnlyCalledOnceData: { [k: string]: [string, number] } = {};
 
-// Twice, actually, because of react dev mode double-calling stuff
+/**
+ * Asserts that a function is not called more than twice. Useful for debugging react lifecycle which may be creating more objects than you realize, impacting performance.
+ * @param id identifier
+ */
 export function assertOnlyCalledOnce(id: string | number) {
   let k = id.toString();
   if (assertOnlyCalledOnceData[k] !== undefined) {
@@ -165,6 +170,13 @@ export function assertOnlyCalledOnce(id: string | number) {
   }
 }
 
+/**
+ * Class representing a value which is only computed when used.
+ * 
+ * Usage: const lazy = new Lazy(() => thingThatReturnsSomething()).
+ * Then thingThatReturnsSomething() will only get called on the first time lazy.get() is called.
+ * On the second and subsequent times, lazy.get() will return the same object - the factory method is not called again.
+ */
 export class Lazy<T> {
   private _wasConstructed: boolean = false;
   private _value: T | undefined = undefined;
@@ -220,6 +232,11 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
   ];
 }
 
+/**
+ * Multiplies colors (0xFFFFFF === 1). use for applying tints manually.
+ * @param color1 A base color
+ * @param color2 A tint
+ */
 export function multiplyColor(color1: number, color2: number): number {
   let reds = [color1 & 0xFF0000, color2 & 0xFF0000];
   let blues = [color1 & 0x0000FF, color2 & 0x0000FF];
