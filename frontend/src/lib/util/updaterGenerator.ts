@@ -1,4 +1,4 @@
-export type UpdaterFnParam2<T, W> = T | ((prev: T, prevWhole: W) => T);
+export type UpdaterFnParam2<T, W> = ((prev: T, prevWhole: W) => T) | (T extends Function ? never : T) // (T | ((prev: T, prevWhole: W) => T));
 export type UpdaterFn2<T, W> = (arg: UpdaterFnParam2<T, W>) => void;
 export type UpdaterGeneratorType2<T, W = T> = {
   [k in keyof T]: ((T[k] extends { [kkt: string]: any } ? UpdaterGeneratorType2<T[k], W> : {}) & {
@@ -10,10 +10,6 @@ export type UpdaterGeneratorType2<T, W = T> = {
   getUpdater: () => UpdaterFn2<T, W>,
   set: UpdaterFn2<T, W>,
   update: UpdaterFn2<T, W>,
-}
-
-function isObject(o: any): o is { [x: string]: any } {
-  return (typeof o === "object");
 }
 
 function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T, W>): UpdaterGeneratorType2<T, W> {
@@ -47,6 +43,24 @@ function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T,
   }
 }
 
+/**
+ * Convenience method for generating setState<FancyObject.sub.component>() from setState<FancyObject> callbacks.
+ * If used in react, recommended that this be memoized.
+ * 
+ * @generic T should be a data-only object - nested objects are allowed but arrays, sets not supported
+ * @param dataObject ANY instance of T, used only for its keys. MUST have all keys present
+ * @param setState an updater function, which can be called as: dataUpdater(newT) or
+ *   dataUpdater((oldT) => { return newTFromOldT(oldT) }) ; e.g. react setState() function.
+ * @return a deep object that has the same keys as T, except each key also has a getUpdater()/set/update member;
+ *   the getUpdater() on a subobject of T acts similarly to the [setState] param but to the subobject rather than the whole object;
+ *   the whole object is also available as the second argument of the callback
+ * e.g. :
+ *   let gameStateUpdater = updaterGenerator(skeletonObject, setGameState);
+ *   let setName = gameStateUpdater.player.name.getUpdater();
+ *   gameStateUpdater.player.name.set(newName);
+ *   gameStateUpdater.player.name.update((oldName, wholeObject) => oldName + " ");
+ * 
+ */
 export function updaterGenerator2<T>(dataObject: T, setState: UpdaterFn<T>): UpdaterGeneratorType2<T> {
   const dataUpdater2 = (stateCallbackFunction: UpdaterFnParam2<T, T>) => {
     if (typeof stateCallbackFunction === 'function') {
@@ -63,7 +77,7 @@ export function updaterGenerator2<T>(dataObject: T, setState: UpdaterFn<T>): Upd
 
 
 
-type UpdaterFnParam<T> = T | ((prev: T) => T);
+type UpdaterFnParam<T> = (T extends Function ? never  : T) | ((prev: T) => T);
 // type UpdaterFnParam<T> = ((prev: T) => T);
 export type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;
 

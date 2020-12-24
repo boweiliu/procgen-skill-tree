@@ -1,9 +1,8 @@
 import * as Pixi from "pixi.js";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
-import { assertOnlyCalledOnce, DeepReadonly, updaterGenerator, UpdaterGeneratorType } from "../lib/util/misc";
+import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
 import { RootApplication } from "./RootApplication";
-import createBunnyExample from "./BunnyExample";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 // temp for backcompatibility
@@ -53,7 +52,7 @@ export class BaseApplication {
    * Need to provide config to set up the pixi canvas
    */
   constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}) {
-    // assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now
+    assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now
 
     this.config = Object.assign({}, defaultConfig, args);
 

@@ -1,18 +1,10 @@
 import * as Pixi from "pixi.js";
 import { KeyboardState } from "../lib/pixi/keyboard";
-import { FpsTracker } from "../lib/util/fpsTracker";
-import { registerDraggable } from "../lib/pixi/DraggableHelper";
-import createBunnyExample from "./BunnyExample";
-import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
-import { ZLevel } from "./ZLevel";
-import { RenderedZLevel } from "./RenderedZLevel";
-import { HashMap } from "../lib/util/data_structures/hash";
-import { GameState, PointNodeRef } from "../data/GameState";
+import { GameState} from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
-import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { assertOnlyCalledOnce, Const, DeepReadonly, Lazy, UpdaterGeneratorType } from "../lib/util/misc";
+import { assertOnlyCalledOnce, Const, Lazy } from "../lib/util/misc";
 import { FpsComponent } from "./components/FpsComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./components/ZLevelComponent";
@@ -153,7 +145,7 @@ export class RootApplication {
   renderSelf(props: RootApplicationProps) {
   }
   didMount() {
-    const { args, updaters } = this.staleProps;
+    const { updaters } = this.staleProps;
     assertOnlyCalledOnce("root application did mount");
     updaters.worldGen.zLevels.update((prev, prevGameState) => {
       assertOnlyCalledOnce("root application callback");

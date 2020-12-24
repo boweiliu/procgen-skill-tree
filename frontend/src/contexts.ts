@@ -1,6 +1,6 @@
 import React from "react";
 import { GameState } from "./data/GameState";
-import { DeepReadonly, UpdaterGeneratorType } from "./lib/util/misc";
+import { DeepReadonly } from "./lib/util/misc";
 import { UpdaterGeneratorType2 } from "./lib/util/updaterGenerator";
 
 // nullable, but should be OK, just remember to populate the context

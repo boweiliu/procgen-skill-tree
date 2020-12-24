@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { batchify, Lazy, updaterGenerator } from "./lib/util/misc";
+import { batchify, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
