@@ -95,20 +95,20 @@ export class RootApplication {
     // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
     backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
-      const childProps = {
-        delta: 0,
-        args: {
-          pointNodeTexture: this.state.pointNodeTexture.get(),
-          z: 0,
-        },
-        updaters: props.updaters,
-        position: props.appSize.multiply(0.5),
-        zLevelGen: new ZLevelGenFactory({}).create({ seed: props.gameState.worldGen.seed, z: 0 }),
-        selectedPointNode: props.gameState.playerUI.selectedPointNode,
-        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
-      };
-    this.zLevel = new ZLevelComponent(childProps);
-    this.actionStage.addChild(this.zLevel.container);
+    //   const childProps = {
+    //     delta: 0,
+    //     args: {
+    //       pointNodeTexture: this.state.pointNodeTexture.get(),
+    //       z: 0,
+    //     },
+    //     updaters: props.updaters,
+    //     position: props.appSize.multiply(0.5),
+    //     zLevelGen: new ZLevelGenFactory({}).create({ seed: props.gameState.worldGen.seed, z: 0 }),
+    //     selectedPointNode: props.gameState.playerUI.selectedPointNode,
+    //     allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+    //   };
+    // this.zLevel = new ZLevelComponent(childProps);
+    // this.actionStage.addChild(this.zLevel.container);
 
 
     this.renderSelf(props);
@@ -154,7 +154,10 @@ export class RootApplication {
   }
   didMount() {
     const { args, updaters } = this.staleProps;
+    assertOnlyCalledOnce("root application did mount");
     updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      assertOnlyCalledOnce("root application callback");
+      window.alert("generated the thing!");
       if (!prev[0]) {
         return [new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 })];
       }

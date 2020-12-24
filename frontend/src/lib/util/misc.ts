@@ -1,3 +1,5 @@
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
+
 let lastUsedId = 0;
 
 export const getUniqueID = () => {
@@ -283,15 +285,19 @@ export type DeepReadonly<T> = T extends Function ? T : {
 }
 export type Const<T> = DeepReadonly<T>;
 
-const assertOnlyCalledOnceData: { [k: string]: string } = {};
+const assertOnlyCalledOnceData: { [k: string]: [string, number] } = {};
 
 export function assertOnlyCalledOnce(id: string | number) {
   let k = id.toString();
   if (assertOnlyCalledOnceData[k] !== undefined) {
-    throw new Error("Error, called twice with same id: " + k + " , callback the first time was : " + assertOnlyCalledOnceData[k]);
+    if (assertOnlyCalledOnceData[k][1] === 1) {
+      assertOnlyCalledOnceData[k][1] = 2;
+    } else {
+      throw new Error("Error, called more than twice with same id: " + k + " , callback the first time was : " + assertOnlyCalledOnceData[k]);
+    }
   } else {
     const stacktrace = new Error().stack!
-    assertOnlyCalledOnceData[k] = stacktrace;
+    assertOnlyCalledOnceData[k] = [stacktrace, 1];
   }
 }
 
