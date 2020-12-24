@@ -52,7 +52,7 @@ export class BaseApplication {
    * Need to provide config to set up the pixi canvas
    */
   constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}) {
-    assertOnlyCalledOnce("Base application constructor");
+    // assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now
 
     this.config = Object.assign({}, defaultConfig, args);
 
