@@ -66,6 +66,7 @@ export class RootComponent {
   public fpsTracker: FpsComponent;
   public zLevel: ZLevelComponent | undefined;
   public reticle: ReticleComponent;
+  public backdrop: Pixi.Graphics;
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -124,14 +125,14 @@ export class RootComponent {
     })
     this.fixedCameraStage.addChild(this.fpsTracker.container);
 
-    const backdrop = new Pixi.Graphics();
-    this.backdropStage.addChild(backdrop);
-    backdrop.beginFill(0xabcdef, 1);
+    this.backdrop = new Pixi.Graphics();
+    this.backdropStage.addChild(this.backdrop);
+    this.backdrop.beginFill(0xabcdef, 1);
     // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
-    backdrop.interactive = true;
+    this.backdrop.interactive = true;
     // backdrop.interactiveChildren = true; // not sure what this does
     // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
-    backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
+    this.backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
 
     this.reticle = new ReticleComponent({
@@ -212,7 +213,10 @@ export class RootComponent {
     this.state.tick++;
   }
 
-  renderSelf(props: Props) { }
+  renderSelf(props: Props) {
+    this.backdrop.width = props.appSize.x;
+    this.backdrop.height = props.appSize.y;
+  }
 
   didMount() {
   }

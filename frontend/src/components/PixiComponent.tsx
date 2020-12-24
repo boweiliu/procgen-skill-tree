@@ -54,7 +54,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
       <button onClick={() => {
         application.pause();
         application.destroy();
-        setApplication(new BaseApplication());
+        setApplication(new BaseApplication(undefined, true));
 
         let newGameState = new GameStateFactory({}).create(+new Date());
         props.originalSetGameState((old: GameState) => {
@@ -68,10 +68,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
         onClick={() => {
           application.pause();
           application.destroy();
-          setApplication(new BaseApplication({
-            originalWindowWidth: window.innerWidth,
-            originalWindowHeight: window.innerHeight,
-          }, {}, true));
+          setApplication(new BaseApplication(undefined, true));
         }}
       >
         Rerender pixi application
