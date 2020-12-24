@@ -22,20 +22,8 @@ export class FpsComponent {
     });
     this.state = new FpsTracker();
     this.staleProps = props;
-    this.container.position = PixiPointFrom(props.position);
 
-    // this.app.ticker.add(() => {
-    //   textFpsHud.text = this.fpsTracker.getFpsString() + " FPS\n" + this.fpsTracker.getUpsString() + " UPS\n" + 
-    //   this.app.screen.width + "x" + this.app.screen.height;
-    // })
-    // textFpsHud.x = this.app.screen.width;
-    // this.onResize.push(() => { textFpsHud.x = this.app.screen.width; });
-    // textFpsHud.anchor.x = 1; // right justify
-
-    // textFpsHud.x = 0;
-    // textFpsHud.y = 0;
-    // this.fixedCameraStage.addChild(textFpsHud);
-
+    this.renderSelf(props)
   }
 
   public update(props: FpsComponentProps) {

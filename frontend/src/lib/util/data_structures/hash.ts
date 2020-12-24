@@ -32,6 +32,10 @@ export class HashSet<K extends { hash(): string }> {
   hash(): string {
     return this._values.hashKeyset();
   }
+
+  clone(): HashSet<K> {
+    return this.clone();
+  }
 }
 
 export class HashMap<K extends { hash(): string }, V> {
@@ -63,6 +67,12 @@ export class HashMap<K extends { hash(): string }, V> {
     const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
     let code: number = hashes.reduce((pv, cv) => pv + cv);
     return code.toString();
+  }
+
+  clone(): HashMap<K, V> {
+    let n = new HashMap<K, V>();
+    n._values = { ...this._values };
+    return n;
   }
 }
 
@@ -115,6 +125,13 @@ export class KeyedHashMap<K extends { hash(): string }, V>{
     let code: number = hashes.reduce((pv, cv) => pv + cv);
     return code.toString();
   }
+
+  clone(): KeyedHashMap<K, V> {
+    let n = new KeyedHashMap<K, V>();
+    n._kvalues = { ...this._kvalues };
+    return n;
+  }
+
 }
 
 export class DefaultHashMap<K extends { hash(): string }, V> {
