@@ -48,7 +48,7 @@ type Props = {
   appSize: Vector2
 }
 
-export class RootApplication {
+export class RootComponent {
   public container: Pixi.Container;
   staleProps: Props;
   state: State;

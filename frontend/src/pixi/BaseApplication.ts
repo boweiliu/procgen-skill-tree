@@ -2,7 +2,7 @@ import * as Pixi from "pixi.js";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
 import { assertOnlyCalledOnce, DeepReadonly } from "../lib/util/misc";
-import { RootApplication } from "./RootApplication";
+import { RootComponent } from "./RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 // temp for backcompatibility
@@ -38,7 +38,7 @@ export class BaseApplication {
   state!: BaseApplicationState;
   props!: BaseApplicationProps;
 
-  rootApplication!: RootApplication;
+  RootComponent!: RootComponent;
   isMounted: boolean;
   onTick!: (d: number) => void;
 
@@ -83,7 +83,7 @@ export class BaseApplication {
 
     this.isMounted = false;
 
-    // this.rootApplication = new RootApplication({
+    // this.RootComponent = new RootComponent({
     //   args: {
     //     renderer: this.app.renderer,
     //   },
@@ -92,7 +92,7 @@ export class BaseApplication {
     //   gameState: this.props.gameState,
     //   appSize: this.state.appSize,
     // })
-    // this.app.stage.addChild(this.rootApplication.container);
+    // this.app.stage.addChild(this.RootComponent.container);
 
     // this.renderSelf(this.props);
 
@@ -137,7 +137,7 @@ export class BaseApplication {
     if (!this.isMounted) {
       this.isMounted = true;
       // finish initialization
-      this.rootApplication = new RootApplication({
+      this.RootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,
         },
@@ -146,7 +146,7 @@ export class BaseApplication {
         gameState: this.props.gameState,
         appSize: this.state.appSize,
       })
-      this.app.stage.addChild(this.rootApplication.container);
+      this.app.stage.addChild(this.RootComponent.container);
 
       this.renderSelf(this.props);
 
@@ -167,7 +167,7 @@ export class BaseApplication {
     // assume props is up to date
     this.updateSelf(this.props);
     // send props downwards
-    this.rootApplication.update({
+    this.RootComponent.update({
       args: {
         renderer: this.app.renderer,
       },
