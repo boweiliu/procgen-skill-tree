@@ -219,6 +219,12 @@ export class RootComponent {
   }
 
   didMount() {
+    const { args, updaters } = this.staleProps;
+    this.backdrop.addListener('pointerdown', (event) => {
+      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, whole) => {
+        return undefined;
+      })
+    });
   }
 
   willUnmount(props: Props) {

@@ -10,7 +10,7 @@ type Props = {
   availableSp: number,
 }
 
-export function NodeDetail({
+export function DebugTab({
   selectedPointNode,
   allocatedPointNodeSet,
   worldGen,
@@ -23,10 +23,7 @@ export function NodeDetail({
   }, [selectedPointNode]);
 
   if (!selectedPointNode) {
-    return (<>
-      <h1>Stats</h1>
-      <div>Select a node first!</div>
-    </>)
+    return (<> </>)
   }
   const pointNodeGen = worldGen.zLevels[selectedPointNode.z]!.chunks.get(selectedPointNode.chunkCoord)!.pointNodes.get(selectedPointNode.pointNodeCoord)!
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
@@ -37,12 +34,39 @@ export function NodeDetail({
   }
   return (
     <>
-      <h1>Stats</h1>
+      <h1>Current</h1>
+      <div>
+        Z={selectedPointNode.z}
+      </div>
+      <div>
+        Chunk={selectedPointNode.chunkCoord.x},{selectedPointNode.chunkCoord.y}
+      </div>
+      <div>
+        Node={selectedPointNode.pointNodeCoord.x},{selectedPointNode.pointNodeCoord.y}
+      </div>
+      <br></br>
+      <div>Allocated? {isAllocated ? "yes" : "no"} </div>
+      <br></br>
+      <div>Can be allocated? {canBeAllocated} </div>
+      <br></br>
+      <div> Stats: </div>
       <div> {nodeDescription} </div>
-      <h3>Allocated?</h3>
-      {isAllocated ? "yes" : "no"}
-      <h3>Can be allocated?</h3>
-      {canBeAllocated}
+      <h3>Previous</h3>
+      {history
+        .slice(0, -1)
+        .map((pointNodeRef: PointNodeRef, i) => {
+          return (
+            <div key={i}>
+              <div>
+                Z={pointNodeRef.z} { }
+                Chunk={pointNodeRef.chunkCoord.x},{pointNodeRef.chunkCoord.y} { }
+                Node={pointNodeRef.pointNodeCoord.x},{pointNodeRef.pointNodeCoord.y}
+              </div>
+            </div>
+          );
+        })
+        .reverse()}
     </>
   );
 }
+

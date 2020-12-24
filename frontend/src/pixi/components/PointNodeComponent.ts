@@ -6,7 +6,7 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet } from "../../lib/util/data_structures/hash";
 import { multiplyColor } from "../../lib/util/misc";
-import { canAllocate } from "../../data/lib/Neighbors";
+import { canAllocate } from "../../game/Neighbors";
 
 type Props = {
   delta: number,

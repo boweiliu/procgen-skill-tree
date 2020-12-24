@@ -37,7 +37,7 @@ export class ZLevelGenFactory {
     for (let i = -max; i <= max; i++) {
       for (let j = -max; j <= max; j++){
         let location = new Vector2(i, j);
-        chunks.put(location, this.chunkGenFactory.create({ seed: id, location }));
+        chunks.put(location, this.chunkGenFactory.create({ seed: id, location, z: args.z }));
       }
     }
 
@@ -56,7 +56,7 @@ export class ChunkGenFactory {
     this.pointNodeGenFactory = new PointNodeGenFactory({});
   }
 
-  public create(args: { seed: number, location: Vector2 }): ChunkGen {
+  public create(args: { seed: number, location: Vector2, z: number }): ChunkGen {
     const id = squirrel3(args.seed + squirrel3(args.seed + args.location.x) + args.location.y);
     const pointNodes: KeyedHashMap<Vector2, PointNodeGen> = new KeyedHashMap();
 
@@ -80,7 +80,7 @@ export class ChunkGenFactory {
       for (let j = -ChunkGenConstants.CHUNK_HALF_DIM; j <= ChunkGenConstants.CHUNK_HALF_DIM; j++) {
         let loc = new Vector2(i, j);
         if (!droppedNodes.get(loc)) {
-          pointNodes.put(loc, this.pointNodeGenFactory.create({ seed: id, location: loc }));
+          pointNodes.put(loc, this.pointNodeGenFactory.create({ seed: id, location: loc, chunk: args.location, z: args.z }));
         }
       }
     }
@@ -98,7 +98,7 @@ export class PointNodeGenFactory {
     this.config = config;
   }
 
-  public create(args: { seed: number, location: Vector2 }): PointNodeGen {
+  public create(args: { seed: number, location: Vector2, chunk: Vector2, z: number }): PointNodeGen {
     const id = squirrel3(args.seed + squirrel3(args.seed + args.location.x) + args.location.y);
 
     let randomFloat = squirrel3(id + 1) / INTMAX32;
@@ -112,6 +112,10 @@ export class PointNodeGenFactory {
     } else if (randomFloat < 0.60) {
       resourceType = ResourceType.Mana2;
     } else {
+      resourceType = ResourceType.Nothing;
+    }
+    // override for root node
+    if (args.location.equals(Vector2.Zero) && args.chunk.equals(Vector2.Zero) && args.z === 0) {
       resourceType = ResourceType.Nothing;
     }
 

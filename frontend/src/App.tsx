@@ -14,6 +14,7 @@ import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { batchify, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
+import { DebugTab } from "./components/DebugTab";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -29,7 +30,7 @@ if (
   forceRotate = true;
 }
 
-const tabLabels = ["Quest Progress", "Node Details", ];
+const tabLabels = ["Quest Progress", "Node Details", "Debug" ];
 
 const initialGameState: Lazy<GameState> = new Lazy(() => new GameStateFactory({}).create());
 
@@ -62,7 +63,21 @@ function App() {
         remainingPoints={gameState.playerSave.availableSp}
         allocatedPoints={gameState.playerSave.allocatedPointNodeSet.size()}
       />);
-  }, [gameState.playerSave.allocatedPointNodeSet,  gameState.playerSave.availableSp]);
+  }, [gameState.playerSave.allocatedPointNodeSet, gameState.playerSave.availableSp]);
+  tabViews[2] = useMemo(() => {
+    return (
+      <DebugTab
+        selectedPointNode={gameState.playerUI.selectedPointNode}
+        allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
+        worldGen={gameState.worldGen}
+        availableSp={gameState.playerSave.availableSp}
+      />);
+  }, [
+    gameState.playerUI.selectedPointNode,
+    gameState.playerSave.allocatedPointNodeSet,
+    gameState.worldGen,
+    gameState.playerSave.availableSp
+  ]);
 
 
   return (
