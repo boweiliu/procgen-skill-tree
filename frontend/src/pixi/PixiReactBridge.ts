@@ -139,8 +139,8 @@ export class PixiReactBridge {
 
       // test
       // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+      this.didMount();
     }
-    this.didMount();
   }
 
   renderSelf(props: Props) {
