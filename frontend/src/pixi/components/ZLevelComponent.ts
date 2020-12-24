@@ -139,7 +139,7 @@ export class ZLevelComponent {
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
-    this.staleProps.allocatedPointNodeSubset = this.staleProps.allocatedPointNodeSubset.clone();
+    // this.staleProps.allocatedPointNodeSubset = this.staleProps.allocatedPointNodeSubset.clone();
   }
 
   didUpdate(prevProps: Props, props: Props) {

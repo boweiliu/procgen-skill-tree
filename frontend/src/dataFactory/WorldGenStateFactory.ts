@@ -64,6 +64,7 @@ export class ChunkGenFactory {
         if (i === 0 && j === 0) {
           continue;
         }
+        // 4 way symmetry plz
         if (squirrel3(id + i * ChunkGenConstants.CHUNK_DIM + j) / INTMAX32 < ChunkGenConstants.DROP_NODES_CHANCE / 4) {
           droppedNodes.put(new Vector2(i, j));
           droppedNodes.put(new Vector2(j, -i));

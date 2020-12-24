@@ -14,7 +14,6 @@ import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
 import { batchify, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
-import { JsxElement } from "typescript";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -58,14 +57,14 @@ function App() {
         allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
         worldGen={gameState.worldGen}
       />);
-  }, [gameState.playerUI.selectedPointNode, gameState.playerSave.allocatedPointNodeSet, gameState.worldGen, batchContents]);
+  }, [gameState.playerUI.selectedPointNode, gameState.playerSave.allocatedPointNodeSet, gameState.worldGen]);
   tabViews[1] = useMemo(() => {
     return (
       <QuestProgress
         remainingPoints={batchContents}
         allocatedPoints={gameState.playerSave.allocatedPointNodeSet.size()}
       />);
-  }, [gameState.playerSave.allocatedPointNodeSet.hash(), batchContents]);
+  }, [gameState.playerSave.allocatedPointNodeSet, batchContents]);
 
 
   return (

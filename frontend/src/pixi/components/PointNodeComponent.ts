@@ -89,14 +89,14 @@ export class PointNodeComponent {
         }
         return prev;
       })
-      updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
+      updaters.playerSave.allocatedPointNodeSet.update((prev: HashSet<PointNodeRef>, prevGameState) => {
         let history = prevGameState.playerSave.allocatedPointNodeHistory
         let mostRecent = history[history.length - 1]
           console.log({ history, actualHistory: [...history] });
         // if we were already selected, try to allocate us
         if (!prev.contains(mostRecent)) {
-          prev.put(mostRecent);
           const next = prev.clone();
+          next.put(mostRecent);
           console.log({ prev, next, prevSize: prev.size(), nextSize: next.size(), isEqual: prev === next })
           return next;
         }
