@@ -1,4 +1,3 @@
-import { rm } from "fs";
 import { WorldGenState, ChunkGen, PointNodeGen, ChunkGenConstants, ZLevelGen, ResourceType, ResourceModifier } from "../data/GameState";
 import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";

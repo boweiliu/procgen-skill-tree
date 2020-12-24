@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { RenderedChunkConstants } from "./ChunkComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { ChunkGenConstants, GameState, PointNodeGen, PointNodeRef, ResourceType, WorldGenState } from "../../data/GameState";
+import { GameState, PointNodeGen, PointNodeRef, ResourceType } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet } from "../../lib/util/data_structures/hash";

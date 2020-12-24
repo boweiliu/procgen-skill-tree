@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState } from "react";
 import "./PixiComponent.css";
-import { GameState, PointNodeRef } from "../data/GameState";
+import { GameState } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
 import { PixiReactBridge } from "../pixi/PixiReactBridge";
@@ -16,7 +16,7 @@ export type PixiComponentState = {
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
 export function PixiComponent(props: { originalSetGameState: Function }) {
-  const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
+  const [_, gameStateUpdaters]  = useContext(UseGameStateContext);
   const [pixiComponentState, setPixiComponentState] = useState<PixiComponentState>({
     orientation: "original",
     innerHeight: window.innerHeight,
