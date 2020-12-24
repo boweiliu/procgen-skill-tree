@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { UseGameStateContext } from "../contexts";
-import { GameState } from "../data/GameState";
-import { DeepReadonly } from "../lib/util/misc";
-import { Application } from "../pixi/Application";
+import { BaseApplication } from "../pixi/BaseApplication";
 import { PixiComponentState } from "./PixiComponent";
 
 export function PixiWrapperComponent(props: {
-  application: any,
+  application: BaseApplication,
   pixiComponentState: PixiComponentState,
   fireBatchedSetPixiComponentState: () => void,
 }) {
@@ -28,11 +26,11 @@ export function PixiWrapperComponent(props: {
     container.current!.appendChild(application.app.view);
   }, [application.app.view]);
 
-  const prevRef = useRef<DeepReadonly<GameState>>();
-  useEffect(() => {
-    prevRef.current = gameState;
-  });
-  const prevGameState = prevRef.current;
+  // const prevRef = useRef<DeepReadonly<GameState>>();
+  // useEffect(() => {
+  //   prevRef.current = gameState;
+  // });
+  // const prevGameState = prevRef.current;
 
   // Trigger component render on first load and also when game state is updated
   application.rerender({

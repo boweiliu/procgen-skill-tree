@@ -1,6 +1,5 @@
 import * as Pixi from "pixi.js";
-import { RenderedChunkConstants } from "../RenderedChunk";
-
+import { RenderedChunkConstants } from "../components/ChunkComponent";
 
 export function generatePointNodeTexture(renderer: Pixi.Renderer) {
     let g = new Pixi.Graphics();

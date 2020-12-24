@@ -5,9 +5,7 @@ import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { RenderedChunkConstants } from "../RenderedChunk";
-import { ChunkComponent } from "./ChunkComponent";
-
+import { RenderedChunkConstants, ChunkComponent } from "./ChunkComponent";
 
 type Props = {
   delta: number,

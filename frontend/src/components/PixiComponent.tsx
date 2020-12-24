@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import "./PixiComponent.css";
-import { Application } from "../pixi/Application";
 import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
@@ -28,8 +27,8 @@ export function PixiComponent(props: {
   let [batchedSetPixiComponentState, fireBatchedSetPixiComponentState] =
     useMemo(() => batchify(setPixiComponentState), [setPixiComponentState]);
 
-  const [application, setApplication] = useState<any>(initialApplication.get());
-  // const [application, setApplication] = useState<any>(() => new BaseApplication({
+  const [application, setApplication] = useState(initialApplication.get());
+  // const [application, setApplication] = useState(() => new BaseApplication({
     // originalWindowWidth: window.innerWidth,
     // originalWindowHeight: window.innerHeight,
   // }));
@@ -48,7 +47,7 @@ export function PixiComponent(props: {
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {
-          setApplication(new Application({
+          setApplication(new BaseApplication({
             originalWindowWidth: window.innerWidth,
             originalWindowHeight: window.innerHeight,
           }))

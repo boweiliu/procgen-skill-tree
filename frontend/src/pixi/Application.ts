@@ -6,7 +6,6 @@ import createBunnyExample from "./BunnyExample";
 import { Chunk, RenderedChunk } from "./Chunk";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { ZLevel } from "./ZLevel";
-import { RenderedZLevel } from "./RenderedZLevel";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { GameState, PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
@@ -203,16 +202,16 @@ export class Application {
 
     let pointNodeTexture = generatePointNodeTexture(this.app.renderer);
 
-    let zLevel = new RenderedZLevel({
-      pointNodeTexture,
-      z: 0,
-      zLevelGen: (new ZLevelGenFactory({}).create({ seed: this.randomSeed, z: 0})),
-      stateUpdaterQueue: [] as any,
-      ticker: this.app.ticker
-    })
-    this.actionStage.addChild(zLevel.container);
-    zLevel.container.x = this.app.screen.width / 2;
-    zLevel.container.y = this.app.screen.height / 2;
+    // let zLevel = new RenderedZLevel({
+    //   pointNodeTexture,
+    //   z: 0,
+    //   zLevelGen: (new ZLevelGenFactory({}).create({ seed: this.randomSeed, z: 0})),
+    //   stateUpdaterQueue: [] as any,
+    //   ticker: this.app.ticker
+    // })
+    // this.actionStage.addChild(zLevel.container);
+    // zLevel.container.x = this.app.screen.width / 2;
+    // zLevel.container.y = this.app.screen.height / 2;
 
     return;
 
