@@ -34,7 +34,9 @@ export class HashSet<K extends { hash(): string }> {
   }
 
   clone(): HashSet<K> {
-    return this.clone();
+    let n = new HashSet<K>();
+    n._values = this._values.clone()
+    return n;
   }
 
   *[Symbol.iterator]() {

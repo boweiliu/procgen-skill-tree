@@ -5,21 +5,6 @@ import { GameState, PointNodeRef } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 
-
-/**
- * Usage:
- * class RenderedChunk {
- *  constructor(stateUpdaterQueue) {
- *    this.nodes = 0...10.map(i => new RenderedPointNode({texture, new NodeRef(i), stateUpdaterQueue}))
- *    // this.nodes[0].render({ some, stuff })
- *    this.nodes[0] should listen to gameState.playerUI.selectedPointNode and allocatedPointNodes, and
- *    updating gameState.playerUI.selectedPointNode or gameState.playerSave.allocatedPointNodes or their 
- *       parents should trigger queueing of the rerender
- *    or rather, rerendering
- *  }
- * }
- */
-
 type Props = {
   delta: number,
   args: {
@@ -43,8 +28,7 @@ export class PointNodeComponent {
     this.container = new Pixi.Sprite(props.args.pointNodeTexture);
     this.container.anchor.x = 0.5;
     this.container.anchor.y = 0.5;
-    // this.container.x = node.x * RenderedChunkConstants.SPACING_PX;
-    // this.container.y = node.y * RenderedChunkConstants.SPACING_PX;
+
     this.container.interactive = true;
     this.container.buttonMode = true;
     this.container.hitArea = new Pixi.Rectangle(
@@ -83,6 +67,7 @@ export class PointNodeComponent {
     this.container.addListener("pointerdown", () => {
       updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
         // if we were already selected, allocate us
+        console.log({ prevGameState });
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId == args.selfPointNodeRef.pointNodeId) {
           prev.put(args.selfPointNodeRef);
           return prev.clone();

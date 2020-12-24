@@ -16,14 +16,13 @@ function isObject(o: any): o is { [x: string]: any } {
   return (typeof o === "object");
 }
 
-export function updaterGenerator2Helper<T, W>(_dataObject: T, dataUpdater: UpdaterFn2<T, W>, wholeDataObject: W): UpdaterGeneratorType2<T, W> {
+function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T, W>): UpdaterGeneratorType2<T, W> {
   const updaters: UpdaterGeneratorType2<T, W> = {} as any;
   updaters.getUpdater = () => dataUpdater;
   updaters.set = dataUpdater;
   updaters.update = dataUpdater;
-  if (typeof _dataObject !== "object") return updaters;
+  if (typeof dataObject !== "object") return updaters;
   else {
-    const dataObject: T = _dataObject;
     const keys: (keyof T)[] = Object.keys(dataObject) as any;
     keys.forEach((key: (keyof T)) => {
       if (key === "set" || key === "getUpdater" || key === "update") {
@@ -31,35 +30,35 @@ export function updaterGenerator2Helper<T, W>(_dataObject: T, dataUpdater: Updat
       }
       function keyUpdater(newValueOrCallback: UpdaterFnParam2<T[typeof key], W>) {
         if (typeof newValueOrCallback === "function") {
-          dataUpdater((oldData) => {
+          dataUpdater((oldData: T, wholeData: W) => {
             const newData = {
               ...oldData,
-              [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeDataObject),
+              [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData),
             };
             return newData;
           });
         } else {
-          dataUpdater((oldData) => ({ ...oldData, [key]: newValueOrCallback }));
+          dataUpdater((oldData, wholeData) => ({ ...oldData, [key]: newValueOrCallback }));
         }
       }
-      updaters[key] = (updaterGenerator2Helper<T[typeof key], W>(dataObject[key], keyUpdater, wholeDataObject) as unknown as (typeof updaters)[typeof key]);
+      updaters[key] = (updaterGenerator2Helper<T[typeof key], W>(dataObject[key], keyUpdater) as unknown as (typeof updaters)[typeof key]);
     });
     return updaters;
   }
 }
 
-export function updaterGenerator2<T>(dataObject: T, dataUpdater: UpdaterFn<T>): UpdaterGeneratorType2<T> {
-  const dataUpdater2 = (arg: UpdaterFnParam2<T, T>) => {
-    if (typeof arg === 'function') {
-      dataUpdater((prev) => {
+export function updaterGenerator2<T>(dataObject: T, setState: UpdaterFn<T>): UpdaterGeneratorType2<T> {
+  const dataUpdater2 = (stateCallbackFunction: UpdaterFnParam2<T, T>) => {
+    if (typeof stateCallbackFunction === 'function') {
+      setState((prev: T) => {
         // if T is a function type already, typescript correctly notifies us that this will fail
-        return (arg as ((prev: T, prevWhole: T) => T))(prev, prev);
+        return (stateCallbackFunction as ((prev: T, prevWhole: T) => T))(prev, prev);
       })
     } else {
-      dataUpdater(arg);
+      setState(stateCallbackFunction);
     }
   };
-  return updaterGenerator2Helper<T, T>(dataObject, dataUpdater2, dataObject);
+  return updaterGenerator2Helper<T, T>(dataObject, dataUpdater2);
 }
 
 
