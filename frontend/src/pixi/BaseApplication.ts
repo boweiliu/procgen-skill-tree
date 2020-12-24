@@ -37,7 +37,8 @@ export class BaseApplication {
   state!: BaseApplicationState;
   props!: BaseApplicationProps;
 
-  rootApplication: RootApplication;
+  rootApplication!: RootApplication;
+  isMounted: boolean;
 
   public static appSizeFromWindowSize(window?: DeepReadonly<Vector2>): Vector2 {
     return new Vector2({
@@ -51,13 +52,16 @@ export class BaseApplication {
    */
   constructor(args: Partial<Config> = {}, props: Partial<BaseApplicationProps> = {}) {
     assertOnlyCalledOnce("Base application constructor");
-    this.config = Object.assign({}, defaultConfig, args);
-    // this.props = props;
 
-    this.state.appSize = BaseApplication.appSizeFromWindowSize(
+    this.config = Object.assign({}, defaultConfig, args);
+
+    let appSize = BaseApplication.appSizeFromWindowSize(
       props.pixiComponentState && new Vector2(props.pixiComponentState.innerWidth, props.pixiComponentState.innerHeight)
     );
-    this.state.originalAppSize = this.state.appSize;
+    this.state = {
+      appSize,
+      originalAppSize: appSize
+    }
 
     this.app = new Pixi.Application({
       width: this.state.appSize.x,
@@ -72,22 +76,23 @@ export class BaseApplication {
       backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
     });
 
-    this.rootApplication = new RootApplication({
-      args: {
-        renderer: this.app.renderer,
-      },
-      updaters: this.props.gameStateUpdaters,
-      delta: 0,
-      gameState: this.props.gameState,
-      appSize: this.state.appSize,
-    })
-    this.app.stage.addChild(this.rootApplication.container);
+    this.isMounted = false;
+    // this.rootApplication = new RootApplication({
+    //   args: {
+    //     renderer: this.app.renderer,
+    //   },
+    //   updaters: this.props.gameStateUpdaters,
+    //   delta: 0,
+    //   gameState: this.props.gameState,
+    //   appSize: this.state.appSize,
+    // })
+    // this.app.stage.addChild(this.rootApplication.container);
 
-    this.renderSelf(this.props);
+    // this.renderSelf(this.props);
 
-    // test
-    // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
-    this.didMount();
+    // // test
+    // // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+    // this.didMount();
   }
 
   public didMount() {
@@ -113,6 +118,25 @@ export class BaseApplication {
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   rerender(props: BaseApplicationProps) {
     this.props = props;
+    if (!this.isMounted) {
+      // finish initialization
+      this.rootApplication = new RootApplication({
+        args: {
+          renderer: this.app.renderer,
+        },
+        updaters: this.props.gameStateUpdaters,
+        delta: 0,
+        gameState: this.props.gameState,
+        appSize: this.state.appSize,
+      })
+      this.app.stage.addChild(this.rootApplication.container);
+
+      this.renderSelf(this.props);
+
+      // test
+      // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+      this.didMount();
+    }
   }
 
   renderSelf(props: BaseApplicationProps) {

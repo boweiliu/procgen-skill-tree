@@ -4,6 +4,7 @@ import { Application } from "../pixi/Application";
 import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
 import { batchify, Lazy } from "../lib/util/misc";
+import { BaseApplication } from "../pixi/BaseApplication";
 
 export type PixiComponentState = {
   orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
@@ -11,7 +12,7 @@ export type PixiComponentState = {
   innerHeight: number,
 }
 
-const initialApplication = new Lazy(() => new Application({
+const initialApplication = new Lazy(() => new BaseApplication({
   originalWindowWidth: window.innerWidth,
   originalWindowHeight: window.innerHeight,
 }));
@@ -27,7 +28,13 @@ export function PixiComponent(props: {
   let [batchedSetPixiComponentState, fireBatchedSetPixiComponentState] =
     useMemo(() => batchify(setPixiComponentState), [setPixiComponentState]);
 
-  const [application, setApplication] = useState<Application>(initialApplication.get());
+  const [application, setApplication] = useState<any>(initialApplication.get());
+  // const [application, setApplication] = useState<any>(() => new BaseApplication({
+  // originalWindowWidth: window.innerWidth,
+  // originalWindowHeight: window.innerHeight,
+  // }, {
+
+  // }));
 
   window.onresize = () => {
     batchedSetPixiComponentState(old => {

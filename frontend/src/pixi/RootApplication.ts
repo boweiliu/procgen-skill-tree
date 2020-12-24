@@ -78,7 +78,9 @@ export class RootApplication {
     // //   this.fpsTracker.tick(delta);
     // // })
 
-    this.state.pointNodeTexture = new Lazy(() => generatePointNodeTexture(props.args.renderer));
+    this.state = {
+      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer))
+    };
 
     this.renderSelf(props);
     this.didMount(props);

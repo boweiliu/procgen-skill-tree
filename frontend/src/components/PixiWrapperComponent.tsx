@@ -6,7 +6,7 @@ import { Application } from "../pixi/Application";
 import { PixiComponentState } from "./PixiComponent";
 
 export function PixiWrapperComponent(props: {
-  application: Application,
+  application: any,
   pixiComponentState: PixiComponentState,
   fireBatchedSetPixiComponentState: () => void,
 }) {
