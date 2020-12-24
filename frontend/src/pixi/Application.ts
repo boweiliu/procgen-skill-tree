@@ -339,4 +339,6 @@ export class Application {
   }) {
 
   }
+
+  public update(t?: any) { }
 }

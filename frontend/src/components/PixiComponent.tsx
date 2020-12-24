@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./PixiComponent.css";
 import { Application } from "../pixi/Application";
 import { PointNodeRef } from "../data/GameState";
 import { PixiWrapperComponent } from "./PixiWrapperComponent";
-import { Lazy } from "../lib/util/misc";
+import { batchify, Lazy } from "../lib/util/misc";
 
 export type PixiComponentState = {
   orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
@@ -24,22 +24,22 @@ export function PixiComponent(props: {
     innerHeight: window.innerHeight,
     innerWidth: window.innerWidth,
   });
+  let [batchedSetPixiComponentState, fireBatchedSetPixiComponentState] =
+    useMemo(() => batchify(setPixiComponentState), [setPixiComponentState]);
 
   const [application, setApplication] = useState<Application>(initialApplication.get());
 
   window.onresize = () => {
-    setPixiComponentState(old => {
+    batchedSetPixiComponentState(old => {
       old.innerWidth = window.innerWidth;
       old.innerHeight = window.innerHeight;
       return { ...old };
     })
-
-    // application?.resize?.(window.innerWidth, window.innerHeight);
   };
 
   return (
     <>
-      <PixiWrapperComponent application={application} pixiComponentState={pixiComponentState}/>
+      <PixiWrapperComponent application={application} pixiComponentState={pixiComponentState} fireBatchedSetPixiComponentState={fireBatchedSetPixiComponentState}/>
       <button onClick={() => {}}>draw circle</button>
       <button
         onClick={() => {

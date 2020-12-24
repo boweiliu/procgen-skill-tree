@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./dataFactory/GameStateFactory";
-import { Lazy, updaterGenerator } from "./lib/util/misc";
+import { batchify, Lazy, updaterGenerator } from "./lib/util/misc";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -40,10 +40,10 @@ function App() {
     return initialGameState.get();
   });
 
-  let batchedSetGameState = batchUpdates(setGameState)
-  batchedSetGameState((old: GameState): GameState => old );
-  batchedSetGameState.fireBatch();
-  let updaters = useMemo(() => updaterGenerator(initialGameState.get(), setGameState), [setGameState]);
+  let [batchedSetGameState, fireBatch] = useMemo(() => batchify(setGameState), [setGameState]);
+  // batchedSetGameState((old: GameState): GameState => old );
+  // batchedSetGameState.fireBatch();
+  let updaters = useMemo(() => updaterGenerator(initialGameState.get(), batchedSetGameState), [batchedSetGameState]);
 
   useEffect(() => {
     if (batchContents === 0) {
@@ -60,7 +60,7 @@ function App() {
 
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
-      <UseGameStateContext.Provider value={[gameState, updaters]}>
+      <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
         <PixiComponent onFocusedNodeChange={updaters.playerUI.selectedPointNode.getUpdater()} />
         <Sidebar>
           <Tabs

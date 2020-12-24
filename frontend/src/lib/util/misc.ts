@@ -258,3 +258,17 @@ export class Lazy<T> {
   //   }
   // }
 }
+
+export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: A) => void), () => void] {
+  let batch: A[] = [];
+
+  return [(...args: A) => {
+    batch.push(args);
+  }, (() => {
+      for (let a of batch) {
+        fn(...a);
+      }
+      batch = [];
+    })
+  ];
+}

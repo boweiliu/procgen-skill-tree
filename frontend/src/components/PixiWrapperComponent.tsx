@@ -8,10 +8,15 @@ import { PixiComponentState } from "./PixiComponent";
 export function PixiWrapperComponent(props: {
   application: Application,
   pixiComponentState: PixiComponentState,
+  fireBatchedSetPixiComponentState: () => void,
 }) {
   const { application, pixiComponentState } = props;
   const container = useRef<HTMLDivElement>(null);
-  const [gameState, gameStateUpdaters]  = useContext(UseGameStateContext);
+  const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
+  const fireBatch = () => {
+      fireBatchedSetGameState();
+      props.fireBatchedSetPixiComponentState();
+    }
 
   useEffect(() => {
     // this block only triggers if a new application instance is created.
@@ -29,12 +34,12 @@ export function PixiWrapperComponent(props: {
   });
   const prevGameState = prevRef.current;
 
-  // Trigger component rerender when game state is updated
+  // Trigger component render on first load and also when game state is updated
   application.rerender({
     pixiComponentState,
     gameState,
-    prevGameState,
     gameStateUpdaters,
+    fireBatch
   })
 
   return (

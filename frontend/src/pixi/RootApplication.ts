@@ -12,14 +12,25 @@ import { GameState, PointNodeRef } from "../data/GameState";
 import { generatePointNodeTexture } from "./textures/PointNodeTexture";
 import { Reticle } from "./Reticle";
 import { ZLevelGenFactory } from "../dataFactory/WorldGenStateFactory";
-import { assertOnlyCalledOnce, DeepReadonly, Lazy } from "../lib/util/misc";
+import { assertOnlyCalledOnce, Const, DeepReadonly, Lazy, UpdaterGeneratorType } from "../lib/util/misc";
 
-type RootApplicationState = {}
-type RootApplicationProps = {}
+type RootApplicationState = {
+  pointNodeTexture: Lazy<Pixi.Texture>;
+}
+
+type RootApplicationProps = {
+  args: {
+    renderer: Pixi.Renderer,
+  },
+  updaters: UpdaterGeneratorType<GameState>,
+  delta: number,
+  gameState: Const<GameState>,
+  appSize: Vector2
+}
 
 export class RootApplication {
   state!: RootApplicationState;
-  props!: DeepReadonly<RootApplicationProps>;
+  staleProps!: RootApplicationProps;
   container!: Pixi.Container;
 
   /* children */
@@ -29,54 +40,32 @@ export class RootApplication {
   public actionStage!: Pixi.Container;
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
   public backdropStage!: Pixi.Container;
-
   public keyboard!: KeyboardState;
-
   public fpsTracker!: FpsTracker;
-
-  public static appSizeFromWindowSize(window: Vector2): Vector2 {
-    return new Vector2({
-      x: Math.min(1280, window.x),
-      y: Math.min(720, window.y),
-    });
-  }
 
   /**
    * Need to provide config to set up the pixi canvas
    */
-  constructor(args: any) {
-    // assertOnlyCalledOnce("Base application constructor");
+  constructor(props: RootApplicationProps) {
+    this.staleProps = props;
+    this.container = new Pixi.Container();
 
-    // this.app = new Pixi.Application({
-    //   width: this.originalAppWidth, // both are ignored - see resize() below
-    //   height: this.originalAppHeight,
-    //   antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
-    //   transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
-    //   resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
-    //   // resolution: 0.5,
-    //   // resolution: 2,
-    //   autoDensity: true,
-    //   powerPreference: "low-power", // the only valid one for webgl
-    //   backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
-    // });
+    this.container.sortableChildren = true;
 
-    // this.stage = this.app.stage;
-    // this.stage.sortableChildren = true;
+    this.fixedCameraStage = new Pixi.Sprite();
+    this.fixedCameraStage.zIndex = 1;
+    this.fixedCameraStage.sortableChildren = true;
+    this.container.addChild(this.fixedCameraStage);
 
-    // // this.fixedCameraStage = new Pixi.Sprite();
-    // // this.fixedCameraStage.zIndex = 1;
-    // // this.fixedCameraStage.sortableChildren = true;
-    // // this.stage.addChild(this.fixedCameraStage);
+    this.actionStage = new Pixi.Sprite();
+    this.actionStage.zIndex = 0;
+    this.actionStage.sortableChildren = true;
+    this.container.addChild(this.actionStage);
 
-    // // this.actionStage = new Pixi.Sprite();
-    // // this.actionStage.zIndex = 0;
-    // // this.actionStage.sortableChildren = true;
-    // // this.stage.addChild(this.actionStage);
-
-    // // this.backdropStage = new Pixi.Sprite();
-    // // this.backdropStage.zIndex = -1;
-    // // this.backdropStage.sortableChildren = true;
-    // // this.stage.addChild(this.backdropStage);
+    this.backdropStage = new Pixi.Sprite();
+    this.backdropStage.zIndex = -1;
+    this.backdropStage.sortableChildren = true;
+    this.container.addChild(this.backdropStage);
 
     // // this.keyboard = new KeyboardState();
     // // this.app.ticker.add(() => {
@@ -89,17 +78,28 @@ export class RootApplication {
     // //   this.fpsTracker.tick(delta);
     // // })
 
-    // let pointNodeTexture = new Lazy(() => generatePointNodeTexture(this.app.renderer));
+    this.state.pointNodeTexture = new Lazy(() => generatePointNodeTexture(props.args.renderer));
 
-    // // test
-    // // createBunnyExample({ parent: this.actionStage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
-    // this.app.ticker.add((delta) => this.baseGameLoop(delta));
+    this.renderSelf(props);
+    this.didMount(props);
   }
 
-  // render(props: {
-  //   gameState: DeepReadonly<GameState>,
-  //   pixiComponentState: PixiComponentState,
-  // }) { }
+  public update(props: RootApplicationProps) {
+    this.updateSelf(props)
+    // this.keyboard.update(props);
+    this.renderSelf(props);
+    this.didUpdate(props);
+  }
 
+  updateSelf(props: RootApplicationProps) {
+  }
+  renderSelf(props: RootApplicationProps) {
+  }
+  didMount(props: RootApplicationProps) {
+  }
+  willUnmount(props: RootApplicationProps) {
+  }
+  didUpdate(props: RootApplicationProps) {
+  }
 }
 
