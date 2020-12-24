@@ -150,6 +150,7 @@ export type Const<T> = DeepReadonly<T>;
 
 const assertOnlyCalledOnceData: { [k: string]: [string, number] } = {};
 
+// Twice, actually, because of react dev mode double-calling stuff
 export function assertOnlyCalledOnce(id: string | number) {
   let k = id.toString();
   if (assertOnlyCalledOnceData[k] !== undefined) {
@@ -195,11 +196,19 @@ export class Lazy<T> {
   // }
 }
 
+/**
+ * 
+ * @param fn an arbitrary callback which performs some operation with side effects.
+ * @returns a tuple: [batchedFn, fireBatch]. 
+ * batchedFn takes the same arguments as fn, but the side effects are delayed until fireBatch is called.
+ * if batchedFn is called multiple times, those invocations are stored in order, and then popped off in order when fireBatch is called.
+ */
 export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: A) => void), () => void] {
   let batch: A[] = [];
 
   return [(...args: A) => {
     batch.push(args);
+    console.log({ stack: new Error().stack, batchSize: batch.length });
   }, (() => {
       for (let a of batch) {
         fn(...a);

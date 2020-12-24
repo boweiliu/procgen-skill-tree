@@ -67,16 +67,12 @@ export class PointNodeComponent {
     this.container.addListener("pointerdown", () => {
       updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
         // if we were already selected, allocate us
-        console.log({ prevGameState });
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
           prev.put(args.selfPointNodeRef);
           return prev.clone();
         }
         return prev;
       })
-      let gameStateUpdater = updaters;
-      let setGameState = gameStateUpdater.getUpdater();
-      setGameState((prev: GameState, prevWholeGameState: GameState) => prev)
       updaters.playerSave.allocatedPointNodeHistory.update((prev, prevGameState) => {
         // if we were already selected, allocate us and add to the history (maybe this should be managed elsewhere??)
         if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {

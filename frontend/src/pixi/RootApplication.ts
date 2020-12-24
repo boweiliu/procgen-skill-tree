@@ -149,7 +149,6 @@ export class RootApplication {
     assertOnlyCalledOnce("root application did mount");
     updaters.worldGen.zLevels.update((prev, prevGameState) => {
       assertOnlyCalledOnce("root application callback");
-      window.alert("generated the thing!");
       if (!prev[0]) {
         return [new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 })];
       }
