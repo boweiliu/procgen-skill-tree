@@ -4,11 +4,12 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { GameState} from "../../data/GameState";
 import { generatePointNodeTexture } from "../textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
-import { batchify, Const, Lazy } from "../../lib/util/misc";
+import { Const, Lazy } from "../../lib/util/misc";
 import { FpsComponent } from "./FpsComponent";
 import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
+import { batchify, batchifySetState } from "../../lib/util/batchify";
 
 export type PlayerIntentState = {
   justDown: boolean;
@@ -94,7 +95,7 @@ export class RootComponent {
         this.state = valueOrCallback;
       }
     })
-    let [batchedSetState, fireBatch] = batchify(setState);
+    let [batchedSetState, fireBatch] = batchifySetState(setState);
     this.stateUpdaters = updaterGenerator2<State>(this.state, batchedSetState);
     this.fireStateUpdaters = fireBatch;
 
