@@ -282,6 +282,10 @@ export function multiplyColor(color1: number, color2: number): number {
 }
 
 
-export function enumKeys<T extends {[k: string]: any}>(enm: T) : (keyof T)[] {
-  return Object.keys(enm);
+export function enumKeys<T extends string>(enm: { [key in T]: T }) : T[] {
+  return Object.keys(enm) as T[];
 }
+
+// export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
+//   return Object.keys(enm) as T[];
+// }

@@ -1,9 +1,8 @@
-import { GameState, ResourceModifier, ResourceType, ResourceTypeAndModifier } from "../data/GameState";
+import { ComputedState, GameState, ResourceModifier, ResourceNontrivialType, ResourceType, ResourceTypeAndModifier } from "../data/GameState";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
 
-
-export function computePlayerResourceAmounts(gameState: GameState): ({ [k in ResourceType]: number }) {
+export function computePlayerResourceAmounts(gameState: GameState): ComputedState {
   let amounts: { [k in ResourceType]?: number } = {};
 
   let playerResourceNodesAggregated = new HashMap<ResourceTypeAndModifier, number>();
@@ -17,19 +16,40 @@ export function computePlayerResourceAmounts(gameState: GameState): ({ [k in Res
     let resourceTypeAndModifier = new ResourceTypeAndModifier({
       type: pointNodeGen.resourceType, modifier: pointNodeGen.resourceModifier
     });
+    
+    playerResourceNodesAggregated.put(resourceTypeAndModifier,
+      (playerResourceNodesAggregated.get(resourceTypeAndModifier) || 0) + pointNodeGen.resourceAmount);
   }
 
+  // Do the +flat, %increased, etc. calculations here
 
-
-  for (let key of enumKeys(ResourceType)) {
-    if (key === ResourceType.Nothing) {
-      amounts[key] = 0;
-      continue;
-    }
+  for (let key of enumKeys(ResourceNontrivialType)) {
     // iterate throu
-    amounts[key];
+    let amount = playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+      type: key,
+      modifier: ResourceModifier.Flat
+    })) || 0;
+    amount *= (1 + (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+      type: key,
+      modifier: ResourceModifier.Increased0,
+    })) || 0));
+    amount += playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+      type: key,
+      modifier: ResourceModifier.AfterIncreased0
+    })) || 0;
+    amount *= (1 + (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+      type: key,
+      modifier: ResourceModifier.Increased1,
+    })) || 0));
+    amount += playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+      type: key,
+      modifier: ResourceModifier.AfterIncreased1
+    })) || 0;
+    amounts[key] = amount;
   }
 
-
-  return amounts as { [k in ResourceType]: number }
+  return {
+    playerResourceAmounts: amounts as { [k in ResourceType]: number },
+    playerResourceNodesAggregated
+  };
 }
