@@ -9,7 +9,7 @@ import { FpsComponent } from "./FpsComponent";
 import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/util/updaterGenerator";
 import { ZLevelComponent } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
-import { batchify, batchifySetState } from "../../lib/util/batchify";
+import { batchifySetState } from "../../lib/util/batchify";
 
 export type PlayerIntentState = {
   justDown: boolean;
