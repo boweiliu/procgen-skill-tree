@@ -35,19 +35,16 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
     if (
+      e.repeat === false &&
       configuredIntent !== undefined &&
       configuredIntent !== IntentName.NOOP
     ) {
-      this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
-        (wasNewIntent, prevGameState) => {
-          if (prevGameState.intent.activeIntent[configuredIntent])
-            return wasNewIntent;
-          this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
-            () => false
-          );
-          return true;
-        }
-      );
+      this.props.updaters.newIntent[configuredIntent].enqueueUpdate(() => {
+        this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
+          () => false
+        );
+        return true;
+      });
       this.props.updaters.activeIntent[configuredIntent].enqueueUpdate(
         () => true
       );
