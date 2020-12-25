@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { KeyboardState } from "../../lib/pixi/keyboard";
 import { Vector2 } from "../../lib/util/geometry/vector2";
-import { GameState} from "../../data/GameState";
+import { GameState, IntentName} from "../../data/GameState";
 import { generatePointNodeTexture } from "../textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { Const, Lazy } from "../../lib/util/misc";
@@ -197,6 +197,16 @@ export class RootComponent {
       this.zLevel = new ZLevelComponent(childProps);
       this.actionStage.addChild(this.zLevel.container);
     } else {
+      const activeIntent = props.gameState.intent.activeIntent;
+      let deltaX = 0;
+      let deltaY = 0;
+      const unit = 5;
+      if (activeIntent[IntentName.PAN_DOWN]) deltaY += -unit;
+      if (activeIntent[IntentName.PAN_LEFT]) deltaX += unit;
+      if (activeIntent[IntentName.PAN_RIGHT]) deltaX += -unit;
+      if (activeIntent[IntentName.PAN_UP]) deltaY += unit;
+      if (deltaX) this.actionStage.x += deltaX;
+      if (deltaY) this.actionStage.y += deltaY;
       this.zLevel.update(childProps);
     }
 
