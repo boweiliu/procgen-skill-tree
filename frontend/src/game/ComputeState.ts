@@ -29,18 +29,20 @@ export function computePlayerResourceAmounts(gameState: GameState): ComputedStat
       type: key,
       modifier: ResourceModifier.Flat
     })) || 0;
-    amount *= (1 + (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+    amount *= (1 + .01 * (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
       type: key,
       modifier: ResourceModifier.Increased0,
     })) || 0));
+    amount = Math.floor(amount);
     amount += playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
       type: key,
       modifier: ResourceModifier.AfterIncreased0
     })) || 0;
-    amount *= (1 + (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
+    amount *= (1 + .01 * (playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
       type: key,
       modifier: ResourceModifier.Increased1,
     })) || 0));
+    amount = Math.floor(amount);
     amount += playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
       type: key,
       modifier: ResourceModifier.AfterIncreased1

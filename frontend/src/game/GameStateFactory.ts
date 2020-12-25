@@ -2,6 +2,7 @@ import { GameState, PointNodeRef } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { assertOnlyCalledOnce } from "../lib/util/misc";
+import { computePlayerResourceAmounts } from "./ComputeState";
 import { ZLevelGenFactory } from "./WorldGenStateFactory";
 
 export type GameStateConfig = any;
@@ -29,7 +30,7 @@ export class GameStateFactory {
       pointNodeCoord: origin
     });
 
-    return {
+    const gameState = {
       worldGen: {
         seed: mySeed,
         zLevels: { 0: zLevel },
@@ -46,7 +47,10 @@ export class GameStateFactory {
         selectedPointNode: undefined,
         activeTab: 0
       },
-      computed: {}
+      computed: {
+      }
     }
+    gameState.computed = { ...computePlayerResourceAmounts(gameState) };
+    return gameState;
   }
 }

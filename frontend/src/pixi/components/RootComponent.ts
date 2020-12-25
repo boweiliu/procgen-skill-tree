@@ -25,7 +25,6 @@ export function createPlayerIntentState() : PlayerIntentState {
   }
 }
 
-
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
   tick: number;

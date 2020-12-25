@@ -6,6 +6,7 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
+import { computePlayerResourceAmounts } from "../../game/ComputeState";
 
 type Props = {
   delta: number,
@@ -156,13 +157,16 @@ export class PointNodeComponent {
         return prev;
       });
 
-      // if we spent sp, remember to update quest status and such
+      // TODO(bowei): if we spent sp, remember to update quest status!!
       updaters.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justSpentSp) {
-          this.state.justSpentSp = false;
+          // this.state.justSpentSp = false;
           return {
             ...prev,
             playerSave: afterMaybeSpendingSp(prev.playerSave, prevGameState),
+            computed: {
+              ...computePlayerResourceAmounts(prevGameState)
+            }
           };
         }
         return prev;

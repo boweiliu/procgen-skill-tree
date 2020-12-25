@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
+import { ComputedState, PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../game/Neighbors";
+import { computePlayerResourceAmounts } from "../game/ComputeState";
 
 type Props = {
   selectedPointNode?: PointNodeRef
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   worldGen: WorldGenState,
   availableSp: number,
+  computed: ComputedState
 }
 
 export function DebugTab({
@@ -15,6 +17,7 @@ export function DebugTab({
   allocatedPointNodeSet,
   worldGen,
   availableSp,
+  computed
 }: Props) {
   const [history, setHistory] = useState<PointNodeRef[]>([]);
   useEffect(() => {
@@ -34,7 +37,9 @@ export function DebugTab({
   }
   return (
     <>
-      <h1>Current</h1>
+      <h3>Player resources</h3> 
+      {JSON.stringify(computed.playerResourceAmounts)}
+      <h3>Current Node</h3>
       <div>
         Z={selectedPointNode.z}
       </div>
@@ -45,9 +50,9 @@ export function DebugTab({
         Node={selectedPointNode.pointNodeCoord.x},{selectedPointNode.pointNodeCoord.y}
       </div>
       <br></br>
-      <div>Allocated? {isAllocated ? "yes" : "no"} </div>
+      <div>Allocated? <br />{isAllocated ? "yes" : "no"} </div>
       <br></br>
-      <div>Can be allocated? {canBeAllocated} </div>
+      <div>Can be allocated? <br />{canBeAllocated} </div>
       <br></br>
       <div> Stats: </div>
       <div> {nodeDescription} </div>

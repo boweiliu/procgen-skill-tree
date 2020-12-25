@@ -67,8 +67,14 @@ function App() {
         createQuestCb={createQuestCb}
         activeQuest={gameState.playerSave.activeQuest}
         numBatches={gameState.playerSave.batchesSinceQuestStart}
+        playerResourceAmounts={gameState.computed.playerResourceAmounts}
       />);
-  }, [gameState.playerSave.availableSp, gameState.playerSave.activeQuest, createQuestCb, gameState.playerSave.batchesSinceQuestStart]);
+  }, [gameState.playerSave.availableSp,
+  gameState.playerSave.activeQuest,
+    createQuestCb,
+  gameState.playerSave.batchesSinceQuestStart,
+  gameState.computed.playerResourceAmounts
+  ]);
   tabViews[2] = useMemo(() => {
     return (
       <DebugTab
@@ -76,12 +82,14 @@ function App() {
         allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
         worldGen={gameState.worldGen}
         availableSp={gameState.playerSave.availableSp}
+        computed={gameState.computed}
       />);
   }, [
     gameState.playerUI.selectedPointNode,
     gameState.playerSave.allocatedPointNodeSet,
     gameState.worldGen,
-    gameState.playerSave.availableSp
+      gameState.playerSave.availableSp,
+    gameState.computed
   ]);
 
 
