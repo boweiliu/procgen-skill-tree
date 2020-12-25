@@ -6,7 +6,7 @@ type Props = {
   intent: PlayerIntentState;
 };
 type keyToIntentMap = {
-  [key in BrowserKeys]: IntentName;
+  [key in BrowserKeys]?: IntentName;
 };
 type BrowserKeys = string;
 
@@ -50,6 +50,7 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
       );
     }
   };
+
   handleKeyup = (e: KeyboardEvent) => {
     const keyIntentConfig = this.state.keyIntentConfig;
     const key: BrowserKeys = e.key;
