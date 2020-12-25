@@ -3,7 +3,8 @@
   right:0;
   left:auto;
   height:100%;
-  width:30%;
+  width: fit-content;
+  padding: 15px;
   top:0;
   flex:1 0 auto;
   overflow-y:auto;

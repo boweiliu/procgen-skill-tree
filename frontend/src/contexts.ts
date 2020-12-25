@@ -1,11 +1,9 @@
 import React from "react";
-import { Vector2 } from "./lib/util/geometry/vector2";
-import { Chunk } from "./pixi/Chunk";
+import { GameState } from "./data/GameState";
+import { Const } from "./lib/util/misc";
+import { UpdaterGeneratorType2 } from "./lib/util/updaterGenerator";
 
-export const GameContext = React.createContext<{
-  [k: string]: any;
-}>({});
-
-export const UIContext = React.createContext<{
-  focusedNode?: { chunk: Chunk; node: Vector2 };
-}>({});
+// nullable, but should be OK, just remember to populate the context
+// export const GameContext = React.createContext<GameState>(null as any);
+// export const GameUpdatersContext = React.createContext<UpdaterGeneratorType<GameState>>(null as any);
+export const UseGameStateContext = React.createContext<[Const<GameState>, UpdaterGeneratorType2<GameState>, () => void]>([] as any);

@@ -1,65 +1,70 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import "./PixiComponent.css";
-import { Application } from "../pixi/Application";
+import { GameState, WindowState } from "../data/GameState";
+import { PixiWrapperComponent } from "./PixiWrapperComponent";
+import { Lazy } from "../lib/util/misc";
+import { PixiReactBridge } from "../pixi/PixiReactBridge";
+import { UseGameStateContext } from "../contexts";
+import { GameStateFactory } from "../game/GameStateFactory";
+import { batchifySetState } from "../lib/util/batchify";
 
-/**
- * Initialize the pixi app
- */
-// const game = new BaseGame({
-//   scale: 1,
-//   canvasWidth: 800,
-//   canvasHeight: 800,
-//   tileHeight: 16,
-//   tileWidth: 16,
-//   debugFlags: {},
-//   state: {
-//     tick: 0,
-//   },
-//   backgroundColor: 0xffffff, // TODO(bowei): fix this
-// });
-// let application = new Application({ originalWindowWidth: window.innerHeight * .75, originalWindowHeight: window.innerHeight * .75 });
+const initialApplication = new Lazy(() => new PixiReactBridge());
 
-export function PixiComponent({
-  onFocusedNodeChange,
-}: {
-  whatever?: any;
-  onFocusedNodeChange: (...x: any) => void;
-}) {
-  const container = useRef<HTMLDivElement>(null);
-  const [application, setApplication] = useState();
-  function initializeApplication() {
-    const newApp = new Application({
-      originalWindowWidth: window.innerWidth,
-      originalWindowHeight: window.innerHeight,
-      onFocusedNodeChange,
-    });
-    // application.register(container.current!);
-    container.current!.appendChild(newApp.app.view);
-    // container.current!.appendChild(application.app.view)
-    // console.log(container.current!)
-    newApp.drawStart();
-    setApplication(newApp);
-  }
+export function PixiComponent(props: { originalSetGameState: Function }) {
+  // eslint-disable-next-line
+  const [_, gameStateUpdaters]  = useContext(UseGameStateContext);
+  const [windowState, setWindowState] = useState<WindowState>({
+    orientation: "original",
+    innerHeight: window.innerHeight,
+    innerWidth: window.innerWidth,
+  });
+  let [batchedSetWindowState, fireBatchedSetWindowState] =
+    useMemo(() => batchifySetState(setWindowState), [setWindowState]);
 
-  useEffect(() => {
-    return initializeApplication();
-  }, []);
+  // needed to prevent react double-render for some reason (dev mode??)
+  const [application, setApplication] = useState(initialApplication.get());
 
   window.onresize = () => {
-    application?.resize?.(window.innerWidth, window.innerHeight);
+    batchedSetWindowState(old => {
+      old.innerWidth = window.innerWidth;
+      old.innerHeight = window.innerHeight;
+      return { ...old };
+    })
   };
 
   return (
     <>
-      <div ref={container} />
-      <button onClick={() => {}}>draw circle</button>
+      <PixiWrapperComponent application={application} windowState={windowState} fireBatchedSetWindowState={fireBatchedSetWindowState}/>
+      <button onClick={() => {
+        gameStateUpdaters.update((old) => {
+          let newGameState = new GameStateFactory({}).create(old.worldGen.seed);
+          old.playerSave = newGameState.playerSave;
+          old.playerUI = newGameState.playerUI;
+          old.worldGen = newGameState.worldGen;
+          return old
+        });
+      }}>Reset game state</button>
+      <button onClick={() => {
+        application.pause();
+        application.destroy();
+        setApplication(new PixiReactBridge(undefined, true));
+
+        let newGameState = new GameStateFactory({}).create(+new Date());
+        props.originalSetGameState((old: GameState) => {
+          old.playerSave = newGameState.playerSave;
+          old.playerUI = newGameState.playerUI;
+          old.worldGen = newGameState.worldGen;
+          return old
+        });
+      }}>Get a fresh seed, reset, and rerender</button>
       <button
         onClick={() => {
-          container.current!.removeChild(application?.app?.view);
-          initializeApplication();
+          application.pause();
+          application.destroy();
+          setApplication(new PixiReactBridge(undefined, true));
         }}
       >
-        [DEBUG] reset and rerender
+        Rerender pixi application
       </button>
     </>
   );

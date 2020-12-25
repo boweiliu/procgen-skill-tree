@@ -142,3 +142,92 @@ export class Util {
     return string + intersperse + character.repeat(length - string.length);
   }
 }
+
+/**
+ * A deep readonly type - given an object type, all subobjects and their subobjects are also marked as readonly.
+ */
+export type Const<T> = T extends Function ? T : {
+  readonly [P in keyof T]: T[P] extends { [k: string]: any } ? Const<T[P]> : T[P];
+}
+
+const assertOnlyCalledOnceData: { [k: string]: [string, number] } = {};
+
+/**
+ * Asserts that a function is not called more than twice. Useful for debugging react lifecycle which may be creating more objects than you realize, impacting performance.
+ * @param id identifier
+ */
+export function assertOnlyCalledOnce(id: string | number) {
+  let k = id.toString();
+  if (assertOnlyCalledOnceData[k] !== undefined) {
+    if (assertOnlyCalledOnceData[k][1] === 1) {
+      assertOnlyCalledOnceData[k][1] = 2;
+    } else {
+      throw new Error("Error, called more than twice with same id: " + k + " , callback the first time was : " + assertOnlyCalledOnceData[k]);
+    }
+  } else {
+    const stacktrace = new Error().stack!
+    assertOnlyCalledOnceData[k] = [stacktrace, 1];
+  }
+}
+
+/**
+ * Class representing a value which is only computed when used.
+ * 
+ * Usage: const lazy = new Lazy(() => thingThatReturnsSomething()).
+ * Then thingThatReturnsSomething() will only get called on the first time lazy.get() is called.
+ * On the second and subsequent times, lazy.get() will return the same object - the factory method is not called again.
+ */
+export class Lazy<T> {
+  private _wasConstructed: boolean = false;
+  private _value: T | undefined = undefined;
+  private _factory: () => T
+
+  constructor(factory: () => T) {
+    this._factory = factory;
+  }
+  public get(): T {
+    // T might have undefined as a valid value
+    if (this._value !== undefined || this._wasConstructed === true) {
+      return this._value!;
+    } else {
+      this._value = this._factory();
+      this._wasConstructed = true;
+      return this._value;
+    }
+  }
+  // public async getAsync(): Promise<T> {
+  //   if (this._value !== undefined || this._wasConstructed === true) {
+  //     return Promise.resolve(this._value!);
+  //   } else {
+  //     return new Promise<T>((resolve, reject) => {
+  //       this._value = this._factory();
+  //       this._wasConstructed = true;
+  //       resolve(this._value);
+  //     });
+  //   }
+  // }
+}
+
+/**
+ * Multiplies colors (0xFFFFFF === 1). use for applying tints manually.
+ * @param color1 A base color
+ * @param color2 A tint
+ */
+export function multiplyColor(color1: number, color2: number): number {
+  let reds = [color1 & 0xFF0000, color2 & 0xFF0000];
+  let blues = [color1 & 0x0000FF, color2 & 0x0000FF];
+  let greens = [color1 & 0x00FF00, color2 & 0x00FF00];
+  let out = Math.round(reds[0] / (0x010000) * reds[1] / (0xFFFFFF)) * 0x010000;
+  out += Math.round(greens[0] / 0x000100 * greens[1] / 0x00FF00) * 0x000100;
+  out += Math.round(blues[0] * blues[1] / 0x0000FF);
+  return out;
+}
+
+
+export function enumKeys<T extends string>(enm: { [key in T]: T }) : T[] {
+  return Object.keys(enm) as T[];
+}
+
+// export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
+//   return Object.keys(enm) as T[];
+// }

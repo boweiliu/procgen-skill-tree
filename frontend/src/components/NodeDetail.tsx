@@ -1,39 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
+import { HashSet } from "../lib/util/data_structures/hash";
+import { canAllocate } from "../game/Neighbors";
+
+type Props = {
+  selectedPointNode?: PointNodeRef
+  allocatedPointNodeSet: HashSet<PointNodeRef>,
+  worldGen: WorldGenState,
+  availableSp: number,
+}
 
 export function NodeDetail({
-  focusedNode,
-}: {
-  focusedNode?: { chunk: any; node: any };
-}) {
-  const [history, setHistory] = useState<{ chunk: any; node: any }[]>([]);
-  useEffect(() => {
-    if (!focusedNode || focusedNode?.chunk === null) return;
-    setHistory((history) => [...history, focusedNode]);
-  }, [focusedNode]);
+  selectedPointNode,
+  allocatedPointNodeSet,
+  worldGen,
+  availableSp,
+}: Props) {
+  if (!selectedPointNode) {
+    return (<>
+      <h1>Stats</h1>
+      <div>Select a node first!</div>
+    </>)
+  }
+  const pointNodeGen = worldGen.zLevels[selectedPointNode.z]!.chunks.get(selectedPointNode.chunkCoord)!.pointNodes.get(selectedPointNode.pointNodeCoord)!
+  const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
+  const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, availableSp);
+  let nodeDescription: string = "Nothing (empty node)";
+  if (pointNodeGen.resourceType !== ResourceType.Nothing) {
+    nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`
+  }
   return (
     <>
-      {focusedNode && focusedNode.chunk && (
-        <>
-          <h1>Current</h1>
-          <h3>
-            Chunk: {focusedNode.chunk.location.x},{focusedNode.chunk.location.y}
-          </h3>
-          <h3>X: {focusedNode.node.x}</h3>
-          <h3>Y: {focusedNode.node.y}</h3>
-          <h2>Previous</h2>
-          {history
-            .slice(0, -1)
-            .map(({ chunk, node }, i) => {
-              return (
-                <div key={i}>
-                  Chunk ({chunk.location.x},{chunk.location.y}) at ({node.x},
-                  {node.y})
-                </div>
-              );
-            })
-            .reverse()}
-        </>
-      )}
+      <h1>Stats</h1>
+      <div> {nodeDescription} </div>
+      <h3>Allocated?</h3>
+      {isAllocated ? "yes" : "no"}
+      <h3>Can be allocated?</h3>
+      {canBeAllocated}
     </>
   );
 }
