@@ -12,10 +12,10 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
-import { batchify, Lazy } from "./lib/util/misc";
+import { batchify, batchifySetState, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { DebugTab } from "./components/DebugTab";
-import { createQuest } from "./game/CreateQuest";
+import { createQuest } from "./game/QuestFactory";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -40,7 +40,7 @@ function App() {
     return initialGameState.get();
   });
 
-  let [batchedSetGameState, fireBatch] = useMemo(() => batchify(setGameState), [setGameState]);
+  let [batchedSetGameState, fireBatch] = useMemo(() => batchifySetState(setGameState), [setGameState]);
   let updaters = useMemo(() => updaterGenerator2(initialGameState.get(), batchedSetGameState), [batchedSetGameState]);
 
   let tabViews: JSX.Element[] = []

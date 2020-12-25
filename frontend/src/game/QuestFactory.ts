@@ -1,4 +1,4 @@
-import { GameState, Quest } from "../data/GameState";
+import { GameState, Quest, ResourceType } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 
@@ -25,7 +25,9 @@ export class QuestFactory {
 
   public create(): Quest {
     return {
-      description: "placeholder"
+      description: "",
+      resourceType: ResourceType.Mana0,
+      resourceAmount: 3000
     };
   }
 

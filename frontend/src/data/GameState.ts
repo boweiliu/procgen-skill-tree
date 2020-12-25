@@ -81,7 +81,9 @@ export type PlayerSaveState = {
 }
 
 export type Quest = {
-  description: string
+  description: string | undefined,
+  resourceType: ResourceType,
+  resourceAmount: number,
 }
 
 export type PlayerUIState = {

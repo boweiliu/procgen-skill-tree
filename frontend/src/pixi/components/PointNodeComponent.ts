@@ -6,7 +6,7 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { canAllocate } from "../../game/Neighbors";
-import { afterAppendAllocationHistory } from "../../game/OnAllocation";
+import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 
 type Props = {
   delta: number,
@@ -22,7 +22,10 @@ type Props = {
 };
 
 type State = {
-
+  justTriedToAllocate: boolean
+  justSpentSp: boolean
+  justFailedToAllocate: boolean
+  numClicks:number
 }
 
 export class PointNodeComponent {
@@ -34,7 +37,12 @@ export class PointNodeComponent {
 
   constructor(props: Props) {
     this.staleProps = props;
-    this.state = {};
+    this.state = {
+      justTriedToAllocate: false,
+      justSpentSp: false,
+      justFailedToAllocate: false,
+      numClicks: 0
+    };
     this.container = new Pixi.Container();
     this.container.sortableChildren = true;
     this.sprite = new Pixi.Sprite(props.args.pointNodeTexture);
@@ -120,36 +128,52 @@ export class PointNodeComponent {
   didMount() {
     const { args, updaters } = this.staleProps; // we assume this will never change
 
+
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
+      this.state.numClicks++;
       // event.stopPropagation();
 
-      updaters.playerSave.justAllocated.enqueueUpdate((prev: PointNodeRef | undefined, prevGameState) : PointNodeRef | undefined => {
-        // if we were already selected, but not yet allocated, allocate us and add to the history (maybe this should be managed elsewhere??)
-        if (prevGameState.playerUI.selectedPointNode?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
-          if (canAllocate(
-            args.selfPointNodeRef,
-            prevGameState.worldGen,
-            prevGameState.playerSave.allocatedPointNodeSet,
-            prevGameState.playerSave.availableSp
-          ) === 'yes') {
-            return args.selfPointNodeRef;
+      // update selected to ourselves
+      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
+        if (prev?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
+          this.state.justTriedToAllocate = true;
+        }
+        return args.selfPointNodeRef;
+      });
+
+      // if we tried to allocate ourselves, see if we can
+      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
+        if (this.state.justTriedToAllocate) {
+          this.state.justTriedToAllocate = false;
+          let [next, succeeded] = doTryAllocate(prev, prevGameState, args.selfPointNodeRef);
+          if (succeeded) {
+            this.state.justSpentSp = true;
+            return next;
           } else {
-            // happens +1 tick afterwards due to nested enqueue, but NBD
-            updaters.playerUI.activeTab.enqueueUpdate((prev) => {
-              return 1;
-            })
+            this.state.justFailedToAllocate = true;
+            return prev;
           }
         }
         return prev;
       });
 
-      // whether or not we successfully allocated, run this just in case
-      afterAppendAllocationHistory(updaters);
-
-      // update selected to ourselves
-      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
-        return args.selfPointNodeRef;
+      // if we spent sp, remember to update quest status and such
+      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
+        if (this.state.justSpentSp) {
+          this.state.justSpentSp = false;
+          return afterMaybeSpendingSp(prev, prevGameState);
+        }
+        return prev;
       })
+
+      // if we failed to allocate, shift the active tab so the player can see why
+      updaters.playerUI.activeTab.enqueueUpdate((prev, prevGameState) => {
+        if (this.state.justFailedToAllocate) {
+          this.state.justFailedToAllocate = false;
+          return 1;
+        }
+        return prev;
+      });
     });
   }
 }

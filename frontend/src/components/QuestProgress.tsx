@@ -29,13 +29,13 @@ export default function QuestProgress({
       </>) : (<>
           <h2> Active quest: </h2>
           <h3>Goal:</h3>
-          <div>{activeQuest.description}</div>
+          <div>{activeQuest.resourceAmount} {activeQuest.resourceType}</div>
           <br></br>
           <h3>Current:</h3>
           <div>{'[PLACEHOLDER]'}</div>
           <br></br>
-          <h3>Reward:</h3>
-          <div>{'???'}</div>
+          <h3>Score:</h3>
+          <div>{'SS'}</div>
           <h3>Batches so far: </h3>
           <div>{numBatches}</div>
           <br></br>

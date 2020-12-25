@@ -233,6 +233,40 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
 }
 
 /**
+ * Same use case and types as [batchify], however, specifically we expect [fn] to be a setState function which takes value-or-callback
+ * as its single argument, and instead of calling [fn] repeatedly for each callback in the batch, we apply the callbacks in the batch
+ * sequentially to get a single state update which we then provide to [fn].
+ */
+export function batchifySetState<T>(
+  fn: (arg: T) => void
+): [((arg: T) => void), () => void] {
+  let batch: T[] = [];
+
+  return [(arg: T) => {
+    batch.push(arg);
+    console.log({ batchSize: batch.length });
+  }, (() => {
+      if (batch.length === 0) {
+        return;
+      }
+      console.log({ fired: batch.length });
+      let thisBatch = [...batch];
+      batch = [];
+      (fn as any)((prev: any) => {
+        let next = prev;
+        for (let valueOrCallback of thisBatch) {
+          if (typeof valueOrCallback === 'function') {
+            next = valueOrCallback(next);
+          } else {
+            next = valueOrCallback;
+          }
+        }
+        return next;
+      });
+  })]
+}
+
+/**
  * Multiplies colors (0xFFFFFF === 1). use for applying tints manually.
  * @param color1 A base color
  * @param color2 A tint

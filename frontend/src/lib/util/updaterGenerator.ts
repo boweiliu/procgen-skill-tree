@@ -33,6 +33,7 @@ function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T,
               ...oldData,
               [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData),
             };
+            // console.log({ newData });
             return newData;
           });
         } else {
@@ -68,7 +69,9 @@ export function updaterGenerator2<T>(dataObject: T, setState: UpdaterFn<T>): Upd
     if (typeof stateCallbackFunction === 'function') {
       setState((prev: T) => {
         // if T is a function type already, typescript correctly notifies us that this will fail
-        return (stateCallbackFunction as ((prev: T, prevWhole: T) => T))(prev, prev);
+        const next = (stateCallbackFunction as ((prev: T, prevWhole: T) => T))(prev, prev);
+        // console.log(" in updater generator 2", { next });
+        return next;
       })
     } else {
       setState(stateCallbackFunction);
@@ -77,5 +80,5 @@ export function updaterGenerator2<T>(dataObject: T, setState: UpdaterFn<T>): Upd
   return updaterGenerator2Helper<T, T>(dataObject, dataUpdater2);
 }
 
-type UpdaterFnParam<T> = (T extends Function ? never  : T) | ((prev: T) => T);
+export type UpdaterFnParam<T> = (T extends Function ? never  : T) | ((prev: T) => T);
 export type UpdaterFn<T> = (arg: UpdaterFnParam<T>) => void;

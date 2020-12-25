@@ -1,26 +1,37 @@
-import { GameState } from "../data/GameState";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import { GameState, PlayerSaveState, PointNodeRef } from "../data/GameState";
+import { canAllocate } from "./Neighbors";
 
-// Things that should happen after allocation history is appended to , in order to maintain the game state in a good state
-export function afterAppendAllocationHistory(updaters: UpdaterGeneratorType2<GameState>) {
-  updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
-    let justAllocated = prevGameState.playerSave.justAllocated; // we are assuming that someone verified that this is good2go
-    if (!justAllocated) { return prev; }
+export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, selfPointNodeRef: PointNodeRef): [PlayerSaveState, boolean] {
+  if (canAllocate(
+    selfPointNodeRef,
+    prevGameState.worldGen,
+    prevGameState.playerSave.allocatedPointNodeSet,
+    prevGameState.playerSave.availableSp
+  ) === 'yes') {
+    // do the change
+    const nextSet = prev.allocatedPointNodeSet.clone();
+    nextSet.put(selfPointNodeRef);
+    const nextHistory = [...prev.allocatedPointNodeHistory];
+    nextHistory.push(selfPointNodeRef);
+    let availableSp = prev.availableSp - 1;
+    return [{
+      ...prev,
+      allocatedPointNodeHistory: nextHistory,
+      allocatedPointNodeSet: nextSet,
+      availableSp
+    }, true];
+  } else {
+    return [prev, false];
+  }
+}
 
-    let prevSet = prev.allocatedPointNodeSet;
-    if (!prevSet.contains(justAllocated)) { // if it's new, add it to history, set, and decrement sp
-      const nextSet = prev.allocatedPointNodeSet.clone();
-      nextSet.put(justAllocated);
-      const nextHistory = [...prev.allocatedPointNodeHistory];
-      nextHistory.push(justAllocated);
-      let availableSp = prev.availableSp - 1;
-      return {
-        ...prev,
-        allocatedPointNodeHistory: nextHistory,
-        allocatedPointNodeSet: nextSet,
-        availableSp
-      };
-    }
-    return prev;
-  });
+export function afterMaybeSpendingSp(prev: PlayerSaveState, prevGameState: GameState): PlayerSaveState {
+  if (prev.availableSp === 0 && prev.activeQuest) {
+    return {
+      ...prev,
+      availableSp: 5,
+      batchesSinceQuestStart: prev.batchesSinceQuestStart + 1
+    };
+  }
+  return prev;
 }
