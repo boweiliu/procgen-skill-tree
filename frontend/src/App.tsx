@@ -12,7 +12,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
-import { batchify, batchifySetState, Lazy } from "./lib/util/misc";
+import { batchifySetState, Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { DebugTab } from "./components/DebugTab";
 import { createQuest } from "./game/QuestFactory";

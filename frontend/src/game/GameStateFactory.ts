@@ -36,7 +36,7 @@ export class GameStateFactory {
       },
       playerSave: {
         availableSp: 0,
-        justAllocated: undefined,
+        // justAllocated: undefined,
         activeQuest: undefined,
         batchesSinceQuestStart: 0,
         allocatedPointNodeSet: new HashSet([pointNodeRef]),
@@ -45,7 +45,8 @@ export class GameStateFactory {
       playerUI: {
         selectedPointNode: undefined,
         activeTab: 0
-      }
+      },
+      computed: {}
     }
   }
 }

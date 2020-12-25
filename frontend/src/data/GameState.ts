@@ -1,4 +1,4 @@
-import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash"
+import { HashMap, HashSet, KeyedHashMap } from "../lib/util/data_structures/hash"
 import { Vector2 } from "../lib/util/geometry/vector2"
 
 /**
@@ -12,6 +12,7 @@ import { Vector2 } from "../lib/util/geometry/vector2"
  *   very far away pixi/react components.
  *   Should be persisted to disk - will help the player "remember their place" in the game, but not a big deal if lost.
  * 4. data about the window display - should never be persisted to disk.
+ * 5. data that is computed from other data - no need to persist to disk.
  * 
  * Does NOT include UI data which is only relevant to a small part of the component hierarchy - e.g. how many seconds since last tap.
  * That data should belong in state owned by subcomponents.
@@ -20,6 +21,7 @@ export type GameState = {
   worldGen: WorldGenState,
   playerSave: PlayerSaveState,
   playerUI: PlayerUIState,
+  computed: ComputedState
 }
 
 export type WorldGenState = {
@@ -47,17 +49,20 @@ export type PointNodeGen = {
   id: number;
 
   // more data to be generated here - size, color, etc.
-  resourceType: ResourceType | null;
+  resourceType: ResourceType;
   resourceModifier: ResourceModifier;
   resourceAmount: number;
 }
 
-export enum ResourceType {
+export enum ResourceNontrivialType {
   Mana0 = "Mana0",
   Mana1 = "Mana1",
   Mana2 = "Mana2",
-  Nothing = "Nothing"
 }
+
+export type ResourceType = "Nothing" | ResourceNontrivialType;
+// eslint-disable-next-line
+export const ResourceType = { Nothing: "Nothing", ...ResourceNontrivialType };
 
 export enum ResourceModifier {
   Flat = "Flat",
@@ -74,7 +79,7 @@ export type PlayerSaveState = {
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],
-  justAllocated: PointNodeRef | undefined,
+  // justAllocated: PointNodeRef | undefined,
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[],
@@ -132,4 +137,24 @@ export type WindowState = {
   orientation: "original" | "rotated", // rotated === we are forcing landscape-in-portrait
   innerWidth: number,
   innerHeight: number,
+}
+
+export type ComputedState = {
+  playerResourceAmounts?: { [k in ResourceType]: number }
+  playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>
+}
+
+// export type ResourceTypeAndModifier = [ResourceType.Nothing] | ([ResourceType, ResourceModifier]);
+export class ResourceTypeAndModifier {
+  public type: ResourceNontrivialType;
+  public modifier: ResourceModifier;
+
+  constructor(args: { type: ResourceNontrivialType, modifier: ResourceModifier}) {
+    this.type = args.type;
+    this.modifier = args.modifier;
+  }
+
+  public hash(): string {
+    return this.type.toString() + ',' + this.modifier.toString();
+  }
 }

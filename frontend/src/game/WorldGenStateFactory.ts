@@ -104,7 +104,7 @@ export class PointNodeGenFactory {
     let randomFloat = squirrel3(id + 1) / INTMAX32;
     let resourceType: ResourceType;
     if (randomFloat < 0.0) {
-      resourceType = ResourceType.Nothing;
+      resourceType = "Nothing";
     } else if (randomFloat < 0.20) {
       resourceType = ResourceType.Mana0;
     } else if (randomFloat < 0.35) {
@@ -112,11 +112,11 @@ export class PointNodeGenFactory {
     } else if (randomFloat < 0.60) {
       resourceType = ResourceType.Mana2;
     } else {
-      resourceType = ResourceType.Nothing;
+      resourceType = "Nothing";
     }
     // override for root node
     if (args.location.equals(Vector2.Zero) && args.chunk.equals(Vector2.Zero) && args.z === 0) {
-      resourceType = ResourceType.Nothing;
+      resourceType = "Nothing";
     }
 
     randomFloat = squirrel3(id + 2) / INTMAX32;

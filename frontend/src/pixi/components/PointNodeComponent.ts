@@ -5,7 +5,6 @@ import { GameState, PointNodeGen, PointNodeRef, ResourceType } from "../../data/
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
-import { canAllocate } from "../../game/Neighbors";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 
 type Props = {
@@ -158,10 +157,13 @@ export class PointNodeComponent {
       });
 
       // if we spent sp, remember to update quest status and such
-      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
+      updaters.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justSpentSp) {
           this.state.justSpentSp = false;
-          return afterMaybeSpendingSp(prev, prevGameState);
+          return {
+            ...prev,
+            playerSave: afterMaybeSpendingSp(prev.playerSave, prevGameState),
+          };
         }
         return prev;
       })

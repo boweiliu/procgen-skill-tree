@@ -27,6 +27,7 @@ export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, s
 
 export function afterMaybeSpendingSp(prev: PlayerSaveState, prevGameState: GameState): PlayerSaveState {
   if (prev.availableSp === 0 && prev.activeQuest) {
+    // TODO: need to find out if the quest is finished...
     return {
       ...prev,
       availableSp: 5,
