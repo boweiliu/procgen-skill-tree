@@ -1,3 +1,12 @@
+/**
+ * Intended as a typescript-friendly replacement for {[k: string]: boolean} that allows us to specify what the key type should be (
+ * rather than allowing any keyType.toString() to be a valid key, and without going through the trouble of declaring distinguishable
+ * types for each key type we want to use). Also serves as a slightly different version of ES6 native Set(), which is hardcoded
+ * to use === for object referential equality.
+ * 
+ * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
+ * TODO: write StrictHashSet<K extends {hash(): string, equals(k: K): boolean}> to handle custom equality checks
+ */
 export class HashSet<K extends { hash(): string }> {
   private _values: HashMap<K, K>;
 
@@ -29,9 +38,9 @@ export class HashSet<K extends { hash(): string }> {
     return this._values.values();
   }
 
-  hash(): string {
-    return this._values.hashKeyset();
-  }
+  // hash(): string {
+  //   return this._values.hashKeyset();
+  // }
 
   clone(): HashSet<K> {
     let n = new HashSet<K>();
@@ -43,14 +52,23 @@ export class HashSet<K extends { hash(): string }> {
     return this._values.size();
   }
 
-  *[Symbol.iterator]() {
-    // construct a new iterator. note that as usual
-    for (let key of Object.keys(this._values)) {
-      yield key;
-    }
-  }
+  // *[Symbol.iterator]() {
+  //   // construct a new iterator. note that as usual
+  //   for (let key of Object.keys(this._values)) {
+  //     yield key;
+  //   }
+  // }
 }
 
+/**
+ * Intended as a typescript-friendly replacement for {[k: string]: V} that allows us to specify what the key type should be (
+ * rather than allowing any keyType.toString() to be a valid key, and without going through the trouble of declaring distinguishable
+ * types for each key type we want to use). Also serves as a slightly different version of ES6 native Map(), which is hardcoded
+ * to use === for object referential equality.
+ * 
+ * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
+ * TODO: write StrictHashMap<K extends {hash(): string, equals(K): boolean}> to handle custom equality checks
+ */
 export class HashMap<K extends { hash(): string }, V> {
   protected _values: { [key: string]: V } = {};
 
@@ -76,19 +94,19 @@ export class HashMap<K extends { hash(): string }, V> {
     // return Object.keys(this._values).map(key => this._values[key]); // why grant???
   }
 
-  *[Symbol.iterator]() {
-    // construct a new iterator. note that as usual
-    for (let key of Object.keys(this._values)) {
-      yield key;
-    }
-  }
+  // *[Symbol.iterator]() {
+  //   // construct a new iterator. note that as usual editing the object during iteration is not supported
+  //   for (let key of Object.keys(this._values)) {
+  //     yield key;
+  //   }
+  // }
 
   // hashes only the keys - use HashableHashMap if you know that the value type here is also hashable
-  hashKeyset(): string {
-    const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
-    let code: number = hashes.reduce((pv, cv) => pv + cv);
-    return code.toString();
-  }
+  // hashKeyset(): string {
+  //   const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
+  //   let code: number = hashes.reduce((pv, cv) => pv + cv);
+  //   return code.toString();
+  // }
 
   size(): number {
     return Object.keys(this._values).length;

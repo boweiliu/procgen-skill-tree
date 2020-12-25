@@ -110,7 +110,7 @@ export class PointNodeRef {
   }
 
   public hash(): string {
-    return this.pointNodeId.toString();
+    return this.pointNodeId.toString() + this.z.toString() + this.chunkCoord.toString() + this.pointNodeCoord.toString();
   }
 }
 
@@ -126,7 +126,7 @@ export class ChunkRef {
   }
 
   public hash(): string {
-    return this.chunkId.toString();
+    return this.chunkId.toString() + this.z.toString() + this.chunkCoord.toString();
   }
 }
 

@@ -84,13 +84,13 @@ export class ZLevelComponent {
           continue;
         }
       }
-      if (key === 'allocatedPointNodeSubset') {
-        if (prevProps[key].hash() !== props[key].hash()) {
-          return true;
-        } else {
-          continue;
-        }
-      }
+      // if (key === 'allocatedPointNodeSubset') {
+      //   if (prevProps[key].hash() !== props[key].hash()) {
+      //     return true;
+      //   } else {
+      //     continue;
+      //   }
+      // }
       if (prevProps[key] !== props[key]) {
         return true;
       }
