@@ -1,9 +1,15 @@
 import {
   HashMap,
-  HashSet,
-  KeyedHashMap,
 } from "../lib/util/data_structures/hash";
-import { Vector2 } from "../lib/util/geometry/vector2";
+import { enumKeys } from "../lib/util/misc";
+import { PlayerSaveState } from "./PlayerSaveState";
+import { PointNodeRef} from "./PointNodeRef";
+import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
+
+export { PointNodeRef, ChunkRef } from "./PointNodeRef";
+export type { PlayerSaveState, Quest } from "./PlayerSaveState";
+export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen,   } from "./WorldGenState";
+export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType, ResourceType } from "./WorldGenState";
 
 /**
  * Data owned by the master "App" component, to be made available as props to ALL subcomponents (both pixi and react); react uses context providers to make this easier
@@ -29,6 +35,10 @@ export type GameState = {
   intent: PlayerIntentState;
 };
 
+/**
+ * Player intents == what they want to do when they press certain mouse/keyboard keys. This is decoupled
+ * from their actual keyboard keys to make remapping easier.
+ */
 export type PlayerIntentState = {
   activeIntent: Intent;
   newIntent: Intent;
@@ -40,138 +50,21 @@ export type Intent = {
 };
 
 export enum IntentName {
+  // Default intent - does nothing
   NOOP = "NOOP",
-  PAN_UP = "PAN_UP",
-  PAN_DOWN = "PAN_DOWN",
-  PAN_LEFT = "PAN_LEFT",
-  PAN_RIGHT = "PAN_RIGHT",
+
+  PAN_NORTH = "PAN_NORTH",
+  PAN_SOUTH = "PAN_SOUTH",
+  PAN_WEST = "PAN_WEST",
+  PAN_EAST = "PAN_EAST",
   TRAVEL_IN = "TRAVEL_IN",
   TRAVEL_OUT = "TRAVEL_OUT",
 }
 
-// ??? What is going on
-export const noIntent = Object.keys(IntentName).reduce((object, key) => {
-  object[key as keyof typeof IntentName] = false;
+export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
+  object[key] = false;
   return object;
 }, {} as Intent);
-
-export type WorldGenState = {
-  seed: number;
-  zLevels: { [z: number]: ZLevelGen };
-};
-
-export type ZLevelGen = {
-  id: number;
-  chunks: KeyedHashMap<Vector2, ChunkGen>;
-};
-
-export type ChunkGen = {
-  id: number;
-  pointNodes: KeyedHashMap<Vector2, PointNodeGen>;
-};
-
-export class ChunkGenConstants {
-  public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
-  public static CHUNK_HALF_DIM = (ChunkGenConstants.CHUNK_DIM - 1) / 2;
-  public static DROP_NODES_CHANCE = 0.3; // before generating edges, how many of the nodes to throw out
-}
-
-export type PointNodeGen = {
-  id: number;
-
-  // more data to be generated here - size, color, etc.
-  resourceType: ResourceType;
-  resourceModifier: ResourceModifier;
-  resourceAmount: number;
-};
-
-export enum ResourceNontrivialType {
-  Mana0 = "Mana0",
-  Mana1 = "Mana1",
-  Mana2 = "Mana2",
-}
-
-export type ResourceType = "Nothing" | ResourceNontrivialType;
-// eslint-disable-next-line
-export const ResourceType = { Nothing: "Nothing", ...ResourceNontrivialType };
-
-export enum ResourceModifier {
-  Flat = "Flat",
-  Increased0 = "% increased",
-  AfterIncreased0 = "added after % increased",
-  Increased1 = "% increased multiplier",
-  AfterIncreased1 = "added after % increased multiplier",
-}
-
-export type PlayerSaveState = {
-  availableSp: number;
-  activeQuest: Quest | undefined;
-  batchesSinceQuestStart: number;
-  // TODO(bowei): save the seed in here as well?
-
-  // selectedPointNodeHistory: PointNodeRef[],
-  // justAllocated: PointNodeRef | undefined,
-  allocatedPointNodeSet: HashSet<PointNodeRef>;
-  // history[-1] == most recent, histoery[0] == oldest
-  allocatedPointNodeHistory: PointNodeRef[];
-};
-
-export type Quest = {
-  description: string | undefined;
-  resourceType: ResourceType;
-  resourceAmount: number;
-};
-
-export type PlayerUIState = {
-  selectedPointNode: PointNodeRef | undefined;
-  activeTab: number;
-};
-
-export class PointNodeRef {
-  public z: number;
-  public chunkCoord: Vector2;
-  public pointNodeCoord: Vector2;
-  public pointNodeId: number;
-
-  constructor(args: {
-    z: number;
-    chunkCoord: Vector2;
-    pointNodeCoord: Vector2;
-    pointNodeId: number;
-  }) {
-    this.z = args.z;
-    this.chunkCoord = args.chunkCoord;
-    this.pointNodeCoord = args.pointNodeCoord;
-    this.pointNodeId = args.pointNodeId;
-  }
-
-  public hash(): string {
-    return (
-      this.pointNodeId.toString() +
-      this.z.toString() +
-      this.chunkCoord.toString() +
-      this.pointNodeCoord.toString()
-    );
-  }
-}
-
-export class ChunkRef {
-  public z: number;
-  public chunkCoord: Vector2;
-  public chunkId: number;
-
-  constructor(args: { z: number; chunkCoord: Vector2; chunkId: number }) {
-    this.z = args.z;
-    this.chunkCoord = args.chunkCoord;
-    this.chunkId = args.chunkId;
-  }
-
-  public hash(): string {
-    return (
-      this.chunkId.toString() + this.z.toString() + this.chunkCoord.toString()
-    );
-  }
-}
 
 /**
  * current window settings -- allows for dynamic resizing and also rotation on mobile web
@@ -187,7 +80,6 @@ export type ComputedState = {
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
 };
 
-// export type ResourceTypeAndModifier = [ResourceType.Nothing] | ([ResourceType, ResourceModifier]);
 export class ResourceTypeAndModifier {
   public type: ResourceNontrivialType;
   public modifier: ResourceModifier;
@@ -204,3 +96,8 @@ export class ResourceTypeAndModifier {
     return this.type.toString() + "," + this.modifier.toString();
   }
 }
+
+export type PlayerUIState = {
+  selectedPointNode: PointNodeRef | undefined;
+  activeTab: number;
+};

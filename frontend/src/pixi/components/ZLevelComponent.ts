@@ -12,8 +12,8 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
-    z: number,
   },
+  z: number,
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
   zLevelGen: Const<ZLevelGen> | undefined,
@@ -35,7 +35,7 @@ export class ZLevelComponent {
 
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
-        z: props.args.z,
+        z: props.z,
         chunkCoord,
         chunkId: chunkGen.id,
       });
@@ -51,8 +51,8 @@ export class ZLevelComponent {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
-          selfChunkRef: chunkRef,
         },
+        selfChunkRef: chunkRef,
         updaters: props.updaters,
         position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
         chunkGen: chunkGen,
@@ -103,7 +103,7 @@ export class ZLevelComponent {
     this.updateSelf(props);
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
-        z: props.args.z,
+        z: props.z,
         chunkCoord,
         chunkId: chunkGen.id,
       });
@@ -119,8 +119,8 @@ export class ZLevelComponent {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
-          selfChunkRef: chunkRef,
         },
+        selfChunkRef: chunkRef,
         updaters: props.updaters,
         position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
         chunkGen: chunkGen,
@@ -149,9 +149,9 @@ export class ZLevelComponent {
   didMount() {
     const { args, updaters } = this.staleProps;
     // if we mounted but our data is not generated, please generate ourselves
-    updaters.worldGen.zLevels.update((prev, prevGameState) => {
-      if (!prev[args.z]) {
-        return { [args.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: args.z }) };
+    updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
+      if (!prev[this.staleProps.z]) {
+        return { [this.staleProps.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: this.staleProps.z }) };
       }
       return prev;
     })

@@ -28,6 +28,7 @@ export function createPlayerIntentState() : PlayerIntentState {
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
   tick: number;
+  playerCurrentZ: number;
   playerIntents: {
     decreaseZLevel: PlayerIntentState
     increaseZLevel: PlayerIntentState
@@ -78,6 +79,7 @@ export class RootComponent {
     this.state = {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
       tick: 0,
+      playerCurrentZ: 0,
       playerIntents: {
         decreaseZLevel: createPlayerIntentState(),
         increaseZLevel: createPlayerIntentState(),
@@ -144,11 +146,11 @@ export class RootComponent {
       delta: 0,
       args: {
         pointNodeTexture: this.state.pointNodeTexture.get(),
-        z: 0,
       },
+      z: this.state.playerCurrentZ,
       updaters: props.updaters,
       position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[0],
+      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
       selectedPointNode: props.gameState.playerUI.selectedPointNode,
       allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
     };
@@ -185,11 +187,11 @@ export class RootComponent {
       delta: 0,
       args: {
         pointNodeTexture: this.state.pointNodeTexture.get(),
-        z: 0,
       },
+      z: this.state.playerCurrentZ,
       updaters: props.updaters,
       position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[0],
+      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
       selectedPointNode: props.gameState.playerUI.selectedPointNode,
       allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
     };
@@ -197,16 +199,6 @@ export class RootComponent {
       this.zLevel = new ZLevelComponent(childProps);
       this.actionStage.addChild(this.zLevel.container);
     } else {
-      const activeIntent = props.gameState.intent.activeIntent;
-      let deltaX = 0;
-      let deltaY = 0;
-      const unit = 5;
-      if (activeIntent[IntentName.PAN_DOWN]) deltaY += -unit;
-      if (activeIntent[IntentName.PAN_LEFT]) deltaX += unit;
-      if (activeIntent[IntentName.PAN_RIGHT]) deltaX += -unit;
-      if (activeIntent[IntentName.PAN_UP]) deltaY += unit;
-      if (deltaX) this.actionStage.x += deltaX;
-      if (deltaY) this.actionStage.y += deltaY;
       this.zLevel.update(childProps);
     }
 
@@ -221,6 +213,23 @@ export class RootComponent {
 
   updateSelf(props: Props) {
     this.state.tick++;
+
+    const activeIntent = props.gameState.intent.activeIntent;
+    let deltaX = 0;
+    let deltaY = 0;
+    const unit = 5;
+    // if we want to pan [the hud] west (i.e. the left key was pressed), action stage needs to move east
+    if (activeIntent[IntentName.PAN_WEST]) deltaX += unit;
+    if (activeIntent[IntentName.PAN_EAST]) deltaX += -unit;
+    // if we want to pan south (i.e. the down key was pressed), action stage needs to move north to give the impression
+    // the hud is moving south. note that north is negative y direction since top left is 0,0
+    if (activeIntent[IntentName.PAN_SOUTH]) deltaY += -unit;
+    if (activeIntent[IntentName.PAN_NORTH]) deltaY += unit;
+    this.actionStage.x += deltaX;
+    this.actionStage.y += deltaY;
+
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) this.state.playerCurrentZ--;
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) this.state.playerCurrentZ++;
   }
 
   renderSelf(props: Props) {
@@ -244,9 +253,9 @@ export class RootComponent {
     const { updaters } = this.staleProps;
     // if we find ourselves a little idle, start pregenerating other layers
     if (this.state.tick > 60 && !props.gameState.worldGen.zLevels[-1]) {
-      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
         if (!prev[-1]) {
-          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 });
+          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: -1 });
           return {...prev};
         } else {
           return prev;
@@ -254,7 +263,7 @@ export class RootComponent {
       })
     }
     if (this.state.tick > 120 && !props.gameState.worldGen.zLevels[1]) {
-      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
         if (!prev[1]) {
           prev[1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 1 });
           return {...prev};
