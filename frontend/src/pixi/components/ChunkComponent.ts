@@ -100,7 +100,7 @@ export class ChunkComponent {
   }
 
   public update(props: Props) {
-    let staleState = { ... this.state };
+    // let staleState = { ...this.state };
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {

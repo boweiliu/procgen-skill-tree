@@ -16,6 +16,7 @@ type ChildInstructions<
   ) => ChildPropsType;
 };
 
+// class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
 abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   protected container!: PIXI.Container;
   protected state!: S;
@@ -50,19 +51,20 @@ abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     new Promise((resolve) => resolve(this.didUpdate()));
   }
 
-  fireStateUpdaters(): void { } 
-  didMount(): void { }
-  abstract updateSelf(nextProps: P): void
-  shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean {
+  protected fireStateUpdaters(): void { } 
+  protected didMount(): void { }
+  protected abstract updateSelf(nextProps: P): void
+  protected shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean {
     return true;
   }
-  updateChildren(nextProps: P) {
+  protected updateChildren(nextProps: P) {
     this._children.forEach(({ instance, propsFactory }) => {
       instance._update(propsFactory(nextProps, this.state));
     });
   }
-  abstract renderSelf(nextProps: P): void
-  didUpdate(): void { }
+  protected abstract renderSelf(nextProps: P): void
+  protected didUpdate(): void { }
+  protected willUnmount(): void { }
 
   _setStaleProps(nextProps: P) {
     this._staleProps = nextProps;
