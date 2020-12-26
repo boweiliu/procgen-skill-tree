@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { ComputedState, PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../game/Neighbors";
-import { computePlayerResourceAmounts } from "../game/ComputeState";
 
 type Props = {
   selectedPointNode?: PointNodeRef

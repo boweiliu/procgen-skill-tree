@@ -2,11 +2,12 @@ import {
   HashMap,
 } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
-import { PlayerSaveState, Quest } from "./PlayerSaveState";
-export type { PlayerSaveState, Quest } from "./PlayerSaveState";
-import { PointNodeRef, ChunkRef } from "./PointNodeRef";
+import { PlayerSaveState } from "./PlayerSaveState";
+import { PointNodeRef} from "./PointNodeRef";
+import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
+
 export { PointNodeRef, ChunkRef } from "./PointNodeRef";
-import { ChunkGenConstants, ChunkGen, ZLevelGen, PointNodeGen, ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
+export type { PlayerSaveState, Quest } from "./PlayerSaveState";
 export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen,   } from "./WorldGenState";
 export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType, ResourceType } from "./WorldGenState";
 
