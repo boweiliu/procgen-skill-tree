@@ -45,6 +45,7 @@ export class PointNodeComponent {
       numClicks: 0
     };
     this.container = new Pixi.Container();
+
     this.container.sortableChildren = true;
     this.sprite = new Pixi.Sprite(props.args.pointNodeTexture);
     this.sprite.anchor.x = 0.5;
@@ -57,14 +58,17 @@ export class PointNodeComponent {
     this.centerSprite.anchor.y = 0.5;
     this.centerSprite.scale = PixiPointFrom(new Vector2(0.5, 0.5));
     this.centerSprite.zIndex = 1;
-    this.container.addChild(this.centerSprite);
+    this.centerSprite.alpha = 0; // TESTING
+    // this.container.addChild(this.centerSprite);
 
     this.halfwayCenterSprite = new Pixi.Sprite(props.args.pointNodeTexture);
     this.halfwayCenterSprite.anchor.x = 0.5;
     this.halfwayCenterSprite.anchor.y = 0.5;
     this.halfwayCenterSprite.scale = PixiPointFrom(new Vector2(0.75, 0.75));
     this.halfwayCenterSprite.zIndex = 0;
-    // this.container.addChild(this.halfwayCenterSprite); // disable this for now - causes a fairly significant fps hit, until we get around to holding less nodes on the page at once
+    // disable this sprite for now - causes a fairly significant fps hit, until we get around to holding less nodes on the page at once
+    this.halfwayCenterSprite.alpha = 0;
+    // this.container.addChild(this.halfwayCenterSprite);
 
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS

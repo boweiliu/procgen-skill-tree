@@ -11,32 +11,10 @@ import { ZLevelComponent } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
 
-export type PlayerIntentState = {
-  justDown: boolean;
-  justUp: boolean;
-  down: boolean;
-}
-
-export function createPlayerIntentState() : PlayerIntentState {
-  return {
-    justDown: false,
-    justUp: false,
-    down: false
-  }
-}
-
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
   tick: number;
   playerCurrentZ: number;
-  playerIntents: {
-    decreaseZLevel: PlayerIntentState
-    increaseZLevel: PlayerIntentState
-    panLeft: PlayerIntentState
-    panRight: PlayerIntentState
-    panUp: PlayerIntentState
-    panDown: PlayerIntentState
-  }
 }
 
 type Props = {
@@ -80,14 +58,6 @@ export class RootComponent {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
       tick: 0,
       playerCurrentZ: 0,
-      playerIntents: {
-        decreaseZLevel: createPlayerIntentState(),
-        increaseZLevel: createPlayerIntentState(),
-        panLeft: createPlayerIntentState(),
-        panRight: createPlayerIntentState(),
-        panUp: createPlayerIntentState(),
-        panDown: createPlayerIntentState(),
-      }
     };
     const setState: UpdaterFn<State> = ((valueOrCallback) => {
       if (typeof valueOrCallback === "function") {
