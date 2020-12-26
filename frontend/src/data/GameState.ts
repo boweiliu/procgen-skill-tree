@@ -53,10 +53,10 @@ export enum IntentName {
   // Default intent - does nothing
   NOOP = "NOOP",
 
-  PAN_UP = "PAN_UP",
-  PAN_DOWN = "PAN_DOWN",
-  PAN_LEFT = "PAN_LEFT",
-  PAN_RIGHT = "PAN_RIGHT",
+  PAN_NORTH = "PAN_NORTH",
+  PAN_SOUTH = "PAN_SOUTH",
+  PAN_WEST = "PAN_WEST",
+  PAN_EAST = "PAN_EAST",
   TRAVEL_IN = "TRAVEL_IN",
   TRAVEL_OUT = "TRAVEL_OUT",
 }

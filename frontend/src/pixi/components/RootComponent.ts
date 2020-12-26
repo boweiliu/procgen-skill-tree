@@ -216,10 +216,13 @@ export class RootComponent {
     let deltaX = 0;
     let deltaY = 0;
     const unit = 5;
-    if (activeIntent[IntentName.PAN_DOWN]) deltaY += -unit;
-    if (activeIntent[IntentName.PAN_LEFT]) deltaX += unit;
-    if (activeIntent[IntentName.PAN_RIGHT]) deltaX += -unit;
-    if (activeIntent[IntentName.PAN_UP]) deltaY += unit;
+    // if we want to pan [the hud] west (i.e. the left key was pressed), action stage needs to move east
+    if (activeIntent[IntentName.PAN_WEST]) deltaX += unit;
+    if (activeIntent[IntentName.PAN_EAST]) deltaX += -unit;
+    // if we want to pan south (i.e. the down key was pressed), action stage needs to move north to give the impression
+    // the hud is moving south. note that north is negative y direction since top left is 0,0
+    if (activeIntent[IntentName.PAN_SOUTH]) deltaY += -unit;
+    if (activeIntent[IntentName.PAN_NORTH]) deltaY += unit;
     if (deltaX) this.actionStage.x += deltaX;
     if (deltaY) this.actionStage.y += deltaY;
   }
