@@ -10,12 +10,10 @@ export type UpdaterGeneratorType2<T, W = T> = {
   [k in keyof T]: ((T[k] extends { [kkt: string]: any } ? UpdaterGeneratorType2<T[k], W> : {}) & {
     getUpdater: () => UpdaterFn2<T[k], W>,
     enqueueUpdate: UpdaterFn2<T[k], W>,
-    update: UpdaterFn2<T[k], W>,
   })
 } & {
   getUpdater: () => UpdaterFn2<T, W>,
   enqueueUpdate: UpdaterFn2<T, W>,
-  update: UpdaterFn2<T, W>,
 }
 
 // helper method for the recursion
@@ -23,7 +21,6 @@ function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T,
   const updaters: UpdaterGeneratorType2<T, W> = {} as any;
   updaters.getUpdater = () => dataUpdater;
   updaters.enqueueUpdate = dataUpdater;
-  updaters.update = dataUpdater;
   if (typeof dataObject !== "object") return updaters;
   else {
     const keys: (keyof T)[] = Object.keys(dataObject) as any;

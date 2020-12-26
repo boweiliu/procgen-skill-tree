@@ -245,7 +245,7 @@ export class RootComponent {
     const { updaters } = this.staleProps;
     // if we find ourselves a little idle, start pregenerating other layers
     if (this.state.tick > 60 && !props.gameState.worldGen.zLevels[-1]) {
-      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
         if (!prev[-1]) {
           prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 });
           return {...prev};
@@ -255,7 +255,7 @@ export class RootComponent {
       })
     }
     if (this.state.tick > 120 && !props.gameState.worldGen.zLevels[1]) {
-      updaters.worldGen.zLevels.update((prev, prevGameState) => {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
         if (!prev[1]) {
           prev[1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 1 });
           return {...prev};

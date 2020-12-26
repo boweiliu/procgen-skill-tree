@@ -149,7 +149,7 @@ export class ZLevelComponent {
   didMount() {
     const { args, updaters } = this.staleProps;
     // if we mounted but our data is not generated, please generate ourselves
-    updaters.worldGen.zLevels.update((prev, prevGameState) => {
+    updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
       if (!prev[args.z]) {
         return { [args.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: args.z }) };
       }
