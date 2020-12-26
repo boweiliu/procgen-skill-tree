@@ -1,6 +1,7 @@
 import {
   HashMap,
 } from "../lib/util/data_structures/hash";
+import { enumKeys } from "../lib/util/misc";
 import { PlayerSaveState, Quest } from "./PlayerSaveState";
 export type { PlayerSaveState, Quest } from "./PlayerSaveState";
 import { PointNodeRef, ChunkRef } from "./PointNodeRef";
@@ -33,6 +34,10 @@ export type GameState = {
   intent: PlayerIntentState;
 };
 
+/**
+ * Player intents == what they want to do when they press certain mouse/keyboard keys. This is decoupled
+ * from their actual keyboard keys to make remapping easier.
+ */
 export type PlayerIntentState = {
   activeIntent: Intent;
   newIntent: Intent;
@@ -53,9 +58,8 @@ export enum IntentName {
   TRAVEL_OUT = "TRAVEL_OUT",
 }
 
-// ??? What is going on
-export const noIntent = Object.keys(IntentName).reduce((object, key) => {
-  object[key as keyof typeof IntentName] = false;
+export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
+  object[key] = false;
   return object;
 }, {} as Intent);
 
@@ -73,7 +77,6 @@ export type ComputedState = {
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
 };
 
-// export type ResourceTypeAndModifier = [ResourceType.Nothing] | ([ResourceType, ResourceModifier]);
 export class ResourceTypeAndModifier {
   public type: ResourceNontrivialType;
   public modifier: ResourceModifier;
