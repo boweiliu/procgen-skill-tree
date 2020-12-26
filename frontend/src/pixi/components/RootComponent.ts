@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { KeyboardState } from "../../lib/pixi/keyboard";
 import { Vector2 } from "../../lib/util/geometry/vector2";
-import { GameState, IntentName} from "../../data/GameState";
+import { ChunkGenConstants, GameState, IntentName} from "../../data/GameState";
 import { generatePointNodeTexture } from "../textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { Const, Lazy } from "../../lib/util/misc";
@@ -201,10 +201,18 @@ export class RootComponent {
 
     if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) {
       this.state.playerCurrentZ--;
+
+      // scale by a factor of 9
+      this.actionStage.x *= ChunkGenConstants.CHUNK_DIM;
+      this.actionStage.y *= ChunkGenConstants.CHUNK_DIM;
+
       console.log({ currentZ: this.state.playerCurrentZ });
     }
     if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) {
       this.state.playerCurrentZ++;
+
+      this.actionStage.x /= ChunkGenConstants.CHUNK_DIM;
+      this.actionStage.y /= ChunkGenConstants.CHUNK_DIM;
       console.log({ currentZ: this.state.playerCurrentZ });
     }
   }
