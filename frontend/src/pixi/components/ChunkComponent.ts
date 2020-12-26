@@ -18,6 +18,7 @@ export class RenderedChunkConstants {
   public static NODE_ROUNDED_PX: number = 4;
 }
 
+export type ChunkComponentProps = Props;
 type Props = {
   delta: number,
   args: {
