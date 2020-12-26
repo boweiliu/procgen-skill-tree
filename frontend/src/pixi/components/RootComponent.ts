@@ -223,8 +223,8 @@ export class RootComponent {
     // the hud is moving south. note that north is negative y direction since top left is 0,0
     if (activeIntent[IntentName.PAN_SOUTH]) deltaY += -unit;
     if (activeIntent[IntentName.PAN_NORTH]) deltaY += unit;
-    if (deltaX) this.actionStage.x += deltaX;
-    if (deltaY) this.actionStage.y += deltaY;
+    this.actionStage.x += deltaX;
+    this.actionStage.y += deltaY;
   }
 
   renderSelf(props: Props) {
