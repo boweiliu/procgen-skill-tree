@@ -76,6 +76,8 @@ export class ChunkComponent {
     this.container.position = PixiPointFrom(props.position);
   }
 
+  public willUnmount() { }
+
   updateSelf(props: Props) { }
   shouldUpdate(prevProps: Props, props: Props): boolean {
     return true;

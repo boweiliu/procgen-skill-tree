@@ -66,9 +66,8 @@ export class PointNodeComponent {
     this.halfwayCenterSprite.zIndex = 0;
     this.container.addChild(this.halfwayCenterSprite);
 
-    // this.container.mask
-
     this.container.interactive = true;
+    // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
     this.container.buttonMode = true;
     this.container.hitArea = new Pixi.Rectangle(
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
@@ -190,4 +189,7 @@ export class PointNodeComponent {
       });
     });
   }
+
+  public willUnmount() { } 
+
 }

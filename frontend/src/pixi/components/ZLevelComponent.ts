@@ -101,6 +101,8 @@ export class ZLevelComponent {
   public update(props: Props) {
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props);
+    let childrenToDelete = this.children.clone();
+    console.log(`i have ${this.children.size()} children`)
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
         z: props.z,
@@ -130,12 +132,19 @@ export class ZLevelComponent {
       let childComponent = this.children.get(chunkRef);
       if (childComponent) {
         childComponent.update(childProps);
+        childrenToDelete.remove(chunkRef);
       } else {
         childComponent = new ChunkComponent(childProps);
         this.children.put(chunkRef, childComponent);
         this.container.addChild(childComponent.container);
       }
     }
+    for (let [ref, childComponent] of childrenToDelete.entries()) {
+      childComponent.willUnmount();
+      this.children.remove(ref);
+      this.container.removeChild(childComponent.container);
+    }
+
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
@@ -145,6 +154,8 @@ export class ZLevelComponent {
   didUpdate(prevProps: Props, props: Props) {
 
   }
+
+  public willUnmount() { }
 
   didMount() {
     const { args, updaters } = this.staleProps;

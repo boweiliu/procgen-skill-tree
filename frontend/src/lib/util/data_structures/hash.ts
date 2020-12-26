@@ -175,6 +175,9 @@ export class KeyedHashMap<K extends { hash(): string }, V>{
     return n;
   }
 
+  size(): number {
+    return Object.keys(this._kvalues).length;
+  }
 }
 
 export class DefaultHashMap<K extends { hash(): string }, V> {

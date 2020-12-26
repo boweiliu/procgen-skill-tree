@@ -228,8 +228,14 @@ export class RootComponent {
     this.actionStage.x += deltaX;
     this.actionStage.y += deltaY;
 
-    if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) this.state.playerCurrentZ--;
-    if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) this.state.playerCurrentZ++;
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) {
+      this.state.playerCurrentZ--;
+      console.log({ currentZ: this.state.playerCurrentZ });
+    }
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) {
+      this.state.playerCurrentZ++;
+      console.log({ currentZ: this.state.playerCurrentZ });
+    }
   }
 
   renderSelf(props: Props) {
@@ -246,7 +252,7 @@ export class RootComponent {
     });
   }
 
-  willUnmount(props: Props) {
+  public willUnmount() {
   }
 
   didUpdate(prevProps: Props, props: Props) {

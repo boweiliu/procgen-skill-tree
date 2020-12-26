@@ -11,21 +11,27 @@ type State = {
 }
 
 export class ReticleComponent{
-  public container: Pixi.Graphics;
+  public container: Pixi.Container;
   staleProps: Props
   state: State;
 
   constructor(props: Props) {
-    this.container = new Pixi.Graphics();
+    this.container = new Pixi.Container();
     this.staleProps = props;
     this.state = {
       position: props.appSize.multiply(0.5)
     };
 
-    this.container.lineStyle(2, 0x999999);
-    this.container.drawCircle(0, 0, 10);
-    this.container.interactive = true;
-    this.container.buttonMode = true;
+    const outerCircle = new Pixi.Graphics();
+    outerCircle.lineStyle(2, 0x000000);
+    outerCircle.alpha = 0.5;
+    outerCircle.drawCircle(0, 0, 16);
+    outerCircle.interactive = true;
+    this.container.addChild(outerCircle)
+    outerCircle.moveTo(0, -8);
+    outerCircle.lineTo(0, 8);
+    outerCircle.moveTo(-8, 0);
+    outerCircle.lineTo(8, 0);
 
     this.renderSelf(props);
   }
