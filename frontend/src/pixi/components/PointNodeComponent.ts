@@ -12,8 +12,8 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
-    selfPointNodeRef: PointNodeRef,
   },
+  selfPointNodeRef: PointNodeRef,
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
   pointNodeGen: PointNodeGen,
@@ -126,7 +126,7 @@ export class PointNodeComponent {
   }
 
   didMount() {
-    const { args, updaters } = this.staleProps; // we assume this will never change
+    const { updaters } = this.staleProps; // we assume this will never change
 
 
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
@@ -135,17 +135,17 @@ export class PointNodeComponent {
 
       // update selected to ourselves
       updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
-        if (prev?.pointNodeId === args.selfPointNodeRef.pointNodeId) {
+        if (prev?.pointNodeId === this.staleProps.selfPointNodeRef.pointNodeId) {
           this.state.justTriedToAllocate = true;
         }
-        return args.selfPointNodeRef;
+        return this.staleProps.selfPointNodeRef;
       });
 
       // if we tried to allocate ourselves, see if we can
       updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justTriedToAllocate) {
           this.state.justTriedToAllocate = false;
-          let [next, succeeded] = doTryAllocate(prev, prevGameState, args.selfPointNodeRef);
+          let [next, succeeded] = doTryAllocate(prev, prevGameState, this.staleProps.selfPointNodeRef);
           if (succeeded) {
             this.state.justSpentSp = true;
             return next;

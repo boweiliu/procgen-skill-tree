@@ -28,6 +28,7 @@ export function createPlayerIntentState() : PlayerIntentState {
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
   tick: number;
+  playerCurrentZ: number;
   playerIntents: {
     decreaseZLevel: PlayerIntentState
     increaseZLevel: PlayerIntentState
@@ -78,6 +79,7 @@ export class RootComponent {
     this.state = {
       pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
       tick: 0,
+      playerCurrentZ: 0,
       playerIntents: {
         decreaseZLevel: createPlayerIntentState(),
         increaseZLevel: createPlayerIntentState(),
@@ -144,11 +146,11 @@ export class RootComponent {
       delta: 0,
       args: {
         pointNodeTexture: this.state.pointNodeTexture.get(),
-        z: 0,
       },
+      z: this.state.playerCurrentZ,
       updaters: props.updaters,
       position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[0],
+      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
       selectedPointNode: props.gameState.playerUI.selectedPointNode,
       allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
     };
@@ -185,11 +187,11 @@ export class RootComponent {
       delta: 0,
       args: {
         pointNodeTexture: this.state.pointNodeTexture.get(),
-        z: 0,
       },
+      z: this.state.playerCurrentZ,
       updaters: props.updaters,
       position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[0],
+      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
       selectedPointNode: props.gameState.playerUI.selectedPointNode,
       allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
     };
@@ -225,6 +227,9 @@ export class RootComponent {
     if (activeIntent[IntentName.PAN_NORTH]) deltaY += unit;
     this.actionStage.x += deltaX;
     this.actionStage.y += deltaY;
+
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) this.state.playerCurrentZ--;
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) this.state.playerCurrentZ++;
   }
 
   renderSelf(props: Props) {
@@ -250,7 +255,7 @@ export class RootComponent {
     if (this.state.tick > 60 && !props.gameState.worldGen.zLevels[-1]) {
       updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
         if (!prev[-1]) {
-          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 0 });
+          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: -1 });
           return {...prev};
         } else {
           return prev;

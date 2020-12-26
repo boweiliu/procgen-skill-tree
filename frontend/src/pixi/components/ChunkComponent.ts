@@ -18,8 +18,8 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
-    selfChunkRef: ChunkRef,
   },
+  selfChunkRef: ChunkRef,
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
   chunkGen: ChunkGen,
@@ -42,8 +42,8 @@ export class ChunkComponent {
 
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {
       const pointNodeRef = new PointNodeRef({
-        z: props.args.selfChunkRef.z,
-        chunkCoord: props.args.selfChunkRef.chunkCoord,
+        z: props.selfChunkRef.z,
+        chunkCoord: props.selfChunkRef.chunkCoord,
         pointNodeCoord: pointNodeCoord,
         pointNodeId: pointNodeGen.id
       })
@@ -51,8 +51,8 @@ export class ChunkComponent {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
-          selfPointNodeRef: pointNodeRef,
         },
+        selfPointNodeRef: pointNodeRef,
         updaters: props.updaters,
         pointNodeGen,
         position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
@@ -97,8 +97,8 @@ export class ChunkComponent {
     this.updateSelf(props);
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {
       const pointNodeRef = new PointNodeRef({
-        z: props.args.selfChunkRef.z,
-        chunkCoord: props.args.selfChunkRef.chunkCoord,
+        z: props.selfChunkRef.z,
+        chunkCoord: props.selfChunkRef.chunkCoord,
         pointNodeCoord: pointNodeCoord,
         pointNodeId: pointNodeGen.id
       })
@@ -106,8 +106,8 @@ export class ChunkComponent {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
-          selfPointNodeRef: pointNodeRef,
         },
+        selfPointNodeRef: pointNodeRef,
         updaters: props.updaters,
         position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
         pointNodeGen,
