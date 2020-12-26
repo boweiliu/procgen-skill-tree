@@ -1,5 +1,3 @@
-import { PixiReactBaseComponent } from "./PixiReactBaseComponent";
-
 type Props = {};
 
 type State = {};
