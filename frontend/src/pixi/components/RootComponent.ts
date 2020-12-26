@@ -135,7 +135,7 @@ export class RootComponent {
     this.didMount();
   }
 
-  shouldUpdate(prevProps: Props, props: Props): boolean {
+  shouldUpdate(prevProps: Props, props: Props, prevState: State, state: State): boolean {
 
     let prevSize = prevProps.gameState.playerSave.allocatedPointNodeSet.size()
     let nextSize = props.gameState.playerSave.allocatedPointNodeSet.size()
@@ -144,9 +144,10 @@ export class RootComponent {
   }
 
   public update(props: Props) {
+    let staleState = this.state;
     this.fireStateUpdaters();
-    if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props)
+    if (!this.shouldUpdate(this.staleProps, props, staleState, this.state)) { return; }
     // this.keyboard.update(props);
     this.fpsTracker.update({
       delta: props.delta,

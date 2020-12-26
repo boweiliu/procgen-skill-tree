@@ -158,7 +158,7 @@ export class ZLevelComponent {
   public willUnmount() { }
 
   didMount() {
-    const { args, updaters } = this.staleProps;
+    const { updaters } = this.staleProps;
     // if we mounted but our data is not generated, please generate ourselves
     updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
       if (!prev[this.staleProps.z]) {
@@ -166,20 +166,5 @@ export class ZLevelComponent {
       }
       return prev;
     })
-    // updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
-    //   if (prev.size() === 0) {
-    //     let startNode = prevGameState.worldGen.zLevels[0].chunks.get(new Vector2(0, 0))?.pointNodes.get(new Vector2(0, 0));
-    //     if (startNode) {
-    //       prev.put(new PointNodeRef({
-    //         z: 0,
-    //         chunkCoord: new Vector2(0, 0),
-    //         pointNodeCoord: new Vector2(0, 0),
-    //         pointNodeId: startNode?.id
-    //       }))
-    //       return prev.clone();
-    //     }
-    //   }
-    //   return prev;
-    // })
   }
 }
