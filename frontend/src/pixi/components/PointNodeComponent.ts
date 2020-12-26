@@ -33,6 +33,7 @@ export class PointNodeComponent {
   staleProps!: Props;
   state!: State;
   public sprite: Pixi.Sprite
+  public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
 
   constructor(props: Props) {
@@ -57,6 +58,13 @@ export class PointNodeComponent {
     this.centerSprite.scale = PixiPointFrom(new Vector2(0.5, 0.5));
     this.centerSprite.zIndex = 1;
     this.container.addChild(this.centerSprite);
+
+    this.halfwayCenterSprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.halfwayCenterSprite.anchor.x = 0.5;
+    this.halfwayCenterSprite.anchor.y = 0.5;
+    this.halfwayCenterSprite.scale = PixiPointFrom(new Vector2(0.75, 0.75));
+    this.halfwayCenterSprite.zIndex = 0;
+    this.container.addChild(this.halfwayCenterSprite);
 
     // this.container.mask
 

@@ -7,10 +7,14 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 
 export class RenderedChunkConstants {
-  public static SPACING_PX: number = 24;
-  public static CHUNK_SPACING_PX: number = (ChunkGenConstants.CHUNK_DIM + 0.5) * RenderedChunkConstants.SPACING_PX;
-  public static NODE_SIZE_PX: number = 14;
-  public static NODE_HITAREA_PX: number = 18;
+//   public static SPACING_PX: number = 24;
+//   public static CHUNK_SPACING_PX: number = (ChunkGenConstants.CHUNK_DIM + 0.5) * RenderedChunkConstants.SPACING_PX;
+//   public static NODE_SIZE_PX: number = 14;
+//   public static NODE_HITAREA_PX: number = 18;
+  public static SPACING_PX: number = 36;
+  public static CHUNK_SPACING_PX: number = (ChunkGenConstants.CHUNK_DIM + 0.0) * RenderedChunkConstants.SPACING_PX;
+  public static NODE_SIZE_PX: number = 22;
+  public static NODE_HITAREA_PX: number = RenderedChunkConstants.NODE_SIZE_PX + 4;
   public static NODE_ROUNDED_PX: number = 4;
 }
 
