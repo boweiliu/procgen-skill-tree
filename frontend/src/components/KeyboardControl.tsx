@@ -23,10 +23,10 @@ type keyToIntentMap = {
 };
 
 const defaultKeyIntentConfig = {
-  W: IntentName.PAN_NORTH,
-  A: IntentName.PAN_WEST,
-  S: IntentName.PAN_SOUTH,
-  D: IntentName.PAN_EAST,
+  w: IntentName.PAN_NORTH,
+  a: IntentName.PAN_WEST,
+  s: IntentName.PAN_SOUTH,
+  d: IntentName.PAN_EAST,
   ArrowUp: IntentName.PAN_NORTH,
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
