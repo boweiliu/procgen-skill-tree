@@ -64,7 +64,7 @@ export class PointNodeComponent {
     this.halfwayCenterSprite.anchor.y = 0.5;
     this.halfwayCenterSprite.scale = PixiPointFrom(new Vector2(0.75, 0.75));
     this.halfwayCenterSprite.zIndex = 0;
-    this.container.addChild(this.halfwayCenterSprite);
+    // this.container.addChild(this.halfwayCenterSprite); // disable this for now - causes a fairly significant fps hit, until we get around to holding less nodes on the page at once
 
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
@@ -112,6 +112,10 @@ export class PointNodeComponent {
 
     this.sprite.tint = multiplyColor(baseColor, tint);
     this.centerSprite.tint = multiplyColor(baseColor, centerTint);
+
+    if (props.selfPointNodeRef.pointNodeCoord.equals(Vector2.Zero)) {
+      this.container.scale = PixiPointFrom(new Vector2(1.25, 1.25));
+    }
   }
 
   updateSelf(props: Props) { }
