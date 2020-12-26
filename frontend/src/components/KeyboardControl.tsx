@@ -30,6 +30,7 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
     document.addEventListener("keydown", this.handleKeydown);
     document.addEventListener("keyup", this.handleKeyup);
   }
+
   handleKeydown = (e: KeyboardEvent) => {
     const keyIntentConfig = this.state.keyIntentConfig;
     const key: BrowserKeys = e.key;

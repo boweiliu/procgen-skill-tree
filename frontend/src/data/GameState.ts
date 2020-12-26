@@ -125,6 +125,7 @@ export type Quest = {
 export type PlayerUIState = {
   selectedPointNode: PointNodeRef | undefined;
   activeTab: number;
+  z: number;
 };
 
 export class PointNodeRef {

@@ -50,6 +50,7 @@ export class GameStateFactory {
       playerUI: {
         selectedPointNode: undefined,
         activeTab: 0,
+        z:0
       },
       computed: {},
       intent: {

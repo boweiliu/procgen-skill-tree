@@ -32,6 +32,7 @@ export class ZLevelComponent {
     this.staleProps = props;
     this.state = {};
     this.container = new Pixi.Container();
+    // this.container.alpha = 0;
 
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const chunkRef = new ChunkRef({
