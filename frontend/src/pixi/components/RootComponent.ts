@@ -197,16 +197,6 @@ export class RootComponent {
       this.zLevel = new ZLevelComponent(childProps);
       this.actionStage.addChild(this.zLevel.container);
     } else {
-      const activeIntent = props.gameState.intent.activeIntent;
-      let deltaX = 0;
-      let deltaY = 0;
-      const unit = 5;
-      if (activeIntent[IntentName.PAN_DOWN]) deltaY += -unit;
-      if (activeIntent[IntentName.PAN_LEFT]) deltaX += unit;
-      if (activeIntent[IntentName.PAN_RIGHT]) deltaX += -unit;
-      if (activeIntent[IntentName.PAN_UP]) deltaY += unit;
-      if (deltaX) this.actionStage.x += deltaX;
-      if (deltaY) this.actionStage.y += deltaY;
       this.zLevel.update(childProps);
     }
 
@@ -221,6 +211,17 @@ export class RootComponent {
 
   updateSelf(props: Props) {
     this.state.tick++;
+
+    const activeIntent = props.gameState.intent.activeIntent;
+    let deltaX = 0;
+    let deltaY = 0;
+    const unit = 5;
+    if (activeIntent[IntentName.PAN_DOWN]) deltaY += -unit;
+    if (activeIntent[IntentName.PAN_LEFT]) deltaX += unit;
+    if (activeIntent[IntentName.PAN_RIGHT]) deltaX += -unit;
+    if (activeIntent[IntentName.PAN_UP]) deltaY += unit;
+    if (deltaX) this.actionStage.x += deltaX;
+    if (deltaY) this.actionStage.y += deltaY;
   }
 
   renderSelf(props: Props) {
