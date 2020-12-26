@@ -1,6 +1,11 @@
 
 type UpdaterFnParam2<T, W> = ((prev: T, prevWhole: W) => T) | (T extends Function ? never : T) // (T | ((prev: T, prevWhole: W) => T));
 type UpdaterFn2<T, W> = (arg: UpdaterFnParam2<T, W>) => void;
+
+/**
+ * Represent the type which has the same deep object struture as T but instead of values, it has
+ * functions on [getUpdater], [enqueueUpdate], and [update] attached to every level of the object structure.
+ */
 export type UpdaterGeneratorType2<T, W = T> = {
   [k in keyof T]: ((T[k] extends { [kkt: string]: any } ? UpdaterGeneratorType2<T[k], W> : {}) & {
     getUpdater: () => UpdaterFn2<T[k], W>,

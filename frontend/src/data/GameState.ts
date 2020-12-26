@@ -49,7 +49,9 @@ export type Intent = {
 };
 
 export enum IntentName {
+  // Default intent - does nothing
   NOOP = "NOOP",
+
   PAN_UP = "PAN_UP",
   PAN_DOWN = "PAN_DOWN",
   PAN_LEFT = "PAN_LEFT",

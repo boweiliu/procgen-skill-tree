@@ -1,14 +1,26 @@
 import React from "react";
 import { GameState, IntentName, PlayerIntentState } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+
 type Props = {
-  updaters: UpdaterGeneratorType2<GameState>["intent"];
+  updaters: UpdaterGeneratorType2<PlayerIntentState, GameState>;
   intent: PlayerIntentState;
 };
+
+type State = {
+  keyIntentConfig: keyToIntentMap;
+};
+
+// TODO: enumerate all the keyboard keys we care about
+type BrowserKeys = string;
+
+/**
+ * Holds the mapping of which keyboard keys (as interpreted by the browser)
+ * map to which intents, e.g. "up arrow" means "pan left"
+ */
 type keyToIntentMap = {
   [key in BrowserKeys]?: IntentName;
 };
-type BrowserKeys = string;
 
 const defaultKeyIntentConfig = {
   ArrowUp: IntentName.PAN_UP,
@@ -18,9 +30,7 @@ const defaultKeyIntentConfig = {
   "<": IntentName.TRAVEL_OUT,
   ">": IntentName.TRAVEL_IN,
 };
-type State = {
-  keyIntentConfig: keyToIntentMap;
-};
+
 export class KeyboardControlComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -30,8 +40,10 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
     document.addEventListener("keydown", this.handleKeydown);
     document.addEventListener("keyup", this.handleKeyup);
   }
+
+  // NOTE(bowei): does using e.repeat here break when window loses focus??
   handleKeydown = (e: KeyboardEvent) => {
-    const keyIntentConfig = this.state.keyIntentConfig;
+    const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
     if (
@@ -52,7 +64,7 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
   };
 
   handleKeyup = (e: KeyboardEvent) => {
-    const keyIntentConfig = this.state.keyIntentConfig;
+    const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
     if (
