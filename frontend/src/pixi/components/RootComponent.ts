@@ -144,6 +144,7 @@ export class RootComponent {
   }
 
   public update(props: Props) {
+    this.fireStateUpdaters();
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
     this.updateSelf(props)
     // this.keyboard.update(props);
@@ -178,7 +179,6 @@ export class RootComponent {
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
-    this.fireStateUpdaters();
   }
 
   updateSelf(props: Props) {

@@ -175,7 +175,7 @@ export class PointNodeComponent {
       // TODO(bowei): if we spent sp, remember to update quest status!!
       updaters.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justSpentSp) {
-          // this.state.justSpentSp = false;
+          this.state.justSpentSp = false;
           return {
             ...prev,
             playerSave: afterMaybeSpendingSp(prev.playerSave, prevGameState),
