@@ -116,6 +116,7 @@ export class PixiReactBridge {
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
+  // props should be a referentially distinct object from props the last time this was called
   rerender(props: Props) {
     console.log("base app rerender called", { playerUI: props.gameState.playerUI });
     this.props = props;

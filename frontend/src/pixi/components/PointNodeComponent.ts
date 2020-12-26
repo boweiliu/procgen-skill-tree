@@ -134,8 +134,9 @@ export class PointNodeComponent {
   }
 
   public update(props: Props) {
+    let staleState = { ... this.state };
+    this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
-    this.updateSelf(props);
     this.renderSelf(props);
     this.staleProps = props;
   }

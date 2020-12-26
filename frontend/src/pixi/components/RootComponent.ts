@@ -144,7 +144,7 @@ export class RootComponent {
   }
 
   public update(props: Props) {
-    let staleState = this.state;
+    let staleState = { ... this.state };
     this.fireStateUpdaters();
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props, staleState, this.state)) { return; }

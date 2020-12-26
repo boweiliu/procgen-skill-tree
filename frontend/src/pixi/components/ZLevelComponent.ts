@@ -99,8 +99,9 @@ export class ZLevelComponent {
   }
 
   public update(props: Props) {
+    let staleState = { ... this.state };
+    this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
-    this.updateSelf(props);
     let childrenToDelete = this.children.clone();
     console.log(`i have ${this.children.size()} children`)
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
