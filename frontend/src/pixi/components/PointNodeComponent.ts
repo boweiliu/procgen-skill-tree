@@ -7,6 +7,8 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 import { computePlayerResourceAmounts } from "../../game/ComputeState";
+import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
+import { LifecycleHandlerType } from "./LifecycleHandler";
 
 type Props = {
   delta: number,
@@ -35,6 +37,8 @@ export class PointNodeComponent {
   public sprite: Pixi.Sprite
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
+
+  public tooltippableArea: LifecycleHandlerType<any, any>
 
   constructor(props: Props) {
     this.staleProps = props;
@@ -79,6 +83,10 @@ export class PointNodeComponent {
       RenderedChunkConstants.NODE_HITAREA_PX,
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
+
+    this.tooltippableArea = new TooltippableAreaComponent({});
+    this.container.addChild(this.tooltippableArea.container);
+
     this.renderSelf(props);
     this.didMount();
   }
@@ -146,6 +154,9 @@ export class PointNodeComponent {
     // let staleState = { ...this.state };
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
+
+    this.tooltippableArea._update({});
+
     this.renderSelf(props);
     this.staleProps = props;
   }
@@ -153,6 +164,13 @@ export class PointNodeComponent {
   didMount() {
     const { updaters } = this.staleProps; // we assume this will never change
 
+//     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
+//       this.state.pointerover = event;
+//     })
+//     this.container.addListener('pointerout', () => {
+//       this.state.pointerover = undefined;
+//     })
+// 
 
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
       this.state.numClicks++;

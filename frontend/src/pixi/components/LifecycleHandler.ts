@@ -20,7 +20,8 @@ type ChildInstructions<
 
 // class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
 export class LifecycleHandlerBase<P extends Props, S extends State> {
-  protected container!: Pixi.Container;
+  // public, only to interface with non lifecycleHandler classes that we have yet to refactor
+  public container!: Pixi.Container;
   protected state!: S;
   private _staleProps: P;
   private _children: ChildInstructions<any, any, P, S>[];
