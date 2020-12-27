@@ -34,7 +34,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public outerBar: Pixi.Graphics;
   public innerBar: Pixi.Graphics;
   public innerBar2: Pixi.Graphics;
-  public filter: Pixi.filters.BlurFilter;
+  public filter!: Pixi.filters.BlurFilter;
   public titleText: Pixi.Text;
   public barFill: Pixi.Graphics;
   public mask: Pixi.Graphics;
@@ -53,33 +53,34 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     };
     this.titleText = new Pixi.Text('Efficiency', style);
     this.titleText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
-    this.titleText.anchor = PixiPointFrom(new Vector2(0.5, 0.0));
+    this.titleText.anchor = PixiPointFrom(new Vector2(0.5, 0.0)); // center ourselves, left-right
     this.titleText.zIndex = 0;
-    this.titleText.x = 50;
-    this.titleText.y = 4;
+    this.titleText.x = 50; // full container width is 100, we want to be in the middle
+    this.titleText.y = 4; // bit of padding for the top
     this.container.addChild(this.titleText);
 
     this.outerBar = new Pixi.Graphics();
-    this.outerBar.beginFill(0xDDEEFF);
-    this.outerBar.drawRoundedRect(0, 0, 100, 236, 10);
+    this.outerBar.beginFill(0xDDEEFF); // background color is the blue AACCEE, this is very light bluer than that
+    this.outerBar.drawRoundedRect(0, 0, 100, 236, 10); // outerbar = the box containing the efficiency text + bar. 100px is just enough width for the word "Efficiency". 236px height was chosen arbitrarily
     this.outerBar.zIndex = -1;
-    this.outerBar.alpha = .9;
-    this.filter = new Pixi.filters.BlurFilter();
-    // this.outerBar.filters = [this.filter];
+    this.outerBar.alpha = .9; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
     this.container.addChild(this.outerBar);
-    this.filter.blur = 8;
+    // this.filter = new Pixi.filters.BlurFilter();
+    // this.outerBar.filters = [this.filter];
+    // this.filter.blur = 8;
 
     this.innerBar = new Pixi.Graphics();
-    this.innerBar.lineStyle(2, 0x000000, 1);
+    // this.innerBar.lineStyle(2, 0x000000, 1); // 2 pixel wide lines look sharp but noticeable
     this.innerBar.beginFill(0xFFFFFF);
-    this.innerBar.drawRoundedRect(0, 0, 40, 200, 10);
+    this.innerBar.drawRoundedRect(0, 0, 40, 200, 10); // we want the inner bar (containing the actual efficiency colors) to be 40 wide and 200 tall. round the corners at the same radius as the outer box.
     // this.innerBar.x = 12;
-    this.innerBar.pivot.x = 20;
-    this.innerBar.x = 50;
-    this.innerBar.y = 24;
+    this.innerBar.pivot.x = 20; // this is our width over 2
+    this.innerBar.x = 50; // this is outer bar width / 2
+    this.innerBar.y = 24; // this is just enough space below the "Efficiency" text to look nice
     this.innerBar.zIndex = 3;
     this.container.addChild(this.innerBar);
 
+    // rainbow red-green gradient for the contents of the inner bar
     this.barFill = new Pixi.Graphics();
     // source: https://www.schemecolor.com/red-orange-green-gradient.php
     this.barFill.beginFill(0x69B34C);
@@ -94,32 +95,32 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.barFill.drawRect(0, 160, 40, 40);
     this.barFill.pivot.x = 20;
     this.barFill.x = 50;
-    this.barFill.y = 24;
+    this.barFill.y = 24; // same positioning as innerBar
     this.barFill.zIndex = 4;
+    this.container.addChild(this.barFill);
     // this.barFill.filters = [this.filter];
+    // mask controls how much of the red-green gradient fillings are visible, depending on how well the player is doing
     this.mask = new Pixi.Graphics();
-    this.mask.beginFill(0x000000, 1);
-    this.mask.drawRoundedRect(0, 0, 40, 200, 10);
-    this.mask.zIndex = 30;
+    this.mask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
+    this.mask.drawRoundedRect(0, 0, 40, 200, 10); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this innerBar2 is reapplied over the top to cover the leaks.
+    this.mask.zIndex = 30; // doesnt matter
     this.mask.pivot.x = 20; // left-right center in ourselves
     this.mask.x = 50; // center in the outerBar
-    this.mask.y = 24; // mask y starts at 24, the same as inner bar, and goes till 224
-    this.container.addChild(this.mask);
+    this.mask.y = 24; // same positioning as inner bar
+    this.container.addChild(this.mask); // have to add child here -- not sure why
     this.barFill.mask = this.mask;
 
+    // another copy of innerbar, except this time the fill is transparent; we just need the line style to be redrawn so that 
+    // the inner filling mask leakage gets hidden
     this.innerBar2 = new Pixi.Graphics();
     this.innerBar2.lineStyle(2, 0x000000, 1);
-    this.innerBar2.beginFill(0xFFFFFF, 0);
+    this.innerBar2.beginFill(0x000000, 0);
     this.innerBar2.drawRoundedRect(0, 0, 40, 200, 10);
     this.innerBar2.pivot.x = 20;
     this.innerBar2.x = 50;
     this.innerBar2.y = 24;
     this.innerBar2.zIndex = 7;
     this.container.addChild(this.innerBar2);
-
-
-    this.container.addChild(this.barFill);
-
   }
 
   public renderSelf(props: Props) {
