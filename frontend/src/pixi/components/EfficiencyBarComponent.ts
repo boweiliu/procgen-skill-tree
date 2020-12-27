@@ -32,6 +32,7 @@ type State = {}
 class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
 
   public container: Pixi.Container;
+  public state: State = {}
 
   private cornerRadius: number = 10;
   private boundingBoxWidth: number = 100;
@@ -147,6 +148,12 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
 
   public updateSelf(props: Props) {
   }
+
+  didMount() { }
+  didUpdate() { }
+  shouldUpdate(): boolean { return true; }
+  willUnmount() { }
+  fireStateUpdaters() { }
 }
 
 const toExport = engageLifecycle(EfficiencyBarComponent);

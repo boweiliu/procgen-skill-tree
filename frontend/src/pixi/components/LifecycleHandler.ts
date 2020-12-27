@@ -22,10 +22,10 @@ type ChildInstructions<
  * LifecycleHandlerConstructor <- this should take the usual props, and will return new proxy, new base component(props), the handler object which has the construct() property and that function in it
  */
 // class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
-export class LifecycleHandlerBase<P extends Props, S extends State> {
+export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
-  public container!: Pixi.Container;
-  protected state!: S;
+  public abstract container: Pixi.Container;
+  protected abstract state: S;
   private _staleProps: P;
   private _children: ChildInstructions<any, any, P, S>[];
 
@@ -57,20 +57,18 @@ export class LifecycleHandlerBase<P extends Props, S extends State> {
     new Promise((resolve) => resolve(this.didUpdate()));
   }
 
-  protected fireStateUpdaters(): void { } 
-  protected didMount(): void { }
-  protected updateSelf(nextProps: P): void { } 
-  protected shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean {
-    return true;
-  }
+  protected abstract fireStateUpdaters(): void 
+  protected abstract didMount(): void 
+  protected abstract updateSelf(nextProps: P): void 
+  protected abstract shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean 
   protected updateChildren(nextProps: P) {
     this._children.forEach(({ instance, propsFactory }) => {
       instance._update(propsFactory(nextProps, this.state));
     });
   }
-  protected renderSelf(nextProps: P): void { }
-  protected didUpdate(): void { }
-  protected willUnmount(): void { }
+  protected abstract renderSelf(nextProps: P): void 
+  protected abstract didUpdate(): void 
+  protected abstract willUnmount(): void 
 
   _setStaleProps(nextProps: P) {
     this._staleProps = nextProps;
@@ -125,8 +123,11 @@ type ReferenceState = {
 };
 
 export class Reference extends LifecycleHandler<ReferenceProps, ReferenceState> {
+  public container: Pixi.Container
+  public state: ReferenceState
   constructor(props: ReferenceProps) {
     super(props);
+    this.container = new Pixi.Container();
     this.state = {
       lalalala: "hahahah",
     };
@@ -134,4 +135,9 @@ export class Reference extends LifecycleHandler<ReferenceProps, ReferenceState> 
 
   updateSelf(nextProps: ReferenceProps) { }
   renderSelf(nextProps: ReferenceProps) { }
+  didMount() { } 
+  didUpdate() { }
+  shouldUpdate(): boolean { return true; }
+  fireStateUpdaters() { }
+  willUnmount() { }
 }

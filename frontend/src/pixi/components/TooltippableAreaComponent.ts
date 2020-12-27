@@ -11,6 +11,7 @@ type State = {
 }
 
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
+  public state: State
   public container: Pixi.Container;
 
   constructor(props: Props) {
@@ -18,6 +19,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.container = new Pixi.Container();
     this.container.interactive = true;
     this.container.hitArea = props.hitArea;
+    this.state = {}
   }
 
   public renderSelf(props: Props) {
@@ -29,10 +31,18 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   didMount() {
-    this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
-      console.log('got here in toolltippable');
-    })
+    this.container.addListener('pointerover', this.onPointerOver);
   }
+
+  onPointerOver = (event: Pixi.InteractionEvent) => {
+      console.log('got here in toolltippable');
+  }
+
+  willUnmount() { }
+  fireStateUpdaters() { }
+  shouldUpdate(): boolean { return true; } 
+  didUpdate() { }
+
 }
 
 const toExport = engageLifecycle(TooltippableAreaComponent);
