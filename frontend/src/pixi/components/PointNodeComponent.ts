@@ -7,7 +7,7 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 import { computePlayerResourceAmounts } from "../../game/ComputeState";
-import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
+import { TooltippableAreaComponent, TooltippableAreaComponentType } from "./TooltippableAreaComponent";
 import { LifecycleHandlerType } from "./LifecycleHandler";
 
 type Props = {
@@ -38,7 +38,7 @@ export class PointNodeComponent {
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
 
-  public tooltippableArea: LifecycleHandlerType<any, any>
+  public tooltippableArea: TooltippableAreaComponentType
 
   constructor(props: Props) {
     this.staleProps = props;
@@ -84,7 +84,9 @@ export class PointNodeComponent {
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
 
-    this.tooltippableArea = new TooltippableAreaComponent({});
+    this.tooltippableArea = new TooltippableAreaComponent({
+      hitArea: this.container.hitArea
+    });
     this.container.addChild(this.tooltippableArea.container);
 
     this.renderSelf(props);
@@ -155,7 +157,9 @@ export class PointNodeComponent {
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
 
-    this.tooltippableArea._update({});
+    this.tooltippableArea._update({
+      hitArea: this.container.hitArea
+    });
 
     this.renderSelf(props);
     this.staleProps = props;

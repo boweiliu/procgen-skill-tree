@@ -1,9 +1,14 @@
 import * as Pixi from "pixi.js";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
-type Props = {}
+type Props = {
+  hitArea: Pixi.IHitArea;
+  delaySeconds?: number;
+}
 
-type State = {}
+type State = {
+
+}
 
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
@@ -11,6 +16,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   constructor(props: Props) {
     super(props);
     this.container = new Pixi.Container();
+    this.container.interactive = true;
+    this.container.hitArea = props.hitArea;
   }
 
   public renderSelf(props: Props) {
@@ -22,7 +29,9 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   didMount() {
-
+    this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
+      console.log('got here in toolltippable');
+    })
   }
 }
 
