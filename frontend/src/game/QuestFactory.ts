@@ -1,34 +1,55 @@
-import { GameState, Quest, ResourceType } from "../data/GameState";
+import {
+  GameState,
+  Quest,
+  ResourceNontrivialType,
+  ResourceType,
+} from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
-
-export function createQuest(updaters: UpdaterGeneratorType2<GameState>) {
+export function createQuest(
+  updaters: UpdaterGeneratorType2<GameState>,
+  gameState: GameState,
+  config: QuestFactoryConfig = {}
+) {
   updaters.playerSave.activeQuest.enqueueUpdate((prev) => {
-    return new QuestFactory({}).create();
+    const r = Math.floor(Math.random() * 3) as 0 | 1 | 2;
+    const resource = Object.values(ResourceNontrivialType)[r];
+    const currentResource =
+      gameState.computed.playerResourceAmounts?.[resource] || 50;
+    const totalAllocatedNodes =
+      gameState.computed.playerResourceNodesAggregated?.size() ?? 0;
+    const scale = 2 + 1 / (totalAllocatedNodes + 1);
+    return new QuestFactory(config).create(
+      resource,
+      Math.round(currentResource * scale)
+    );
   });
   updaters.playerSave.batchesSinceQuestStart.enqueueUpdate((prev) => {
     return 1;
   });
-  updaters.playerSave.availableSp.enqueueUpdate((prev) =>  {
+  updaters.playerSave.availableSp.enqueueUpdate((prev) => {
     return 5;
   });
 }
 
-
-type QuestFactoryConfig = { }
+type QuestFactoryConfig = {};
 export class QuestFactory {
-  public config: QuestFactoryConfig
+  public config: QuestFactoryConfig;
 
   constructor(config: QuestFactoryConfig) {
     this.config = config;
   }
 
-  public create(): Quest {
+  public create(
+    resourceType: ResourceType,
+    resourceAmount: number,
+    description: string = ""
+  ): Quest {
+    console.log(resourceAmount);
     return {
-      description: "",
-      resourceType: ResourceType.Mana0,
-      resourceAmount: 3000
+      description,
+      resourceType,
+      resourceAmount,
     };
   }
-
 }

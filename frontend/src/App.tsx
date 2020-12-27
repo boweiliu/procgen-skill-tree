@@ -52,7 +52,10 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-  let createQuestCb = useCallback(() => createQuest(updaters), [updaters]);
+  let createQuestCb = useCallback(() => createQuest(updaters, gameState), [
+    updaters,
+    gameState,
+  ]);
 
   let tabViews: JSX.Element[] = [];
   tabViews = [
