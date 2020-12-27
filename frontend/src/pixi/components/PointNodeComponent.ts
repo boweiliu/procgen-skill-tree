@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { RenderedChunkConstants } from "./ChunkComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { GameState, PointNodeGen, PointNodeRef, ResourceType } from "../../data/GameState";
+import { GameState, PointNodeGen, PointNodeRef, ResourceModifier, ResourceType } from "../../data/GameState";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
@@ -99,20 +99,29 @@ export class PointNodeComponent {
     } else {
     }
     let baseColor: number = 0;
-    switch (props.pointNodeGen.resourceType) {
-      case ResourceType.Nothing:
-        baseColor = 0x99bbff; // blue that mixes in with bg
-        break;
-      case ResourceType.Mana0:
-        baseColor = 0xeeaaaa; // red
-        break;
-      case ResourceType.Mana1:
-        baseColor = 0xbb7733; // brown?
-        break;
-      case ResourceType.Mana2:
-        baseColor = 0x44aa44; // green
-        break;
+    if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
+      baseColor = 0x99bbff; // blue that mixes in with bg
+    } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
+      if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
+        baseColor = 0xeeaaaa; // pink
+      } else if (props.pointNodeGen.resourceModifier === ResourceModifier.Increased0) {
+        baseColor = 0xcc88ee; // lavender?
+      }
     }
+    // switch (props.pointNodeGen.resourceType) {
+    //   case ResourceType.Nothing:
+    //     baseColor = 0x99bbff; // blue that mixes in with bg
+    //     break;
+    //   case ResourceType.Mana0:
+    //     baseColor = 0xeeaaaa; // red
+    //     break;
+    //   case ResourceType.Mana1:
+    //     baseColor = 0xbb7733; // brown?
+    //     break;
+    //   case ResourceType.Mana2:
+    //     baseColor = 0x44aa44; // green
+    //     break;
+    // }
 
     this.sprite.tint = multiplyColor(baseColor, tint);
     this.centerSprite.tint = multiplyColor(baseColor, centerTint);
