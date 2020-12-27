@@ -59,6 +59,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   constructor(props: Props) {
     super(props);
     this.container = new Pixi.Container();
+    this.container.interactive = true;
     this.container.sortableChildren = true;
 
     this.titleText = new Pixi.Text('Efficiency', this.textStyle);
