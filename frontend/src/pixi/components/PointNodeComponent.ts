@@ -77,7 +77,7 @@ export class PointNodeComponent {
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
     this.container.buttonMode = true;
-    this.container.hitArea = new Pixi.Rectangle(
+    this.container.hitArea = new Pixi.Rectangle( // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
       RenderedChunkConstants.NODE_HITAREA_PX,
