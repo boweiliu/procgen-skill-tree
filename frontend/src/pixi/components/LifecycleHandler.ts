@@ -18,6 +18,9 @@ type ChildInstructions<
   ) => ChildPropsType;
 };
 
+/**
+ * LifecycleHandlerConstructor <- this should take the usual props, and will return new proxy, new base component(props), the handler object which has the construct() property and that function in it
+ */
 // class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
 export class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
