@@ -73,7 +73,7 @@ export class LifecycleHandlerBase<P extends Props, S extends State> {
   }
 }
 
-type LifecycleHandlerType<P, S> = LifecycleHandlerBase<P, S>;
+export type LifecycleHandlerType<P, S> = LifecycleHandlerBase<P, S>;
 export const LifecycleHandler = new Proxy(LifecycleHandlerBase, {
   construct: (target, args) => {
     const instance = new (target as any)(args[0]);
@@ -120,7 +120,7 @@ type ReferenceState = {
   lalalala: "hahahah";
 };
 
-class Reference extends LifecycleHandler<ReferenceProps, ReferenceState> {
+export class Reference extends LifecycleHandler<ReferenceProps, ReferenceState> {
   constructor(props: ReferenceProps) {
     super(props);
     this.state = {
