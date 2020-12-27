@@ -1,6 +1,6 @@
-import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
-import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
+import { HashSet } from "../lib/util/data_structures/hash";
 import { PointNodeRef } from "./PointNodeRef";
+import { ResourceType } from "./WorldGenState";
 
 export type PlayerSaveState = {
   availableSp: number;
@@ -13,6 +13,7 @@ export type PlayerSaveState = {
   allocatedPointNodeSet: HashSet<PointNodeRef>;
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[];
+  score: number;
 };
 
 export type Quest = {
@@ -20,4 +21,3 @@ export type Quest = {
   resourceType: ResourceType;
   resourceAmount: number;
 };
-

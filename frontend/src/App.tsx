@@ -52,59 +52,33 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
+  let createQuestCb = useCallback(() => createQuest(updaters), [updaters]);
 
   let tabViews: JSX.Element[] = [];
-  tabViews[1] = useMemo(() => {
-    return (
-      <NodeDetail
-        selectedPointNode={gameState.playerUI.selectedPointNode}
-        allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
-        worldGen={gameState.worldGen}
-        availableSp={gameState.playerSave.availableSp}
-      />
-    );
-  }, [
-    gameState.playerUI.selectedPointNode,
-    gameState.playerSave.allocatedPointNodeSet,
-    gameState.worldGen,
-    gameState.playerSave.availableSp,
-  ]);
-  let createQuestCb = useCallback(() => createQuest(updaters), [updaters]);
-  tabViews[0] = useMemo(() => {
-    return (
-      <QuestProgress
-        remainingPoints={gameState.playerSave.availableSp}
-        createQuestCb={createQuestCb}
-        activeQuest={gameState.playerSave.activeQuest}
-        numBatches={gameState.playerSave.batchesSinceQuestStart}
-        playerResourceAmounts={gameState.computed.playerResourceAmounts}
-      />
-    );
-  }, [
-    gameState.playerSave.availableSp,
-    gameState.playerSave.activeQuest,
-    createQuestCb,
-    gameState.playerSave.batchesSinceQuestStart,
-    gameState.computed.playerResourceAmounts,
-  ]);
-  tabViews[2] = useMemo(() => {
-    return (
-      <DebugTab
-        selectedPointNode={gameState.playerUI.selectedPointNode}
-        allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
-        worldGen={gameState.worldGen}
-        availableSp={gameState.playerSave.availableSp}
-        computed={gameState.computed}
-      />
-    );
-  }, [
-    gameState.playerUI.selectedPointNode,
-    gameState.playerSave.allocatedPointNodeSet,
-    gameState.worldGen,
-    gameState.playerSave.availableSp,
-    gameState.computed,
-  ]);
-
+  tabViews = [
+    <QuestProgress
+      remainingPoints={gameState.playerSave.availableSp}
+      createQuestCb={createQuestCb}
+      activeQuest={gameState.playerSave.activeQuest}
+      numBatches={gameState.playerSave.batchesSinceQuestStart}
+      playerResourceAmounts={gameState.computed.playerResourceAmounts}
+      updaters={updaters.playerSave}
+      score={gameState.playerSave.score}
+    />,
+    <NodeDetail
+      selectedPointNode={gameState.playerUI.selectedPointNode}
+      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
+      worldGen={gameState.worldGen}
+      availableSp={gameState.playerSave.availableSp}
+    />,
+    <DebugTab
+      selectedPointNode={gameState.playerUI.selectedPointNode}
+      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
+      worldGen={gameState.worldGen}
+      availableSp={gameState.playerSave.availableSp}
+      computed={gameState.computed}
+    />,
+  ];
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
