@@ -28,6 +28,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
   public abstract container: Pixi.Container;
   protected abstract state: S;
+  protected abstract fireStateUpdaters?: () => void;
   private _staleProps: P;
   private _children: ChildInstructions<any, any, P, S>[];
 
@@ -57,6 +58,8 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     const [batchedSetState, fireBatch] = batchifySetState(setState);
     const stateUpdaters = updaterGenerator2<S>(initialState, batchedSetState);
 
+    this.state = initialState;
+    this.fireStateUpdaters = fireBatch;
     return {
       state: initialState,
       setState,
@@ -67,7 +70,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // NOTE(bowei): this is public because the root of component hierarchy needs to be bootstrapped from pixi react bridge
   public _update(nextProps: P) {
     const staleState = { ...this.state };
-    this.fireStateUpdaters();
+    this.fireStateUpdaters?.();
     this.updateSelf(nextProps);
     if (!this.shouldUpdate(this._staleProps, staleState, nextProps, this.state))
       return;
@@ -77,7 +80,6 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     new Promise((resolve) => resolve(this.didUpdate()));
   }
 
-  protected abstract fireStateUpdaters(): void 
   protected abstract didMount(): void 
   protected abstract updateSelf(nextProps: P): void 
   protected abstract shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean 
@@ -158,6 +160,6 @@ export class Reference extends LifecycleHandler<ReferenceProps, ReferenceState> 
   didMount() { } 
   didUpdate() { }
   shouldUpdate(): boolean { return true; }
-  fireStateUpdaters() { }
   willUnmount() { }
+  fireStateUpdaters = () => { };
 }

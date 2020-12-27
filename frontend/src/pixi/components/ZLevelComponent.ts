@@ -45,20 +45,21 @@ export class ZLevelComponent {
 
   updateSelf(props: Props) { }
   shouldUpdate(prevProps: Props, props: Props): boolean {
-    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
-      if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
-      if (key === 'position') {
-        if (!prevProps[key].equals(props[key])) {
-          return true;
-        } else {
-          continue;
-        }
-      }
-      if (prevProps[key] !== props[key]) {
-        return true;
-      }
-    }
-    return false;
+    return true;
+    // for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+    //   if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+    //   if (key === 'position') {
+    //     if (!prevProps[key].equals(props[key])) {
+    //       return true;
+    //     } else {
+    //       continue;
+    //     }
+    //   }
+    //   if (prevProps[key] !== props[key]) {
+    //     return true;
+    //   }
+    // }
+    // return false;
   }
 
   doChild(props: Props, chunkCoord: Vector2, chunkGen: ChunkGen): { childKey: ChunkRef, childProps: ChunkComponentProps } {

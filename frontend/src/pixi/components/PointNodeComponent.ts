@@ -76,6 +76,7 @@ export class PointNodeComponent {
 
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
+<<<<<<< Updated upstream
     this.container.buttonMode = true;
     this.container.hitArea = new Pixi.Rectangle( // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
@@ -83,6 +84,15 @@ export class PointNodeComponent {
       RenderedChunkConstants.NODE_HITAREA_PX,
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
+=======
+    // this.container.buttonMode = true;
+    // this.container.hitArea = new Pixi.Rectangle( // causes a bug with hitareas in children: https://github.com/pixijs/pixi.js/issues/5837
+    //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
+    //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
+    //   RenderedChunkConstants.NODE_HITAREA_PX,
+    //   RenderedChunkConstants.NODE_HITAREA_PX,
+    // );
+>>>>>>> Stashed changes
 
     this.tooltippableArea = new TooltippableAreaComponent({
       hitArea: this.container.hitArea
@@ -143,6 +153,7 @@ export class PointNodeComponent {
 
   updateSelf(props: Props) { }
   shouldUpdate(prevProps: Props, props: Props): boolean {
+    return true;
     for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
       if (prevProps[key] !== props[key]) {
@@ -167,14 +178,6 @@ export class PointNodeComponent {
 
   didMount() {
     const { updaters } = this.staleProps; // we assume this will never change
-
-//     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
-//       this.state.pointerover = event;
-//     })
-//     this.container.addListener('pointerout', () => {
-//       this.state.pointerover = undefined;
-//     })
-// 
 
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
       this.state.numClicks++;

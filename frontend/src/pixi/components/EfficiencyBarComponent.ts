@@ -153,7 +153,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   didUpdate() { }
   shouldUpdate(): boolean { return true; }
   willUnmount() { }
-  fireStateUpdaters() { }
+  fireStateUpdaters = () => { }
 }
 
 const toExport = engageLifecycle(EfficiencyBarComponent);
