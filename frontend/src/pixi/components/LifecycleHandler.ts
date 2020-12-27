@@ -1,4 +1,6 @@
 import * as Pixi from "pixi.js";
+import { batchifySetState } from "../../lib/util/batchify";
+import { UpdaterFn, updaterGenerator2 } from "../../lib/util/updaterGenerator";
 
 type Props = {};
 
@@ -44,6 +46,24 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     this.didMount();
   }
 
+  useState(initialState: S) {
+    const setState: UpdaterFn<S> = ((valueOrCallback) => {
+      if (typeof valueOrCallback === "function") {
+        this.state = (valueOrCallback as ((s: S) => S))(this.state);
+      } else {
+        this.state = valueOrCallback;
+      }
+    })
+    const [batchedSetState, fireBatch] = batchifySetState(setState);
+    const stateUpdaters = updaterGenerator2<S>(initialState, batchedSetState);
+
+    return {
+      state: initialState,
+      setState,
+      fireStateUpdaters: fireBatch,
+      stateUpdaters
+    };
+  }
   // NOTE(bowei): this is public because the root of component hierarchy needs to be bootstrapped from pixi react bridge
   public _update(nextProps: P) {
     const staleState = { ...this.state };

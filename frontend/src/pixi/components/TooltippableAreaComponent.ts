@@ -1,4 +1,5 @@
 import * as Pixi from "pixi.js";
+import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
@@ -13,33 +14,40 @@ type State = {
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   public state: State
   public container: Pixi.Container;
+  stateUpdaters: UpdaterGeneratorType2<State>
 
   constructor(props: Props) {
     super(props);
     this.container = new Pixi.Container();
     this.container.interactive = true;
     this.container.hitArea = props.hitArea;
-    this.state = {}
+
+    ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
+      super.useState({}));
   }
 
   public renderSelf(props: Props) {
+    // create a box
 
   }
 
   public updateSelf(props: Props) {
-
   }
 
   didMount() {
     this.container.addListener('pointerover', this.onPointerOver);
+    this.container.addListener('pointerout', this.onPointerOut);
   }
 
-  onPointerOver = (event: Pixi.InteractionEvent) => {
+  private onPointerOver = (event: Pixi.InteractionEvent) => {
+      console.log('got here in toolltippable');
+  }
+  private onPointerOut = (event: Pixi.InteractionEvent) => {
       console.log('got here in toolltippable');
   }
 
   willUnmount() { }
-  fireStateUpdaters() { }
+  fireStateUpdaters() { this.fireStateUpdaters(); }
   shouldUpdate(): boolean { return true; } 
   didUpdate() { }
 
