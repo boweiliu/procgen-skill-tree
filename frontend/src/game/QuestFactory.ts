@@ -12,8 +12,9 @@ export function createQuest(
   config: QuestFactoryConfig = {}
 ) {
   updaters.playerSave.activeQuest.enqueueUpdate((prev) => {
-    const r = Math.floor(Math.random() * 3) as 0 | 1 | 2;
-    const resource = Object.values(ResourceNontrivialType)[r];
+    // const r = Math.floor(Math.random() * 3) as 0 | 1 | 2;
+    // const resource = Object.values(ResourceNontrivialType)[r];
+    const resource = ResourceType.Mana0;
     const currentResource =
       gameState.computed.playerResourceAmounts?.[resource] || 50;
     const totalAllocatedNodes =
