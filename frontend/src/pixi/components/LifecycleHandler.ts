@@ -1,3 +1,5 @@
+import * as Pixi from "pixi.js";
+
 type Props = {};
 
 type State = {};
@@ -17,11 +19,11 @@ type ChildInstructions<
 };
 
 // class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
-abstract class LifecycleHandlerBase<P extends Props, S extends State> {
-  protected container!: PIXI.Container;
+export class LifecycleHandlerBase<P extends Props, S extends State> {
+  protected container!: Pixi.Container;
   protected state!: S;
-  _staleProps: P;
-  _children: ChildInstructions<any, any, P, S>[];
+  private _staleProps: P;
+  private _children: ChildInstructions<any, any, P, S>[];
 
   constructor(props: P) {
     this._staleProps = props;
@@ -53,7 +55,7 @@ abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
   protected fireStateUpdaters(): void { } 
   protected didMount(): void { }
-  protected abstract updateSelf(nextProps: P): void
+  protected updateSelf(nextProps: P): void { } 
   protected shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean {
     return true;
   }
@@ -62,7 +64,7 @@ abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       instance._update(propsFactory(nextProps, this.state));
     });
   }
-  protected abstract renderSelf(nextProps: P): void
+  protected renderSelf(nextProps: P): void { }
   protected didUpdate(): void { }
   protected willUnmount(): void { }
 
@@ -79,6 +81,16 @@ export const LifecycleHandler = new Proxy(LifecycleHandlerBase, {
     return instance;
   },
 });
+
+export function engageLifecycle<T extends object>(derived: T): T {
+  return new Proxy<T>(derived, {
+    construct: (target, args) => {
+      const instance = new (target as any)(args[0]);
+      instance._didConstruct(args[0]);
+      return instance;
+    },
+  });
+}
 
 /**
  * First render:
