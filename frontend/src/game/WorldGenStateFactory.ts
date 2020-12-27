@@ -105,11 +105,11 @@ export class PointNodeGenFactory {
     let resourceType: ResourceType;
     if (randomFloat < 0.0) {
       resourceType = "Nothing";
-    } else if (randomFloat < 0.20) {
+    } else if (randomFloat < 0.15) {
       resourceType = ResourceType.Mana0;
-    } else if (randomFloat < 0.35) {
+    } else if (randomFloat < -0.35) {
       resourceType = ResourceType.Mana1;
-    } else if (randomFloat < 0.60) {
+    } else if (randomFloat < -0.60) {
       resourceType = ResourceType.Mana2;
     } else {
       resourceType = "Nothing";
@@ -121,13 +121,13 @@ export class PointNodeGenFactory {
 
     randomFloat = squirrel3(id + 2) / INTMAX32;
     let resourceModifier: ResourceModifier;
-    if (randomFloat < 0.70) {
+    if (randomFloat < 0.55) {
       resourceModifier = ResourceModifier.Flat;
-    } else if (randomFloat < 0.73) {
+    } else if (randomFloat < -0.70) {
       resourceModifier = ResourceModifier.AfterIncreased0;
-    } else if (randomFloat < 0.75) {
+    } else if (randomFloat < -0.70) {
       resourceModifier = ResourceModifier.AfterIncreased1;
-    } else if (randomFloat < 0.95) {
+    } else if (randomFloat < 1.95) {
       resourceModifier = ResourceModifier.Increased0;
     } else {
       resourceModifier = ResourceModifier.Increased1;
@@ -137,11 +137,13 @@ export class PointNodeGenFactory {
     if (resourceModifier === ResourceModifier.Flat ||
       resourceModifier === ResourceModifier.AfterIncreased0 ||
       resourceModifier === ResourceModifier.AfterIncreased1) {
-      randomFloat = Math.floor(squirrel3(id + 3) / INTMAX32 * 4); // base is 20 ish?
+      // ([0..3] x 3) * 20 + 60 == 150 +/- 90
+      randomFloat = Math.floor(squirrel3(id + 3) / INTMAX32 * 4);
       randomFloat += Math.floor(squirrel3(id + 4) / INTMAX32 * 4); // base is 20 ish?
       randomFloat += Math.floor(squirrel3(id + 5) / INTMAX32 * 4); // base is 20 ish?
       resourceAmount = randomFloat * 20 + 60;
     } else {
+      // 3 + [0..1] x 4 == 5% +/- 2
       randomFloat = Math.floor(squirrel3(id + 3) / INTMAX32 * 2); // base is 20 ish?
       randomFloat += Math.floor(squirrel3(id + 4) / INTMAX32 * 2); // base is 20 ish?
       randomFloat += Math.floor(squirrel3(id + 5) / INTMAX32 * 2); // base is 20 ish?

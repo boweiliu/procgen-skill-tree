@@ -1,6 +1,7 @@
 import * as Pixi from "pixi.js";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { GameState, WindowState } from "../data/GameState";
+// eslint-disable-next-line
 import { assertOnlyCalledOnce, Const } from "../lib/util/misc";
 import { RootComponent } from "./components/RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
@@ -43,7 +44,7 @@ export class PixiReactBridge {
   constructor(props?: Props, isSecondConstructorCall: boolean = false) {
     // verify that we are not loading this twice when we expect to load it only once -- bad for performance!!
     if (!(props?.args?.isSecondConstructorCall || isSecondConstructorCall)) {
-      assertOnlyCalledOnce("Base application constructor"); // annoying with react hot reload, disable for now}
+      // assertOnlyCalledOnce("Pixi react bridge constructor"); // annoying with react hot reload, disable for now}
     }
 
     // let appSize = appSizeFromWindowSize(

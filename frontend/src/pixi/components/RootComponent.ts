@@ -10,6 +10,7 @@ import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/u
 import { ZLevelComponent } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
+import { EfficiencyBarComponent, EfficiencyBarComponentType } from "./EfficiencyBarComponent";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -42,10 +43,11 @@ export class RootComponent {
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
   public backdropStage: Pixi.Container;
   public keyboard!: KeyboardState;
-  public fpsTracker: FpsComponent;
+  public fpsTracker!: FpsComponent;
   public zLevel: ZLevelComponent | undefined;
   public reticle: ReticleComponent;
   public backdrop: Pixi.Graphics;
+  public efficiencyBar: EfficiencyBarComponentType;
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -85,11 +87,6 @@ export class RootComponent {
     this.backdropStage.sortableChildren = true;
     this.container.addChild(this.backdropStage);
 
-    // // this.keyboard = new KeyboardState();
-    // // this.app.ticker.add(() => {
-    // //   this.keyboard.update();
-    // // })
-
     this.fpsTracker = new FpsComponent({
       delta: props.delta,
       position: new Vector2(0, 0),
@@ -103,7 +100,6 @@ export class RootComponent {
     // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
     this.backdrop.interactive = true;
     // backdrop.interactiveChildren = true; // not sure what this does
-    // backdrop.buttonMode = true; // changes the mouse cursor on hover to pointer; not desirable for the entire backdrop
     this.backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
 
@@ -131,6 +127,16 @@ export class RootComponent {
       this.zLevel.update(childProps);
     }
 
+    this.efficiencyBar = new EfficiencyBarComponent({
+      delta: 0,
+      args: {},
+      updaters: {},
+      tick: this.state.tick,
+      position: new Vector2(60, 60),
+      efficiencyPercent: 100
+    })
+    this.fixedCameraStage.addChild(this.efficiencyBar.container);
+
     this.renderSelf(props);
     this.didMount();
   }
@@ -148,7 +154,6 @@ export class RootComponent {
     this.fireStateUpdaters();
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props, staleState, this.state)) { return; }
-    // this.keyboard.update(props);
     this.fpsTracker.update({
       delta: props.delta,
       position: new Vector2(0, 0),
@@ -177,6 +182,14 @@ export class RootComponent {
     this.reticle.update({
       appSize: props.appSize
     })
+    this.efficiencyBar._update({
+      args: {},
+      updaters: {},
+      delta: props.delta,
+      tick: this.state.tick,
+      position: new Vector2(60, 60),
+      efficiencyPercent: 100,
+    });
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
     this.staleProps = props;
