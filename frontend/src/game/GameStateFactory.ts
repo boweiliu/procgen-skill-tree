@@ -46,6 +46,7 @@ export class GameStateFactory {
         batchesSinceQuestStart: 0,
         allocatedPointNodeSet: new HashSet([pointNodeRef]),
         allocatedPointNodeHistory: [pointNodeRef],
+        score: 0,
       },
       playerUI: {
         selectedPointNode: undefined,
