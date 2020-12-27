@@ -78,7 +78,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
       this.cornerRadius
     ); // outerbar = the box containing the efficiency text + bar. 100px is just enough width for the word "Efficiency". 236px height was chosen arbitrarily
     this.boundingBox.zIndex = -1;
-    this.boundingBox.alpha = .9; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
+    this.boundingBox.alpha = .8; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
     this.container.addChild(this.boundingBox);
 
     this.innerBar = new Pixi.Graphics();
