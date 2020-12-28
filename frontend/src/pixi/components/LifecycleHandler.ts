@@ -11,14 +11,34 @@ type ChildInstructions<
   ChildPropsType extends Props,
   ParentPropsType extends Props,
   ParentStateType extends State
-> = {
-  childClass: new (props: ChildPropsType) => ChildInstanceType;
-  instance?: ChildInstanceType;
-  propsFactory: (
-    parentProps: ParentPropsType,
-    parentState: ParentStateType
-  ) => ChildPropsType;
-};
+  > = {
+    childClass: new (props: ChildPropsType) => ChildInstanceType;
+    instance?: ChildInstanceType;
+    propsFactory: (
+      parentProps: ParentPropsType,
+      parentState: ParentStateType
+    ) => ChildPropsType;
+  };
+
+class ChildrenArray<P extends Props, S extends State> {
+  private _values: ChildInstructions<any, any, P, S>[] = [];
+
+  public push<CIT, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
+    this._values.push(c);
+  }
+
+  public remove<CIT>(c: CIT) {
+    this._values.splice(this._values.findIndex(it => it.instance === c), 1);
+  }
+
+  public forEach(callbackfn: (
+    value: ChildInstructions<any, any, P, S>,
+    index: number,
+    array: ChildInstructions<any, any, P, S>[],
+  ) => void) {
+    this._values.forEach(callbackfn);
+  }
+}
 
 /**
  * LifecycleHandlerConstructor <- this should take the usual props, and will return new proxy, new base component(props), the handler object which has the construct() property and that function in it
@@ -29,14 +49,14 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
   public abstract container: Pixi.Container;
   protected abstract state: S;
-  protected _staleProps: P; // need it for args
-  private _children: ChildInstructions<any, any, P, S>[];
+
+  protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
+  private _children: ChildrenArray<P, S> = new ChildrenArray();
 
   constructor(props: P) {
     this._staleProps = props;
-    this._children = []; // child implementation should register child class and props factory in constructor?
   }
-  _didConstruct(props: P) {
+  private _didConstruct(props: P) {
     this._children.forEach((child) => {
       child.instance = new child.childClass(
         child.propsFactory(props, this.state)
@@ -47,7 +67,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     this.didMount();
   }
 
-  useState(initialState: S) {
+  protected useState(initialState: S) {
     const setState: UpdaterFn<S> = (valueOrCallback) => {
       if (typeof valueOrCallback === "function") {
         this.state = (valueOrCallback as (s: S) => S)(this.state);
@@ -65,18 +85,25 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       stateUpdaters,
     };
   }
+
   // NOTE(bowei): this is public because the root of component hierarchy needs to be bootstrapped from pixi react bridge
-  public _update(nextProps: P) {
+  public _update(nextProps: P) { // nextProps is guaranteed to be referentially a distinct object (might be shallow copy though)
     const staleState = { ...this.state };
     this.fireStateUpdaters();
     this.updateSelf(nextProps);
     if (!this.shouldUpdate(this._staleProps, staleState, nextProps, this.state)) {
       return;
     }
-    this.updateChildren(nextProps); // implementation should call children._update in here
+    this._updateChildren(nextProps); // implementation should call children._update in here
     this.renderSelf(nextProps);
-    this._setStaleProps(nextProps);
+    this._staleProps = nextProps;
     new Promise((resolve) => resolve(this.didUpdate()));
+  }
+
+  private _updateChildren(nextProps: P) {
+    this._children.forEach(({ instance, propsFactory }) => {
+      instance._update(propsFactory(nextProps, this.state));
+    });
   }
 
   protected abstract fireStateUpdaters(): void;
@@ -88,18 +115,9 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     nextProps: P,
     state: S
   ): boolean;
-  protected updateChildren(nextProps: P) {
-    this._children.forEach(({ instance, propsFactory }) => {
-      instance._update(propsFactory(nextProps, this.state));
-    });
-  }
   protected abstract renderSelf(nextProps: P): void;
   protected abstract didUpdate(): void;
   protected abstract willUnmount(): void;
-
-  _setStaleProps(nextProps: P) {
-    this._staleProps = nextProps;
-  }
 }
 
 export type LifecycleHandlerType<P, S> = LifecycleHandlerBase<P, S>;
