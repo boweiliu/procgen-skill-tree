@@ -173,6 +173,7 @@ export class ZLevelComponent {
         // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
 
         this.didForceUpdateChild(instance);
+        this.didForceUpdate();
       }
       // no need to do anything else -- stale props has not changed
       return;
@@ -182,14 +183,13 @@ export class ZLevelComponent {
     this.upsertChildren(props);
 
     this.renderSelf(props);
-    this.didUpdate(this.staleProps, props);
+    this.didUpdate();
     this.staleProps = props;
     // this.staleProps.allocatedPointNodeSubset = this.staleProps.allocatedPointNodeSubset.clone();
   }
 
-  didUpdate(prevProps: Props, props: Props) {
-
-  }
+  didUpdate() { }
+  didForceUpdate() { }
 
   public willUnmount() { }
 
