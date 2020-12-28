@@ -92,7 +92,7 @@ export class ChunkComponent {
 
   upsertChildren(props: Props) {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
-    console.log('chunk component upsert children');
+    console.log(`chunk component upsert children has ${this.children.size()} children`);
     // .clone() is SLOW!!! for now, let's not track children to delete
     // let childrenToDelete = new KeyedHashMap<PointNodeRef, PointNodeComponent>();
 
@@ -127,12 +127,12 @@ export class ChunkComponent {
         this.children.put(pointNodeRef, childComponent);
         this.container.addChild(childComponent.container);
       }
-      // for (let [childKey, childComponent] of childrenToDelete.entries()) {
-      //   console.log('chunk component todelete iteration');
-      //   childComponent.willUnmount();
-      //   this.children.remove(childKey);
-      //   this.container.removeChild(childComponent.container);
-      // }
+    }
+    console.log(`chunk component to delete has ${childrenToDelete.size()} children`);
+    for (let [childKey, childComponent] of childrenToDelete.entries()) {
+      childComponent.willUnmount();
+      this.children.remove(childKey);
+      this.container.removeChild(childComponent.container);
     }
   }
 
