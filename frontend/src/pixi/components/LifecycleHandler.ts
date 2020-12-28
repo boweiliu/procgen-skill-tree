@@ -23,6 +23,7 @@ type ChildInstructions<
 /**
  * LifecycleHandlerConstructor <- this should take the usual props, and will return new proxy, new base component(props), the handler object which has the construct() property and that function in it
  */
+// export function LifecycleHandlerConstructor<T>(props:
 // class and interface merging??? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
 export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
@@ -47,13 +48,13 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   }
 
   useState(initialState: S) {
-    const setState: UpdaterFn<S> = ((valueOrCallback) => {
+    const setState: UpdaterFn<S> = (valueOrCallback) => {
       if (typeof valueOrCallback === "function") {
-        this.state = (valueOrCallback as ((s: S) => S))(this.state);
+        this.state = (valueOrCallback as (s: S) => S)(this.state);
       } else {
         this.state = valueOrCallback;
       }
-    })
+    };
     const [batchedSetState, fireBatch] = batchifySetState(setState);
     const stateUpdaters = updaterGenerator2<S>(initialState, batchedSetState);
 
@@ -61,7 +62,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       state: initialState,
       setState,
       fireStateUpdaters: fireBatch,
-      stateUpdaters
+      stateUpdaters,
     };
   }
   // NOTE(bowei): this is public because the root of component hierarchy needs to be bootstrapped from pixi react bridge
@@ -77,18 +78,23 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     new Promise((resolve) => resolve(this.didUpdate()));
   }
 
-  protected abstract fireStateUpdaters(): void 
-  protected abstract didMount(): void 
-  protected abstract updateSelf(nextProps: P): void 
-  protected abstract shouldUpdate(staleProps: P, staleState: S, nextProps: P, state: S): boolean 
+  protected abstract fireStateUpdaters(): void;
+  protected abstract didMount(): void;
+  protected abstract updateSelf(nextProps: P): void;
+  protected abstract shouldUpdate(
+    staleProps: P,
+    staleState: S,
+    nextProps: P,
+    state: S
+  ): boolean;
   protected updateChildren(nextProps: P) {
     this._children.forEach(({ instance, propsFactory }) => {
       instance._update(propsFactory(nextProps, this.state));
     });
   }
-  protected abstract renderSelf(nextProps: P): void 
-  protected abstract didUpdate(): void 
-  protected abstract willUnmount(): void 
+  protected abstract renderSelf(nextProps: P): void;
+  protected abstract didUpdate(): void;
+  protected abstract willUnmount(): void;
 
   _setStaleProps(nextProps: P) {
     this._staleProps = nextProps;
@@ -97,9 +103,9 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
 export type LifecycleHandlerType<P, S> = LifecycleHandlerBase<P, S>;
 export const LifecycleHandler = new Proxy(LifecycleHandlerBase, {
-  construct: (target, args) => {
-    const instance = new (target as any)(args[0]);
-    instance._didConstruct(args[0]);
+  construct: (target, args, newTarget) => {
+    const instance = Reflect.construct(target, args, newTarget);
+    instance._didConstruct(...args);
     return instance;
   },
 });
