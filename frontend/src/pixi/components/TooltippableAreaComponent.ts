@@ -68,8 +68,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
         // if doesnt exist, construct it
         this.tooltipContainer = new Pixi.Container();
         const box = new Pixi.Graphics();
-        box.lineStyle(2, 0xeeeeee, 1);
-        box.beginFill(0x222222);
+        box.lineStyle(1, 0x222222, 1);
+        box.beginFill(0xEEEEEE);
         box.drawRoundedRect(0, 0, 40, 40, 4);
         this.tooltipContainer.addChild(box)
         this.container.addChild(this.tooltipContainer);
