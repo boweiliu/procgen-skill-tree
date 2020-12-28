@@ -110,7 +110,7 @@ export class ZLevelComponent {
 
   upsertChildren(props: Props) {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
-    // console.log(`i have ${this.children.size()} children`)
+    console.log(`zlevel component have ${this.children.size()} children`)
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const { childKey, childProps } = this.doChild(props, chunkCoord, chunkGen);
       let childComponent = this.children.get(childKey);
@@ -123,6 +123,7 @@ export class ZLevelComponent {
         this.container.addChild(childComponent.container);
       }
     }
+    console.log(`zlevel component have ${childrenToDelete.size()} children to delete`)
     for (let [childKey, childComponent] of childrenToDelete.entries()) {
       childComponent.willUnmount();
       this.children.remove(childKey);
