@@ -75,15 +75,41 @@ export class ChunkComponent {
     // return true;
     for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+      if (key === 'position') {
+        if (!prevProps[key].equals(props[key])) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (key === 'selectedPointNode') {
+        if (prevProps[key]?.hash() !== props[key]?.hash()) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (key === 'selfChunkRef') {
+        if (prevProps[key]?.hash() !== props[key]?.hash()) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
       if (key === 'allocatedPointNodeSubset') {
         // subsets could be different objects but have the same contents
-        if (prevProps[key].equals(props[key])) {
+        if (!prevProps[key].equals(props[key])) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
           return true;
         } else {
           continue;
         }
       }
       if (prevProps[key] !== props[key]) {
+        console.log(`chunk shouldUpdate differed in ${key}, returning true`);
         return true;
       }
     }
