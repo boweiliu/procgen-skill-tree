@@ -90,14 +90,15 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addListener('pointerout', this.onPointerOut);
   }
 
-  private onPointerOver = (event: Pixi.InteractionEvent) => {
+  onPointerOver = (event: Pixi.InteractionEvent) => {
     console.log('got onPointerOver in toolltippable');
     this.stateUpdaters.isActive.enqueueUpdate(() => {
       console.log('fired onPointerOver in toolltippable');
       return true;
     });
   }
-  private onPointerOut = (event: Pixi.InteractionEvent) => {
+
+  onPointerOut = (event: Pixi.InteractionEvent) => {
     console.log('got onPointerOut in tooltippable')
     this.stateUpdaters.isActive.enqueueUpdate(() => {
       console.log('fired onPointerOut in tooltippable')

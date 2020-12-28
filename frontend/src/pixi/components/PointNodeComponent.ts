@@ -90,15 +90,15 @@ export class PointNodeComponent {
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
     // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
-    this.container.hitArea = this.hitArea;
+    // this.container.hitArea = this.hitArea;
 
     this.tooltippableAreaPropsFactory = (p: Props, s: State) => {
       return {
         hitArea: this.hitArea
       }
     }
-    // this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
-    // this.container.addChild(this.tooltippableArea.container);
+    this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
+    this.container.addChild(this.tooltippableArea.container);
 
     this.renderSelf(props);
     this.didMount();
@@ -158,6 +158,22 @@ export class PointNodeComponent {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
       if (prevProps[key] !== props[key]) {
         return true;
+      }
+      if (key === 'position') {
+        if (!prevProps[key].equals(props[key])) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (key === 'selfPointNodeRef') {
+        if (prevProps[key]?.hash() !== props[key]?.hash()) {
+          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
       }
     }
     return false;
