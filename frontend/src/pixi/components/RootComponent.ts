@@ -113,17 +113,17 @@ export class RootComponent {
     });
     this.fixedCameraStage.addChild(this.reticle.container);
 
-    this.zLevelPropsFactory = (p: Props, s: State) => {
+    this.zLevelPropsFactory = (props: Props, state: State) => {
       return {
-        delta: p.delta,
+        delta: props.delta,
         args: {
-          pointNodeTexture: this.state.pointNodeTexture.get(),
+          pointNodeTexture: state.pointNodeTexture.get(),
           markForceUpdate: this.markForceUpdate,
         },
-        z: this.state.playerCurrentZ,
+        z: state.playerCurrentZ,
         updaters: props.updaters,
         position: props.appSize.multiply(0.5),
-        zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
+        zLevelGen: props.gameState.worldGen.zLevels[state.playerCurrentZ],
         selectedPointNode: props.gameState.playerUI.selectedPointNode,
         allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
       };
@@ -207,7 +207,7 @@ export class RootComponent {
     const activeIntent = props.gameState.intent.activeIntent;
     let deltaX = 0;
     let deltaY = 0;
-    const unit = 5;
+    const unit = 5 * props.delta;
     // if we want to pan [the hud] west (i.e. the left key was pressed), action stage needs to move east
     if (activeIntent[IntentName.PAN_WEST]) deltaX += unit;
     if (activeIntent[IntentName.PAN_EAST]) deltaX += -unit;

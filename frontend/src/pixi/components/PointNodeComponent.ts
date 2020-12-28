@@ -40,7 +40,7 @@ export class PointNodeComponent {
   public centerSprite: Pixi.Sprite;
   public hitArea: Pixi.IHitArea;
 
-  public tooltippableArea: TooltippableAreaComponentType
+  public tooltippableArea?: TooltippableAreaComponentType
   public tooltippableAreaPropsFactory: (p: Props, s: State) => TooltippableAreaComponentProps
 
   public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
@@ -97,8 +97,8 @@ export class PointNodeComponent {
         hitArea: this.hitArea
       }
     }
-    this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
-    this.container.addChild(this.tooltippableArea.container);
+    // this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
+    // this.container.addChild(this.tooltippableArea.container);
 
     this.renderSelf(props);
     this.didMount();
@@ -188,7 +188,7 @@ export class PointNodeComponent {
       return;
     }
 
-    this.tooltippableArea._update(this.tooltippableAreaPropsFactory(props, this.state));
+    this.tooltippableArea?._update(this.tooltippableAreaPropsFactory(props, this.state));
 
     this.renderSelf(props);
     this.staleProps = props;
