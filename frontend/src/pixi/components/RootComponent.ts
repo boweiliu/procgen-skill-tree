@@ -159,7 +159,7 @@ export class RootComponent {
     }
   }
 
-  shouldUpdate(prevProps: Props, props: Props, prevState: State, state: State): boolean {
+  shouldUpdate(prevProps: Props, prevState: State, props: Props, state: State): boolean {
 
     let prevSize = prevProps.gameState.playerSave.allocatedPointNodeSet.size()
     let nextSize = props.gameState.playerSave.allocatedPointNodeSet.size()
@@ -171,7 +171,19 @@ export class RootComponent {
     let staleState = { ...this.state };
     this.fireStateUpdaters();
     this.updateSelf(props)
-    if (!this.shouldUpdate(this.staleProps, props, staleState, this.state)) { return; }
+    if (!this.shouldUpdate(this.staleProps, staleState, props, this.state)) {
+      // we think we don't need to update; however, we still need to
+      // update the chidlren that asked us to forcefully update them
+      let forceUpdates = [...this.forceUpdates];
+      this.forceUpdates = [];
+      for (let { instance, propsFactory } of forceUpdates) {
+        instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
+        // instance._forceUpdate();
+      }
+      // no need to do anything else -- stale props has not changed
+      return;
+    }
+
     this.fpsTracker.update({
       delta: props.delta,
       position: new Vector2(0, 0),

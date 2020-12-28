@@ -184,6 +184,8 @@ export class PointNodeComponent {
     this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
     if ((this._children as any[]).indexOf(childInstance) === -1) {
       throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    } else if (this.forceUpdates.indexOf(childInstance) !== -1) {
+      // already added to forceUpdates array, we can skip
     } else {
       this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
     }
@@ -193,7 +195,8 @@ export class PointNodeComponent {
     // let staleState = { ...this.state };
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) {
-      // update the chidlren that asked us to forcefully update them even though props didnt change
+      // we think we don't need to update; however, we still need to
+      // update the chidlren that asked us to forcefully update them
       let forceUpdates = [...this.forceUpdates];
       this.forceUpdates = [];
       for (let { instance, propsFactory } of forceUpdates) {

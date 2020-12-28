@@ -142,7 +142,19 @@ export class ZLevelComponent {
   public update(props: Props) {
     // let staleState = { ...this.state };
     this.updateSelf(props)
-    if (!this.shouldUpdate(this.staleProps, props)) { return; }
+    if (!this.shouldUpdate(this.staleProps, props)) {
+      // we think we don't need to update; however, we still need to
+      // update the chidlren that asked us to forcefully update them
+      let forceUpdates = [...this.forceUpdates];
+      this.forceUpdates = [];
+      for (let { instance, propsFactory } of forceUpdates) {
+        instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
+        // instance._forceUpdate();
+      }
+      // no need to do anything else -- stale props has not changed
+      return;
+    }
+
 
     this.upsertChildren(props);
 
