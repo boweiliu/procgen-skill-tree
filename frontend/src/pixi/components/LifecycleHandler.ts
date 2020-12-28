@@ -70,8 +70,9 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     const staleState = { ...this.state };
     this.fireStateUpdaters();
     this.updateSelf(nextProps);
-    if (!this.shouldUpdate(this._staleProps, staleState, nextProps, this.state))
+    if (!this.shouldUpdate(this._staleProps, staleState, nextProps, this.state)) {
       return;
+    }
     this.updateChildren(nextProps); // implementation should call children._update in here
     this.renderSelf(nextProps);
     this._setStaleProps(nextProps);
