@@ -93,12 +93,9 @@ export class ZLevelComponent {
     });
 
     let allocatedPointNodeSubset = new HashSet(
-      props.allocatedPointNodeSubset.values()
-        .filter((pointNodeRef) => {
-          return pointNodeRef.chunkCoord.x === chunkRef.chunkCoord.x &&
-            pointNodeRef.chunkCoord.y === chunkRef.chunkCoord.y;
-        })
+      props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
     );
+
     let childProps = {
       delta: props.delta,
       args: {
@@ -109,7 +106,8 @@ export class ZLevelComponent {
       updaters: props.updaters,
       position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
       chunkGen: chunkGen,
-      selectedPointNode: props.selectedPointNode,
+      // NOTE(bowei): for optimization, we dont tell other chunks about selected nodes in other chunks
+      selectedPointNode: (props.selectedPointNode?.chunkCoord.equals(chunkRef.chunkCoord) ? props.selectedPointNode : undefined),
       allocatedPointNodeSubset,
     }
     return {
