@@ -90,7 +90,7 @@ export class PointNodeComponent {
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
     // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
-    // this.container.hitArea = hitArea;
+    this.container.hitArea = this.hitArea;
 
     this.tooltippableAreaPropsFactory = (p: Props, s: State) => {
       return {
