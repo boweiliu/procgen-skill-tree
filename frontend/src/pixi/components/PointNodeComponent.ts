@@ -94,11 +94,19 @@ export class PointNodeComponent {
 
     this.tooltippableAreaPropsFactory = (p: Props, s: State) => {
       return {
-        hitArea: this.hitArea
+        args: {
+          markForceUpdate: this.markForceUpdate,
+        },
+        hitArea: this.hitArea,
       }
     }
     this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
     this.container.addChild(this.tooltippableArea.container);
+    this._children.push({
+      childClass: TooltippableAreaComponent,
+      instance: this.tooltippableArea,
+      propsFactory: this.tooltippableAreaPropsFactory,
+    });
 
     this.renderSelf(props);
     this.didMount();
@@ -182,13 +190,16 @@ export class PointNodeComponent {
   /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
   markForceUpdate = (childInstance: any) => {
     this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
-    if ((this._children as any[]).indexOf(childInstance) === -1) {
-      throw new Error(`Error, child ${childInstance} not found in ${this}`);
-    } else if (this.forceUpdates.indexOf(childInstance) !== -1) {
-      // already added to forceUpdates array, we can skip
-    } else {
-      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+
+    for (let childInfo of this._children) {
+      if (childInfo.instance === childInstance) { // we found the instance in our _children array, now ensure it is in force updates array then return
+        if (this.forceUpdates.indexOf(childInfo) === -1) {
+          this.forceUpdates.push(childInfo);
+        }
+        return;
+      }
     }
+    throw new Error(`Error, child ${childInstance} not found in ${this}`);
   }
 
   public update(props: Props) {
@@ -280,4 +291,7 @@ export class PointNodeComponent {
 
   public willUnmount() { } 
 
+
+  // bridge while we migrate to lifecycle handler
+  public _update(props: Props) { this.update(props); }
 }

@@ -22,10 +22,12 @@ type Props = {
   allocatedPointNodeSubset: Const<HashSet<PointNodeRef>>,
 }
 
+type State = {}
+
 export class ZLevelComponent {
   public container: Pixi.Container;
   staleProps!: Props;
-  state!: {};
+  state!: State;
 
   public children: KeyedHashMap<ChunkRef, ChunkComponent> = new KeyedHashMap();
 
@@ -50,11 +52,16 @@ export class ZLevelComponent {
   /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
   markForceUpdate = (childInstance: any) => {
     this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
-    if ((this._children as any[]).indexOf(childInstance) === -1) {
-      throw new Error(`Error, child ${childInstance} not found in ${this}`);
-    } else {
-      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+
+    for (let childInfo of this._children) {
+      if (childInfo.instance === childInstance) { // we found the instance in our _children array, now ensure it is in force updates array then return
+        if (this.forceUpdates.indexOf(childInfo) === -1) {
+          this.forceUpdates.push(childInfo);
+        }
+        return;
+      }
     }
+    throw new Error(`Error, child ${childInstance} not found in ${this}`);
   }
 
   updateSelf(props: Props) { }
@@ -85,7 +92,7 @@ export class ZLevelComponent {
     return false;
   }
 
-  doChild(props: Props, chunkCoord: Vector2, chunkGen: ChunkGen): { childKey: ChunkRef, childProps: ChunkComponentProps } {
+  doChild(props: Props, chunkCoord: Vector2, chunkGen: ChunkGen): { childKey: ChunkRef, childPropsFactory: (p: Props, s: State) => ChunkComponentProps } {
     const chunkRef = new ChunkRef({
       z: props.z,
       chunkCoord,
@@ -96,23 +103,25 @@ export class ZLevelComponent {
       props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
     );
 
-    let childProps = {
-      delta: props.delta,
-      args: {
-        pointNodeTexture: props.args.pointNodeTexture,
-        markForceUpdate: this.markForceUpdate
-      },
-      selfChunkRef: chunkRef,
-      updaters: props.updaters,
-      position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
-      chunkGen: chunkGen,
-      // NOTE(bowei): for optimization, we dont tell other chunks about selected nodes in other chunks
-      selectedPointNode: (props.selectedPointNode?.chunkCoord.equals(chunkRef.chunkCoord) ? props.selectedPointNode : undefined),
-      allocatedPointNodeSubset,
+    let childPropsFactory = (props: Props, state: State) => {
+      return {
+        delta: props.delta,
+        args: {
+          pointNodeTexture: props.args.pointNodeTexture,
+          markForceUpdate: this.markForceUpdate
+        },
+        selfChunkRef: chunkRef,
+        updaters: props.updaters,
+        position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
+        chunkGen: chunkGen,
+        // NOTE(bowei): for optimization, we dont tell other chunks about selected nodes in other chunks
+        selectedPointNode: (props.selectedPointNode?.chunkCoord.equals(chunkRef.chunkCoord) ? props.selectedPointNode : undefined),
+        allocatedPointNodeSubset,
+      };
     }
     return {
       childKey: chunkRef,
-      childProps
+      childPropsFactory
     };
   }
 
@@ -120,15 +129,20 @@ export class ZLevelComponent {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
     console.log(`zlevel component have ${this.children.size()} children`)
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
-      const { childKey, childProps } = this.doChild(props, chunkCoord, chunkGen);
+      const { childKey, childPropsFactory } = this.doChild(props, chunkCoord, chunkGen);
       let childComponent = this.children.get(childKey);
       if (childComponent) {
-        childComponent.update(childProps);
+        childComponent.update(childPropsFactory(props, this.state));
         childrenToDelete.remove(childKey);
       } else {
-        childComponent = new ChunkComponent(childProps);
+        childComponent = new ChunkComponent(childPropsFactory(props, this.state));
         this.children.put(childKey, childComponent);
         this.container.addChild(childComponent.container);
+        this._children.push({
+          childClass: ChunkComponent,
+          instance: childComponent,
+          propsFactory: childPropsFactory
+        });
       }
     }
     console.log(`zlevel component have ${childrenToDelete.size()} children to delete`)
@@ -136,6 +150,7 @@ export class ZLevelComponent {
       childComponent.willUnmount();
       this.children.remove(childKey);
       this.container.removeChild(childComponent.container);
+      this._children.splice(this._children.findIndex(it => it.instance === childComponent), 1);
     }
   }
 
@@ -150,6 +165,7 @@ export class ZLevelComponent {
       for (let { instance, propsFactory } of forceUpdates) {
         instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
         // instance._forceUpdate();
+        // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
       }
       // no need to do anything else -- stale props has not changed
       return;
@@ -180,6 +196,9 @@ export class ZLevelComponent {
       return prev;
     })
   }
+
+  // bridge while we migrate to lifecycle handler
+  public _update(props: Props) { this.update(props); }
 }
 
 

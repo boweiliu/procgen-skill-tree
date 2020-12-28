@@ -134,6 +134,11 @@ export class RootComponent {
     } else {
       this.zLevel.update(this.zLevelPropsFactory(props, this.state));
     }
+    this._children.push({
+      childClass: ZLevelComponent,
+      instance: this.zLevel,
+      propsFactory: this.zLevelPropsFactory,
+    });
 
     this.efficiencyBar = new EfficiencyBarComponent({
       delta: 0,
@@ -152,18 +157,22 @@ export class RootComponent {
   /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
   markForceUpdate = (childInstance: any) => {
     this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
-    if ((this._children as any[]).indexOf(childInstance) === -1) {
-      throw new Error(`Error, child ${childInstance} not found in ${this}`);
-    } else {
-      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+
+    for (let childInfo of this._children) {
+      if (childInfo.instance === childInstance) { // we found the instance in our _children array, now ensure it is in force updates array then return
+        if (this.forceUpdates.indexOf(childInfo) === -1) {
+          this.forceUpdates.push(childInfo);
+        }
+        return;
+      }
     }
+    throw new Error(`Error, child ${childInstance} not found in ${this}`);
   }
 
   shouldUpdate(prevProps: Props, prevState: State, props: Props, state: State): boolean {
-
-    let prevSize = prevProps.gameState.playerSave.allocatedPointNodeSet.size()
-    let nextSize = props.gameState.playerSave.allocatedPointNodeSet.size()
-    if (prevSize !== nextSize) { console.log('rootapp shouldUpdate', { prevSize, nextSize }); }
+    // let prevSize = prevProps.gameState.playerSave.allocatedPointNodeSet.size()
+    // let nextSize = props.gameState.playerSave.allocatedPointNodeSet.size()
+    // if (prevSize !== nextSize) { console.log('rootapp shouldUpdate', { prevSize, nextSize }); }
     return true;
   }
 
@@ -179,6 +188,7 @@ export class RootComponent {
       for (let { instance, propsFactory } of forceUpdates) {
         instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
         // instance._forceUpdate();
+        // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
       }
       // no need to do anything else -- stale props has not changed
       return;
@@ -289,5 +299,8 @@ export class RootComponent {
       })
     }
   }
+
+  // bridge while we migrate to lifecycle handler
+  public _update(props: Props) { this.update(props); }
 }
 

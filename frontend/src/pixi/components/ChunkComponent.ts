@@ -18,7 +18,6 @@ export class RenderedChunkConstants {
   public static NODE_ROUNDED_PX: number = 4;
 }
 
-export type ChunkComponentProps = Props;
 type Props = {
   delta: number,
   args: {
@@ -33,10 +32,12 @@ type Props = {
   allocatedPointNodeSubset: HashSet<PointNodeRef>,
 }
 
+type State = {}
+
 export class ChunkComponent {
   public container: Pixi.Container;
   staleProps!: Props;
-  state!: {};
+  state!: State;
 
   public children: KeyedHashMap<PointNodeRef, PointNodeComponent>;
   
@@ -63,11 +64,16 @@ export class ChunkComponent {
   /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
   markForceUpdate = (childInstance: any) => {
     this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
-    if ((this._children as any[]).indexOf(childInstance) === -1) {
-      throw new Error(`Error, child ${childInstance} not found in ${this}`);
-    } else {
-      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+
+    for (let childInfo of this._children) {
+      if (childInfo.instance === childInstance) { // we found the instance in our _children array, now ensure it is in force updates array then return
+        if (this.forceUpdates.indexOf(childInfo) === -1) {
+          this.forceUpdates.push(childInfo);
+        }
+        return;
+      }
     }
+    throw new Error(`Error, child ${childInstance} not found in ${this}`);
   }
 
   updateSelf(props: Props) { }
@@ -128,29 +134,36 @@ export class ChunkComponent {
         pointNodeCoord: pointNodeCoord,
         pointNodeId: pointNodeGen.id
       })
-      let childProps = {
-        delta: props.delta,
-        args: {
-          pointNodeTexture: props.args.pointNodeTexture,
-          markForceUpdate: this.markForceUpdate,
-        },
-        selfPointNodeRef: pointNodeRef,
-        updaters: props.updaters,
-        position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
-        pointNodeGen,
-        isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
-        isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
-      };
+      let childPropsFactory = (props: Props, state: State) => {
+        return {
+          delta: props.delta,
+          args: {
+            pointNodeTexture: props.args.pointNodeTexture,
+            markForceUpdate: this.markForceUpdate,
+          },
+          selfPointNodeRef: pointNodeRef,
+          updaters: props.updaters,
+          position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
+          pointNodeGen,
+          isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
+          isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
+        };
+      }
       const childKey = pointNodeRef;
 
       let childComponent = this.children.get(childKey);
       if (childComponent) {
-        childComponent.update(childProps);
+        childComponent.update(childPropsFactory(props, this.state));
         childrenToDelete.remove(childKey);
       } else {
-        childComponent = new PointNodeComponent(childProps);
+        childComponent = new PointNodeComponent(childPropsFactory(props, this.state));
         this.children.put(pointNodeRef, childComponent);
         this.container.addChild(childComponent.container);
+        this._children.push({
+          childClass: ChunkComponent,
+          instance: childComponent,
+          propsFactory: childPropsFactory
+        });
       }
     }
     // console.log(`chunk component to delete has ${childrenToDelete.size()} children`);
@@ -158,6 +171,7 @@ export class ChunkComponent {
       childComponent.willUnmount();
       this.children.remove(childKey);
       this.container.removeChild(childComponent.container);
+      this._children.splice(this._children.findIndex(it => it.instance === childComponent), 1);
     }
   }
 
@@ -172,6 +186,7 @@ export class ChunkComponent {
       for (let { instance, propsFactory } of forceUpdates) {
         instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
         // instance._forceUpdate();
+        // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
       }
       // no need to do anything else -- stale props has not changed
       return;
@@ -182,4 +197,9 @@ export class ChunkComponent {
     this.renderSelf(props);
     this.staleProps = props;
   }
+
+  // bridge while we migrate to lifecycle handler
+  public _update(props: Props) { this.update(props); }
 }
+
+export type ChunkComponentProps = Props;

@@ -4,6 +4,9 @@ import { RenderedChunkConstants } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
+  args: {
+    markForceUpdate: (childInstance: any) => void,
+  },
   hitArea: Pixi.IHitArea;
   delaySeconds?: number;
 }
@@ -91,6 +94,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   onPointerOver = (event: Pixi.InteractionEvent) => {
+    this._staleProps.args.markForceUpdate(this);
     console.log('got onPointerOver in toolltippable');
     this.stateUpdaters.isActive.enqueueUpdate(() => {
       console.log('fired onPointerOver in toolltippable');
@@ -99,6 +103,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   onPointerOut = (event: Pixi.InteractionEvent) => {
+    this._staleProps.args.markForceUpdate(this);
     console.log('got onPointerOut in tooltippable')
     this.stateUpdaters.isActive.enqueueUpdate(() => {
       console.log('fired onPointerOut in tooltippable')

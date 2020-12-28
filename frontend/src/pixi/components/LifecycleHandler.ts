@@ -28,7 +28,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
   public abstract container: Pixi.Container;
   protected abstract state: S;
-  private _staleProps: P;
+  protected _staleProps: P; // need it for args
   private _children: ChildInstructions<any, any, P, S>[];
 
   constructor(props: P) {
