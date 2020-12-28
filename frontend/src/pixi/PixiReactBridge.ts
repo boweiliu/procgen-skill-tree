@@ -126,6 +126,7 @@ export class PixiReactBridge {
       this.RootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,
+          markForceUpdate: () => { },
         },
         updaters: this.props.updaters,
         delta: 0,
@@ -156,6 +157,7 @@ export class PixiReactBridge {
     this.RootComponent?.update({
       args: {
         renderer: this.app.renderer,
+        markForceUpdate: () => { },
       },
       updaters: this.props.updaters,
       delta,

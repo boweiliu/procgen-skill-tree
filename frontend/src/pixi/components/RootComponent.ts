@@ -7,7 +7,7 @@ import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { Const, Lazy } from "../../lib/util/misc";
 import { FpsComponent } from "./FpsComponent";
 import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/util/updaterGenerator";
-import { ZLevelComponent } from "./ZLevelComponent";
+import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
 import { EfficiencyBarComponent, EfficiencyBarComponentType } from "./EfficiencyBarComponent";
@@ -21,6 +21,7 @@ type State = {
 type Props = {
   args: {
     renderer: Pixi.Renderer,
+    markForceUpdate: (childInstance: any) => void,
   },
   updaters: UpdaterGeneratorType2<GameState>,
   delta: number,
@@ -45,9 +46,13 @@ export class RootComponent {
   public keyboard!: KeyboardState;
   public fpsTracker!: FpsComponent;
   public zLevel: ZLevelComponent | undefined;
+  public zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
   public reticle: ReticleComponent;
   public backdrop: Pixi.Graphics;
   public efficiencyBar: EfficiencyBarComponentType;
+
+  public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
+  public forceUpdates: {childClass :any, instance: any, propsFactory: Function}[] = []
 
   /**
    * Need to provide config to set up the pixi canvas
@@ -108,23 +113,26 @@ export class RootComponent {
     });
     this.fixedCameraStage.addChild(this.reticle.container);
 
-    const childProps = {
-      delta: 0,
-      args: {
-        pointNodeTexture: this.state.pointNodeTexture.get(),
-      },
-      z: this.state.playerCurrentZ,
-      updaters: props.updaters,
-      position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
-      selectedPointNode: props.gameState.playerUI.selectedPointNode,
-      allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
-    };
+    this.zLevelPropsFactory = (p: Props, s: State) => {
+      return {
+        delta: p.delta,
+        args: {
+          pointNodeTexture: this.state.pointNodeTexture.get(),
+          markForceUpdate: this.markForceUpdate,
+        },
+        z: this.state.playerCurrentZ,
+        updaters: props.updaters,
+        position: props.appSize.multiply(0.5),
+        zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
+        selectedPointNode: props.gameState.playerUI.selectedPointNode,
+        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+      };
+    }
     if (!this.zLevel) {
-      this.zLevel = new ZLevelComponent(childProps);
+      this.zLevel = new ZLevelComponent(this.zLevelPropsFactory(props, this.state));
       this.actionStage.addChild(this.zLevel.container);
     } else {
-      this.zLevel.update(childProps);
+      this.zLevel.update(this.zLevelPropsFactory(props, this.state));
     }
 
     this.efficiencyBar = new EfficiencyBarComponent({
@@ -139,6 +147,16 @@ export class RootComponent {
 
     this.renderSelf(props);
     this.didMount();
+  }
+
+  /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
+  markForceUpdate = (childInstance: any) => {
+    this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
+    if ((this._children as any[]).indexOf(childInstance) === -1) {
+      throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    } else {
+      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+    }
   }
 
   shouldUpdate(prevProps: Props, props: Props, prevState: State, state: State): boolean {
@@ -160,23 +178,11 @@ export class RootComponent {
       appSize: props.appSize,
     })
 
-    const childProps = {
-      delta: 0,
-      args: {
-        pointNodeTexture: this.state.pointNodeTexture.get(),
-      },
-      z: this.state.playerCurrentZ,
-      updaters: props.updaters,
-      position: props.appSize.multiply(0.5),
-      zLevelGen: props.gameState.worldGen.zLevels[this.state.playerCurrentZ],
-      selectedPointNode: props.gameState.playerUI.selectedPointNode,
-      allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
-    };
     if (!this.zLevel) {
-      this.zLevel = new ZLevelComponent(childProps);
+      this.zLevel = new ZLevelComponent(this.zLevelPropsFactory(props, this.state));
       this.actionStage.addChild(this.zLevel.container);
     } else {
-      this.zLevel.update(childProps);
+      this.zLevel.update(this.zLevelPropsFactory(props, this.state));
     }
 
     this.reticle.update({

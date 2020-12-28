@@ -12,6 +12,7 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
+    markForceUpdate: (childInstance: any) => void,
   },
   z: number,
   updaters: UpdaterGeneratorType2<GameState>,
@@ -28,12 +29,15 @@ export class ZLevelComponent {
 
   public children: KeyedHashMap<ChunkRef, ChunkComponent> = new KeyedHashMap();
 
+  public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
+  public forceUpdates: {childClass :any, instance: any, propsFactory: Function}[] = []
+
   constructor(props: Props) {
     this.staleProps = props;
     this.state = {};
     this.container = new Pixi.Container();
 
-    this.updateChildren(props);
+    this.upsertChildren(props);
 
     this.renderSelf(props);
     this.didMount();
@@ -41,6 +45,16 @@ export class ZLevelComponent {
 
   renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
+  }
+
+  /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
+  markForceUpdate = (childInstance: any) => {
+    this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
+    if ((this._children as any[]).indexOf(childInstance) === -1) {
+      throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    } else {
+      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+    }
   }
 
   updateSelf(props: Props) { }
@@ -79,6 +93,7 @@ export class ZLevelComponent {
       delta: props.delta,
       args: {
         pointNodeTexture: props.args.pointNodeTexture,
+        markForceUpdate: this.markForceUpdate
       },
       selfChunkRef: chunkRef,
       updaters: props.updaters,
@@ -93,9 +108,9 @@ export class ZLevelComponent {
     };
   }
 
-  updateChildren(props: Props) {
+  upsertChildren(props: Props) {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
-    console.log(`i have ${this.children.size()} children`)
+    // console.log(`i have ${this.children.size()} children`)
     for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
       const { childKey, childProps } = this.doChild(props, chunkCoord, chunkGen);
       let childComponent = this.children.get(childKey);
@@ -108,9 +123,9 @@ export class ZLevelComponent {
         this.container.addChild(childComponent.container);
       }
     }
-    for (let [ref, childComponent] of childrenToDelete.entries()) {
+    for (let [childKey, childComponent] of childrenToDelete.entries()) {
       childComponent.willUnmount();
-      this.children.remove(ref);
+      this.children.remove(childKey);
       this.container.removeChild(childComponent.container);
     }
   }
@@ -120,7 +135,7 @@ export class ZLevelComponent {
     this.updateSelf(props)
     if (!this.shouldUpdate(this.staleProps, props)) { return; }
 
-    this.updateChildren(props);
+    this.upsertChildren(props);
 
     this.renderSelf(props);
     this.didUpdate(this.staleProps, props);
@@ -145,3 +160,6 @@ export class ZLevelComponent {
     })
   }
 }
+
+
+export type { Props as ZLevelComponentProps };

@@ -115,3 +115,4 @@ const toExport = engageLifecycle(TooltippableAreaComponent);
 export { toExport as TooltippableAreaComponent };
 type exportedType = TooltippableAreaComponent;
 export type { exportedType as TooltippableAreaComponentType };
+export type { Props as TooltippableAreaComponentProps };

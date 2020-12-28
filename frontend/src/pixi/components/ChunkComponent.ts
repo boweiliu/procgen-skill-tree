@@ -23,6 +23,7 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
+    markForceUpdate: (childInstance: any) => void,
   },
   selfChunkRef: ChunkRef,
   updaters: UpdaterGeneratorType2<GameState>,
@@ -38,6 +39,9 @@ export class ChunkComponent {
   state!: {};
 
   public children: KeyedHashMap<PointNodeRef, PointNodeComponent>;
+  
+  public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
+  public forceUpdates: {childClass :any, instance: any, propsFactory: Function}[] = []
 
   constructor(props: Props) {
     this.staleProps = props;
@@ -45,30 +49,7 @@ export class ChunkComponent {
     this.container = new Pixi.Container();
     this.children = new KeyedHashMap();
 
-    for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {
-      const pointNodeRef = new PointNodeRef({
-        z: props.selfChunkRef.z,
-        chunkCoord: props.selfChunkRef.chunkCoord,
-        pointNodeCoord: pointNodeCoord,
-        pointNodeId: pointNodeGen.id
-      })
-      let childProps = {
-        delta: props.delta,
-        args: {
-          pointNodeTexture: props.args.pointNodeTexture,
-        },
-        selfPointNodeRef: pointNodeRef,
-        updaters: props.updaters,
-        pointNodeGen,
-        position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
-        isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
-        isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
-      };
-
-      let childComponent = new PointNodeComponent(childProps);
-      this.children.put(pointNodeRef, childComponent);
-      this.container.addChild(childComponent.container);
-    }
+    this.upsertChildren(props);
 
     this.renderSelf(props);
   }
@@ -78,6 +59,16 @@ export class ChunkComponent {
   }
 
   public willUnmount() { }
+
+  /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
+  markForceUpdate = (childInstance: any) => {
+    this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
+    if ((this._children as any[]).indexOf(childInstance) === -1) {
+      throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    } else {
+      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+    }
+  }
 
   updateSelf(props: Props) { }
   shouldUpdate(prevProps: Props, props: Props): boolean {
@@ -99,10 +90,9 @@ export class ChunkComponent {
     // return false;
   }
 
-  public update(props: Props) {
-    // let staleState = { ...this.state };
-    this.updateSelf(props)
-    if (!this.shouldUpdate(this.staleProps, props)) { return; }
+  upsertChildren(props: Props) {
+    let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
+
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {
       const pointNodeRef = new PointNodeRef({
         z: props.selfChunkRef.z,
@@ -114,6 +104,7 @@ export class ChunkComponent {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
+          markForceUpdate: this.markForceUpdate,
         },
         selfPointNodeRef: pointNodeRef,
         updaters: props.updaters,
@@ -122,16 +113,32 @@ export class ChunkComponent {
         isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
         isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),
       };
+      const childKey = pointNodeRef;
 
-      let childComponent = this.children.get(pointNodeRef);
+      let childComponent = this.children.get(childKey);
       if (childComponent) {
         childComponent.update(childProps);
+        childrenToDelete.remove(childKey);
       } else {
         childComponent = new PointNodeComponent(childProps);
         this.children.put(pointNodeRef, childComponent);
         this.container.addChild(childComponent.container);
       }
+      for (let [childKey, childComponent] of childrenToDelete.entries()) {
+        childComponent.willUnmount();
+        this.children.remove(childKey);
+        this.container.removeChild(childComponent.container);
+      }
     }
+  }
+
+  public update(props: Props) {
+    // let staleState = { ...this.state };
+    this.updateSelf(props)
+    if (!this.shouldUpdate(this.staleProps, props)) { return; }
+
+    this.upsertChildren(props);
+
     this.renderSelf(props);
     this.staleProps = props;
   }

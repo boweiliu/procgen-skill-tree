@@ -7,13 +7,14 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 import { computePlayerResourceAmounts } from "../../game/ComputeState";
-import { TooltippableAreaComponent, TooltippableAreaComponentType } from "./TooltippableAreaComponent";
+import { TooltippableAreaComponent, TooltippableAreaComponentProps, TooltippableAreaComponentType } from "./TooltippableAreaComponent";
 import { LifecycleHandlerType } from "./LifecycleHandler";
 
 type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
+    markForceUpdate: (childInstance: any) => void,
   },
   selfPointNodeRef: PointNodeRef,
   updaters: UpdaterGeneratorType2<GameState>,
@@ -37,8 +38,13 @@ export class PointNodeComponent {
   public sprite: Pixi.Sprite
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
+  public hitArea: Pixi.IHitArea;
 
   public tooltippableArea: TooltippableAreaComponentType
+  public tooltippableAreaPropsFactory: (p: Props, s: State) => TooltippableAreaComponentProps
+
+  public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
+  public forceUpdates: {childClass :any, instance: any, propsFactory: Function}[] = []
 
   constructor(props: Props) {
     this.staleProps = props;
@@ -77,7 +83,7 @@ export class PointNodeComponent {
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
     this.container.buttonMode = true;
-    const hitArea: Pixi.Rectangle = new Pixi.Rectangle(
+    this.hitArea = new Pixi.Rectangle(
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
       - RenderedChunkConstants.NODE_HITAREA_PX / 2,
       RenderedChunkConstants.NODE_HITAREA_PX,
@@ -86,9 +92,12 @@ export class PointNodeComponent {
     // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
     // this.container.hitArea = hitArea;
 
-    this.tooltippableArea = new TooltippableAreaComponent({
-      hitArea
-    });
+    this.tooltippableAreaPropsFactory = (p: Props, s: State) => {
+      return {
+        hitArea: this.hitArea
+      }
+    }
+    this.tooltippableArea = new TooltippableAreaComponent(this.tooltippableAreaPropsFactory(props, this.state));
     this.container.addChild(this.tooltippableArea.container);
 
     this.renderSelf(props);
@@ -154,14 +163,32 @@ export class PointNodeComponent {
     return false;
   }
 
+  /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
+  markForceUpdate = (childInstance: any) => {
+    this.staleProps.args.markForceUpdate(this); // mark us for update in OUR parent
+    if ((this._children as any[]).indexOf(childInstance) === -1) {
+      throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    } else {
+      this.forceUpdates.push(this._children[(this._children as any[]).indexOf(childInstance)])
+    }
+  }
+
   public update(props: Props) {
     // let staleState = { ...this.state };
     this.updateSelf(props)
-    if (!this.shouldUpdate(this.staleProps, props)) { return; }
+    if (!this.shouldUpdate(this.staleProps, props)) {
+      // update the chidlren that asked us to forcefully update them even though props didnt change
+      let forceUpdates = [...this.forceUpdates];
+      this.forceUpdates = [];
+      for (let { instance, propsFactory } of forceUpdates) {
+        instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
+        // instance._forceUpdate();
+      }
+      // no need to do anything else -- stale props has not changed
+      return;
+    }
 
-    this.tooltippableArea._update({
-      hitArea: this.container.hitArea
-    });
+    this.tooltippableArea._update(this.tooltippableAreaPropsFactory(props, this.state));
 
     this.renderSelf(props);
     this.staleProps = props;
