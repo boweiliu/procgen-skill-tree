@@ -63,12 +63,22 @@ export class ZLevelComponent {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
       if (key === 'position') {
         if (!prevProps[key].equals(props[key])) {
+          console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (key === 'selectedPointNode') {
+        if (prevProps[key]?.hash() !== props[key]?.hash()) {
+          console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
           return true;
         } else {
           continue;
         }
       }
       if (prevProps[key] !== props[key]) {
+        console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
         return true;
       }
     }

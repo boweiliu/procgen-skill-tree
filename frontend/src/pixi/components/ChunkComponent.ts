@@ -72,26 +72,27 @@ export class ChunkComponent {
 
   updateSelf(props: Props) { }
   shouldUpdate(prevProps: Props, props: Props): boolean {
-    return true;
-    // for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
-    //   if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
-    //   if (key === 'allocatedPointNodeSubset') {
-    //     // subsets could be different objects but have the same contents
-    //     if (prevProps[key].hash() !== props[key].hash()) {
-    //       return true;
-    //     } else {
-    //       continue;
-    //     }
-    //   }
-    //   if (prevProps[key] !== props[key]) {
-    //     return true;
-    //   }
-    // }
-    // return false;
+    // return true;
+    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+      if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+      if (key === 'allocatedPointNodeSubset') {
+        // subsets could be different objects but have the same contents
+        if (prevProps[key].equals(props[key])) {
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (prevProps[key] !== props[key]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   upsertChildren(props: Props) {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
+    console.log(`chunk component upsert children got here`);
     // console.log(`chunk component upsert children has ${this.children.size()} children`);
 
     for (let [pointNodeCoord, pointNodeGen] of props.chunkGen.pointNodes.entries()) {

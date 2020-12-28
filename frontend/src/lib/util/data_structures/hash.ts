@@ -52,6 +52,24 @@ export class HashSet<K extends { hash(): string }> {
     return this._values.size();
   }
 
+  equals(other: HashSet<K> | undefined | null) {
+    if (other === undefined || other === null) {
+      return false;
+    }
+
+    if (this.size() !== other.size()) {
+      return false;
+    }
+
+    for (let k of this.values()) {
+      if (!other.contains(k)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   // *[Symbol.iterator]() {
   //   // construct a new iterator. note that as usual
   //   for (let key of Object.keys(this._values)) {
