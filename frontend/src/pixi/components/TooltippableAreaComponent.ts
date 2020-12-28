@@ -1,6 +1,5 @@
 import * as Pixi from "pixi.js";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { RenderedChunkConstants } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {

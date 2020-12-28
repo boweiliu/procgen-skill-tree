@@ -1,7 +1,6 @@
 import {
   GameState,
   Quest,
-  ResourceNontrivialType,
   ResourceType,
 } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";

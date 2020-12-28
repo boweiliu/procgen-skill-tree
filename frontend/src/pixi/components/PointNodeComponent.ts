@@ -8,7 +8,6 @@ import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 import { computePlayerResourceAmounts } from "../../game/ComputeState";
 import { TooltippableAreaComponent, TooltippableAreaComponentProps, TooltippableAreaComponentType } from "./TooltippableAreaComponent";
-import { LifecycleHandlerType } from "./LifecycleHandler";
 
 type Props = {
   delta: number,
