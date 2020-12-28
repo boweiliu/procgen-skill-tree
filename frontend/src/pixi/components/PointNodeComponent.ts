@@ -201,6 +201,9 @@ export class PointNodeComponent {
     throw new Error(`Error, child ${childInstance} not found in ${this}`);
   }
 
+  public didForceUpdateChild(instance: any) {
+  }
+
   public update(props: Props) {
     // let staleState = { ...this.state };
     this.updateSelf(props)
@@ -212,6 +215,9 @@ export class PointNodeComponent {
       for (let { instance, propsFactory } of forceUpdates) {
         instance._update(propsFactory(props, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
         // instance._forceUpdate();
+        // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
+
+        this.didForceUpdateChild(instance);
       }
       // no need to do anything else -- stale props has not changed
       return;
