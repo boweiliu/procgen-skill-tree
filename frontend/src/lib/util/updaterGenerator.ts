@@ -37,9 +37,8 @@ function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T,
             } else {
               const newData = {
                 ...oldData,
-                [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData),
+                [key]: newKey
               };
-              // console.log({ newData });
               return newData;
             }
           });
