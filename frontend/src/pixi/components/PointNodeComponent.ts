@@ -301,7 +301,6 @@ export class PointNodeComponent {
     // console.log(`point node component ${this.staleProps.selfPointNodeRef.toString()} was updated`);
   }
 
-
   // bridge while we migrate to lifecycle handler
   public _update(props: Props) { this.update(props); }
 }

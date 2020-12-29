@@ -31,12 +31,17 @@ function updaterGenerator2Helper<T, W>(dataObject: T, dataUpdater: UpdaterFn2<T,
       function keyUpdater(newValueOrCallback: UpdaterFnParam2<T[typeof key], W>) {
         if (typeof newValueOrCallback === "function") {
           dataUpdater((oldData: T, wholeData: W) => {
-            const newData = {
-              ...oldData,
-              [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData),
-            };
-            // console.log({ newData });
-            return newData;
+            const newKey = (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData);
+            if (oldData[key] === newKey) {
+              return oldData; // no update detected, no need to update anything
+            } else {
+              const newData = {
+                ...oldData,
+                [key]: (newValueOrCallback as ((prev: T[typeof key], whole: W) => T[typeof key]))(oldData[key], wholeData),
+              };
+              // console.log({ newData });
+              return newData;
+            }
           });
         } else {
           dataUpdater((oldData, wholeData) => ({ ...oldData, [key]: newValueOrCallback }));
