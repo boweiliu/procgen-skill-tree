@@ -6,7 +6,8 @@ type Props = {
   args?: {
     markForceUpdate?: (self: LifecycleHandlerBase<any, any>) => void,
     [k: string]: any
-  }
+  },
+  [k: string]: any
 };
 
 type State = {};

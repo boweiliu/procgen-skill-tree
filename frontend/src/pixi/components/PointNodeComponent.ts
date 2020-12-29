@@ -31,7 +31,7 @@ type State = {
   numClicks:number
 }
 
-class PointNodeComponent2 extends LifecycleHandlerBase<Props, State> {
+class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
   public sprite: Pixi.Sprite
@@ -251,8 +251,8 @@ class PointNodeComponent2 extends LifecycleHandlerBase<Props, State> {
   }
 }
 
-const wrapped = engageLifecycle(PointNodeComponent2);
+const wrapped = engageLifecycle(PointNodeComponent);
 // eslint-disable-next-line
-type wrapped = PointNodeComponent2;
+type wrapped = PointNodeComponent;
 export { wrapped as PointNodeComponent };
 export type { Props as PointNodeComponentProps };
