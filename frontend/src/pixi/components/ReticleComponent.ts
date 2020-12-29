@@ -1,6 +1,7 @@
 import * as Pixi from "pixi.js";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
   appSize: Vector2
@@ -10,14 +11,13 @@ type State = {
   position: Vector2;
 }
 
-export class ReticleComponent{
+class ReticleComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  staleProps: Props
-  state: State;
+  protected state: State;
 
   constructor(props: Props) {
+    super(props);
     this.container = new Pixi.Container();
-    this.staleProps = props;
     this.state = {
       position: props.appSize.multiply(0.5)
     };
@@ -32,22 +32,17 @@ export class ReticleComponent{
     outerCircle.lineTo(0, 8);
     outerCircle.moveTo(-8, 0);
     outerCircle.lineTo(8, 0);
-
-    this.renderSelf(props);
   }
 
-  public update(props: Props) {
-    this.updateSelf(props);
-    this.renderSelf(props);
-    this.staleProps = props;
-  }
-
-  updateSelf(props: Props) {
+  protected updateSelf(props: Props) {
     this.state.position = props.appSize.multiply(0.5);
   }
-  renderSelf(props: Props) {
+  protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(this.state.position);
   }
-
-
 }
+
+const wrapped = engageLifecycle(ReticleComponent);
+// eslint-disable-next-line
+type wrapped = ReticleComponent;
+export { wrapped as ReticleComponent };

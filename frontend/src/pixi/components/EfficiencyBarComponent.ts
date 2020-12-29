@@ -30,9 +30,8 @@ type State = {}
  * 
  */
 class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
-
   public container: Pixi.Container;
-  public state: State = {}
+  protected state: State = {}
 
   private cornerRadius: number = 10;
   private boundingBoxWidth: number = 100;
@@ -145,15 +144,6 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
 
     this.mask.y = (100 - props.efficiencyPercent) * 2 + 24;
   }
-
-  public updateSelf(props: Props) {
-  }
-
-  didMount() { }
-  didUpdate() { }
-  shouldUpdate(): boolean { return true; }
-  willUnmount() { }
-  fireStateUpdaters() { }
 }
 
 const wrapped = engageLifecycle(EfficiencyBarComponent);
