@@ -19,7 +19,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   public state: State
   public container: Pixi.Container;
   stateUpdaters: UpdaterGeneratorType2<State>
-  fireStateUpdaters: () => void
+  protected fireStateUpdaters: () => void
 
   public hitAreaDrawn?: Pixi.Graphics; // debug
 
@@ -55,7 +55,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
       }));
   }
 
-  public renderSelf(props: Props) {
+  protected renderSelf(props: Props) {
     // if (this.state.isActive) {
     //   this.hitAreaDrawn.tint = 0x888888;
     // } else {
@@ -83,11 +83,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
-  public updateSelf(props: Props) {
-    // console.log('tooltippable updated itself');
-  }
-
-  didMount() {
+  protected didMount() {
     // TODO(bowei): move these listeners to the parent so that hitArea can be unified
     // TODO(bowei): move this object to somewhere else in pixi e.g. the parent hud layer to resolve hiding issues
     // using worldtransform: https://www.html5gamedevs.com/topic/12774-absolute-position-of-displayobjectsspritesprimitives/
@@ -95,7 +91,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addListener('pointerout', this.onPointerOut);
   }
 
-  onPointerOver = (event: Pixi.InteractionEvent) => {
+  public onPointerOver = (event: Pixi.InteractionEvent) => {
     this._staleProps.args.markForceUpdate(this);
     // console.log('got onPointerOver in toolltippable');
     this.stateUpdaters.isActive.enqueueUpdate(() => {
@@ -104,7 +100,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     });
   }
 
-  onPointerOut = (event: Pixi.InteractionEvent) => {
+  public onPointerOut = (event: Pixi.InteractionEvent) => {
     this._staleProps.args.markForceUpdate(this);
     // console.log('got onPointerOut in tooltippable')
     this.stateUpdaters.isActive.enqueueUpdate(() => {
@@ -112,11 +108,6 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
       return false;
     });
   }
-
-  willUnmount() { }
-  shouldUpdate(): boolean { return true; } 
-  didUpdate() { }
-
 }
 
 const wrapped = engageLifecycle(TooltippableAreaComponent);
