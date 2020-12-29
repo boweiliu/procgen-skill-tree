@@ -26,6 +26,10 @@ export class PointNodeRef {
       this.pointNodeCoord.toString()
     );
   }
+
+  public toString(): string {
+    return this.z + "," + this.chunkCoord.toString() + "," + this.pointNodeCoord.toString()
+  }
 }
 
 export class ChunkRef {

@@ -99,11 +99,11 @@ export class ZLevelComponent {
       chunkId: chunkGen.id,
     });
 
-    let allocatedPointNodeSubset = new HashSet(
-      props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
-    );
-
     let childPropsFactory = (props: Props, state: State) => {
+      let allocatedPointNodeSubset = new HashSet(
+        props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
+      );
+
       return {
         delta: props.delta,
         args: {

@@ -108,6 +108,8 @@ export class ChunkComponent {
       if (key === 'allocatedPointNodeSubset') {
         // subsets could be different objects but have the same contents
         if (!prevProps[key].equals(props[key])) {
+          // console.log(`prevProps: ${JSON.stringify(prevProps[key])}`);
+          // console.log(`props: ${JSON.stringify(props[key])}`);
           console.log(`chunk shouldUpdate differed in ${key}, returning true`);
           return true;
         } else {

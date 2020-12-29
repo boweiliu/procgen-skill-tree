@@ -227,6 +227,7 @@ export class PointNodeComponent {
 
     this.renderSelf(props);
     this.staleProps = props;
+    new Promise((resolve) => resolve(this.didUpdate()));
   }
 
   didMount() {
@@ -295,6 +296,10 @@ export class PointNodeComponent {
   }
 
   public willUnmount() { } 
+
+  public didUpdate() {
+    // console.log(`point node component ${this.staleProps.selfPointNodeRef.toString()} was updated`);
+  }
 
 
   // bridge while we migrate to lifecycle handler
