@@ -1,5 +1,6 @@
 import * as Pixi from "pixi.js";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
   args: {},
@@ -7,17 +8,20 @@ type Props = {
 }
 type State = {}
 
-export class DraggableBackdropComponent {
+class DraggableBackdropComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Graphics;
-  staleProps: Props
-  state: State;
+  protected state: State;
 
   constructor(props: Props) {
-    this.staleProps = props;
+    super(props);
     this.state = {};
     this.container = new Pixi.Graphics();
-
-
   }
 
+  protected renderSelf() { }
 }
+
+const wrapped = engageLifecycle(DraggableBackdropComponent);
+// eslint-disable-next-line
+type wrapped = DraggableBackdropComponent;
+export { wrapped as DraggableBackdropComponent };

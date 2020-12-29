@@ -77,7 +77,6 @@ class FpsComponent extends LifecycleHandlerBase<Props, State> {
   }
 }
 
-
 const wrapped = engageLifecycle(FpsComponent);
 // eslint-disable-next-line
 type wrapped = FpsComponent;
