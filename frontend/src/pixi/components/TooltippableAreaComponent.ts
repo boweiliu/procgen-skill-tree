@@ -116,8 +116,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
 
 }
 
-const toExport = engageLifecycle(TooltippableAreaComponent);
-export { toExport as TooltippableAreaComponent };
-type exportedType = TooltippableAreaComponent;
-export type { exportedType as TooltippableAreaComponentType };
+const wrapped = engageLifecycle(TooltippableAreaComponent);
+// eslint-disable-next-line
+type wrapped = TooltippableAreaComponent;
+export { wrapped as TooltippableAreaComponent };
 export type { Props as TooltippableAreaComponentProps };

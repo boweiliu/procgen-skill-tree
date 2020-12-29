@@ -7,7 +7,7 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
 import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
 import { computePlayerResourceAmounts } from "../../game/ComputeState";
-import { TooltippableAreaComponent, TooltippableAreaComponentProps, TooltippableAreaComponentType } from "./TooltippableAreaComponent";
+import { TooltippableAreaComponent, TooltippableAreaComponentProps } from "./TooltippableAreaComponent";
 
 type Props = {
   delta: number,
@@ -39,7 +39,7 @@ export class PointNodeComponent {
   public centerSprite: Pixi.Sprite;
   public hitArea: Pixi.IHitArea;
 
-  public tooltippableArea?: TooltippableAreaComponentType
+  public tooltippableArea?: TooltippableAreaComponent
   public tooltippableAreaPropsFactory: (p: Props, s: State) => TooltippableAreaComponentProps
 
   public _children: {childClass :any, instance: any, propsFactory: Function}[] = []

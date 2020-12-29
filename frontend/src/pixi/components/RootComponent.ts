@@ -10,7 +10,7 @@ import { updaterGenerator2, UpdaterGeneratorType2, UpdaterFn } from "../../lib/u
 import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
-import { EfficiencyBarComponent, EfficiencyBarComponentType } from "./EfficiencyBarComponent";
+import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -49,7 +49,7 @@ export class RootComponent {
   public zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
   public reticle: ReticleComponent;
   public backdrop: Pixi.Graphics;
-  public efficiencyBar: EfficiencyBarComponentType;
+  public efficiencyBar: EfficiencyBarComponent;
 
   public _children: {childClass :any, instance: any, propsFactory: Function}[] = []
   public forceUpdates: {childClass :any, instance: any, propsFactory: Function}[] = []

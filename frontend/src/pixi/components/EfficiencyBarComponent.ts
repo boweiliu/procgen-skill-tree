@@ -156,7 +156,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   fireStateUpdaters() { }
 }
 
-const toExport = engageLifecycle(EfficiencyBarComponent);
-export { toExport as EfficiencyBarComponent };
-type exportedType = EfficiencyBarComponent;
-export type { exportedType as EfficiencyBarComponentType };
+const wrapped = engageLifecycle(EfficiencyBarComponent);
+// eslint-disable-next-line
+type wrapped = EfficiencyBarComponent;
+export { wrapped as EfficiencyBarComponent };
