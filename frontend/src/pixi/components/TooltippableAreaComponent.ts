@@ -88,6 +88,9 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   didMount() {
+    // TODO(bowei): move these listeners to the parent so that hitArea can be unified
+    // TODO(bowei): move this object to somewhere else in pixi e.g. the parent hud layer to resolve hiding issues
+    // using worldtransform: https://www.html5gamedevs.com/topic/12774-absolute-position-of-displayobjectsspritesprimitives/
     this.container.addListener('pointerover', this.onPointerOver);
     this.container.addListener('pointerout', this.onPointerOut);
   }
