@@ -2,7 +2,12 @@ import * as Pixi from "pixi.js";
 import { batchifySetState } from "../../lib/util/batchify";
 import { UpdaterFn, updaterGenerator2 } from "../../lib/util/updaterGenerator";
 
-type Props = {};
+type Props = {
+  args?: {
+    markForceUpdate?: (self: LifecycleHandlerBase<any, any>) => void,
+    [k: string]: any
+  }
+};
 
 type State = {};
 
@@ -23,12 +28,28 @@ type ChildInstructions<
 class ChildrenArray<P extends Props, S extends State> {
   private _values: ChildInstructions<any, any, P, S>[] = [];
 
-  public push<CIT, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
-    this._values.push(c);
+  public add<CIT, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
+    if (!this.contains(c.instance)) {
+      this._values.push(c);
+    }
   }
 
   public remove<CIT>(c: CIT) {
     this._values.splice(this._values.findIndex(it => it.instance === c), 1);
+  }
+
+  public contains<CIT>(c: CIT): boolean {
+    return (this._values.findIndex(it => it.instance === c) > -1);
+  }
+
+  public get<CIT, CPT>(c: CIT): ChildInstructions<CIT, CPT, P, S> | undefined {
+    return this._values.find(it => it.instance === c);
+  }
+
+  public clone(): ChildrenArray<P, S> {
+    let cloned = new ChildrenArray<P, S>();
+    cloned._values = [...this._values];
+    return cloned;
   }
 
   public forEach(callbackfn: (
@@ -39,6 +60,10 @@ class ChildrenArray<P extends Props, S extends State> {
     this._values.forEach(callbackfn);
   }
 }
+
+// export interface LifecycleHandlerBase<P extends Props, S extends State> {
+// // useful for interface merging?? https://stackoverflow.com/questions/44153378/typescript-abstract-optional-method
+// }
 
 /**
  * LifecycleHandlerConstructor <- this should take the usual props, and will return new proxy, new base component(props), the handler object which has the construct() property and that function in it
@@ -51,20 +76,38 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   protected abstract state: S;
 
   protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
-  private _children: ChildrenArray<P, S> = new ChildrenArray();
+  protected _children: ChildrenArray<P, S> = new ChildrenArray();
+  private _forceUpdates: ChildrenArray<P, S> = new ChildrenArray();
+  // private _self!: LifecycleHandlerBase<P, S>;
 
   constructor(props: P) {
     this._staleProps = props;
   }
+
   private _didConstruct(props: P) {
+    // this._self = this;
     this._children.forEach((child) => {
-      child.instance = new child.childClass(
-        child.propsFactory(props, this.state)
-      );
+      if (!child.instance) {
+        child.instance = new child.childClass(
+          child.propsFactory(props, this.state)
+        );
+      }
       this.container.addChild(child.instance.container);
     });
     this.renderSelf(props);
-    this.didMount();
+    this.didMount?.();
+  }
+
+  /** callback passed to child - since child is not a pure component, it needs to inform us of updates if otherwise we wouldnt update */
+  protected markForceUpdate = (childInstance: any) => {
+    this._staleProps.args?.markForceUpdate?.(this); // mark us for update in OUR parent
+
+    const childInfo = this._children.get(childInstance);
+    if (childInfo) {
+      this._forceUpdates.add(childInfo);
+    } else {
+      throw new Error(`Error, child ${childInstance} not found in ${this}`);
+    }
   }
 
   protected useState(initialState: S) {
@@ -86,18 +129,36 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     };
   }
 
+  // shim while we migrate
+  public update(nextProps: P) { this._update(nextProps); }
+
   // NOTE(bowei): this is public because the root of component hierarchy needs to be bootstrapped from pixi react bridge
   public _update(nextProps: P) { // nextProps is guaranteed to be referentially a distinct object (might be shallow copy though)
     const staleState = { ...this.state };
-    this.fireStateUpdaters();
-    this.updateSelf(nextProps);
-    if (!this.shouldUpdate(this._staleProps, staleState, nextProps, this.state)) {
+    this.fireStateUpdaters?.();
+    this.updateSelf?.(nextProps);
+    if (this.shouldUpdate && !this.shouldUpdate(this._staleProps, staleState, nextProps, this.state)) {
+      // we think we don't need to update; however, we still need to
+      // update the chidlren that asked us to forcefully update them
+      let forceUpdates = this._forceUpdates.clone();
+      this._forceUpdates = new ChildrenArray<P, S>();
+      forceUpdates.forEach(childInfo => {
+        let { instance, propsFactory } = childInfo;
+        instance._update(propsFactory(nextProps, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
+        // instance._forceUpdate();
+        // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
+
+        this.didForceUpdateChild?.(instance);
+      })
+      // no need to do anything else -- stale props has not changed
+
+      this.didForceUpdate?.();
       return;
     }
     this._updateChildren(nextProps); // implementation should call children._update in here
     this.renderSelf(nextProps);
     this._staleProps = nextProps;
-    new Promise((resolve) => resolve(this.didUpdate()));
+    new Promise((resolve) => resolve(this.didUpdate?.()));
   }
 
   private _updateChildren(nextProps: P) {
@@ -106,18 +167,24 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     });
   }
 
-  protected abstract fireStateUpdaters(): void;
-  protected abstract didMount(): void;
-  protected abstract updateSelf(nextProps: P): void;
-  protected abstract shouldUpdate(
+  protected fireStateUpdaters?(): void;
+  protected didMount?(): void;
+  protected updateSelf?(nextProps: P): void;
+  protected shouldUpdate?(
     staleProps: P,
     staleState: S,
     nextProps: P,
     state: S
   ): boolean;
   protected abstract renderSelf(nextProps: P): void;
-  protected abstract didUpdate(): void;
-  protected abstract willUnmount(): void;
+  protected didUpdate?(): void;
+  protected didForceUpdate?(): void;
+  public willUnmount(): void {} // TODO(bowei): revert this to protected nullable; however it's needed for shim for now
+  protected didForceUpdateChild?(child: LifecycleHandlerBase<any, any>): void;
+
+  public toString(): string {
+    return "lifecyclehandler object";
+  }
 }
 
 export type LifecycleHandlerType<P, S> = LifecycleHandlerBase<P, S>;
@@ -161,7 +228,7 @@ export function engageLifecycle<T extends object>(derived: T): T {
 
 type ReferenceProps = {
   updaters: "stuff";
-  args: "other stuff";
+  args: { s: "other stuff" };
 };
 type ReferenceState = {
   lalalala: "hahahah";
