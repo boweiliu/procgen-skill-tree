@@ -1,6 +1,6 @@
 import * as Pixi from "pixi.js";
 import { batchifySetState } from "../../lib/util/batchify";
-import { UpdaterFn, updaterGenerator2, UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
+import { UpdaterFn, updaterGenerator2 } from "../../lib/util/updaterGenerator";
 
 type Props = {
   args?: {
