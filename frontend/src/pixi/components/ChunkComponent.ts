@@ -155,6 +155,10 @@ class ChunkComponent2 extends LifecycleHandlerBase<Props, State> {
     }
   }
 
+  protected updateChildren(props: Props) {
+    this.resyncChildren(props);
+  }
+
   protected didForceUpdateChild(instance: LifecycleHandlerBase<any, any>) {
     // IMPORTANT! this is intended to raise the child that asked for a force update to the top so it isn't covered
     // by other sibling pixi containers. however this code doesnt work well during the update call, for some reason (not sure why)

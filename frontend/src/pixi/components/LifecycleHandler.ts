@@ -179,11 +179,14 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       this.didForceUpdate?.();
       return;
     }
+    this.updateChildren?.(nextProps);
     this._updateChildren(nextProps); // implementation should call children._update in here
     this.renderSelf(nextProps);
     this._staleProps = nextProps;
     new Promise((resolve) => resolve(this.didUpdate?.()));
   }
+
+  protected updateChildren?(nextProps: P): void
 
   // destroy, update, create in that order, so that there's no extra update right before destroy or after create
   private _updateChildren(nextProps: P) {
