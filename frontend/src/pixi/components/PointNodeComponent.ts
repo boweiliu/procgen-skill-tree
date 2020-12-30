@@ -34,6 +34,7 @@ type State = {
 class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
+
   public sprite: Pixi.Sprite
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;

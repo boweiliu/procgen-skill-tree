@@ -31,7 +31,7 @@ type State = {}
  */
 class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  protected state: State = {}
+  public state: State = {}
 
   private cornerRadius: number = 10;
   private boundingBoxWidth: number = 100;

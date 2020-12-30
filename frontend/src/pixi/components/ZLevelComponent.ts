@@ -27,7 +27,7 @@ type State = {}
 
 class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  protected state: State;
+  public state: State;
 
   public children: KeyedHashMap<ChunkRef, ChunkComponent> = new KeyedHashMap();
 

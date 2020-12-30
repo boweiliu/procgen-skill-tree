@@ -10,7 +10,7 @@ type State = {}
 
 class DraggableBackdropComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Graphics;
-  protected state: State;
+  public state: State;
 
   constructor(props: Props) {
     super(props);

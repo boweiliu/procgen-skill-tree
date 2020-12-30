@@ -28,13 +28,17 @@ function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   });
 }
 
+/**
+ * TODO(bowei): move the resizing out of this function and into root component,
+ * and only handle react/pixi state management in this class
+ */
 export class PixiReactBridge {
   public app!: Pixi.Application;
 
   state!: State;
   props!: Props;
 
-  RootComponent: RootComponent | undefined;
+  rootComponent: RootComponent | undefined;
   onTick!: (d: number) => void;
 
   /**
@@ -47,9 +51,6 @@ export class PixiReactBridge {
       // assertOnlyCalledOnce("Pixi react bridge constructor"); // annoying with react hot reload, disable for now}
     }
 
-    // let appSize = appSizeFromWindowSize(
-    //   props.windowState && new Vector2(props.windowState.innerWidth, props.windowState.innerHeight)
-    // );
     let appSize = new Vector2(800, 600);
     this.state = {
       appSize,
@@ -69,22 +70,8 @@ export class PixiReactBridge {
       backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
     });
 
-    // this.RootComponent = new RootComponent({
-    //   args: {
-    //     renderer: this.app.renderer,
-    //   },
-    //   updaters: this.props.updaters,
-    //   delta: 0,
-    //   gameState: this.props.gameState,
-    //   appSize: this.state.appSize,
-    // })
-    // this.app.stage.addChild(this.RootComponent.container);
-
-    // this.renderSelf(this.props);
-
-    // // test
-    // // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
-    // this.didMount();
+    // test
+    // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
   }
 
   public pause() {
@@ -108,10 +95,6 @@ export class PixiReactBridge {
     curr.appendChild(this.app.view);
   }
 
-  public update(props: Props) {
-    this.props = props;
-  }
-
   updateSelf(props: Props) {
     this.state.appSize = appSizeFromWindowSize(new Vector2(props.windowState.innerWidth, props.windowState.innerHeight));
   }
@@ -121,9 +104,9 @@ export class PixiReactBridge {
   rerender(props: Props) {
     console.log("base app rerender called", { playerUI: props.gameState.playerUI });
     this.props = props;
-    if (!this.RootComponent) {
+    if (!this.rootComponent) {
       // finish initialization
-      this.RootComponent = new RootComponent({
+      this.rootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,
           markForceUpdate: () => { },
@@ -133,7 +116,7 @@ export class PixiReactBridge {
         gameState: this.props.gameState,
         appSize: this.state.appSize,
       })
-      this.app.stage.addChild(this.RootComponent.container);
+      this.app.stage.addChild(this.rootComponent.container);
 
       this.renderSelf(this.props);
 
@@ -147,14 +130,11 @@ export class PixiReactBridge {
     this.app.renderer.resize(this.state.appSize.x, this.state.appSize.y);
   }
 
-  public didUpdate(props: Props) {
-  }
-
   baseGameLoop(delta: number) {
     // assume props is up to date
     this.updateSelf(this.props);
     // send props downwards
-    this.RootComponent?.update({
+    this.rootComponent?.update({
       args: {
         renderer: this.app.renderer,
         markForceUpdate: () => { },
@@ -166,7 +146,6 @@ export class PixiReactBridge {
     });
     
     this.renderSelf(this.props);
-    this.didUpdate(this.props); // add updaters to queue if we want them for next cycle
     this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }

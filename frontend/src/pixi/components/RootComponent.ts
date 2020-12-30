@@ -11,6 +11,7 @@ import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
+import { LifecycleHandlerBase } from "./LifecycleHandler";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -304,3 +305,118 @@ export class RootComponent {
   public _update(props: Props) { this.update(props); }
 }
 
+class RootComponent2 extends LifecycleHandlerBase<Props, State> {
+  public container: Pixi.Container;
+  public state: State;
+  private stateUpdaters: UpdaterGeneratorType2<State>;
+  protected fireStateUpdaters: () => void;
+
+
+  /* children */
+  // Contains HUD, and other entities that don't move when game camera moves
+  public fixedCameraStage: Pixi.Container;
+  // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
+  public actionStage: Pixi.Container;
+  // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
+  public backdropStage: Pixi.Container;
+  // public keyboard: KeyboardState;
+  public fpsTracker: FpsComponent;
+  public zLevel: ZLevelComponent | undefined;
+  public zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
+  public reticle: ReticleComponent;
+  public backdrop: Pixi.Graphics;
+  public efficiencyBar: EfficiencyBarComponent;
+
+  constructor(props: Props) {
+    super(props);
+    this.container = new Pixi.Container();
+    this.container.sortableChildren = true;
+    ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
+      this.useState<State, RootComponent2>(this, {
+      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
+      tick: 0,
+      playerCurrentZ: 0,
+      }));
+
+    this.fixedCameraStage = new Pixi.Sprite();
+    this.fixedCameraStage.zIndex = 1;
+    this.fixedCameraStage.sortableChildren = true;
+    this.container.addChild(this.fixedCameraStage);
+
+    this.actionStage = new Pixi.Sprite();
+    this.actionStage.zIndex = 0;
+    this.actionStage.sortableChildren = true;
+    this.container.addChild(this.actionStage);
+
+    this.backdropStage = new Pixi.Sprite();
+    this.backdropStage.zIndex = -1;
+    this.backdropStage.sortableChildren = true;
+    this.container.addChild(this.backdropStage);
+
+    this.fpsTracker = new FpsComponent({
+      delta: props.delta,
+      position: new Vector2(0, 0),
+      appSize: props.appSize,
+    })
+    // this is not container.addChild, so let's manage this ourselves, outside of lifecyclehandler
+    this.fixedCameraStage.addChild(this.fpsTracker.container);
+
+    this.backdrop = new Pixi.Graphics();
+    this.backdropStage.addChild(this.backdrop);
+    this.backdrop.beginFill(0xabcdef, 1);
+    // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
+    this.backdrop.interactive = true;
+    // backdrop.interactiveChildren = true; // not sure what this does
+    this.backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
+
+
+    this.reticle = new ReticleComponent({
+      appSize: props.appSize
+    });
+    this.fixedCameraStage.addChild(this.reticle.container);
+
+    this.zLevelPropsFactory = (props: Props, state: State): ZLevelComponentProps => {
+      return {
+        delta: props.delta,
+        args: {
+          pointNodeTexture: state.pointNodeTexture.get(),
+          markForceUpdate: this.markForceUpdate,
+        },
+        z: state.playerCurrentZ,
+        updaters: props.updaters,
+        position: props.appSize.multiply(0.5),
+        zLevelGen: props.gameState.worldGen.zLevels[state.playerCurrentZ],
+        selectedPointNode: props.gameState.playerUI.selectedPointNode,
+        allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
+      };
+    }
+    if (!this.zLevel) {
+      this.zLevel = new ZLevelComponent(this.zLevelPropsFactory(props, this.state));
+      this.actionStage.addChild(this.zLevel.container);
+    } else {
+      this.zLevel.update(this.zLevelPropsFactory(props, this.state));
+    }
+    this.registerChild({
+      childClass: ZLevelComponent,
+      instance: this.zLevel,
+      propsFactory: this.zLevelPropsFactory,
+    });
+
+    this.efficiencyBar = new EfficiencyBarComponent({
+      delta: 0,
+      args: {},
+      updaters: {},
+      tick: this.state.tick,
+      position: new Vector2(60, 60),
+      efficiencyPercent: 100
+    })
+    this.fixedCameraStage.addChild(this.efficiencyBar.container);
+  }
+}
+
+
+const wrapped = engageLifecycle(RootComponent2);
+// eslint-disable-next-line
+type wrapped = RootComponent2;
+// export { wrapped as RootComponent };
+export type { Props as ZLevelComponentProps };

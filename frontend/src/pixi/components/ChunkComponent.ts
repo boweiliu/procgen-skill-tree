@@ -37,7 +37,7 @@ type State = {}
 
 class ChunkComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  protected state: State;
+  public state: State;
 
   public children: KeyedHashMap<PointNodeRef, PointNodeComponent>;
 

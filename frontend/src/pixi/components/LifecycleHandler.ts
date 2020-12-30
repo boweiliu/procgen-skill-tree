@@ -1,6 +1,6 @@
 import * as Pixi from "pixi.js";
 import { batchifySetState } from "../../lib/util/batchify";
-import { UpdaterFn, updaterGenerator2 } from "../../lib/util/updaterGenerator";
+import { UpdaterFn, updaterGenerator2, UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 
 type Props = {
   args?: {
@@ -80,7 +80,8 @@ class ChildrenArray<P extends Props, S extends State> {
 export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
   public abstract container: Pixi.Container;
-  protected abstract state: S;
+  // public, only to allow useState function below to set this.state
+  public abstract state: S;
 
   protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
   private _children: ChildrenArray<P, S> = new ChildrenArray();
@@ -93,9 +94,17 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     this._staleProps = props;
   }
 
-  protected addChild<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
+  protected addChild<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(
+    c: ChildInstructions<CIT, CPT, P, S>
+  ) {
     this._children.add(c); // make sure children are updated
     this._childrenToConstruct.add(c); // if not already constructed/added to pixi hierarchy, queue it up
+  }
+
+  protected registerChild<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(
+    c: ChildInstructions<CIT, CPT, P, S>
+  ) { // only add children to updateable, not constructed
+    this._children.add(c);
   }
 
   protected removeChild<CIT extends LifecycleHandlerBase<any, any>>(c: CIT) {
