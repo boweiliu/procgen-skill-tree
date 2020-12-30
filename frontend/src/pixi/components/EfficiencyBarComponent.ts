@@ -37,7 +37,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   private boundingBoxWidth: number = 100;
   public boundingBox: Pixi.Graphics;
 
-  private innerBarWidth: number = 40;
+  private innerBarWidth: number = 24;
   private innerBarHeight: number = 200;
   private textHeight: number = 24; // observed height of the title text, including padding at the top of the text
   private paddingBottom: number = 12;

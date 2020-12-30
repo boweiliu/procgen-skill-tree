@@ -90,15 +90,11 @@ function QuestProgressComponent({
       {<Score score={score} scoreDetails={scoreDetails} />}
       {activeQuest === undefined ? (
         <>
-          <h2>
-            {" "}
-            You have no <br />
-            active quests!{" "}
+          <h2>Ready to start?
           </h2>
           <br></br>
-          <br></br>
           <button className="button" onClick={handleStartQuest}>
-            Get a quest
+            Start game
           </button>
           <br></br>
           <br></br>
@@ -107,16 +103,21 @@ function QuestProgressComponent({
       ) : (
         <>
           <h2> Active quest: </h2>
+            <h3>
+              Initial:
+            </h3>
+            <div>
+              {"placeholder"} {activeQuest.resourceType}
+            </div>
           <h3>Goal:</h3>
           <div>
             {activeQuest.resourceAmount} {activeQuest.resourceType}
           </div>
-          <br></br>
           <h3>Current:</h3>
           <div className={classnames({ good: isQuestComplete })}>
             {playerResourceAmounts?.[activeQuest.resourceType]}{" "}
             {activeQuest.resourceType}
-          </div>
+            </div>
           {isQuestComplete ? (
             <>
               <br></br>
