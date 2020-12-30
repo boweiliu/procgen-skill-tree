@@ -16,6 +16,9 @@ type State = {
 
 }
 
+/**
+ * For a interesting reference implementation, see https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/button.html
+ */
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   public state: State
   public container: Pixi.Container;
