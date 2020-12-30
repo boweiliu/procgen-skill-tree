@@ -7,6 +7,7 @@ import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 type Props = {
   remainingPoints: number;
+  spSpentThisQuest: number | undefined;
   createQuestCb: () => void;
   activeQuest: Quest | undefined;
   numBatches: number;
@@ -30,7 +31,7 @@ export default React.memo(QuestProgressComponent);
 
 function QuestProgressComponent({
   activeQuest,
-  remainingPoints,
+  spSpentThisQuest,
   createQuestCb,
   numBatches,
   playerResourceAmounts,
@@ -116,9 +117,6 @@ function QuestProgressComponent({
             {playerResourceAmounts?.[activeQuest.resourceType]}{" "}
             {activeQuest.resourceType}
           </div>
-          <br></br>
-          <h3>Efficiency:</h3>
-          <div>{"SS"}</div>
           {isQuestComplete ? (
             <>
               <br></br>
@@ -134,26 +132,12 @@ function QuestProgressComponent({
           ) : (
             <></>
           )}
-          <h3>Batches so far: </h3>
-          <div>{numBatches}</div>
           <br></br>
-          <div>
-            (Hint: You won't run <br />
-            out of skill points, but
-            <br /> they come in batches -<br />
-            try to use the <br /> fewest you can!)
-          </div>
+          <h3>SP spent so far:</h3>
+          <div>{spSpentThisQuest === undefined ? "" : spSpentThisQuest}</div>
+          <h3>Efficiency:</h3>
+          <div>{"SS"}</div>
         </>
-      )}
-      <br></br>
-      <h3> Available SP: </h3>
-      <div>{remainingPoints}</div>
-      {remainingPoints === 0 ? (
-        <div>
-          <br></br>(Start a quest first!)
-        </div>
-      ) : (
-        <></>
       )}
     </>
   );

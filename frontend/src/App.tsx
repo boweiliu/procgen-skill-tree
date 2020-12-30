@@ -61,6 +61,7 @@ function App() {
   tabViews = [
     <QuestProgress
       remainingPoints={gameState.playerSave.availableSp}
+      spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
       createQuestCb={createQuestCb}
       activeQuest={gameState.playerSave.activeQuest}
       numBatches={gameState.playerSave.batchesSinceQuestStart}

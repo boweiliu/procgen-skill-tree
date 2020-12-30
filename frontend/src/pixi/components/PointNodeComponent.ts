@@ -224,6 +224,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       updaters.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justSpentSp) {
           this.state.justSpentSp = false;
+          // console.log("just spent SP!");
           return {
             ...prev,
             playerSave: afterMaybeSpendingSp(prev.playerSave, prevGameState),

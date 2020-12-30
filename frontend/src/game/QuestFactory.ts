@@ -28,7 +28,7 @@ export function createQuest(
     return 1;
   });
   updaters.playerSave.availableSp.enqueueUpdate((prev) => {
-    return 5;
+    return 1;
   });
   updaters.playerSave.spSpentThisQuest.enqueueUpdate((prev) => {
     return 0;
