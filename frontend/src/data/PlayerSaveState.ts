@@ -6,6 +6,7 @@ export type PlayerSaveState = {
   availableSp: number;
   activeQuest: Quest | undefined;
   batchesSinceQuestStart: number;
+  spSpentThisQuest: number | undefined;
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],

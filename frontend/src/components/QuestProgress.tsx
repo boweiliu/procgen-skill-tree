@@ -25,7 +25,9 @@ type ScoreComponent = {
   outputScore: number;
   outputDescription: string;
 };
+
 export default React.memo(QuestProgressComponent);
+
 function QuestProgressComponent({
   activeQuest,
   remainingPoints,
