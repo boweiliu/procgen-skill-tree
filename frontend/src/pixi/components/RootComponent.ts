@@ -11,7 +11,7 @@ import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { batchifySetState } from "../../lib/util/batchify";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
-import { LifecycleHandlerBase } from "./LifecycleHandler";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -353,10 +353,18 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.backdropStage.sortableChildren = true;
     this.container.addChild(this.backdropStage);
 
-    this.fpsTracker = new FpsComponent({
-      delta: props.delta,
-      position: new Vector2(0, 0),
-      appSize: props.appSize,
+    let fpsTrackerPropsFactory = (props: Props, state: State) => {
+      return {
+        delta: props.delta,
+        position: new Vector2(0, 0),
+        appSize: props.appSize,
+      };
+    };
+    this.fpsTracker = new FpsComponent(fpsTrackerPropsFactory(props, this.state));
+    this.registerChild({
+      childClass: FpsComponent,
+      instance: this.fpsTracker,
+      propsFactory: fpsTrackerPropsFactory,
     })
     // this is not container.addChild, so let's manage this ourselves, outside of lifecyclehandler
     this.fixedCameraStage.addChild(this.fpsTracker.container);
@@ -370,8 +378,16 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
 
-    this.reticle = new ReticleComponent({
-      appSize: props.appSize
+    const reticlePropsFactory = (props: Props, state: State) => {
+      return {
+        appSize: props.appSize,
+      };
+    };
+    this.reticle = new ReticleComponent(reticlePropsFactory(props, this.state));
+    this.registerChild({
+      childClass: ReticleComponent,
+      instance: this.reticle,
+      propsFactory: reticlePropsFactory,
     });
     this.fixedCameraStage.addChild(this.reticle.container);
 
@@ -390,28 +406,107 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         allocatedPointNodeSubset: props.gameState.playerSave.allocatedPointNodeSet,
       };
     }
-    if (!this.zLevel) {
-      this.zLevel = new ZLevelComponent(this.zLevelPropsFactory(props, this.state));
-      this.actionStage.addChild(this.zLevel.container);
-    } else {
-      this.zLevel.update(this.zLevelPropsFactory(props, this.state));
-    }
+    this.zLevel = new ZLevelComponent(this.zLevelPropsFactory(props, this.state));
+    this.actionStage.addChild(this.zLevel.container);
     this.registerChild({
       childClass: ZLevelComponent,
       instance: this.zLevel,
       propsFactory: this.zLevelPropsFactory,
     });
 
-    this.efficiencyBar = new EfficiencyBarComponent({
-      delta: 0,
-      args: {},
-      updaters: {},
-      tick: this.state.tick,
-      position: new Vector2(60, 60),
-      efficiencyPercent: 100
-    })
+    let efficiencyBarPropsFactory = (props: Props, state: State) => {
+      return {
+        delta: props.delta,
+        args: {},
+        updaters: {},
+        tick: state.tick,
+        position: new Vector2(60, 60),
+        efficiencyPercent: 100
+      };
+    };
+    this.efficiencyBar = new EfficiencyBarComponent(efficiencyBarPropsFactory(props, this.state));
+    this.registerChild({
+      childClass: EfficiencyBarComponent,
+      instance: this.efficiencyBar,
+      propsFactory: efficiencyBarPropsFactory,
+    });
     this.fixedCameraStage.addChild(this.efficiencyBar.container);
   }
+
+  protected updateSelf(props: Props) {
+    this.state.tick++;
+
+    const activeIntent = props.gameState.intent.activeIntent;
+    let deltaX = 0;
+    let deltaY = 0;
+    const unit = 5 * props.delta;
+    // if we want to pan [the hud] west (i.e. the left key was pressed), action stage needs to move east
+    if (activeIntent[IntentName.PAN_WEST]) deltaX += unit;
+    if (activeIntent[IntentName.PAN_EAST]) deltaX += -unit;
+    // if we want to pan south (i.e. the down key was pressed), action stage needs to move north to give the impression
+    // the hud is moving south. note that north is negative y direction since top left is 0,0
+    if (activeIntent[IntentName.PAN_SOUTH]) deltaY += -unit;
+    if (activeIntent[IntentName.PAN_NORTH]) deltaY += unit;
+    this.actionStage.x += deltaX;
+    this.actionStage.y += deltaY;
+
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_IN]) {
+      this.state.playerCurrentZ--;
+
+      // scale by a factor of 9
+      this.actionStage.x *= ChunkGenConstants.CHUNK_DIM;
+      this.actionStage.y *= ChunkGenConstants.CHUNK_DIM;
+
+      console.log({ currentZ: this.state.playerCurrentZ });
+    }
+    if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) {
+      this.state.playerCurrentZ++;
+
+      this.actionStage.x /= ChunkGenConstants.CHUNK_DIM;
+      this.actionStage.y /= ChunkGenConstants.CHUNK_DIM;
+      console.log({ currentZ: this.state.playerCurrentZ });
+    }
+  }
+
+  protected renderSelf(props: Props) {
+    this.backdrop.width = props.appSize.x;
+    this.backdrop.height = props.appSize.y;
+  }
+
+  protected didMount() {
+    const { updaters } = this._staleProps;
+    this.backdrop.addListener('pointerdown', (event) => {
+      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, whole) => {
+        return undefined;
+      })
+    });
+  }
+
+  protected didUpdate() {
+    const { updaters } = this._staleProps;
+    // if we find ourselves a little idle, start pregenerating other layers
+    if (this.state.tick > 60 && !this._staleProps.gameState.worldGen.zLevels[-1]) {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
+        if (!prev[-1]) {
+          prev[-1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: -1 });
+          return {...prev};
+        } else {
+          return prev;
+        }
+      })
+    }
+    if (this.state.tick > 120 && !this._staleProps.gameState.worldGen.zLevels[1]) {
+      updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
+        if (!prev[1]) {
+          prev[1] = new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: 1 });
+          return {...prev};
+        } else {
+          return prev;
+        }
+      })
+    }
+  }
+
 }
 
 
