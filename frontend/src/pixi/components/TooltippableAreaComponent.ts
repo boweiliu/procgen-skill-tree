@@ -1,6 +1,5 @@
 import * as Pixi from "pixi.js";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { RenderedChunkConstants } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
@@ -35,6 +34,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.container.interactive = true;
     this.container.buttonMode = true;
     this.container.hitArea = props.hitArea;
+    this.container.zIndex = 2;
     // this.container.hitArea = new Pixi.Rectangle(
     //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
     //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
