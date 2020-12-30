@@ -50,7 +50,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.tooltipContainer = null;
 
     ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
-      super.useState({
+      super.useState<State, TooltippableAreaComponent>(this, {
         isActive: false
       }));
   }

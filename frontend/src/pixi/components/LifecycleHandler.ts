@@ -27,24 +27,30 @@ type ChildInstructions<
   };
 
 class ChildrenArray<P extends Props, S extends State> {
-  private _values: ChildInstructions<any, any, P, S>[] = [];
+  private _values: ChildInstructions<LifecycleHandlerBase<any, any>, any, P, S>[] = [];
 
-  public add<CIT, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
-    if (!this.contains(c.instance)) {
-      this._values.push(c);
+  public add<CIT extends LifecycleHandlerBase<any, any>, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
+    if (this._values.indexOf(c) === -1 || (c.instance && this.contains(c.instance))) { 
+      // do nohting - its already in here
+    }
+    this._values.push(c);
+  }
+
+  public remove<CIT extends LifecycleHandlerBase<any, any>>(c: CIT): ChildInstructions<CIT, any, P, S> | undefined {
+    const removed = this._values.splice(this._values.findIndex(it => it.instance === c), 1);
+    if (removed.length === 0) {
+      return undefined;
+    } else {
+      return removed[0] as ChildInstructions<CIT, any, P, S>;
     }
   }
 
-  public remove<CIT>(c: CIT) {
-    this._values.splice(this._values.findIndex(it => it.instance === c), 1);
-  }
-
-  public contains<CIT>(c: CIT): boolean {
+  public contains<CIT extends LifecycleHandlerBase<any, any>>(c: CIT): boolean {
     return (this._values.findIndex(it => it.instance === c) > -1);
   }
 
-  public get<CIT, CPT>(c: CIT): ChildInstructions<CIT, CPT, P, S> | undefined {
-    return this._values.find(it => it.instance === c);
+  public get<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(c: CIT): ChildInstructions<CIT, CPT, P, S> | undefined {
+    return this._values.find((it) => it.instance === c) as (ChildInstructions<CIT, CPT, P, S> | undefined);
   }
 
   public clone(): ChildrenArray<P, S> {
@@ -54,9 +60,9 @@ class ChildrenArray<P extends Props, S extends State> {
   }
 
   public forEach(callbackfn: (
-    value: ChildInstructions<any, any, P, S>,
+    value: ChildInstructions<LifecycleHandlerBase<any, any>, any, P, S>,
     index: number,
-    array: ChildInstructions<any, any, P, S>[],
+    array: ChildInstructions<LifecycleHandlerBase<any, any>, any, P, S>[],
   ) => void) {
     this._values.forEach(callbackfn);
   }
@@ -77,7 +83,9 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   protected abstract state: S;
 
   protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
-  protected _children: ChildrenArray<P, S> = new ChildrenArray();
+  private _children: ChildrenArray<P, S> = new ChildrenArray();
+  private _childrenToConstruct: ChildrenArray<P, S> = new ChildrenArray();
+  private _childrenToDestruct: ChildrenArray<P, S> = new ChildrenArray();
   private _forceUpdates: ChildrenArray<P, S> = new ChildrenArray();
   // private _self!: LifecycleHandlerBase<P, S>;
 
@@ -85,15 +93,26 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     this._staleProps = props;
   }
 
+  protected addChild<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
+    this._children.add(c);
+    this._childrenToConstruct.add(c);
+  }
+
+  protected removeChild<CIT extends LifecycleHandlerBase<any, any>, CP, CS>(c: CIT) {
+    let childInfo = this._children.remove(c);
+    childInfo && this._childrenToDestruct.add(childInfo);
+  }
+
   private _didConstruct(props: P) {
     // this._self = this;
-    this._children.forEach((child) => {
+    this._childrenToConstruct.forEach((child) => {
       if (!child.instance) {
         child.instance = new child.childClass(
           child.propsFactory(props, this.state)
         );
+        // only add newly created instance containers to this.container
+        this.container.addChild(child.instance.container);
       }
-      this.container.addChild(child.instance.container);
     });
     this.renderSelf(props);
     this.didMount?.();
@@ -111,12 +130,12 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     }
   }
 
-  protected useState(initialState: S) {
+  protected useState<S, T extends { state: S }>(self: T, initialState: S) {
     const setState: UpdaterFn<S> = (valueOrCallback) => {
       if (typeof valueOrCallback === "function") {
-        this.state = (valueOrCallback as (s: S) => S)(this.state);
+        self.state = (valueOrCallback as (s: S) => S)(self.state);
       } else {
-        this.state = valueOrCallback;
+        self.state = valueOrCallback;
       }
     };
     const [batchedSetState, fireBatch] = batchifySetState(setState);
@@ -145,11 +164,11 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       this._forceUpdates = new ChildrenArray<P, S>();
       forceUpdates.forEach(childInfo => {
         let { instance, propsFactory } = childInfo;
-        instance._update(propsFactory(nextProps, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
+        instance?._update(propsFactory(nextProps, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
         // instance._forceUpdate();
         // note that children can add themselves into forceupdate next tick as well, if they need to ensure they're continuously in there
 
-        this.didForceUpdateChild?.(instance);
+        instance && this.didForceUpdateChild?.(instance);
       })
       // no need to do anything else -- stale props has not changed
 
@@ -163,8 +182,22 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   }
 
   private _updateChildren(nextProps: P) {
+    this._childrenToDestruct.forEach((child) => {
+      if (child.instance) {
+        child.instance.willUnmount?.()
+        this.container.removeChild(child.instance.container);
+      }
+    });
     this._children.forEach(({ instance, propsFactory }) => {
-      instance._update(propsFactory(nextProps, this.state));
+      instance?._update(propsFactory(nextProps, this.state));
+    });
+    this._childrenToConstruct.forEach((child) => {
+      if (!child.instance) {
+        child.instance = new child.childClass(
+          child.propsFactory(nextProps, this.state)
+        );
+        this.container.addChild(child.instance.container);
+      }
     });
   }
 

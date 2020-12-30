@@ -97,7 +97,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     }
     this.tooltippableArea = new TooltippableAreaComponent(tooltippableAreaPropsFactory(props, this.state));
     // this.container.addChild(this.tooltippableArea.container);
-    this._children.add({
+    this.addChild({
       childClass: TooltippableAreaComponent,
       instance: this.tooltippableArea,
       propsFactory: tooltippableAreaPropsFactory,
