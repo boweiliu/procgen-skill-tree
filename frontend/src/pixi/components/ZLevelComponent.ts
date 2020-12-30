@@ -25,7 +25,7 @@ type Props = {
 
 type State = {}
 
-export class ZLevelComponent {
+class ZLevelComponent {
   public container: Pixi.Container;
   staleProps!: Props;
   state!: State;
@@ -272,6 +272,10 @@ class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
     return false;
   }
 
+  protected updateChildren(props: Props) {
+    this.upsertChildren(props);
+  }
+
   private upsertChildren(props: Props) {
     let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
     console.log(`zlevel component have ${this.children.size()} children`)
@@ -340,5 +344,5 @@ class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
 const wrapped = engageLifecycle(ZLevelComponent2);
 // eslint-disable-next-line
 type wrapped = ZLevelComponent2;
-// export { wrapped as ZLevelComponent };
+export { wrapped as ZLevelComponent };
 export type { Props as ZLevelComponentProps };
