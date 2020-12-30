@@ -1,5 +1,6 @@
 import * as Pixi from "pixi.js";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
+import { RenderedChunkConstants } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
@@ -50,7 +51,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
     this.tooltipContainer = null;
 
     ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
-      super.useState<State, TooltippableAreaComponent>(this, {
+      this.useState<State, TooltippableAreaComponent>(this, {
         isActive: false
       }));
   }
@@ -92,8 +93,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   public onPointerOver = (event: Pixi.InteractionEvent) => {
-    this._staleProps.args.markForceUpdate(this);
     // console.log('got onPointerOver in toolltippable');
+    this._staleProps.args.markForceUpdate(this);
     this.stateUpdaters.isActive.enqueueUpdate(() => {
       // console.log('fired onPointerOver in toolltippable');
       return true;

@@ -94,13 +94,14 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   }
 
   protected addChild<CIT extends LifecycleHandlerBase<CPT, any>, CPT>(c: ChildInstructions<CIT, CPT, P, S>) {
-    this._children.add(c);
-    this._childrenToConstruct.add(c);
+    this._children.add(c); // make sure children are updated
+    this._childrenToConstruct.add(c); // if not already constructed/added to pixi hierarchy, queue it up
   }
 
-  protected removeChild<CIT extends LifecycleHandlerBase<any, any>, CP, CS>(c: CIT) {
-    let childInfo = this._children.remove(c);
-    childInfo && this._childrenToDestruct.add(childInfo);
+  protected removeChild<CIT extends LifecycleHandlerBase<any, any>>(c: CIT) {
+    let childInfo = this._children.remove(c); // make sure children are no longer updated
+    // NOTE(bowei): do we need to call willUnount on the children here??
+    childInfo && this._childrenToDestruct.add(childInfo); // queue it for destruction next update tick
   }
 
   private _didConstruct(props: P) {
@@ -110,9 +111,10 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
         child.instance = new child.childClass(
           child.propsFactory(props, this.state)
         );
-        // only add newly created instance containers to this.container
-        this.container.addChild(child.instance.container);
       }
+      // NOTE(bowei): we are assuming the derived class did NOT manually add child to pixi hierarchy, even if 
+      // they constructed the instance themselves (in order to e.g. hold a reference); we do that here
+      this.container.addChild(child.instance.container);
     });
     this.renderSelf(props);
     this.didMount?.();
@@ -130,6 +132,8 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     }
   }
 
+  // cannot be attached to an instance due to typescript
+  // if satic, cannot be called "useState" or else react linter complains
   protected useState<S, T extends { state: S }>(self: T, initialState: S) {
     const setState: UpdaterFn<S> = (valueOrCallback) => {
       if (typeof valueOrCallback === "function") {
@@ -181,24 +185,30 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     new Promise((resolve) => resolve(this.didUpdate?.()));
   }
 
+  // destroy, update, create in that order, so that there's no extra update right before destroy or after create
   private _updateChildren(nextProps: P) {
     this._childrenToDestruct.forEach((child) => {
-      if (child.instance) {
+      if (child.instance) { // should always be true
         child.instance.willUnmount?.()
         this.container.removeChild(child.instance.container);
       }
     });
+    this._childrenToDestruct = new ChildrenArray();
+
     this._children.forEach(({ instance, propsFactory }) => {
       instance?._update(propsFactory(nextProps, this.state));
     });
+
     this._childrenToConstruct.forEach((child) => {
+      // here we expect the child instances to be empty, but they could be already constructed, if the derived class needs to keep a reference to it
       if (!child.instance) {
         child.instance = new child.childClass(
           child.propsFactory(nextProps, this.state)
         );
-        this.container.addChild(child.instance.container);
       }
+      this.container.addChild(child.instance.container);
     });
+    this._childrenToConstruct = new ChildrenArray();
   }
 
   protected fireStateUpdaters?(): void;
