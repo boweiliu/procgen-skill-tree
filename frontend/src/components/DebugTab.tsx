@@ -41,6 +41,8 @@ export function DebugTab({
     <>
       <h3>Player resources</h3> 
       {JSON.stringify(computed.playerResourceAmounts)}
+      <h3>Export to string</h3>
+      {btoa(JSON.stringify(playerSave))}
       <h3>Current Node</h3>
       <div>
         Z={selectedPointNode.z}
