@@ -3,12 +3,17 @@ import { PointNodeRef } from "./PointNodeRef";
 import { ResourceType } from "./WorldGenState";
 
 export type PlayerSaveState = {
+  // deprecated
   availableSp: number;
-  activeQuest: Quest | undefined;
+  // deprecated
   batchesSinceQuestStart: number;
+
+  activeQuest: Quest | undefined;
   spSpentThisQuest: number | undefined;
   questProgressHistory: number[];
   questInitialAmount: number;
+  score: number;
+  questsCompleted: Quest[];
   // TODO(bowei): save the seed in here as well?
 
   // selectedPointNodeHistory: PointNodeRef[],
@@ -16,7 +21,6 @@ export type PlayerSaveState = {
   allocatedPointNodeSet: HashSet<PointNodeRef>;
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[];
-  score: number;
 };
 
 export type Quest = {
