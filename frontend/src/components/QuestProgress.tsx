@@ -91,7 +91,7 @@ function QuestProgressComponent({
       {<Score score={score} scoreDetails={scoreDetails} />}
       {activeQuest === undefined ? (
         <>
-          <h2>You have no active quests!
+          <h2>No active quest
           </h2>
           <br></br>
           <button className="button" onClick={handleStartQuest}>
