@@ -4,8 +4,6 @@ import { ResourceType } from "./WorldGenState";
 
 export type PlayerSaveState = {
   // deprecated
-  availableSp: number;
-  // deprecated
   batchesSinceQuestStart: number;
 
   activeQuest: Quest | undefined;

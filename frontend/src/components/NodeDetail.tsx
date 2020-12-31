@@ -7,14 +7,14 @@ type Props = {
   selectedPointNode?: PointNodeRef;
   allocatedPointNodeSet: HashSet<PointNodeRef>;
   worldGen: WorldGenState;
-  availableSp: number;
+  hasActiveQuest: boolean;
 };
 export const NodeDetail = React.memo(NodeDetailComponent);
 function NodeDetailComponent({
   selectedPointNode,
   allocatedPointNodeSet,
   worldGen,
-  availableSp,
+  hasActiveQuest,
 }: Props) {
   if (!selectedPointNode) {
     return (
@@ -32,7 +32,7 @@ function NodeDetailComponent({
     selectedPointNode,
     worldGen,
     allocatedPointNodeSet,
-    availableSp
+    hasActiveQuest,
   );
   let nodeDescription: string = "Nothing (empty node)";
   if (pointNodeGen.resourceType !== ResourceType.Nothing) {

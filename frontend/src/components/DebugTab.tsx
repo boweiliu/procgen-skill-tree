@@ -8,7 +8,6 @@ type Props = {
   selectedPointNode?: PointNodeRef
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   worldGen: WorldGenState,
-  availableSp: number,
   playerSave: PlayerSaveState,
   computed: ComputedState
 }
@@ -19,7 +18,7 @@ export function DebugTab({
   worldGen,
   computed
 }: Props) {
-  const { allocatedPointNodeSet, availableSp } = playerSave;
+  const { allocatedPointNodeSet} = playerSave;
 
   let [b64PlayerSaveString, setB64PlayerSaveString] = useState<string>('');
   const [history, setHistory] = useState<PointNodeRef[]>([]);
@@ -33,7 +32,7 @@ export function DebugTab({
   }
   const pointNodeGen = worldGen.zLevels[selectedPointNode.z]!.chunks.get(selectedPointNode.chunkCoord)!.pointNodes.get(selectedPointNode.pointNodeCoord)!
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
-  const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, availableSp);
+  const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, playerSave.activeQuest !== undefined);
   let nodeDescription: string = "Nothing (empty node)";
   if (pointNodeGen.resourceType !== ResourceType.Nothing) {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`

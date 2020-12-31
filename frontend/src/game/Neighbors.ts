@@ -197,14 +197,18 @@ export function canAllocate(
   selfPointNodeRef: PointNodeRef,
   worldGen: WorldGenState,
   allocatedPointNodeSet: HashSet<PointNodeRef>,
-  availableSp: number
-): "yes" | "already allocated" | "not enough sp" | "not connected" {
+  hasActiveQuest: boolean,
+): "yes" | "already allocated" | "no active quest" | "not connected" {
   if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
     return "already allocated";
   }
-  if (availableSp < 1) {
-    return "not enough sp";
+  // if (availableSp < 1) {
+  //   return "not enough sp";
+  // }
+  if (hasActiveQuest === false) {
+    return "no active quest"
   }
+
   // check if any of our neighbors are allocated
   const neighbors = getNeighbors(selfPointNodeRef, worldGen);
   

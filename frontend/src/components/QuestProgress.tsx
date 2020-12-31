@@ -6,7 +6,6 @@ import { GameState, Quest, ResourceType } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 type Props = {
-  remainingPoints: number;
   spSpentThisQuest: number | undefined;
   createQuestCb: () => void;
   activeQuest: Quest | undefined;

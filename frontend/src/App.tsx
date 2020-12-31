@@ -60,7 +60,6 @@ function App() {
   let tabViews: JSX.Element[] = [];
   tabViews = [
     <QuestProgress
-      remainingPoints={gameState.playerSave.availableSp}
       spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
       createQuestCb={createQuestCb}
       activeQuest={gameState.playerSave.activeQuest}
@@ -75,13 +74,12 @@ function App() {
       selectedPointNode={gameState.playerUI.selectedPointNode}
       allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
       worldGen={gameState.worldGen}
-      availableSp={gameState.playerSave.availableSp}
+      hasActiveQuest={gameState.playerSave.activeQuest !== undefined}
     />,
     <DebugTab
       selectedPointNode={gameState.playerUI.selectedPointNode}
       allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
       worldGen={gameState.worldGen}
-      availableSp={gameState.playerSave.availableSp}
       playerSave={gameState.playerSave}
       computed={gameState.computed}
     />,

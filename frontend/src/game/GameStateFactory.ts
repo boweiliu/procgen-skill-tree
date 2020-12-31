@@ -40,7 +40,6 @@ export class GameStateFactory {
         zLevels: { 0: zLevel },
       },
       playerSave: {
-        availableSp: 0,
         // justAllocated: undefined,
         activeQuest: undefined,
         batchesSinceQuestStart: 0,
