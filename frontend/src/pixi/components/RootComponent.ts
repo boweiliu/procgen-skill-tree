@@ -11,6 +11,7 @@ import { ReticleComponent } from "./ReticleComponent";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { computeQuestEfficiencyPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
+import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -38,18 +39,15 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
-  public fixedCameraStage: Pixi.Container;
+  public fixedCameraStage: FixedCameraStageComponent;
   // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
   public actionStage: Pixi.Container;
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
   public backdropStage: Pixi.Container;
   // public keyboard: KeyboardState;
-  public fpsTracker: FpsComponent;
   public zLevel: ZLevelComponent | undefined;
   public zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
-  public reticle: ReticleComponent;
   public backdrop: Pixi.Graphics;
-  public efficiencyBar: EfficiencyBarComponent;
 
   constructor(props: Props) {
     super(props);
@@ -62,10 +60,24 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       playerCurrentZ: 0,
       }));
 
-    this.fixedCameraStage = new Pixi.Sprite();
-    this.fixedCameraStage.zIndex = 1;
-    this.fixedCameraStage.sortableChildren = true;
-    this.container.addChild(this.fixedCameraStage);
+    const fixedCameraStagePropsFactory = (props: Props, state: State) => {
+      return {
+        args: {
+          renderer: props.args.renderer,
+          markForceUpdate: this.markForceUpdate,
+        },
+        delta: props.delta,
+        gameState: props.gameState,
+        appSize: props.appSize,
+        tick: state.tick,
+      };
+    }
+    this.fixedCameraStage = new FixedCameraStageComponent(fixedCameraStagePropsFactory(props, this.state));
+    this.addChild({
+      childClass: FixedCameraStageComponent,
+      instance: this.fixedCameraStage,
+      propsFactory: fixedCameraStagePropsFactory,
+    })
 
     this.actionStage = new Pixi.Sprite();
     this.actionStage.zIndex = 0;
@@ -77,22 +89,6 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.backdropStage.sortableChildren = true;
     this.container.addChild(this.backdropStage);
 
-    let fpsTrackerPropsFactory = (props: Props, state: State) => {
-      return {
-        delta: props.delta,
-        position: new Vector2(0, 0),
-        appSize: props.appSize,
-      };
-    };
-    this.fpsTracker = new FpsComponent(fpsTrackerPropsFactory(props, this.state));
-    this.registerChild({
-      childClass: FpsComponent,
-      instance: this.fpsTracker,
-      propsFactory: fpsTrackerPropsFactory,
-    })
-    // this is not container.addChild, so let's manage this ourselves, outside of lifecyclehandler
-    this.fixedCameraStage.addChild(this.fpsTracker.container);
-
     this.backdrop = new Pixi.Graphics();
     this.backdropStage.addChild(this.backdrop);
     this.backdrop.beginFill(0xabcdef, 1);
@@ -101,19 +97,6 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     // backdrop.interactiveChildren = true; // not sure what this does
     this.backdrop.drawRect(0, 0, props.appSize.x, props.appSize.y);
 
-
-    const reticlePropsFactory = (props: Props, state: State) => {
-      return {
-        appSize: props.appSize,
-      };
-    };
-    this.reticle = new ReticleComponent(reticlePropsFactory(props, this.state));
-    this.registerChild({
-      childClass: ReticleComponent,
-      instance: this.reticle,
-      propsFactory: reticlePropsFactory,
-    });
-    this.fixedCameraStage.addChild(this.reticle.container);
 
     this.zLevelPropsFactory = (props: Props, state: State): ZLevelComponentProps => {
       return {
@@ -138,23 +121,6 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       propsFactory: this.zLevelPropsFactory,
     });
 
-    let efficiencyBarPropsFactory = (props: Props, state: State) => {
-      return {
-        delta: props.delta,
-        args: {},
-        updaters: {},
-        tick: state.tick,
-        position: new Vector2(60, 60),
-        efficiencyPercent: remapQuestEfficiencyToDisplayable(computeQuestEfficiencyPercent(props.gameState.playerSave)),
-      };
-    };
-    this.efficiencyBar = new EfficiencyBarComponent(efficiencyBarPropsFactory(props, this.state));
-    this.registerChild({
-      childClass: EfficiencyBarComponent,
-      instance: this.efficiencyBar,
-      propsFactory: efficiencyBarPropsFactory,
-    });
-    this.fixedCameraStage.addChild(this.efficiencyBar.container);
   }
 
   protected updateSelf(props: Props) {
@@ -238,4 +204,3 @@ const wrapped = engageLifecycle(RootComponent2);
 // eslint-disable-next-line
 type wrapped = RootComponent2;
 export { wrapped as RootComponent };
-export type { Props as ZLevelComponentProps };

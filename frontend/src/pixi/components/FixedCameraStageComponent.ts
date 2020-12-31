@@ -5,7 +5,7 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 import { FpsComponent } from "./FpsComponent";
-import { LifecycleHandlerBase } from "./LifecycleHandler";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { ReticleComponent } from "./ReticleComponent";
 
 
@@ -87,3 +87,9 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
 
   }
 }
+
+const wrapped = engageLifecycle(FixedCameraStageComponent);
+// eslint-disable-next-line
+type wrapped = FixedCameraStageComponent;
+export { wrapped as FixedCameraStageComponent };
+export type { Props as FixedCameraStageComponentProps };
