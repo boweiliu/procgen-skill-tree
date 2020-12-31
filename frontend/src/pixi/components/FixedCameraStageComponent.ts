@@ -7,6 +7,7 @@ import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 import { FpsComponent } from "./FpsComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { ReticleComponent } from "./ReticleComponent";
+import { TooltipComponent, TooltipInfo } from "./TooltipComponent";
 
 
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
   gameState: Const<GameState>,
   appSize: Vector2,
   tick: number,
+  tooltip: TooltipInfo,
 }
 
 type State = { 
@@ -29,9 +31,9 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
 
-  private fpsTracker: FpsComponent;
-  private reticle: ReticleComponent;
-  private efficiencyBar: EfficiencyBarComponent;
+  private fpsTracker!: FpsComponent;
+  private reticle!: ReticleComponent;
+  private efficiencyBar!: EfficiencyBarComponent;
 
   constructor(props: Props) {
     super(props);
@@ -39,52 +41,49 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
     this.container.sortableChildren = true;
     this.state = {};
 
-    let fpsTrackerPropsFactory = (props: Props, state: State) => {
-      return {
-        delta: props.delta,
-        position: new Vector2(0, 0),
-        appSize: props.appSize,
-      };
-    };
-    this.fpsTracker = new FpsComponent(fpsTrackerPropsFactory(props, this.state));
     this.addChild({
       childClass: FpsComponent,
-      instance: this.fpsTracker,
-      propsFactory: fpsTrackerPropsFactory,
+      propsFactory: (props: Props, state: State) => {
+        return {
+          delta: props.delta,
+          position: new Vector2(0, 0),
+          appSize: props.appSize,
+        };
+      },
     });
 
-    const reticlePropsFactory = (props: Props, state: State) => {
-      return {
-        appSize: props.appSize,
-      };
-    };
-    this.reticle = new ReticleComponent(reticlePropsFactory(props, this.state));
     this.addChild({
       childClass: ReticleComponent,
-      instance: this.reticle,
-      propsFactory: reticlePropsFactory,
+      propsFactory: (props: Props, state: State) => {
+        return {
+          appSize: props.appSize,
+        };
+      },
     });
 
-    let efficiencyBarPropsFactory = (props: Props, state: State) => {
-      return {
-        delta: props.delta,
-        args: {},
-        updaters: {},
-        tick: props.tick,
-        position: new Vector2(60, 60),
-        efficiencyPercent: remapQuestEfficiencyToDisplayable(computeQuestEfficiencyPercent(props.gameState.playerSave)),
-      };
-    };
-    this.efficiencyBar = new EfficiencyBarComponent(efficiencyBarPropsFactory(props, this.state));
     this.addChild({
       childClass: EfficiencyBarComponent,
-      instance: this.efficiencyBar,
-      propsFactory: efficiencyBarPropsFactory,
+      propsFactory: (props: Props, state: State) => {
+        return {
+          delta: props.delta,
+          args: {},
+          updaters: {},
+          tick: props.tick,
+          position: new Vector2(60, 60),
+          efficiencyPercent: remapQuestEfficiencyToDisplayable(computeQuestEfficiencyPercent(props.gameState.playerSave)),
+        };
+      },
+    });
+
+    this.addChild({
+      childClass: TooltipComponent,
+      propsFactory: (props: Props, state: State) => {
+        return { ...props.tooltip };
+      }
     });
   }
 
   protected renderSelf(props: Props) {
-
   }
 }
 

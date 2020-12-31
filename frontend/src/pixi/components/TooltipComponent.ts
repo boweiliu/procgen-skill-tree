@@ -3,13 +3,15 @@ import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
-type Props = {
-  args: {
-  },
+
+export type TooltipInfo = {
   text: string;
-  position: Vector2;
+  position: Vector2 | undefined; // should be nonnull if visible === true
   visible: boolean;
 }
+
+type Props = {
+} & TooltipInfo;
 
 type State = {} 
 
@@ -47,7 +49,7 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
 
   protected renderSelf(props: Props) {
     this.container.visible = props.visible;
-    this.container.position = PixiPointFrom(props.position);
+    this.container.position = PixiPointFrom(props?.position || Vector2.Zero);
   }
 }
 

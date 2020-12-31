@@ -8,11 +8,13 @@ import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
+import { TooltipInfo } from "./TooltipComponent";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
   tick: number;
   playerCurrentZ: number;
+  tooltip: TooltipInfo;
 }
 
 type Props = {
@@ -51,9 +53,14 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.container.sortableChildren = true;
     ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
       this.useState<State, RootComponent2>(this, {
-      pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
-      tick: 0,
-      playerCurrentZ: 0,
+        pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
+        tick: 0,
+        playerCurrentZ: 0,
+        tooltip: {
+          visible: false,
+          position: undefined,
+          text: '',
+        }
       }));
 
     const fixedCameraStagePropsFactory = (props: Props, state: State) => {
@@ -66,6 +73,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         gameState: props.gameState,
         appSize: props.appSize,
         tick: state.tick,
+        tooltip: { ...state.tooltip }
       };
     }
     this.fixedCameraStage = new FixedCameraStageComponent(fixedCameraStagePropsFactory(props, this.state));
