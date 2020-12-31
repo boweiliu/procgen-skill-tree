@@ -21,6 +21,7 @@ export function DebugTab({
 }: Props) {
   const { allocatedPointNodeSet, availableSp } = playerSave;
 
+  let [b64PlayerSaveString, setB64PlayerSaveString] = useState<string>('');
   const [history, setHistory] = useState<PointNodeRef[]>([]);
   useEffect(() => {
     if (!selectedPointNode) return;
@@ -42,7 +43,14 @@ export function DebugTab({
       <h3>Player resources</h3> 
       {JSON.stringify(computed.playerResourceAmounts)}
       <h3>Export to string</h3>
-      {btoa(JSON.stringify(playerSave))}
+      <div>
+      <button onClick={() => {
+        // window.alert(btoa(JSON.stringify(playerSave)));
+        setB64PlayerSaveString(btoa(JSON.stringify(playerSave, undefined, 2)));
+      }}>
+        export to base64 {' '}
+      </button></div>
+      <div>{b64PlayerSaveString}</div>
       <h3>Current Node</h3>
       <div>
         Z={selectedPointNode.z}
