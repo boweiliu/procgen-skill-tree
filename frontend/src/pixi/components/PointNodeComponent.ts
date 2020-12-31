@@ -89,10 +89,15 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     // this.container.hitArea = this.hitArea;
 
     const tooltippableAreaPropsFactory = (p: Props, s: State) => {
+      let nodeDescription: string = "Nothing (empty node)";
+      if (p.pointNodeGen.resourceType !== ResourceType.Nothing) {
+        nodeDescription = `${p.pointNodeGen.resourceAmount} ${p.pointNodeGen.resourceModifier} ${p.pointNodeGen.resourceType}`;
+      }
       return {
         args: {
           markForceUpdate: this.markForceUpdate,
         },
+        text: nodeDescription,
         hitArea: this.hitArea, // TODO(bowei): move into state???
       }
     }

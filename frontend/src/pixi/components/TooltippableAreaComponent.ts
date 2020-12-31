@@ -1,4 +1,6 @@
 import * as Pixi from "pixi.js";
+import { PixiPointFrom } from "../../lib/pixi/pixify";
+import { Vector2 } from "../../lib/util/geometry/vector2";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
@@ -7,6 +9,7 @@ type Props = {
     markForceUpdate: (childInstance: any) => void,
   },
   hitArea: Pixi.IHitArea;
+  text: string;
   delaySeconds?: number;
 }
 
@@ -70,11 +73,27 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
       if (this.tooltipContainer === null) {
         // if doesnt exist, construct it
         this.tooltipContainer = new Pixi.Container();
+        this.tooltipContainer.sortableChildren = true;
+
+        const text = new Pixi.Text(props.text, {
+          fontFamily: 'PixelMix',
+          padding: 4, // https://github.com/pixijs/pixi.js/issues/4500 -- otherwise on first load the text bounding box is calculated to be too small and the tops of the f's get cut off
+          fontSize: 26, // use 26 then scale down 50% results in sharper letters than 13
+          // align: 'center'
+        });
+        text.scale = PixiPointFrom(new Vector2(0.5, 0.5));
+        text.x = 10;
+        text.y = 10;
+        text.zIndex = 1;
+        this.tooltipContainer.addChild(text);
+
         const box = new Pixi.Graphics();
         box.lineStyle(1, 0x222222, 1);
         box.beginFill(0xEEEEEE);
-        box.drawRoundedRect(0, 0, 40, 40, 4);
-        this.tooltipContainer.addChild(box)
+        box.drawRoundedRect(0, 0, text.width + 18, text.height + 18, 4);
+        box.zIndex = 0;
+        this.tooltipContainer.addChild(box);
+
         this.container.addChild(this.tooltipContainer);
       }
     } else {
