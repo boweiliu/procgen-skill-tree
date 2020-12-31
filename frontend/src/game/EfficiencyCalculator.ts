@@ -37,7 +37,8 @@ export function remapQuestEfficiencyToDisplayable(percent: number): number {
   return x;
 }
 
-export function remapQuestEfficiencyToGrade(percent: number): string {
+export type Grade = "S" | "A" | "B" | "C" | "D";
+export function remapQuestEfficiencyToGrade(percent: number): Grade {
   const displayable = remapQuestEfficiencyToDisplayable(percent);
   // 0 - 100, remap to grades D, C, B, A, S
   if (displayable <= 20) {
@@ -50,5 +51,21 @@ export function remapQuestEfficiencyToGrade(percent: number): string {
     return "A";
   } else {
     return "S";
+  }
+}
+
+export function remapEfficiencyGradeToNumber(grade: Grade) : number {
+  if (grade === "S") {
+    return 4;
+  } else if (grade === "A") {
+    return 3;
+  } else if (grade === "B") {
+    return 2;
+  } else if (grade === "C") {
+    return 1;
+  } else if (grade === "D") {
+    return 0;
+  } else {
+    return 0;
   }
 }

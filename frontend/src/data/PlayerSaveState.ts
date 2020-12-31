@@ -3,9 +3,6 @@ import { PointNodeRef } from "./PointNodeRef";
 import { ResourceType } from "./WorldGenState";
 
 export type PlayerSaveState = {
-  // deprecated
-  batchesSinceQuestStart: number;
-
   activeQuest: Quest | undefined;
   spSpentThisQuest: number | undefined;
   questProgressHistory: number[];

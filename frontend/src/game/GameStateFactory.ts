@@ -42,7 +42,6 @@ export class GameStateFactory {
       playerSave: {
         // justAllocated: undefined,
         activeQuest: undefined,
-        batchesSinceQuestStart: 0,
         spSpentThisQuest: undefined,
         questProgressHistory: [],
         questInitialAmount: 0,

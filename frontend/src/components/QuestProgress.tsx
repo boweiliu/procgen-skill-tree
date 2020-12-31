@@ -4,15 +4,15 @@ import classnames from "classnames";
 import React, { useEffect, useState } from "react";
 import { GameState, Quest, ResourceType } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import { Grade, remapEfficiencyGradeToNumber } from "../game/EfficiencyCalculator";
 
 type Props = {
   spSpentThisQuest: number | undefined;
   createQuestCb: () => void;
   activeQuest: Quest | undefined;
-  numBatches: number;
   playerResourceAmounts?: { [k in ResourceType]: number };
   updaters: UpdaterGeneratorType2<GameState, GameState>["playerSave"];
-  efficiencyGrade: string;
+  efficiencyGrade: Grade;
   score: GameState["playerSave"]["score"];
   questInitialAmount: number;
 };
@@ -33,7 +33,6 @@ function QuestProgressComponent({
   activeQuest,
   spSpentThisQuest,
   createQuestCb,
-  numBatches,
   playerResourceAmounts,
   updaters,
   efficiencyGrade,
@@ -59,10 +58,10 @@ function QuestProgressComponent({
       outputDescription: "",
     });
     questScore.scoreComponents.push({
-      inputAmount: numBatches,
-      inputTitle: "nodes allocated",
-      outputScore: Math.floor(10 / (numBatches + 1)),
-      outputDescription: "efficiency",
+      inputAmount: remapEfficiencyGradeToNumber(efficiencyGrade),
+      inputTitle: "efficiency grade",
+      outputScore: Math.floor(10 / (remapEfficiencyGradeToNumber(efficiencyGrade) + 1)),
+      outputDescription: "",
     });
     const total = questScore.scoreComponents.reduce(
       (subtotal, prev) => subtotal + prev.outputScore,

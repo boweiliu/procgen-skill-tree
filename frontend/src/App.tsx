@@ -63,7 +63,6 @@ function App() {
       spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
       createQuestCb={createQuestCb}
       activeQuest={gameState.playerSave.activeQuest}
-      numBatches={gameState.playerSave.batchesSinceQuestStart}
       playerResourceAmounts={gameState.computed.playerResourceAmounts}
       updaters={updaters.playerSave}
       score={gameState.playerSave.score}
