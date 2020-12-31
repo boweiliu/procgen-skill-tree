@@ -221,17 +221,20 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       });
 
       // TODO(bowei): if we spent sp, remember to update quest status!!
-      updaters.enqueueUpdate((prev, prevGameState) => {
+      updaters.computed.enqueueUpdate((prev, prevGameState) => {
+        if (this.state.justSpentSp) {
+          // this.state.justSpentSp = false;
+          // console.log("just spent SP!");
+          return computePlayerResourceAmounts(prevGameState);
+        }
+        return prev;
+      })
+
+      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
         if (this.state.justSpentSp) {
           this.state.justSpentSp = false;
           // console.log("just spent SP!");
-          return {
-            ...prev,
-            playerSave: afterMaybeSpendingSp(prev.playerSave, prevGameState),
-            computed: {
-              ...computePlayerResourceAmounts(prevGameState)
-            }
-          };
+          return afterMaybeSpendingSp(prev, prevGameState);
         }
         return prev;
       })

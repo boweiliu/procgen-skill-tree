@@ -18,6 +18,7 @@ import { createQuest } from "./game/QuestFactory";
 import { batchifySetState } from "./lib/util/batchify";
 import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
+import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./game/EfficiencyCalculator";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -68,6 +69,7 @@ function App() {
       playerResourceAmounts={gameState.computed.playerResourceAmounts}
       updaters={updaters.playerSave}
       score={gameState.playerSave.score}
+      efficiencyGrade={remapQuestEfficiencyToGrade(computeQuestEfficiencyPercent(gameState.playerSave))}
     />,
     <NodeDetail
       selectedPointNode={gameState.playerUI.selectedPointNode}
@@ -80,6 +82,7 @@ function App() {
       allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
       worldGen={gameState.worldGen}
       availableSp={gameState.playerSave.availableSp}
+      playerSave={gameState.playerSave}
       computed={gameState.computed}
     />,
   ];

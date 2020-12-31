@@ -13,7 +13,7 @@ type Props = {
   numBatches: number;
   playerResourceAmounts?: { [k in ResourceType]: number };
   updaters: UpdaterGeneratorType2<GameState, GameState>["playerSave"];
-
+  efficiencyGrade: string;
   score: GameState["playerSave"]["score"];
 };
 type QuestScoreDetails = {
@@ -36,6 +36,7 @@ function QuestProgressComponent({
   numBatches,
   playerResourceAmounts,
   updaters,
+  efficiencyGrade,
   score,
 }: Props) {
   const [scoreDetails, setScoreDetails] = useState<QuestScoreDetails>({
@@ -137,7 +138,7 @@ function QuestProgressComponent({
           <h3>SP spent so far:</h3>
           <div>{spSpentThisQuest === undefined ? "" : spSpentThisQuest}</div>
           <h3>Efficiency:</h3>
-          <div>{"SS"}</div>
+          <div>{efficiencyGrade}</div>
         </>
       )}
     </>

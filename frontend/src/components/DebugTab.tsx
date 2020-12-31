@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { ComputedState, PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
+import { ComputedState, PlayerSaveState, PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../game/Neighbors";
+import { computeQuestEfficiencyPercent } from "../game/EfficiencyCalculator";
 
 type Props = {
   selectedPointNode?: PointNodeRef
   allocatedPointNodeSet: HashSet<PointNodeRef>,
   worldGen: WorldGenState,
   availableSp: number,
+  playerSave: PlayerSaveState,
   computed: ComputedState
 }
 
 export function DebugTab({
   selectedPointNode,
-  allocatedPointNodeSet,
+  playerSave,
   worldGen,
-  availableSp,
   computed
 }: Props) {
+  const { allocatedPointNodeSet, availableSp } = playerSave;
+
   const [history, setHistory] = useState<PointNodeRef[]>([]);
   useEffect(() => {
     if (!selectedPointNode) return;
@@ -55,6 +58,21 @@ export function DebugTab({
       <br></br>
       <div> Stats: </div>
       <div> {nodeDescription} </div>
+      <h3>efficiency percent</h3>
+      {
+        computeQuestEfficiencyPercent(playerSave)
+      }
+      <h3>Quest progress history</h3>
+      {
+        playerSave.questProgressHistory.length === 0 ? (<> empty </>) : 
+        playerSave.questProgressHistory.map((num, i) => {
+          return (
+            <div key={i}>
+              i={i}, quest progress={num}
+            </div>
+          )
+        })
+      }
       <h3>Previous</h3>
       {history
         .slice(0, -1)

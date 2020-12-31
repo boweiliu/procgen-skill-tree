@@ -26,22 +26,23 @@ export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, s
 }
 
 export function afterMaybeSpendingSp(prev: PlayerSaveState, prevGameState: GameState): PlayerSaveState {
-  let next = prev;
-  if (prev.spSpentThisQuest !== undefined) {
-    next = {
-      ...next,
-      spSpentThisQuest: prev.spSpentThisQuest + 1
-    };
+  let next = { ...prev };
+  if (next.spSpentThisQuest !== undefined) {
+    next.spSpentThisQuest += 1;
   }
 
-  if (prev.availableSp === 0 && prev.activeQuest) {
+  if (next.availableSp === 0 && next.activeQuest) {
     // TODO: need to find out if the quest is finished...
-    next = {
-      ...next,
-      availableSp: 1,
-      batchesSinceQuestStart: prev.batchesSinceQuestStart + 1
-    };
+    next.availableSp = 1;
+    next.batchesSinceQuestStart += 1;
   }
   // console.log({ next });
+
+  // update quest progress history?
+  if (next.activeQuest) {
+    let resourceType = next.activeQuest.resourceType;
+    let amount = prevGameState.computed.playerResourceAmounts?.[resourceType] || 0;
+    next.questProgressHistory.push(amount);
+  }
   return next;
 }

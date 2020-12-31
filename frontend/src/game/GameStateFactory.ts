@@ -45,6 +45,7 @@ export class GameStateFactory {
         activeQuest: undefined,
         batchesSinceQuestStart: 0,
         spSpentThisQuest: undefined,
+        questProgressHistory: [],
         allocatedPointNodeSet: new HashSet([pointNodeRef]),
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,

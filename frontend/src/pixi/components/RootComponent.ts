@@ -10,6 +10,7 @@ import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { ReticleComponent } from "./ReticleComponent";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import { computeQuestEfficiencyPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
 
 type State = {
   pointNodeTexture: Lazy<Pixi.Texture>;
@@ -144,7 +145,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         updaters: {},
         tick: state.tick,
         position: new Vector2(60, 60),
-        efficiencyPercent: 100
+        efficiencyPercent: remapQuestEfficiencyToDisplayable(computeQuestEfficiencyPercent(props.gameState.playerSave)),
       };
     };
     this.efficiencyBar = new EfficiencyBarComponent(efficiencyBarPropsFactory(props, this.state));
