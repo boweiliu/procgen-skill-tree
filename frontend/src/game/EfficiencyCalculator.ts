@@ -8,7 +8,7 @@ export function computeQuestEfficiencyPercent(playerSave: Const<PlayerSaveState>
   }
   let noEffectNodeCount = 0;
   playerSave.questProgressHistory.forEach((num, i, arr) => {
-    let prev = (i === 0) ? 0 : arr[i - 1];
+    let prev = (i === 0) ? playerSave.questInitialAmount : arr[i - 1];
     if (num === prev) {
       noEffectNodeCount += 1;
     }

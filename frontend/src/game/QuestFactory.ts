@@ -36,6 +36,14 @@ export function createQuest(
   updaters.playerSave.questProgressHistory.enqueueUpdate((prev) => {
     return [];
   });
+  updaters.playerSave.questInitialAmount.enqueueUpdate((prev, prevGameState) => {
+    let resourceType = prevGameState.playerSave.activeQuest?.resourceType
+    if (resourceType) {
+      let newAmount = prevGameState.computed.playerResourceAmounts?.[resourceType];
+      return newAmount || prev;
+    }
+    return prev;
+  });
 }
 
 type QuestFactoryConfig = {};
