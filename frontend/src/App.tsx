@@ -14,7 +14,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
-import { createQuest } from "./game/OnCreateNewQuest";
+import { createQuest } from "./game/OnCreateQuest";
 import { batchifySetState } from "./lib/util/batchify";
 import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
