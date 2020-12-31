@@ -21,7 +21,7 @@ type QuestScoreDetails = {
   scoreComponents: ScoreComponent[];
 };
 type ScoreComponent = {
-  inputAmount: number;
+  inputAmount: number | string;
   inputTitle: string;
   outputScore: number;
   outputDescription: string;
@@ -58,8 +58,8 @@ function QuestProgressComponent({
       outputDescription: "",
     });
     questScore.scoreComponents.push({
-      inputAmount: remapEfficiencyGradeToNumber(efficiencyGrade),
-      inputTitle: "efficiency grade",
+      inputAmount: "",
+      inputTitle: "efficiency grade: " + efficiencyGrade,
       outputScore: Math.floor(10 / (remapEfficiencyGradeToNumber(efficiencyGrade) + 1)),
       outputDescription: "",
     });

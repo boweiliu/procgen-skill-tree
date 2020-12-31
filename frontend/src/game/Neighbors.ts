@@ -202,9 +202,6 @@ export function canAllocate(
   if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
     return "already allocated";
   }
-  // if (availableSp < 1) {
-  //   return "not enough sp";
-  // }
   if (hasActiveQuest === false) {
     return "no active quest"
   }

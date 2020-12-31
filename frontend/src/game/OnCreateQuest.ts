@@ -37,12 +37,6 @@ export function createQuest(
       description: ""
     };
   });
-  // updaters.playerSave.batchesSinceQuestStart.enqueueUpdate((prev) => {
-  //   return 1;
-  // });
-  // updaters.playerSave.availableSp.enqueueUpdate((prev) => {
-  //   return 1;
-  // });
   updaters.playerSave.spSpentThisQuest.enqueueUpdate((prev) => {
     return 0;
   });
