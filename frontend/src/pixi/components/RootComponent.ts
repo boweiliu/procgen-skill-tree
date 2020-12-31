@@ -4,13 +4,9 @@ import { ChunkGenConstants, GameState, IntentName} from "../../data/GameState";
 import { generatePointNodeTexture } from "../textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { Const, Lazy } from "../../lib/util/misc";
-import { FpsComponent } from "./FpsComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
-import { ReticleComponent } from "./ReticleComponent";
-import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
-import { computeQuestEfficiencyPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
 import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
 
 type State = {
