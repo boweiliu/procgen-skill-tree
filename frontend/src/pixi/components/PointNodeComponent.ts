@@ -24,10 +24,7 @@ type Props = {
 };
 
 type State = {
-  justTriedToAllocate: boolean
-  justSpentSp: boolean
-  justFailedToAllocate: boolean
-  numClicks:number
+  numClicks:number // debug
 }
 
 class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
@@ -44,9 +41,6 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      justTriedToAllocate: false,
-      justSpentSp: false,
-      justFailedToAllocate: false,
       numClicks: 0
     };
     this.container = new Pixi.Container();
