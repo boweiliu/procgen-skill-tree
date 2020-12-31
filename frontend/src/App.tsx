@@ -70,6 +70,7 @@ function App() {
       updaters={updaters.playerSave}
       score={gameState.playerSave.score}
       efficiencyGrade={remapQuestEfficiencyToGrade(computeQuestEfficiencyPercent(gameState.playerSave))}
+      questInitialAmount={gameState.playerSave.questInitialAmount}
     />,
     <NodeDetail
       selectedPointNode={gameState.playerUI.selectedPointNode}

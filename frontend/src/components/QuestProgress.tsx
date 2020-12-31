@@ -15,6 +15,7 @@ type Props = {
   updaters: UpdaterGeneratorType2<GameState, GameState>["playerSave"];
   efficiencyGrade: string;
   score: GameState["playerSave"]["score"];
+  questInitialAmount: number;
 };
 type QuestScoreDetails = {
   total: number;
@@ -38,6 +39,7 @@ function QuestProgressComponent({
   updaters,
   efficiencyGrade,
   score,
+  questInitialAmount,
 }: Props) {
   const [scoreDetails, setScoreDetails] = useState<QuestScoreDetails>({
     total: 0,
@@ -103,22 +105,50 @@ function QuestProgressComponent({
         </>
       ) : (
         <>
-          <h2> Active quest: </h2>
-            <h3>
-              Initial:
-            </h3>
-            <div>
-              {"placeholder"} {activeQuest.resourceType}
-            </div>
-          <h3>Goal:</h3>
-          <div>
-            {activeQuest.resourceAmount} {activeQuest.resourceType}
-          </div>
-          <h3>Current:</h3>
-          <div className={classnames({ good: isQuestComplete })}>
-            {playerResourceAmounts?.[activeQuest.resourceType]}{" "}
-            {activeQuest.resourceType}
-            </div>
+            <h2> Active quest: </h2>
+            <table className={classnames({ table: true })}>
+              <tr>
+                <td>
+                  Initial
+                </td>
+                <td>
+                  {questInitialAmount} {activeQuest.resourceType}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Current
+                </td>
+                <td>
+                  {playerResourceAmounts?.[activeQuest.resourceType]} {activeQuest.resourceType}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Target
+                </td>
+                <td>
+                  {activeQuest.resourceAmount} {activeQuest.resourceType}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  SP spent
+                </td>
+                <td>
+                  {spSpentThisQuest === undefined ? "" : spSpentThisQuest}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Efficiency
+                </td>
+                <td>
+                  {efficiencyGrade}
+                </td>
+              </tr>
+            </table>
+
           {isQuestComplete ? (
             <>
               <br></br>
@@ -134,11 +164,6 @@ function QuestProgressComponent({
           ) : (
             <></>
           )}
-          <br></br>
-          <h3>SP spent so far:</h3>
-          <div>{spSpentThisQuest === undefined ? "" : spSpentThisQuest}</div>
-          <h3>Efficiency:</h3>
-          <div>{efficiencyGrade}</div>
         </>
       )}
     </>
