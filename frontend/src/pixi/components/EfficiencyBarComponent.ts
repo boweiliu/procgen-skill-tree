@@ -93,6 +93,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addChild(this.innerBar);
 
     // rainbow red-green gradient for the contents of the inner bar
+    const barFillContainer = new Pixi.Container();
     this.barFill = new Pixi.Graphics();
     // source: https://www.schemecolor.com/red-orange-green-gradient.php
     this.barFill.beginFill(0x69B34C);
@@ -109,9 +110,15 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.barFill.x = this.boundingBoxWidth / 2;
     this.barFill.y = this.textHeight; // same positioning as innerBar
     this.barFill.zIndex = 4;
-    this.container.addChild(this.barFill);
+    // this.container.addChild(this.barFill);
+    barFillContainer.addChild(this.barFill);
+    barFillContainer.zIndex = 4;
+    this.container.addChild(barFillContainer);
+
     // this.barFill.filters = [this.filter];
     // mask controls how much of the red-green gradient fillings are visible, depending on how well the player is doing
+    const maskContainer = new Pixi.Container();
+    // this mask moves up and down
     this.mask = new Pixi.Graphics();
     this.mask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
     this.mask.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
@@ -119,8 +126,24 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.mask.pivot.x = this.innerBarWidth/2; // left-right center in ourselves
     this.mask.x = this.boundingBoxWidth/2; // center in the boundingBox
     this.mask.y = this.textHeight; // same positioning as inner bar
-    this.container.addChild(this.mask); // have to add child here -- not sure why
-    this.barFill.mask = this.mask;
+
+    // this mask does not
+    const fixedMask = new Pixi.Graphics();
+    fixedMask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
+    fixedMask.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
+    fixedMask.zIndex = 31; // doesnt matter
+    fixedMask.pivot.x = this.innerBarWidth/2; // left-right center in ourselves
+    fixedMask.x = this.boundingBoxWidth/2; // center in the boundingBox
+    fixedMask.y = this.textHeight; // same positioning as inner bar
+
+    maskContainer.addChild(this.mask);
+    // maskContainer.addChild(fixedMask);
+    this.container.addChild(maskContainer);
+    // this.container.addChild(this.mask); // have to add child here -- not sure why
+    this.barFill.mask = maskContainer;
+
+    this.container.addChild(fixedMask);
+    barFillContainer.mask = fixedMask;
 
     // another copy of innerbar, except this time the fill is transparent; we just need the line style to be redrawn so that 
     // the inner filling mask leakage gets hidden
