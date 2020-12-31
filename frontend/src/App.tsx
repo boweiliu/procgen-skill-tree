@@ -14,7 +14,7 @@ import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
-import { createQuest } from "./game/QuestFactory";
+import { createQuest } from "./game/OnCreateNewQuest";
 import { batchifySetState } from "./lib/util/batchify";
 import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
@@ -53,9 +53,8 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-  let createQuestCb = useCallback(() => createQuest(updaters, gameState), [
+  let createQuestCb = useCallback(() => createQuest(updaters), [
     updaters,
-    gameState,
   ]);
 
   let tabViews: JSX.Element[] = [];

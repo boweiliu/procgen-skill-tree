@@ -5,10 +5,9 @@ import { GameState, PointNodeGen, PointNodeRef, ResourceModifier, ResourceType }
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { multiplyColor } from "../../lib/util/misc";
-import { afterMaybeSpendingSp, doTryAllocate } from "../../game/OnAllocation";
-import { computePlayerResourceAmounts } from "../../game/ComputeState";
 import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
 
 type Props = {
   delta: number,
@@ -198,61 +197,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
       this.state.numClicks++;
+      selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
+
       // event.stopPropagation();
-
-      // update selected to ourselves
-      updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
-        if (prev?.pointNodeId === this._staleProps.selfPointNodeRef.pointNodeId) {
-          console.log('just selected: ', this);
-          this.state.justTriedToAllocate = true;
-        }
-        return this._staleProps.selfPointNodeRef;
-      });
-
-      // if we tried to allocate ourselves, see if we can
-      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
-        if (this.state.justTriedToAllocate) {
-          this.state.justTriedToAllocate = false;
-          let [next, succeeded] = doTryAllocate(prev, prevGameState, this._staleProps.selfPointNodeRef);
-          if (succeeded) {
-            this.state.justSpentSp = true;
-            return next;
-          } else {
-            this.state.justFailedToAllocate = true;
-            return prev;
-          }
-        }
-        return prev;
-      });
-
-      // TODO(bowei): if we spent sp, remember to update quest status!!
-      updaters.computed.enqueueUpdate((prev, prevGameState) => {
-        if (this.state.justSpentSp) {
-          // this.state.justSpentSp = false;
-          // console.log("just spent SP!");
-          return computePlayerResourceAmounts(prevGameState);
-        }
-        return prev;
-      })
-
-      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
-        if (this.state.justSpentSp) {
-          this.state.justSpentSp = false;
-          // console.log("just spent SP!");
-          return afterMaybeSpendingSp(prev, prevGameState);
-        }
-        return prev;
-      })
-
-      // if we failed to allocate, shift the active tab so the player can see why
-      updaters.playerUI.activeTab.enqueueUpdate((prev, prevGameState) => {
-        if (this.state.justFailedToAllocate) {
-          console.log('just failed to allocate: ', this);
-          this.state.justFailedToAllocate = false;
-          return 1;
-        }
-        return prev;
-      });
     });
   }
 

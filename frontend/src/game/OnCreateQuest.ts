@@ -7,7 +7,7 @@ import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 
 export function createQuest(
   updaters: UpdaterGeneratorType2<GameState>,
-  gameState: GameState,
+  // gameState: GameState,
   // config: QuestFactoryConfig = {}
 ) {
   updaters.playerSave.questsCompleted.enqueueUpdate((prev, prevGameState) => {
@@ -17,12 +17,12 @@ export function createQuest(
   });
   updaters.playerSave.activeQuest.enqueueUpdate((prev, prevGameState) => {
     const numQuestsCompleted = prevGameState.playerSave.questsCompleted.length;
-    const totalAllocatedNodes = gameState.computed.playerResourceNodesAggregated?.size() || 5;
+    const totalAllocatedNodes = prevGameState.computed.playerResourceNodesAggregated?.size() || 5;
 
     // const r = Math.floor(Math.random() * 3) as 0 | 1 | 2;
     // const resource = Object.values(ResourceNontrivialType)[r];
     const resourceType = ResourceType.Mana0;
-    const currentResourceAmount = gameState.computed.playerResourceAmounts?.[resourceType] || 50;
+    const currentResourceAmount = prevGameState.computed.playerResourceAmounts?.[resourceType] || 50;
 
     const historicalAmountPerNode = currentResourceAmount / totalAllocatedNodes; // how much benefit, on average, each node gave
 
