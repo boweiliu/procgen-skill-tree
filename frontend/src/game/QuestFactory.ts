@@ -33,6 +33,9 @@ export function createQuest(
   updaters.playerSave.spSpentThisQuest.enqueueUpdate((prev) => {
     return 0;
   });
+  updaters.playerSave.questProgressHistory.enqueueUpdate((prev) => {
+    return [];
+  });
 }
 
 type QuestFactoryConfig = {};
