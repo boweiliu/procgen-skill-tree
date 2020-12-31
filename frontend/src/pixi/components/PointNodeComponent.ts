@@ -190,9 +190,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 // 
 
     this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
+      this._staleProps.args.markForceUpdate(this);
       this.state.numClicks++;
       selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
-
       // event.stopPropagation();
     });
   }
