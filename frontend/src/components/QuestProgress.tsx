@@ -158,7 +158,7 @@ function QuestProgressComponent({
                   doClaimReward();
                 }}
               >
-                Claim reward
+                Finish quest
               </button>
             </>
           ) : (
