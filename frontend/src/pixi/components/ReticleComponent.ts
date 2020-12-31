@@ -1,6 +1,7 @@
 import * as Pixi from "pixi.js";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
   appSize: Vector2
@@ -10,38 +11,38 @@ type State = {
   position: Vector2;
 }
 
-export class ReticleComponent{
-  public container: Pixi.Graphics;
-  staleProps: Props
-  state: State;
+class ReticleComponent extends LifecycleHandlerBase<Props, State> {
+  public container: Pixi.Container;
+  public state: State;
 
   constructor(props: Props) {
-    this.container = new Pixi.Graphics();
-    this.staleProps = props;
+    super(props);
+    this.container = new Pixi.Container();
     this.state = {
       position: props.appSize.multiply(0.5)
     };
 
-    this.container.lineStyle(2, 0x999999);
-    this.container.drawCircle(0, 0, 10);
-    this.container.interactive = true;
-    this.container.buttonMode = true;
-
-    this.renderSelf(props);
+    const outerCircle = new Pixi.Graphics();
+    outerCircle.lineStyle(2, 0x000000);
+    outerCircle.alpha = 0.5;
+    outerCircle.drawCircle(0, 0, 16);
+    outerCircle.interactive = true;
+    this.container.addChild(outerCircle)
+    outerCircle.moveTo(0, -8);
+    outerCircle.lineTo(0, 8);
+    outerCircle.moveTo(-8, 0);
+    outerCircle.lineTo(8, 0);
   }
 
-  public update(props: Props) {
-    this.updateSelf(props);
-    this.renderSelf(props);
-    this.staleProps = props;
-  }
-
-  updateSelf(props: Props) {
+  protected updateSelf(props: Props) {
     this.state.position = props.appSize.multiply(0.5);
   }
-  renderSelf(props: Props) {
+  protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(this.state.position);
   }
-
-
 }
+
+const wrapped = engageLifecycle(ReticleComponent);
+// eslint-disable-next-line
+type wrapped = ReticleComponent;
+export { wrapped as ReticleComponent };

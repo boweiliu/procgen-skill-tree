@@ -1,12 +1,15 @@
 import { HashSet } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
 import { ChunkGenConstants, PointNodeRef, WorldGenState } from "../data/GameState";
+import { Vector2 } from "../lib/util/geometry/vector2";
 
 enum Direction {
-  up = 'up',
-  down = 'down',
-  left = 'left',
-  right = 'right',
+  NORTH = 'NORTH',
+  SOUTH = 'SOUTH',
+  EAST = 'EAST',
+  WEST = 'WEST',
+  UP = 'UP',
+  DOWN = 'DOWN',
 }
 
 type NeighborsMap = { [k in Direction]?: PointNodeRef | undefined }
@@ -37,7 +40,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
       let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withX(-ChunkGenConstants.CHUNK_HALF_DIM)
       let nbor = chunk.pointNodes.get(pointNodeCoord);
       if (nbor) {
-        neighbors.right = new PointNodeRef({
+        neighbors.EAST = new PointNodeRef({
           z: selfPointNodeRef.z,
           chunkCoord,
           pointNodeCoord,
@@ -49,7 +52,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addX(1);
     let nbor = myChunk.pointNodes.get(pointNodeCoord);
     if (nbor) {
-      neighbors.right = new PointNodeRef({
+      neighbors.EAST = new PointNodeRef({
         z: selfPointNodeRef.z,
         chunkCoord: selfPointNodeRef.chunkCoord,
         pointNodeCoord,
@@ -65,7 +68,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
       let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withX(ChunkGenConstants.CHUNK_HALF_DIM)
       let nbor = chunk.pointNodes.get(pointNodeCoord);
       if (nbor) {
-        neighbors.left = new PointNodeRef({
+        neighbors.WEST = new PointNodeRef({
           z: selfPointNodeRef.z,
           chunkCoord,
           pointNodeCoord,
@@ -77,7 +80,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addX(-1);
     let nbor = myChunk.pointNodes.get(pointNodeCoord);
     if (nbor) {
-      neighbors.left = new PointNodeRef({
+      neighbors.WEST = new PointNodeRef({
         z: selfPointNodeRef.z,
         chunkCoord: selfPointNodeRef.chunkCoord,
         pointNodeCoord,
@@ -93,7 +96,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
       let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(-ChunkGenConstants.CHUNK_HALF_DIM)
       let nbor = chunk.pointNodes.get(pointNodeCoord);
       if (nbor) {
-        neighbors.down = new PointNodeRef({
+        neighbors.SOUTH = new PointNodeRef({
           z: selfPointNodeRef.z,
           chunkCoord,
           pointNodeCoord,
@@ -105,7 +108,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(1);
     let nbor = myChunk.pointNodes.get(pointNodeCoord);
     if (nbor) {
-      neighbors.down = new PointNodeRef({
+      neighbors.SOUTH = new PointNodeRef({
         z: selfPointNodeRef.z,
         chunkCoord: selfPointNodeRef.chunkCoord,
         pointNodeCoord,
@@ -121,7 +124,7 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
       let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(ChunkGenConstants.CHUNK_HALF_DIM)
       let nbor = chunk.pointNodes.get(pointNodeCoord);
       if (nbor) {
-        neighbors.up = new PointNodeRef({
+        neighbors.NORTH = new PointNodeRef({
           z: selfPointNodeRef.z,
           chunkCoord,
           pointNodeCoord,
@@ -133,12 +136,57 @@ export function getNeighborsMap(selfPointNodeRef: PointNodeRef, worldGen: WorldG
     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(-1);
     let nbor = myChunk.pointNodes.get(pointNodeCoord);
     if (nbor) {
-      neighbors.up = new PointNodeRef({
+      neighbors.NORTH = new PointNodeRef({
         z: selfPointNodeRef.z,
         chunkCoord: selfPointNodeRef.chunkCoord,
         pointNodeCoord,
         pointNodeId: nbor.id
       })
+    }
+  }
+  
+  // progress zlevels
+  // up is only available if we are the center of our chunk
+  if (selfPointNodeRef.pointNodeCoord.equals(Vector2.Zero)) {
+    let upZLevel = worldGen.zLevels[selfPointNodeRef.z + 1];
+    if (upZLevel) {
+      // use our chunkcoord and divide by CHUNK_DIM 
+      let chunkCoord = selfPointNodeRef.chunkCoord;
+      let upChunkCoordX = Math.round(chunkCoord.x / ChunkGenConstants.CHUNK_DIM)
+      let upNodeX = chunkCoord.x - ChunkGenConstants.CHUNK_DIM * upChunkCoordX // should be between - CHUNK_HALF_DIM and CHUNK_HALF_DIM
+      let upChunkCoordY = Math.round(chunkCoord.y / ChunkGenConstants.CHUNK_DIM)
+      let upNodeY = chunkCoord.y - ChunkGenConstants.CHUNK_DIM * upChunkCoordX // should be between - CHUNK_HALF_DIM and CHUNK_HALF_DIM
+      let upChunkCoord = new Vector2(upChunkCoordX, upChunkCoordY);
+      let upChunk = upZLevel.chunks.get(upChunkCoord);
+      if (upChunk) {
+        let upNode = new Vector2(upNodeX, upNodeY);
+        let nbor = upChunk.pointNodes.get(upNode)
+        if (nbor) {
+          neighbors.UP = new PointNodeRef({
+            z: selfPointNodeRef.z + 1,
+            chunkCoord: upChunkCoord,
+            pointNodeCoord: upNode,
+            pointNodeId: nbor.id
+          });
+        }
+      }
+    }
+  }
+  // down
+  let downZLevel = worldGen.zLevels[selfPointNodeRef.z - 1];
+  if (downZLevel) {
+    let chunkCoord = selfPointNodeRef.chunkCoord.multiply(9).add(selfPointNodeRef.pointNodeCoord);
+    let downChunk = downZLevel.chunks.get(chunkCoord);
+    if (downChunk) {
+      let nbor = downChunk.pointNodes.get(Vector2.Zero);
+      if (nbor) {
+        neighbors.DOWN = new PointNodeRef({
+          z: selfPointNodeRef.z - 1,
+          chunkCoord,
+          pointNodeCoord: Vector2.Zero,
+          pointNodeId: nbor.id
+        });
+      }
     }
   }
 

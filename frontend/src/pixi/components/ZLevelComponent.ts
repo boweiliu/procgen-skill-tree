@@ -1,19 +1,21 @@
 import * as Pixi from "pixi.js";
-import { ChunkRef, GameState, PointNodeRef, ZLevelGen } from "../../data/GameState";
+import { ChunkGen, ChunkRef, GameState, PointNodeRef, ZLevelGen } from "../../data/GameState";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { RenderedChunkConstants, ChunkComponent } from "./ChunkComponent";
+import { RenderedChunkConstants, ChunkComponent, ChunkComponentProps } from "./ChunkComponent";
+import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
   delta: number,
   args: {
     pointNodeTexture: Pixi.Texture,
-    z: number,
+    markForceUpdate: (childInstance: any) => void,
   },
+  z: number,
   updaters: UpdaterGeneratorType2<GameState>,
   position: Vector2,
   zLevelGen: Const<ZLevelGen> | undefined,
@@ -21,154 +23,142 @@ type Props = {
   allocatedPointNodeSubset: Const<HashSet<PointNodeRef>>,
 }
 
-export class ZLevelComponent {
+type State = {}
+
+class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  staleProps!: Props;
-  state!: {};
+  public state: State;
 
   public children: KeyedHashMap<ChunkRef, ChunkComponent> = new KeyedHashMap();
 
   constructor(props: Props) {
-    this.staleProps = props;
+    super(props);
     this.state = {};
     this.container = new Pixi.Container();
 
-    for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
-      const chunkRef = new ChunkRef({
-        z: props.args.z,
-        chunkCoord,
-        chunkId: chunkGen.id,
-      });
-
-      let allocatedPointNodeSubset = new HashSet(
-        props.allocatedPointNodeSubset.values()
-          .filter((pointNodeRef) => {
-            return pointNodeRef.chunkCoord.x === chunkRef.chunkCoord.x &&
-              pointNodeRef.chunkCoord.y === chunkRef.chunkCoord.y;
-          })
-      );
-      let childProps = {
-        delta: props.delta,
-        args: {
-          pointNodeTexture: props.args.pointNodeTexture,
-          selfChunkRef: chunkRef,
-        },
-        updaters: props.updaters,
-        position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
-        chunkGen: chunkGen,
-        selectedPointNode: props.selectedPointNode,
-        allocatedPointNodeSubset,
-      }
-      const childComponent = new ChunkComponent(childProps);
-      this.children.put(chunkRef, childComponent);
-      this.container.addChild(childComponent.container);
-
-    }
-
-    this.renderSelf(props);
-    this.didMount();
+    this.upsertChildren(props);
   }
 
-  renderSelf(props: Props) {
+  protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
   }
 
-  updateSelf(props: Props) { }
-  shouldUpdate(prevProps: Props, props: Props): boolean {
+  protected didMount() {
+    const { updaters } = this._staleProps;
+    // if we mounted but our data is not generated, please generate ourselves
+    updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
+      if (!prev[this._staleProps.z]) {
+        return { [this._staleProps.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: this._staleProps.z }) };
+      }
+      return prev;
+    })
+  }
+
+  protected didForceUpdateChild(instance: LifecycleHandlerBase<any, any>) {
+    // IMPORTANT! this is intended to raise the child that asked for a force update to the top so it isn't covered
+    // by other sibling pixi containers. however this code doesnt work well during the update call, for some reason (not sure why)
+    this.container.removeChild(instance.container);
+    this.container.addChild(instance.container);
+  }
+
+  protected shouldUpdate(prevProps: Props, prevState: State, props: Props, state: State): boolean {
     for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
       if (key === 'position') {
         if (!prevProps[key].equals(props[key])) {
+          console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
           return true;
         } else {
           continue;
         }
       }
-      // if (key === 'allocatedPointNodeSubset') {
-      //   if (prevProps[key].hash() !== props[key].hash()) {
-      //     return true;
-      //   } else {
-      //     continue;
-      //   }
-      // }
+      if (key === 'selectedPointNode') {
+        if (prevProps[key]?.hash() !== props[key]?.hash()) {
+          console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
+          return true;
+        } else {
+          continue;
+        }
+      }
       if (prevProps[key] !== props[key]) {
+        console.log(`zlevel shouldUpdate differed in ${key}, returning true`);
         return true;
       }
     }
     return false;
   }
 
-  public update(props: Props) {
-    if (!this.shouldUpdate(this.staleProps, props)) { return; }
-    this.updateSelf(props);
-    for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
-      const chunkRef = new ChunkRef({
-        z: props.args.z,
-        chunkCoord,
-        chunkId: chunkGen.id,
-      });
+  protected updateChildren(props: Props) {
+    this.upsertChildren(props);
+  }
 
+  private upsertChildren(props: Props) {
+    let childrenToDelete = this.children.clone(); // track which children need to be destroyed according to new props
+    console.log(`zlevel component have ${this.children.size()} children`)
+    for (let [chunkCoord, chunkGen] of props.zLevelGen?.chunks?.entries() || []) {
+      const { childKey, childPropsFactory } = this.doChild(props, chunkCoord, chunkGen);
+      let childComponent = this.children.get(childKey);
+      if (childComponent) {
+        // childComponent.update(childPropsFactory(props, this.state));
+        childrenToDelete.remove(childKey);
+      } else {
+        childComponent = new ChunkComponent(childPropsFactory(props, this.state));
+        this.children.put(childKey, childComponent);
+        // this.container.addChild(childComponent.container);
+        this.addChild({
+          childClass: ChunkComponent,
+          instance: childComponent,
+          propsFactory: childPropsFactory
+        });
+      }
+    }
+    console.log(`zlevel component have ${childrenToDelete.size()} children to delete`)
+    for (let [childKey, childComponent] of childrenToDelete.entries()) {
+      // childComponent.willUnmount();
+      this.children.remove(childKey);
+      // this.container.removeChild(childComponent.container);
+      // this._children.splice(this._children.findIndex(it => it.instance === childComponent), 1);
+      this.removeChild(childComponent);
+    }
+  }
+
+  private doChild(props: Props, chunkCoord: Vector2, chunkGen: ChunkGen): { childKey: ChunkRef, childPropsFactory: (p: Props, s: State) => ChunkComponentProps } {
+    const chunkRef = new ChunkRef({
+      z: props.z,
+      chunkCoord,
+      chunkId: chunkGen.id,
+    });
+
+    let childPropsFactory = (props: Props, state: State) => {
       let allocatedPointNodeSubset = new HashSet(
-        props.allocatedPointNodeSubset.values()
-          .filter((pointNodeRef) => {
-            return pointNodeRef.chunkCoord.x === chunkRef.chunkCoord.x &&
-              pointNodeRef.chunkCoord.y === chunkRef.chunkCoord.y;
-          })
+        props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
       );
-      let childProps = {
+
+      return {
         delta: props.delta,
         args: {
           pointNodeTexture: props.args.pointNodeTexture,
-          selfChunkRef: chunkRef,
+          markForceUpdate: this.markForceUpdate
         },
+        selfChunkRef: chunkRef,
         updaters: props.updaters,
         position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
         chunkGen: chunkGen,
-        selectedPointNode: props.selectedPointNode,
+        // NOTE(bowei): for optimization, we dont tell other chunks about selected nodes in other chunks
+        selectedPointNode: (props.selectedPointNode?.chunkCoord.equals(chunkRef.chunkCoord) ? props.selectedPointNode : undefined),
         allocatedPointNodeSubset,
-      }
-      let childComponent = this.children.get(chunkRef);
-      if (childComponent) {
-        childComponent.update(childProps);
-      } else {
-        childComponent = new ChunkComponent(childProps);
-        this.children.put(chunkRef, childComponent);
-        this.container.addChild(childComponent.container);
-      }
+      };
     }
-    this.renderSelf(props);
-    this.didUpdate(this.staleProps, props);
-    this.staleProps = props;
-    // this.staleProps.allocatedPointNodeSubset = this.staleProps.allocatedPointNodeSubset.clone();
+    return {
+      childKey: chunkRef,
+      childPropsFactory
+    };
   }
 
-  didUpdate(prevProps: Props, props: Props) {
-
-  }
-
-  didMount() {
-    const { args, updaters } = this.staleProps;
-    // if we mounted but our data is not generated, please generate ourselves
-    updaters.worldGen.zLevels.update((prev, prevGameState) => {
-      if (!prev[args.z]) {
-        return { [args.z]: new ZLevelGenFactory({}).create({ seed: prevGameState.worldGen.seed, z: args.z }) };
-      }
-      return prev;
-    })
-    // updaters.playerSave.allocatedPointNodeSet.update((prev, prevGameState) => {
-    //   if (prev.size() === 0) {
-    //     let startNode = prevGameState.worldGen.zLevels[0].chunks.get(new Vector2(0, 0))?.pointNodes.get(new Vector2(0, 0));
-    //     if (startNode) {
-    //       prev.put(new PointNodeRef({
-    //         z: 0,
-    //         chunkCoord: new Vector2(0, 0),
-    //         pointNodeCoord: new Vector2(0, 0),
-    //         pointNodeId: startNode?.id
-    //       }))
-    //       return prev.clone();
-    //     }
-    //   }
-    //   return prev;
-    // })
-  }
 }
+
+const wrapped = engageLifecycle(ZLevelComponent2);
+// eslint-disable-next-line
+type wrapped = ZLevelComponent2;
+export { wrapped as ZLevelComponent };
+export type { Props as ZLevelComponentProps };

@@ -11,7 +11,7 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
   return [(...args: A) => {
     batch.push(args);
     // console.log({ stack: new Error().stack, batchSize: batch.length });
-    console.log({ batchSize: batch.length });
+    // console.log({ batchSize: batch.length });
   }, (() => {
       if (batch.length !== 0) { console.log({ fired: batch.length }); }
       for (let a of batch) {
@@ -34,12 +34,12 @@ export function batchifySetState<T>(
 
   return [(arg: T) => {
     batch.push(arg);
-    console.log({ batchSize: batch.length });
+    // console.log({ batchSize: batch.length });
   }, (() => {
       if (batch.length === 0) {
         return;
       }
-      console.log({ fired: batch.length });
+      // console.log({ fired: batch.length });
       let thisBatch = [...batch];
       batch = [];
       (fn as any)((prev: any) => {

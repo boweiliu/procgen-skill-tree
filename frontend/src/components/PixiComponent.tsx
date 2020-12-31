@@ -36,7 +36,7 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
     <>
       <PixiWrapperComponent application={application} windowState={windowState} fireBatchedSetWindowState={fireBatchedSetWindowState}/>
       <button onClick={() => {
-        gameStateUpdaters.update((old) => {
+        gameStateUpdaters.enqueueUpdate((old) => {
           let newGameState = new GameStateFactory({}).create(old.worldGen.seed);
           old.playerSave = newGameState.playerSave;
           old.playerUI = newGameState.playerUI;
