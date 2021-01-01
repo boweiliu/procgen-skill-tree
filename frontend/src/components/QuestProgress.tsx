@@ -43,10 +43,11 @@ function QuestProgressComponent({
     total: 0,
     scoreComponents: [],
   });
+
   const isQuestComplete =
     activeQuest &&
-    (playerResourceAmounts?.[activeQuest.resourceType] || 0) >=
-      activeQuest.resourceAmount;
+    (playerResourceAmounts?.[activeQuest.resourceType] || 0) >= activeQuest.resourceAmount;
+
   function calculateQuestScoreDetails() {
     const questScore: { scoreComponents: ScoreComponent[] } = {
       scoreComponents: [],
@@ -70,11 +71,12 @@ function QuestProgressComponent({
     console.log(total);
     return { ...questScore, total };
   }
+
   const doClaimReward = () => {
     const questScore = calculateQuestScoreDetails();
     updaters.score.enqueueUpdate((lastScore) => {
-      console.log({ score, lastScore, questScore });
-      console.log("updating score");
+      // console.log({ score, lastScore, questScore });
+      // console.log("updating score");
       return lastScore + questScore.total;
     });
     updaters.activeQuest.enqueueUpdate(() => {
@@ -82,13 +84,15 @@ function QuestProgressComponent({
     });
     setScoreDetails(questScore);
   };
+
   const handleStartQuest = () => {
     // setOldPoints()
     createQuestCb();
   };
+
   return (
     <>
-      {<Score score={score} scoreDetails={scoreDetails} />}
+      {<Score scoreDetails={scoreDetails} />}
       {activeQuest === undefined ? (
         <>
           <h2>No active quest
@@ -170,38 +174,41 @@ function QuestProgressComponent({
 
 function Score({
   scoreDetails,
-  score,
 }: {
-  score: number;
-  scoreDetails: QuestScoreDetails;
+  scoreDetails: QuestScoreDetails | undefined;
 }) {
-  const [viewed, setViewed] = useState(true);
+  const [didAcceptRewards, setDidAcceptRewards] = useState(true);
+
   useEffect(() => {
-    console.log({ scoreDetails });
-    if (scoreDetails.total === 0) return;
-    setViewed(false);
+    // console.log({ scoreDetails });
+    if (!scoreDetails || scoreDetails.total === 0) return;
+    setDidAcceptRewards(false);
   }, [scoreDetails]);
+
   return (
     <>
-      {!viewed && (
+      {!didAcceptRewards && (
         <>
-          <h3>Score: {score}</h3>
-          {!!scoreDetails.total && (
-            <h4>Your score increased by {scoreDetails.total}!</h4>
+          <h3>Quest Rewards</h3>
+          {!!(scoreDetails?.total) && (
+            <> +{scoreDetails?.total} to your score! </>
           )}
-          {scoreDetails.scoreComponents.map((scoreComponent) => {
+          <br></br>
+          {scoreDetails?.scoreComponents.map((scoreComponent) => {
             return (
               <React.Fragment key={scoreComponent.inputTitle}>
-                <h5>
+                <br></br>
+                <div>
                   {scoreComponent.outputDescription &&
                     scoreComponent.outputDescription + ": "}
                   {formatDelta(scoreComponent.outputScore)} score for{" "}
                   {scoreComponent.inputAmount} {scoreComponent.inputTitle}
-                </h5>
-              </React.Fragment>
+                </div>
+                </React.Fragment>
             );
           })}
-          <button onClick={() => setViewed(true)}>OK</button>
+          <br></br>
+          <button onClick={() => setDidAcceptRewards(true)}>Claim rewards!</button>
         </>
       )}
     </>
