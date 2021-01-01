@@ -9,7 +9,8 @@ type Props = {
   delta: number,
   tick: number,
   position: Vector2,
-  efficiencyPercent: number // needs to be between 0 and 100
+  efficiencyPercent: number, // needs to be between 0 and 100
+  questProgressPercent: number,
 }
 
 type State = {}

@@ -1,4 +1,4 @@
-import { PlayerSaveState } from "../data/GameState";
+import { GameState, PlayerSaveState } from "../data/GameState";
 import { Const } from "../lib/util/misc";
 
 
@@ -68,4 +68,22 @@ export function remapEfficiencyGradeToNumber(grade: Grade) : number {
   } else {
     return 0;
   }
+}
+
+export function getQuestProgressPercent(gameState: Const<GameState>): number {
+  if (gameState.playerSave.activeQuest === undefined) {
+    return 0;
+  }
+
+  if (gameState.computed.playerResourceAmounts === undefined) {
+    return 0;
+  }
+
+  const resourceType = gameState.playerSave.activeQuest.resourceType;
+  const currentAmount = gameState.computed.playerResourceAmounts[resourceType];
+  const initialAmount = gameState.playerSave.questInitialAmount;
+  const targetAmount = gameState.playerSave.activeQuest.resourceAmount;
+
+  const percent = (currentAmount - initialAmount) / (targetAmount - initialAmount);
+  return Math.max(Math.min(100, percent), 0);
 }

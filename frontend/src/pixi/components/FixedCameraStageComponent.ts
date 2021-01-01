@@ -1,6 +1,6 @@
 import * as Pixi from "pixi.js";
 import { GameState } from "../../data/GameState";
-import { computeQuestEfficiencyPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
+import { computeQuestEfficiencyPercent, getQuestProgressPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
@@ -69,6 +69,7 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
           tick: props.tick,
           position: new Vector2(60, 60),
           efficiencyPercent: remapQuestEfficiencyToDisplayable(computeQuestEfficiencyPercent(props.gameState.playerSave)),
+          questProgressPercent: getQuestProgressPercent(props.gameState),
         };
       },
     });
