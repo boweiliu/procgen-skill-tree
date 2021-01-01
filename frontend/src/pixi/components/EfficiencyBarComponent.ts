@@ -15,6 +15,12 @@ type Props = {
 
 type State = {}
 
+type ContainerWithPadding = {
+  container: Pixi.Container;
+  width: number;
+  height: number;
+}
+
 /**
  * Reference code for pixi gradient or blur filters:
  * https://github.com/pixijs/pixi.js/blob/dev/packages/filters/filter-blur/src/generateBlurFragSource.ts
@@ -34,22 +40,24 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State = {}
 
+  private defaultPadding: number = 4;
   private cornerRadius: number = 10;
+
   private boundingBoxWidth: number = 100;
-  public boundingBox: Pixi.Graphics;
+  // public backpanel: Pixi.Graphics;
 
   private innerBarWidth: number = 24;
   private innerBarHeight: number = 200;
   private textHeight: number = 24; // observed height of the title text, including padding at the top of the text
   private paddingBottom: number = 12;
-  public innerBar: Pixi.Graphics;
+  public whiteBarBody: Pixi.Graphics;
   public barBorder: Pixi.Graphics;
   public filter!: Pixi.filters.BlurFilter;
   public barFill: Pixi.Graphics;
   public mask: Pixi.Graphics;
     // object documentation: https://pixijs.download/dev/docs/PIXI.TextStyle.html
 
-  public titleText: Pixi.Text;
+  public titleText!: Pixi.Text;
   private textStyle: Partial<Pixi.TextStyle> = {
     fontFamily: 'PixelMix',
     padding: 4, // https://github.com/pixijs/pixi.js/issues/4500 -- otherwise on first load the text bounding box is calculated to be too small and the tops of the f's get cut off
@@ -57,41 +65,140 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     // align: 'center'
   };
 
+  private textToReload: Pixi.Text[] = [];
+
+  private makeBackpanel(x: number, y: number, width: number, height: number) : Pixi.Graphics {
+    const backpanel = new Pixi.Graphics();
+    backpanel.beginFill(0xDDEEFF); // background color is the blue AACCEE, this is very light bluer than that
+    backpanel.drawRoundedRect(0, 0, width, height, this.cornerRadius);
+    // outerbar = the box containing the efficiency text + bar. 100px is just enough width for the word "Efficiency". 236px height was chosen arbitrarily
+    backpanel.zIndex = -1;
+    backpanel.alpha = .8; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
+
+    backpanel.x = x;
+    backpanel.y = y;
+    return backpanel;
+  }
+
+  private makeRainbowDirtyFill(x: number, y: number, width: number, height: number, padding: number = this.defaultPadding): ContainerWithPadding {
+    const colors = [0x69B34C, 0xACB334, 0xFAB733, 0xFF8E15, 0xFF4E11].reverse();
+    return this.makeAnyColorFill(x, y, width, height, padding, colors);
+  }
+
+  private makeGrayDirtyFill(x: number, y: number, width: number, height: number, padding: number = this.defaultPadding): ContainerWithPadding {
+    const colors = [0x9999bb];
+    return this.makeAnyColorFill(x, y, width, height, padding, colors);
+  }
+
+  private makeAnyColorFill(x: number, y: number, width: number, height: number, padding: number, colors: number[]): ContainerWithPadding {
+    const dirtyFill = new Pixi.Container();
+
+    const fixedMask = new Pixi.Graphics();
+    fixedMask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
+    fixedMask.drawRoundedRect(0, 0, width, height, this.cornerRadius); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
+    fixedMask.zIndex = 31; // doesnt matter
+
+    const barFill = new Pixi.Graphics();
+    // const colors = [0x69B34C, 0xACB334, 0xFAB733, 0xFF8E15, 0xFF4E11].reverse();
+    const colorsLen = colors.length;
+    colors.forEach((color, idx) => {
+      barFill.beginFill(color);
+      barFill.drawRect(width * idx / colorsLen, 0, width / colorsLen, height);
+    })
+    barFill.mask = fixedMask;
+    dirtyFill.addChild(barFill);
+    dirtyFill.addChild(fixedMask);
+
+    dirtyFill.x = x + padding;
+    dirtyFill.y = y + padding;
+    return {
+      container: dirtyFill,
+      width: dirtyFill.width + 2 * padding,
+      height: dirtyFill.height + 2 * padding,
+    };
+  }
+
+  private makeEfficiencyText(x: number, y: number, padding: number = this.defaultPadding): ContainerWithPadding {
+    const labelText = new Pixi.Text('Efficiency', {
+      fontFamily: 'PixelMix',
+      padding: 4, // https://github.com/pixijs/pixi.js/issues/4500 -- otherwise on first load the text bounding box is calculated to be too small and the tops of the f's get cut off
+      fontSize: 26, // use 26 then scale down 50% results in sharper letters than 13
+      // align: 'center'
+    });
+    // "Efficiency": dims = (54, 14.5) -> (91, 14.5) upon rerender ; ratio === 1.685
+    labelText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
+    labelText.x = x + padding + 140 / 2 - 91 / 2;
+    labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    this.textToReload.push(labelText);
+    return {
+      container: labelText,
+      width: 140,
+      height: 16
+    };
+  }
+
+  private makeQuestProgressText(x: number, y: number, padding: number = this.defaultPadding): ContainerWithPadding {
+    const labelText = new Pixi.Text('Quest Progress', {
+      fontFamily: 'PixelMix',
+      padding: 4, // https://github.com/pixijs/pixi.js/issues/4500 -- otherwise on first load the text bounding box is calculated to be too small and the tops of the f's get cut off
+      fontSize: 26, // use 26 then scale down 50% results in sharper letters than 13
+      // align: 'center'
+    });
+    // "Quest Progress": dims = (78.5, 14.5) -> (135, 14.5) upon rerender ; ratio === 1.685
+    labelText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
+    labelText.x = x + padding + 140 / 2 - 135 / 2;
+    labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    this.textToReload.push(labelText);
+    return {
+      container: labelText,
+      width: 140,
+      height: 16
+    };
+  }
+
   constructor(props: Props) {
     super(props);
     this.container = new Pixi.Container();
     this.container.interactive = true;
     this.container.sortableChildren = true;
 
-    this.titleText = new Pixi.Text('Efficiency', this.textStyle);
-    this.titleText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
-    this.titleText.anchor = PixiPointFrom(new Vector2(0.5, 0.0)); // center ourselves, left-right
-    this.titleText.zIndex = 0;
-    this.titleText.x = 50; // full container width is 100, we want to be in the middle
-    this.titleText.y = 4; // bit of padding for the top
-    this.container.addChild(this.titleText);
+    this.container.addChild(this.makeBackpanel(0, 0, 400, 100));
 
-    this.boundingBox = new Pixi.Graphics();
-    this.boundingBox.beginFill(0xDDEEFF); // background color is the blue AACCEE, this is very light bluer than that
-    this.boundingBox.drawRoundedRect(
-      0, 0,
-      this.boundingBoxWidth,
-      this.textHeight + this.innerBarHeight + this.paddingBottom,
-      this.cornerRadius
-    ); // outerbar = the box containing the efficiency text + bar. 100px is just enough width for the word "Efficiency". 236px height was chosen arbitrarily
-    this.boundingBox.zIndex = -1;
-    this.boundingBox.alpha = .8; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
-    this.container.addChild(this.boundingBox);
+    const text1 = this.makeEfficiencyText(0, 0);
+    // text1.visible = false;
+    this.container.addChild(text1.container);
 
-    this.innerBar = new Pixi.Graphics();
-    this.innerBar.beginFill(0xFFFFFF);
-    this.innerBar.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // we want the inner bar (containing the actual efficiency colors) to be 40 wide and 200 tall. round the corners at the same radius as the outer box.
-    // this.innerBar.x = 12;
-    this.innerBar.pivot.x = this.innerBarWidth/2; // this is our width over 2
-    this.innerBar.x = this.boundingBoxWidth/2; // this is outer bar width / 2
-    this.innerBar.y = this.textHeight; // this is just enough space below the "Efficiency" text to look nice
-    this.innerBar.zIndex = 3;
-    this.container.addChild(this.innerBar);
+    const text2 = this.makeQuestProgressText(0, text1.height);
+    // text2.visible = false;
+    this.container.addChild(text2.container);
+
+
+    // this.container.addChild(this.makeSingleColorDirtyFill(text1.width * 1.685 + 8, text1.height / 2 + 4, 200, 15));
+    // this.container.addChild(this.makeSingleColorDirtyFill(text2.width * 1.720 + 8, text1.height / 2 + 4, 200, 15));
+    // this.container.addChild(this.makeSingleColorDirtyFill(text2.width * 1.720 + 8, (text1.height + 8) + text2.height / 2 + 4 , 200, 15));
+    const efficiencyBar = this.makeRainbowDirtyFill(text1.width, 0, 200, 24);
+    this.container.addChild(efficiencyBar.container);
+    const progressBar = this.makeGrayDirtyFill(text1.width, text1.height, 200, 24);
+    this.container.addChild(progressBar.container);
+
+    // this.titleText = new Pixi.Text('Efficiency', this.textStyle);
+    // this.titleText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
+    // this.titleText.anchor = PixiPointFrom(new Vector2(0.5, 0.0)); // center ourselves, left-right
+    // this.titleText.zIndex = 0;
+    // this.titleText.x = 50; // full container width is 100, we want to be in the middle
+    // this.titleText.y = 4; // bit of padding for the top
+    // this.container.addChild(this.titleText);
+
+
+    this.whiteBarBody = new Pixi.Graphics();
+    this.whiteBarBody.beginFill(0xFFFFFF);
+    this.whiteBarBody.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // we want the inner bar (containing the actual efficiency colors) to be 40 wide and 200 tall. round the corners at the same radius as the outer box.
+    // this.whiteBarBody.x = 12;
+    this.whiteBarBody.pivot.x = this.innerBarWidth/2; // this is our width over 2
+    this.whiteBarBody.x = this.boundingBoxWidth/2; // this is outer bar width / 2
+    this.whiteBarBody.y = this.textHeight; // this is just enough space below the "Efficiency" text to look nice
+    this.whiteBarBody.zIndex = 3;
+    // this.container.addChild(this.whiteBarBody);
 
     // rainbow red-green gradient for the contents of the inner bar
     const barFillContainer = new Pixi.Container();
@@ -114,7 +221,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     // this.container.addChild(this.barFill);
     barFillContainer.addChild(this.barFill);
     barFillContainer.zIndex = 4;
-    this.container.addChild(barFillContainer);
+    // this.container.addChild(barFillContainer);
 
     // this.barFill.filters = [this.filter];
     // mask controls how much of the red-green gradient fillings are visible, depending on how well the player is doing
@@ -139,11 +246,11 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
 
     maskContainer.addChild(this.mask);
     // maskContainer.addChild(fixedMask);
-    this.container.addChild(maskContainer);
+    // this.container.addChild(maskContainer);
     // this.container.addChild(this.mask); // have to add child here -- not sure why
     this.barFill.mask = maskContainer;
 
-    this.container.addChild(fixedMask);
+    // this.container.addChild(fixedMask);
     barFillContainer.mask = fixedMask;
 
     // another copy of innerbar, except this time the fill is transparent; we just need the line style to be redrawn so that 
@@ -156,14 +263,19 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.barBorder.x = this.boundingBoxWidth / 2;
     this.barBorder.y = this.textHeight;
     this.barBorder.zIndex = 7;
-    this.container.addChild(this.barBorder);
+    // this.container.addChild(this.barBorder);
   }
 
   public renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
 
     if (props.tick < 60 && props.tick % 10 === 5) { // poll for document webfonts loaded; TODO, substitute for listening to actual fonts ready event
-      this.titleText.updateText(false); // false == force reload text even when text has not changed. needed to get new fonts
+      this.titleText?.updateText(false); // false == force reload text even when text has not changed. needed to get new fonts
+      this.textToReload.forEach(it => {
+        console.log(`it was size:  ${it.width} ${it.height}`);
+        it.updateText(false)
+        console.log(`it is now size:  ${it.width} ${it.height}`);
+      });
     }
 
     this.mask.y = (100 - props.efficiencyPercent) * 2 + 24;
