@@ -37,15 +37,15 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
-  public fixedCameraStage: FixedCameraStageComponent;
+  private fixedCameraStage: FixedCameraStageComponent;
   // Contains game entities that move when game camera pans/zooms. Highly encouraged to have further subdivions.
-  public actionStage: Pixi.Container;
+  private actionStage: Pixi.Container;
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
-  public backdropStage: Pixi.Container;
+  private backdropStage: Pixi.Container;
   // public keyboard: KeyboardState;
-  public zLevel: ZLevelComponent | undefined;
-  public zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
-  public backdrop: Pixi.Graphics;
+  private zLevel: ZLevelComponent | undefined;
+  private zLevelPropsFactory: (p: Props, s: State) => ZLevelComponentProps;
+  private backdrop: Pixi.Graphics;
 
   constructor(props: Props) {
     super(props);
@@ -111,6 +111,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         },
         z: state.playerCurrentZ,
         updaters: props.updaters,
+        tooltipUpdaters: this.stateUpdaters.tooltip,
         position: props.appSize.multiply(0.5),
         zLevelGen: props.gameState.worldGen.zLevels[state.playerCurrentZ],
         selectedPointNode: props.gameState.playerUI.selectedPointNode,
@@ -151,14 +152,14 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       this.actionStage.x *= ChunkGenConstants.CHUNK_DIM;
       this.actionStage.y *= ChunkGenConstants.CHUNK_DIM;
 
-      console.log({ currentZ: this.state.playerCurrentZ });
+      // console.log({ currentZ: this.state.playerCurrentZ });
     }
     if (props.gameState.intent.newIntent[IntentName.TRAVEL_OUT]) {
       this.state.playerCurrentZ++;
 
       this.actionStage.x /= ChunkGenConstants.CHUNK_DIM;
       this.actionStage.y /= ChunkGenConstants.CHUNK_DIM;
-      console.log({ currentZ: this.state.playerCurrentZ });
+      // console.log({ currentZ: this.state.playerCurrentZ });
     }
   }
 
@@ -208,3 +209,4 @@ const wrapped = engageLifecycle(RootComponent2);
 // eslint-disable-next-line
 type wrapped = RootComponent2;
 export { wrapped as RootComponent };
+export type { Props as RootComponentProps, State as RootComponentState };

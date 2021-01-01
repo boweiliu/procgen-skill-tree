@@ -8,6 +8,7 @@ import { multiplyColor } from "../../lib/util/misc";
 import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
+import { RootComponentState } from "./RootComponent";
 
 type Props = {
   delta: number,
@@ -17,6 +18,7 @@ type Props = {
   },
   selfPointNodeRef: PointNodeRef,
   updaters: UpdaterGeneratorType2<GameState>,
+  tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'],
   position: Vector2,
   pointNodeGen: PointNodeGen,
   isSelected: boolean,
@@ -24,7 +26,8 @@ type Props = {
 };
 
 type State = {
-  numClicks:number // debug
+  numClicks: number // debug
+  descriptionText: string;
 }
 
 class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
@@ -41,8 +44,10 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      numClicks: 0
+      numClicks: 0,
+      descriptionText: '',
     };
+    this.updateSelf(props); // initialize the description text properly
     this.container = new Pixi.Container();
 
     this.container.sortableChildren = true;
@@ -79,28 +84,36 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       RenderedChunkConstants.NODE_HITAREA_PX,
     );
     // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
-    // this.container.hitArea = this.hitArea;
+    this.container.hitArea = this.hitArea;
 
-    const tooltippableAreaPropsFactory = (p: Props, s: State) => {
-      let nodeDescription: string = "Nothing (empty node)";
-      if (p.pointNodeGen.resourceType !== ResourceType.Nothing) {
-        nodeDescription = `${p.pointNodeGen.resourceAmount} ${p.pointNodeGen.resourceModifier} ${p.pointNodeGen.resourceType}`;
-      }
-      return {
-        args: {
-          markForceUpdate: this.markForceUpdate,
-        },
-        text: nodeDescription,
-        hitArea: this.hitArea, // TODO(bowei): move into state???
-      }
-    }
-    this.tooltippableArea = new TooltippableAreaComponent(tooltippableAreaPropsFactory(props, this.state));
+    // const tooltippableAreaPropsFactory = (p: Props, s: State) => {
+    //   let nodeDescription: string = "Nothing (empty node)";
+    //   if (p.pointNodeGen.resourceType !== ResourceType.Nothing) {
+    //     nodeDescription = `${p.pointNodeGen.resourceAmount} ${p.pointNodeGen.resourceModifier} ${p.pointNodeGen.resourceType}`;
+    //   }
+    //   return {
+    //     args: {
+    //       markForceUpdate: this.markForceUpdate,
+    //     },
+    //     text: nodeDescription,
+    //     hitArea: this.hitArea, // TODO(bowei): move into state???
+    //   }
+    // }
+    // this.tooltippableArea = new TooltippableAreaComponent(tooltippableAreaPropsFactory(props, this.state));
     // this.container.addChild(this.tooltippableArea.container);
-    this.addChild({
-      childClass: TooltippableAreaComponent,
-      instance: this.tooltippableArea,
-      propsFactory: tooltippableAreaPropsFactory,
-    });
+    // this.addChild({
+    //   childClass: TooltippableAreaComponent,
+    //   instance: this.tooltippableArea,
+    //   propsFactory: tooltippableAreaPropsFactory,
+    // });
+  }
+
+  protected updateSelf(props: Props) {
+    let nodeDescription: string = "Nothing (empty node)";
+    if (props.pointNodeGen.resourceType !== ResourceType.Nothing) {
+      nodeDescription = `${props.pointNodeGen.resourceAmount} ${props.pointNodeGen.resourceModifier} ${props.pointNodeGen.resourceType}`;
+    }
+    this.state.descriptionText = nodeDescription;
   }
 
   protected renderSelf(props: Props) {
@@ -194,6 +207,27 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       this.state.numClicks++;
       selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
       // event.stopPropagation();
+    });
+
+    this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
+      this._staleProps.args.markForceUpdate(this);
+
+      this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
+        const next = { ...prev, visible: true, text: this.state.descriptionText };
+        next.position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
+        // TODO(bowei): what about position??
+        // console.log({ next });
+        return next;
+      })
+    });
+
+    this.container.addListener('pointerout', (event: Pixi.InteractionEvent) => {
+      this._staleProps.args.markForceUpdate(this);
+
+      this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
+        const next = { ...prev, visible: false, text: '' };
+        return next;
+      })
     });
   }
 

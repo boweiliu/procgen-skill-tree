@@ -8,6 +8,7 @@ import { Const } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { RenderedChunkConstants, ChunkComponent, ChunkComponentProps } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import { RootComponentState } from "./RootComponent";
 
 type Props = {
   delta: number,
@@ -17,6 +18,7 @@ type Props = {
   },
   z: number,
   updaters: UpdaterGeneratorType2<GameState>,
+  tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'],
   position: Vector2,
   zLevelGen: Const<ZLevelGen> | undefined,
   selectedPointNode: PointNodeRef | undefined,
@@ -142,6 +144,7 @@ class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
         },
         selfChunkRef: chunkRef,
         updaters: props.updaters,
+        tooltipUpdaters: props.tooltipUpdaters,
         position: chunkRef.chunkCoord.multiply(RenderedChunkConstants.CHUNK_SPACING_PX),
         chunkGen: chunkGen,
         // NOTE(bowei): for optimization, we dont tell other chunks about selected nodes in other chunks

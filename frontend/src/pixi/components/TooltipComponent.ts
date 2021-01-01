@@ -20,10 +20,12 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
   public state: State;
 
   private text: Pixi.Text;
+  private box?: Pixi.Graphics;
 
   constructor(props: Props) {
     super(props);
     this.container = new Pixi.Container();
+    this.container.sortableChildren = true;
     this.state = {};
 
     this.text = new Pixi.Text(props.text, {
@@ -38,18 +40,39 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
     this.text.zIndex = 2;
     this.container.addChild(this.text);
 
-    const box = new Pixi.Graphics();
+    // this.box = new Pixi.Graphics();
 
-    box.lineStyle(1, 0x222222, 1);
-    box.beginFill(0xEEEEEE);
-    box.drawRoundedRect(0, 0, this.text.width + 18, this.text.height + 18, 4);
-    box.zIndex = 0;
-    this.container.addChild(box);
+    // this.box.lineStyle(1, 0x222222, 1);
+    // this.box.beginFill(0xEEEEEE);
+    // this.box.drawRoundedRect(0, 0, this.text.width + 18, this.text.height + 18, 4);
+    // this.box.zIndex = 0;
+    // this.container.addChild(this.box);
+  }
+
+  protected shouldUpdate(prevProps: Props, prevState: State, props: Props, state: State): boolean {
+    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+      if (prevProps[key] !== props[key]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected renderSelf(props: Props) {
     this.container.visible = props.visible;
     this.container.position = PixiPointFrom(props?.position || Vector2.Zero);
+    this.text.text = props.text;
+
+    if (this.box) {
+      this.container.removeChild(this.box);
+    }
+
+    this.box = new Pixi.Graphics();
+    this.box.lineStyle(1, 0x222222, 1);
+    this.box.beginFill(0xEEEEEE);
+    this.box.drawRoundedRect(0, 0, this.text.width + 18, this.text.height + 18, 4);
+    this.box.zIndex = 0;
+    this.container.addChild(this.box);
   }
 }
 

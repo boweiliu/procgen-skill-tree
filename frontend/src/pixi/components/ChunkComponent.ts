@@ -1,11 +1,12 @@
 import * as Pixi from "pixi.js";
 import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { ChunkGen, ChunkGenConstants, ChunkRef, GameState, PointNodeRef } from "../../data/GameState";
-import { PointNodeComponent } from "./PointNodeComponent";
+import { PointNodeComponent, PointNodeComponentProps } from "./PointNodeComponent";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import { RootComponentState } from "./RootComponent";
 
 export class RenderedChunkConstants {
 //   public static SPACING_PX: number = 24;
@@ -27,6 +28,7 @@ type Props = {
   },
   selfChunkRef: ChunkRef,
   updaters: UpdaterGeneratorType2<GameState>,
+  tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'],
   position: Vector2,
   chunkGen: ChunkGen,
   selectedPointNode: PointNodeRef | undefined,
@@ -114,7 +116,7 @@ class ChunkComponent2 extends LifecycleHandlerBase<Props, State> {
         pointNodeCoord: pointNodeCoord,
         pointNodeId: pointNodeGen.id
       })
-      let childPropsFactory = (props: Props, state: State) => {
+      let childPropsFactory = (props: Props, state: State) : PointNodeComponentProps => {
         return {
           delta: props.delta,
           args: {
@@ -123,6 +125,7 @@ class ChunkComponent2 extends LifecycleHandlerBase<Props, State> {
           },
           selfPointNodeRef: pointNodeRef,
           updaters: props.updaters,
+          tooltipUpdaters: props.tooltipUpdaters,
           position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
           pointNodeGen,
           isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
