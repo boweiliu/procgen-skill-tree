@@ -72,41 +72,11 @@ function QuestProgressComponent({
   const [didAcceptRewards, setDidAcceptRewards] = useState(true);
   const [scoreReward, setScoreReward] = useState<QuestScoreReward | undefined>();
 
-  // function calculateQuestScoreReward() {
-  //   const questScore: { scoreComponents: ScoreComponent[] } = {
-  //     scoreComponents: [],
-  //   };
-  //   questScore.scoreComponents.push({
-  //     inputAmount: 1,
-  //     inputTitle: "quest completed",
-  //     outputScore: 5,
-  //     outputDescription: "",
-  //   });
-  //   questScore.scoreComponents.push({
-  //     inputAmount: "",
-  //     inputTitle: "efficiency grade: " + efficiencyGrade,
-  //     outputScore: Math.floor(10 / (remapEfficiencyGradeToNumber(efficiencyGrade) + 1)),
-  //     outputDescription: "",
-  //   });
-  //   const total = questScore.scoreComponents.reduce(
-  //     (subtotal, prev) => subtotal + prev.outputScore,
-  //     0
-  //   );
-  //   console.log(total);
-  //   return { ...questScore, total };
-  // }
-
   const handleStartQuest = () => {
-    // setOldPoints()
     createQuestCb();
   };
 
   const doFinishQuest = () => {
-    // updaters.score.enqueueUpdate((lastScore) => {
-    //   // console.log({ score, lastScore, questScore });
-    //   // console.log("updating score");
-    //   return lastScore + questScore.total;
-    // });
     updaters.activeQuest.enqueueUpdate(() => {
       return undefined;
     });
@@ -120,7 +90,6 @@ function QuestProgressComponent({
         return prev + scoreReward.total;
       });
       setDidAcceptRewards(true);
-      // setScoreReward(undefined);
     }
   };
 
