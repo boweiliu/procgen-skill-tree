@@ -1,7 +1,7 @@
 import "./QuestProgress.css";
 
 import classnames from "classnames";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { GameState, Quest, ResourceType } from "../data/GameState";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 import { Grade, remapEfficiencyGradeToNumber } from "../game/EfficiencyCalculator";
@@ -16,18 +16,39 @@ type Props = {
   score: GameState["playerSave"]["score"];
   questInitialAmount: number;
 };
-type QuestScoreDetails = {
+type QuestScoreReward = {
   total: number;
   scoreComponents: ScoreComponent[];
 };
 type ScoreComponent = {
-  inputAmount: number | string;
-  inputTitle: string;
-  outputScore: number;
-  outputDescription: string;
+  // inputAmount: number | string;
+  // inputTitle: string;
+  // outputScore: number;
+  // outputDescription: string;
+  scoreAmount: number;
+  scoreReason: string;
 };
 
+
 export default React.memo(QuestProgressComponent);
+
+function calculateQuestScoreReward(grade: Grade): QuestScoreReward {
+  const scoreComponents = [
+    {
+      scoreReason: 'Quest completed',
+      scoreAmount: 50,
+    },
+    {
+      scoreReason: `Efficiency: "${grade}"`,
+      scoreAmount: remapEfficiencyGradeToNumber(grade) * 25,
+    }
+  ];
+  const total = scoreComponents.reduce((pv, cv) => pv + cv.scoreAmount, 0);
+  return {
+    total,
+    scoreComponents,
+  };
+}
 
 function QuestProgressComponent({
   activeQuest,
@@ -36,70 +57,83 @@ function QuestProgressComponent({
   playerResourceAmounts,
   updaters,
   efficiencyGrade,
-  score,
+  // score,
   questInitialAmount,
 }: Props) {
-  const [scoreDetails, setScoreDetails] = useState<QuestScoreDetails>({
-    total: 0,
-    scoreComponents: [],
-  });
-
+  /**
+   * activeQuest === undefined => no active quest, need to start quest
+   * isQuestComplete => can finish the quest to generate rewards
+   * rewards ready => can accept rewards to increment score; cannot generate a new quest
+   */
   const isQuestComplete =
     activeQuest &&
     (playerResourceAmounts?.[activeQuest.resourceType] || 0) >= activeQuest.resourceAmount;
 
-  function calculateQuestScoreDetails() {
-    const questScore: { scoreComponents: ScoreComponent[] } = {
-      scoreComponents: [],
-    };
-    questScore.scoreComponents.push({
-      inputAmount: 1,
-      inputTitle: "quest completed",
-      outputScore: 5,
-      outputDescription: "",
-    });
-    questScore.scoreComponents.push({
-      inputAmount: "",
-      inputTitle: "efficiency grade: " + efficiencyGrade,
-      outputScore: Math.floor(10 / (remapEfficiencyGradeToNumber(efficiencyGrade) + 1)),
-      outputDescription: "",
-    });
-    const total = questScore.scoreComponents.reduce(
-      (subtotal, prev) => subtotal + prev.outputScore,
-      0
-    );
-    console.log(total);
-    return { ...questScore, total };
-  }
+  const [didAcceptRewards, setDidAcceptRewards] = useState(true);
+  const [scoreReward, setScoreReward] = useState<QuestScoreReward | undefined>();
 
-  const doClaimReward = () => {
-    const questScore = calculateQuestScoreDetails();
-    updaters.score.enqueueUpdate((lastScore) => {
-      // console.log({ score, lastScore, questScore });
-      // console.log("updating score");
-      return lastScore + questScore.total;
-    });
-    updaters.activeQuest.enqueueUpdate(() => {
-      return undefined;
-    });
-    setScoreDetails(questScore);
-  };
+  // function calculateQuestScoreReward() {
+  //   const questScore: { scoreComponents: ScoreComponent[] } = {
+  //     scoreComponents: [],
+  //   };
+  //   questScore.scoreComponents.push({
+  //     inputAmount: 1,
+  //     inputTitle: "quest completed",
+  //     outputScore: 5,
+  //     outputDescription: "",
+  //   });
+  //   questScore.scoreComponents.push({
+  //     inputAmount: "",
+  //     inputTitle: "efficiency grade: " + efficiencyGrade,
+  //     outputScore: Math.floor(10 / (remapEfficiencyGradeToNumber(efficiencyGrade) + 1)),
+  //     outputDescription: "",
+  //   });
+  //   const total = questScore.scoreComponents.reduce(
+  //     (subtotal, prev) => subtotal + prev.outputScore,
+  //     0
+  //   );
+  //   console.log(total);
+  //   return { ...questScore, total };
+  // }
 
   const handleStartQuest = () => {
     // setOldPoints()
     createQuestCb();
   };
 
+  const doFinishQuest = () => {
+    // updaters.score.enqueueUpdate((lastScore) => {
+    //   // console.log({ score, lastScore, questScore });
+    //   // console.log("updating score");
+    //   return lastScore + questScore.total;
+    // });
+    updaters.activeQuest.enqueueUpdate(() => {
+      return undefined;
+    });
+    setScoreReward(calculateQuestScoreReward(efficiencyGrade));
+    setDidAcceptRewards(false);
+  };
+
+  const doClaimRewards = () => {
+    if (scoreReward) {
+      updaters.score.enqueueUpdate((prev) => {
+        return prev + scoreReward.total;
+      });
+      setDidAcceptRewards(true);
+      // setScoreReward(undefined);
+    }
+  };
+
   return (
     <>
-      {<Score scoreDetails={scoreDetails} />}
+      {<Score doClaimRewards={doClaimRewards} scoreReward={scoreReward} didAcceptRewards={didAcceptRewards}/>}
       {activeQuest === undefined ? (
         <>
           <h2>No active quest
           </h2>
           <br></br>
-          <button className="button" onClick={handleStartQuest}>
-            Start a quest
+          <button className="button" onClick={handleStartQuest} disabled={!didAcceptRewards}>
+            {didAcceptRewards ? 'Start a quest' : 'Claim rewards first!'}
           </button>
           <br></br>
           <br></br>
@@ -151,21 +185,16 @@ function QuestProgressComponent({
               </tr>
             </table>
 
-          {isQuestComplete ? (
-            <>
-              <br></br>
-              <button
-                className="button"
-                onClick={() => {
-                  doClaimReward();
-                }}
-              >
-                Finish quest
-              </button>
-            </>
-          ) : (
-            <></>
-          )}
+            {isQuestComplete ? (
+              <>
+                <br></br>
+                <button className="button" onClick={doFinishQuest}>
+                  Finish quest
+                  </button>
+              </>
+            ) : (
+                <></>
+              )}
         </>
       )}
     </>
@@ -173,48 +202,46 @@ function QuestProgressComponent({
 }
 
 function Score({
-  scoreDetails,
+  scoreReward,
+  doClaimRewards,
+  didAcceptRewards,
 }: {
-  scoreDetails: QuestScoreDetails | undefined;
+    scoreReward: QuestScoreReward | undefined;
+    doClaimRewards: () => void;
+    didAcceptRewards: boolean;
 }) {
-  const [didAcceptRewards, setDidAcceptRewards] = useState(true);
-
-  useEffect(() => {
-    // console.log({ scoreDetails });
-    if (!scoreDetails || scoreDetails.total === 0) return;
-    setDidAcceptRewards(false);
-  }, [scoreDetails]);
+  if (scoreReward === undefined) {
+    return (<> </>);
+  }
 
   return (
     <>
-      {!didAcceptRewards && (
-        <>
-          <h3>Quest Rewards</h3>
-          {!!(scoreDetails?.total) && (
-            <> +{scoreDetails?.total} to your score! </>
-          )}
-          <br></br>
-          {scoreDetails?.scoreComponents.map((scoreComponent) => {
-            return (
-              <React.Fragment key={scoreComponent.inputTitle}>
-                <br></br>
-                <div>
-                  {scoreComponent.outputDescription &&
-                    scoreComponent.outputDescription + ": "}
-                  {formatDelta(scoreComponent.outputScore)} score for{" "}
-                  {scoreComponent.inputAmount} {scoreComponent.inputTitle}
-                </div>
-                </React.Fragment>
-            );
-          })}
-          <br></br>
-          <button onClick={() => setDidAcceptRewards(true)}>Claim rewards!</button>
-        </>
+      <h3>Quest Rewards</h3>
+      <div>+{scoreReward.total} to your score! </div>
+      <br></br>
+      <table className={classnames({ table: true })}>
+        {scoreReward.scoreComponents.map((it) => (
+          <tr>
+            <td> +{it.scoreAmount} score </td>
+            <td> {it.scoreReason} </td>
+          </tr>))
+        }
+      </table>
+      <br></br>
+      {(
+        didAcceptRewards ? (<> </>) : 
+          (
+      <button
+        className="button"
+        onClick={() => doClaimRewards()}>
+        Claim rewards!
+      </button>
+          )
       )}
     </>
   );
 }
 
-function formatDelta(d: number): string {
-  return d < 0 ? d.toString() : "+" + d.toString();
-}
+// function formatDelta(d: number): string {
+//   return d < 0 ? d.toString() : "+" + d.toString();
+// }
