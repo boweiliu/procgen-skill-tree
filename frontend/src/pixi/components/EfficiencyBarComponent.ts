@@ -40,7 +40,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State = {}
 
-  private defaultPadding: number = 4;
+  private defaultPadding: number = 8;
   private cornerRadius: number = 10;
 
   private boundingBoxWidth: number = 100;
@@ -126,14 +126,17 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
       // align: 'center'
     });
     // "Efficiency": dims = (54, 14.5) -> (91, 14.5) upon rerender ; ratio === 1.685
+    labelText.anchor = PixiPointFrom(new Vector2(0.5, 0.5));
     labelText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
-    labelText.x = x + padding + 140 / 2 - 91 / 2;
-    labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    labelText.x = x + padding + 140 / 2;
+    // labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    labelText.y = y + padding + 16 / 2;
+    // labelText.y = y;
     this.textToReload.push(labelText);
     return {
       container: labelText,
-      width: 140,
-      height: 16
+      width: 140 + 2 * padding,
+      height: 16 + 2 * padding,
     };
   }
 
@@ -142,17 +145,21 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
       fontFamily: 'PixelMix',
       padding: 4, // https://github.com/pixijs/pixi.js/issues/4500 -- otherwise on first load the text bounding box is calculated to be too small and the tops of the f's get cut off
       fontSize: 26, // use 26 then scale down 50% results in sharper letters than 13
-      // align: 'center'
+      align: 'center'
     });
     // "Quest Progress": dims = (78.5, 14.5) -> (135, 14.5) upon rerender ; ratio === 1.685
+    labelText.anchor = PixiPointFrom(new Vector2(0.5, 0.5));
     labelText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
-    labelText.x = x + padding + 140 / 2 - 135 / 2;
-    labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    // labelText.x = x + padding + 140 / 2 - 135 / 2;
+    labelText.x = x + padding + 140 / 2;
+    // labelText.y = y + padding + 16 / 2 - 14.5 / 2;
+    labelText.y = y + padding + 16 / 2;
+    // labelText.y = y;
     this.textToReload.push(labelText);
     return {
       container: labelText,
-      width: 140,
-      height: 16
+      width: 140 + 2 * padding,
+      height: 16 + 2 * padding,
     };
   }
 
@@ -162,13 +169,16 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.container.interactive = true;
     this.container.sortableChildren = true;
 
-    this.container.addChild(this.makeBackpanel(0, 0, 400, 100));
+    // this.container.addChild(this.makeBackpanel(0, 0, 400, 100));
 
-    const text1 = this.makeEfficiencyText(0, 0);
+    const text1 = this.makeEfficiencyText(0, 4);
     // text1.visible = false;
     this.container.addChild(text1.container);
 
-    const text2 = this.makeQuestProgressText(0, text1.height);
+    const efficiencyBar = this.makeRainbowDirtyFill(text1.width - this.defaultPadding, 0, 200, 24);
+    this.container.addChild(efficiencyBar.container);
+
+    const text2 = this.makeQuestProgressText(0, efficiencyBar.height + 4 - this.defaultPadding);
     // text2.visible = false;
     this.container.addChild(text2.container);
 
@@ -176,10 +186,12 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     // this.container.addChild(this.makeSingleColorDirtyFill(text1.width * 1.685 + 8, text1.height / 2 + 4, 200, 15));
     // this.container.addChild(this.makeSingleColorDirtyFill(text2.width * 1.720 + 8, text1.height / 2 + 4, 200, 15));
     // this.container.addChild(this.makeSingleColorDirtyFill(text2.width * 1.720 + 8, (text1.height + 8) + text2.height / 2 + 4 , 200, 15));
-    const efficiencyBar = this.makeRainbowDirtyFill(text1.width, 0, 200, 24);
-    this.container.addChild(efficiencyBar.container);
-    const progressBar = this.makeGrayDirtyFill(text1.width, text1.height, 200, 24);
+    const progressBar = this.makeGrayDirtyFill(text1.width - this.defaultPadding, efficiencyBar.height - this.defaultPadding, 200, 24);
     this.container.addChild(progressBar.container);
+    
+    this.container.addChild(this.makeBackpanel(0, 0, text1.width + efficiencyBar.width - this.defaultPadding,
+      efficiencyBar.height + progressBar.height - this.defaultPadding
+    ));
 
     // this.titleText = new Pixi.Text('Efficiency', this.textStyle);
     // this.titleText.scale = PixiPointFrom(new Vector2(0.5, 0.5));
