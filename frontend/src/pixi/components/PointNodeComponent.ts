@@ -212,10 +212,10 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
       // this._staleProps.args.markForceUpdate(this);
 
-      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
+      // const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
 
       this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
-        const next = { ...prev, visible: true, text: this.state.descriptionText, position };
+        const next = { ...prev, visible: true, text: this.state.descriptionText };
         // console.log({ next });
         return next;
       })
