@@ -11,6 +11,7 @@ export type TooltipInfo = {
 }
 
 type Props = {
+  offset: Vector2,
 } & TooltipInfo;
 
 type State = {} 
@@ -60,7 +61,7 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
 
   protected renderSelf(props: Props) {
     this.container.visible = props.visible;
-    this.container.position = PixiPointFrom(props?.position || Vector2.Zero);
+    this.container.position = PixiPointFrom(props.offset.add(props?.position || Vector2.Zero));
     this.text.text = props.text;
 
     if (this.box) {

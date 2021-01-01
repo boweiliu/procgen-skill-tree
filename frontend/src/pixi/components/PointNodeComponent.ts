@@ -210,25 +210,37 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     });
 
     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
-      this._staleProps.args.markForceUpdate(this);
+      // this._staleProps.args.markForceUpdate(this);
+
+      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
 
       this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
-        const next = { ...prev, visible: true, text: this.state.descriptionText };
-        next.position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
-        // TODO(bowei): what about position??
+        const next = { ...prev, visible: true, text: this.state.descriptionText, position };
         // console.log({ next });
         return next;
       })
     });
 
     this.container.addListener('pointerout', (event: Pixi.InteractionEvent) => {
-      this._staleProps.args.markForceUpdate(this);
+      // this._staleProps.args.markForceUpdate(this);
 
       this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
         const next = { ...prev, visible: false, text: '' };
         return next;
       })
     });
+
+    this.container.addListener('pointermove', (event: Pixi.InteractionEvent) => {
+      // this._staleProps.args.markForceUpdate(this);
+
+      // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
+      const localPosition = event.data.getLocalPosition(this.container);
+      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
+
+      this._staleProps.tooltipUpdaters.position.enqueueUpdate((prev) => {
+        return position.add(localPosition);
+      });
+    })
   }
 
   public toString(): string {

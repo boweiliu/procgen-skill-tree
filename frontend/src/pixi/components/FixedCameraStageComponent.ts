@@ -78,7 +78,7 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
     this.addChild({
       childClass: TooltipComponent,
       propsFactory: (props: Props, state: State) => {
-        return { ...props.tooltip };
+        return { offset: new Vector2(8, 8), ...props.tooltip };
       }
     });
   }
