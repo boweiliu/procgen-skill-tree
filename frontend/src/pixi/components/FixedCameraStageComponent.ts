@@ -1,7 +1,6 @@
 import * as Pixi from "pixi.js";
 import { GameState } from "../../data/GameState";
 import { computeQuestEfficiencyPercent, remapQuestEfficiencyToDisplayable } from "../../game/EfficiencyCalculator";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { EfficiencyBarComponent } from "./EfficiencyBarComponent";
@@ -10,13 +9,11 @@ import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { ReticleComponent } from "./ReticleComponent";
 import { TooltipComponent, TooltipInfo } from "./TooltipComponent";
 
-
 type Props = {
   args: {
     renderer: Pixi.Renderer,
     markForceUpdate: (childInstance: any) => void,
   },
-  // updaters: UpdaterGeneratorType2<GameState>,
   delta: number,
   gameState: Const<GameState>,
   appSize: Vector2,
@@ -25,7 +22,6 @@ type Props = {
 }
 
 type State = { 
-
 }
 
 class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
