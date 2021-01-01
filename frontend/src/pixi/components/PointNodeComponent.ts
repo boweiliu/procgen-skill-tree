@@ -212,10 +212,13 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
       // this._staleProps.args.markForceUpdate(this);
 
+      // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
+      const localPosition = event.data.getLocalPosition(this.container);
+      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
       // const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
 
       this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
-        const next = { ...prev, visible: true, text: this.state.descriptionText };
+        const next = { ...prev, visible: true, text: this.state.descriptionText, position: position.add(localPosition) };
         // console.log({ next });
         return next;
       })
@@ -237,9 +240,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       const localPosition = event.data.getLocalPosition(this.container);
       const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
 
-      this._staleProps.tooltipUpdaters.position.enqueueUpdate((prev) => {
-        return position.add(localPosition);
-      });
+      this._staleProps.tooltipUpdaters.position.enqueueUpdate(position.add(localPosition));
     })
   }
 
