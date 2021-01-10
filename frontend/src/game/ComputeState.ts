@@ -9,7 +9,7 @@ export function computePlayerResourceAmounts(gameState: GameState): ComputedStat
 
   for (let pointNodeRef of gameState.playerSave.allocatedPointNodeHistory) {
     let pointNodeGen = gameState.worldGen.zLevels[pointNodeRef.z]!.chunks.get(pointNodeRef.chunkCoord)!.pointNodes.get(pointNodeRef.pointNodeCoord)!
-    if (pointNodeGen.resourceType === "Nothing") {
+    if (pointNodeGen.resourceType === "Nothing" || pointNodeGen.resourceType === "EfficiencyGate") {
       continue;
     }
 

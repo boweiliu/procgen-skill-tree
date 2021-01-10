@@ -110,7 +110,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
   protected updateSelf(props: Props) {
     let nodeDescription: string = "Nothing (empty node)";
-    if (props.pointNodeGen.resourceType !== ResourceType.Nothing) {
+    if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+      nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`;
+    } else if (props.pointNodeGen.resourceType !== ResourceType.Nothing) {
       nodeDescription = `${props.pointNodeGen.resourceAmount} ${props.pointNodeGen.resourceModifier} ${props.pointNodeGen.resourceType}`;
     }
     this.state.descriptionText = nodeDescription;
@@ -134,6 +136,15 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     let baseColor: number = 0;
     if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
       baseColor = 0x99bbff; // blue that mixes in with bg
+    } else if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+      // baseColor = 0xccee88; // bright yellow green
+      // baseColor = 0xcccccc; // gray almost invisible
+
+      // baseColor = 0xccccee; // lavender almost invisible
+      // baseColor = 0xaacccc; // lavender almost invisible
+      baseColor = 0xdddddd; // grayish white?
+      // baseColor = 0xaaaaaa; // dark grayish brown
+      // baseColor = 0x777777; // very dark brown
     } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
       if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
         baseColor = 0xeeaaaa; // pink

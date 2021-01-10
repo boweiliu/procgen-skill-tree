@@ -20,7 +20,7 @@ export type ChunkGen = {
 export class ChunkGenConstants {
   public static CHUNK_DIM = 9; // each chunk is a DIM x DIM grid of nodes, centered on a single node
   public static CHUNK_HALF_DIM = (ChunkGenConstants.CHUNK_DIM - 1) / 2;
-  public static DROP_NODES_CHANCE = 0.3; // before generating edges, how many of the nodes to throw out
+  public static DROP_NODES_CHANCE = 0.0; // before generating edges, how many of the nodes to throw out
 }
 
 export type PointNodeGen = {
@@ -38,9 +38,13 @@ export enum ResourceNontrivialType {
   Mana2 = "Mana2",
 }
 
-export type ResourceType = "Nothing" | ResourceNontrivialType;
+export type ResourceType = "Nothing" | "EfficiencyGate" | ResourceNontrivialType;
 // eslint-disable-next-line
-export const ResourceType = { Nothing: "Nothing", ...ResourceNontrivialType };
+export const ResourceType = {
+  Nothing: "Nothing",
+  EfficiencyGate: "EfficiencyGate",
+  ...ResourceNontrivialType,
+};
 
 export enum ResourceModifier {
   Flat = "Flat",

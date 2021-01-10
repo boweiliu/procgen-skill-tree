@@ -107,6 +107,8 @@ export class PointNodeGenFactory {
       resourceType = "Nothing";
     } else if (randomFloat < 0.15) {
       resourceType = ResourceType.Mana0;
+    } else if (randomFloat < 0.35) {
+      resourceType = "EfficiencyGate";
     } else if (randomFloat < -0.35) {
       resourceType = ResourceType.Mana1;
     } else if (randomFloat < -0.60) {
