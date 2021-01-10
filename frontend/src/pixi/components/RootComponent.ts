@@ -1,7 +1,7 @@
 import * as Pixi from "pixi.js";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { ChunkGenConstants, GameState, IntentName} from "../../data/GameState";
-import { generatePointNodeTexture } from "../textures/PointNodeTexture";
+import { generatePointNodeTexture, PointNodeTextureSet } from "../textures/PointNodeTexture";
 import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
 import { Const, Lazy } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
@@ -11,7 +11,7 @@ import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
 import { TooltipInfo } from "./TooltipComponent";
 
 type State = {
-  pointNodeTexture: Lazy<Pixi.Texture>;
+  pointNodeTexture: Lazy<PointNodeTextureSet>;
   tick: number;
   playerCurrentZ: number;
   tooltip: TooltipInfo;

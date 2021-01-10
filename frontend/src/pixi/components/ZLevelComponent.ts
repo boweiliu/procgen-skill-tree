@@ -6,6 +6,7 @@ import { HashSet, KeyedHashMap } from "../../lib/util/data_structures/hash";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { Const } from "../../lib/util/misc";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
+import { PointNodeTextureSet } from "../textures/PointNodeTexture";
 import { RenderedChunkConstants, ChunkComponent, ChunkComponentProps } from "./ChunkComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { RootComponentState } from "./RootComponent";
@@ -13,7 +14,7 @@ import { RootComponentState } from "./RootComponent";
 type Props = {
   delta: number,
   args: {
-    pointNodeTexture: Pixi.Texture,
+    pointNodeTexture: PointNodeTextureSet,
     markForceUpdate: (childInstance: any) => void,
   },
   z: number,

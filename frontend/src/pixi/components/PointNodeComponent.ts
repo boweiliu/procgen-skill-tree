@@ -9,11 +9,12 @@ import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
 import { RootComponentState } from "./RootComponent";
+import { PointNodeTextureSet } from "../textures/PointNodeTexture";
 
 type Props = {
   delta: number,
   args: {
-    pointNodeTexture: Pixi.Texture,
+    pointNodeTexture: PointNodeTextureSet,
     markForceUpdate: (childInstance: any) => void,
   },
   selfPointNodeRef: PointNodeRef,
@@ -37,6 +38,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   public sprite: Pixi.Sprite
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
+  public topHalfSprite: Pixi.Sprite;
   public hitArea: Pixi.IHitArea;
 
   public tooltippableArea?: TooltippableAreaComponent
@@ -50,14 +52,38 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.updateSelf(props); // initialize the description text properly
     this.container = new Pixi.Container();
 
+    let defaultTexture = props.args.pointNodeTexture.find((it) => {
+      return (it.cropFraction >= 0.990);
+    })?.texture;
     this.container.sortableChildren = true;
-    this.sprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.sprite = new Pixi.Sprite(defaultTexture);
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 0.5;
-    this.sprite.zIndex = -1;
+    this.sprite.zIndex = -2;
     this.container.addChild(this.sprite);
 
-    this.centerSprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.topHalfSprite = new Pixi.Sprite(props.args.pointNodeTexture.find((it) => {
+      return(it.cropFraction >= 0.499);
+    })?.texture);
+    this.topHalfSprite.anchor.x = 0.5;
+    this.topHalfSprite.anchor.y = 0.5;
+    this.topHalfSprite.zIndex = -1;
+    // this.topHalfSprite.alpha = 0;
+    if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+      // adding this drops FPS from 90 static/50 moving to 70 static/40 moving, even when alpha off, so we only add it for the nodes that need it
+      this.container.addChild(this.topHalfSprite);
+    }
+
+    const mask = new Pixi.Graphics();
+    mask.beginFill(0x000000);
+    mask.drawRect(0, 0, this.topHalfSprite.width, this.topHalfSprite.height /2);
+    mask.pivot.x = this.topHalfSprite.width / 2;
+    mask.pivot.y = this.topHalfSprite.height / 2;
+    mask.zIndex = 30;
+    // this.container.addChild(mask);
+    // this.topHalfSprite.mask = mask; // DO NOT DO THIS, masking many masks is extremely slow: https://forums.rpgmakerweb.com/index.php?threads/games-optimisations-tips.92717/
+
+    this.centerSprite = new Pixi.Sprite(defaultTexture);
     this.centerSprite.anchor.x = 0.5;
     this.centerSprite.anchor.y = 0.5;
     this.centerSprite.scale = PixiPointFrom(new Vector2(0.5, 0.5));
@@ -65,7 +91,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.centerSprite.alpha = 0; // TESTING
     // this.container.addChild(this.centerSprite);
 
-    this.halfwayCenterSprite = new Pixi.Sprite(props.args.pointNodeTexture);
+    this.halfwayCenterSprite = new Pixi.Sprite(defaultTexture);
     this.halfwayCenterSprite.anchor.x = 0.5;
     this.halfwayCenterSprite.anchor.y = 0.5;
     this.halfwayCenterSprite.scale = PixiPointFrom(new Vector2(0.75, 0.75));
@@ -134,15 +160,18 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     } else {
     }
     let baseColor: number = 0;
+    let topHalfColor: number = 0;
     if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
       baseColor = 0x99bbff; // blue that mixes in with bg
     } else if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
       // baseColor = 0xccee88; // bright yellow green
       // baseColor = 0xcccccc; // gray almost invisible
+      baseColor = 0xbbccdd; // bg color = abcdef
+      topHalfColor = 0xddffdd; // grayish white
 
       // baseColor = 0xccccee; // lavender almost invisible
       // baseColor = 0xaacccc; // lavender almost invisible
-      baseColor = 0xdddddd; // grayish white?
+      // baseColor = 0xdddddd; // grayish white?
       // baseColor = 0xaaaaaa; // dark grayish brown
       // baseColor = 0x777777; // very dark brown
     } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
@@ -169,6 +198,13 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
     this.sprite.tint = multiplyColor(baseColor, tint);
     this.centerSprite.tint = multiplyColor(baseColor, centerTint);
+    this.topHalfSprite.tint = multiplyColor(topHalfColor, tint);
+
+    // TESTING
+    let textureToFind = Math.floor(Math.random() * 9) / 8 - 0.001;
+    this.topHalfSprite.texture = props.args.pointNodeTexture.find(
+      (it) => (it.cropFraction >= textureToFind)
+    )?.texture!
 
     // NOTE(bowei): careful, we dont want to set the scale of our tooltip to be bigger
     if (props.selfPointNodeRef.pointNodeCoord.equals(Vector2.Zero)) {

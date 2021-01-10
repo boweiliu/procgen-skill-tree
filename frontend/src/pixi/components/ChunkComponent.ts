@@ -7,6 +7,7 @@ import { Vector2 } from "../../lib/util/geometry/vector2";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { RootComponentState } from "./RootComponent";
+import { PointNodeTextureSet } from "../textures/PointNodeTexture";
 
 export class RenderedChunkConstants {
 //   public static SPACING_PX: number = 24;
@@ -23,7 +24,7 @@ export class RenderedChunkConstants {
 type Props = {
   delta: number,
   args: {
-    pointNodeTexture: Pixi.Texture,
+    pointNodeTexture: PointNodeTextureSet,
     markForceUpdate: (childInstance: any) => void,
   },
   selfChunkRef: ChunkRef,
