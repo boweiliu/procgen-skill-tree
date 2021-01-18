@@ -1,4 +1,4 @@
-import { GameState, PlayerSaveState, PointNodeRef } from "../data/GameState";
+import { GameState, PlayerSaveState, PointNodeRef, ResourceType } from "../data/GameState";
 import { canAllocate } from "./Neighbors";
 
 export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, selfPointNodeRef: PointNodeRef): [PlayerSaveState, boolean] {
@@ -7,7 +7,10 @@ export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, s
     prevGameState.worldGen,
     prevGameState.playerSave.allocatedPointNodeSet,
     prevGameState.playerSave.activeQuest !== undefined,
-  ) === 'yes') {
+  ) === 'yes' && checkEfficiencyGate(
+    selfPointNodeRef,
+    prevGameState,
+  )) {
     // do the change
     const nextSet = prev.allocatedPointNodeSet.clone();
     nextSet.put(selfPointNodeRef);
@@ -36,4 +39,23 @@ export function afterMaybeSpendingSp(prev: PlayerSaveState, prevGameState: GameS
     next.questProgressHistory.push(amount);
   }
   return next;
+}
+
+export function checkEfficiencyGate(
+  selfPointNodeRef: PointNodeRef,
+  gameState: GameState,
+) {
+  const self = gameState.worldGen
+    .zLevels[selfPointNodeRef.z]
+    .chunks.get(selfPointNodeRef.chunkCoord)
+    ?.pointNodes.get(selfPointNodeRef.pointNodeCoord)!;
+  
+  if (self.resourceType !== ResourceType.EfficiencyGate) {
+    return true;
+  } else {
+    let resourceType = self.resourceType;
+    let amount = gameState.computed.playerResourceAmounts?.[resourceType] || 0;
+    // TODO(bowei); refactor then finish this logic
+    return false;
+  }
 }

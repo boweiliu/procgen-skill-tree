@@ -13,8 +13,10 @@ let COLORS = {
   nodeLavender: 0x777777,
   nodeBlue: 0xdddddd,
 
-  nodeAqua: 0xff7777,
-  nodeGrey: 0xffaaaa,
+  // used for lock nodes
+  nodeAqua: 0xffaaaa,
+  // gateTint: 0xaaaaaa,
+  gateTint: 0xffffff,
 
   selectedTint: 0xbbbbff,
   allocatedTint: 0x444444,

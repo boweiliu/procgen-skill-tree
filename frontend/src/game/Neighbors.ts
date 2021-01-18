@@ -1,6 +1,6 @@
 import { HashSet } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
-import { ChunkGenConstants, PointNodeRef, WorldGenState } from "../data/GameState";
+import { ChunkGenConstants, PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
 import { Vector2 } from "../lib/util/geometry/vector2";
 
 enum Direction {
@@ -202,17 +202,21 @@ export function canAllocate(
   if (allocatedPointNodeSet.contains(selfPointNodeRef)) {
     return "already allocated";
   }
-  if (hasActiveQuest === false) {
-    return "no active quest"
-  }
+  // if (hasActiveQuest === false) {
+  //   return "no active quest"
+  // }
 
   // check if any of our neighbors are allocated
   const neighbors = getNeighbors(selfPointNodeRef, worldGen);
   
+  let connected = false;
   for (let nbor of neighbors) {
     if (allocatedPointNodeSet.contains(nbor)) {
-      return "yes";
+      connected = true;
     }
+  }
+  if (connected) {
+    return "yes";
   }
 
   return "not connected";
