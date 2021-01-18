@@ -123,11 +123,11 @@ class ChunkComponent2 extends LifecycleHandlerBase<Props, State> {
           args: {
             pointNodeTexture: props.args.pointNodeTexture,
             markForceUpdate: this.markForceUpdate,
+            position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
           },
           selfPointNodeRef: pointNodeRef,
           updaters: props.updaters,
           tooltipUpdaters: props.tooltipUpdaters,
-          position: pointNodeRef.pointNodeCoord.multiply(RenderedChunkConstants.SPACING_PX),
           pointNodeGen,
           isSelected: props.selectedPointNode?.pointNodeId === pointNodeRef.pointNodeId,
           isAllocated: props.allocatedPointNodeSubset.contains(pointNodeRef),

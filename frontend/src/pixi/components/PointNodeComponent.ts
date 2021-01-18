@@ -16,12 +16,12 @@ type Props = {
   delta: number,
   args: {
     pointNodeTexture: PointNodeTextureSet,
+    position: Vector2,
     markForceUpdate: (childInstance: any) => void,
   },
   selfPointNodeRef: PointNodeRef,
   updaters: UpdaterGeneratorType2<GameState>,
   tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'],
-  position: Vector2,
   pointNodeGen: PointNodeGen,
   isSelected: boolean,
   isAllocated: boolean
@@ -146,7 +146,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
-    this.container.position = PixiPointFrom(props.position);
+    this.container.position = PixiPointFrom(props.args.position);
     let tint: number;
     let centerTint: number;
     if (props.isSelected) {
@@ -211,19 +211,12 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     for (let key of (Object.keys(staleProps) as (keyof Props)[])) {
       if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
       if (staleProps[key] !== props[key]) {
+        console.log(`node shouldUpdate differed in ${key}, returning true`);
         return true;
-      }
-      if (key === 'position') {
-        if (!staleProps[key].equals(props[key])) {
-          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
-          return true;
-        } else {
-          continue;
-        }
       }
       if (key === 'selfPointNodeRef') {
         if (staleProps[key]?.hash() !== props[key]?.hash()) {
-          console.log(`chunk shouldUpdate differed in ${key}, returning true`);
+          console.log(`node shouldUpdate differed in ${key}, returning true`);
           return true;
         } else {
           continue;
