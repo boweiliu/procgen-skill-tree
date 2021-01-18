@@ -1,4 +1,5 @@
 import { ComputedState, GameState, ResourceModifier, ResourceNontrivialType, ResourceType, ResourceTypeAndModifier } from "../data/GameState";
+import { NodeType } from "../data/WorldGenState";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
 
@@ -9,7 +10,7 @@ export function computePlayerResourceAmounts(gameState: GameState): ComputedStat
 
   for (let pointNodeRef of gameState.playerSave.allocatedPointNodeHistory) {
     let pointNodeGen = gameState.worldGen.zLevels[pointNodeRef.z]!.chunks.get(pointNodeRef.chunkCoord)!.pointNodes.get(pointNodeRef.pointNodeCoord)!
-    if (pointNodeGen.resourceType === "Nothing" || pointNodeGen.resourceType === "EfficiencyGate") {
+    if (pointNodeGen.nodeType === NodeType.Nothing) {
       continue;
     }
 

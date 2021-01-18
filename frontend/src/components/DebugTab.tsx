@@ -3,6 +3,7 @@ import { ComputedState, PlayerSaveState, PointNodeRef, ResourceType, WorldGenSta
 import { HashSet } from "../lib/util/data_structures/hash";
 import { canAllocate } from "../game/Neighbors";
 import { computeQuestEfficiencyPercent } from "../game/EfficiencyCalculator";
+import { NodeType } from "../data/WorldGenState";
 
 type Props = {
   selectedPointNode?: PointNodeRef
@@ -34,7 +35,7 @@ export function DebugTab({
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
   const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, playerSave.activeQuest !== undefined);
   let nodeDescription: string = "Nothing (empty node)";
-  if (pointNodeGen.resourceType !== "Nothing") {
+  if (pointNodeGen.nodeType !== NodeType.Nothing) {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`
   }
   return (

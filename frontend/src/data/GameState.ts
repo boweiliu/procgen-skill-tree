@@ -8,8 +8,8 @@ import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState }
 
 export { PointNodeRef, ChunkRef } from "./PointNodeRef";
 export type { PlayerSaveState, Quest } from "./PlayerSaveState";
-export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen,   } from "./WorldGenState";
-export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType, ResourceType } from "./WorldGenState";
+export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen, ResourceType } from "./WorldGenState";
+export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType } from "./WorldGenState";
 
 /**
  * Data owned by the master "App" component, to be made available as props to ALL subcomponents (both pixi and react); react uses context providers to make this easier

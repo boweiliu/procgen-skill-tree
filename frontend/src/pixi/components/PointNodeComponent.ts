@@ -11,6 +11,7 @@ import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
 import { RootComponentState } from "./RootComponent";
 import { PointNodeTextureSet } from "../textures/PointNodeTexture";
 import COLORS from "../colors";
+import { NodeType, ResourceNontrivialType } from "../../data/WorldGenState";
 
 type Props = {
   delta: number,
@@ -70,7 +71,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.topHalfSprite.anchor.y = 0.5;
     this.topHalfSprite.zIndex = -1;
     // this.topHalfSprite.alpha = 0;
-    if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+    if (props.pointNodeGen.nodeType === NodeType.EfficiencyGate) {
       // adding this drops FPS from 90 static/50 moving to 70 static/40 moving, even when alpha off, so we only add it for the nodes that need it
       this.container.addChild(this.topHalfSprite);
     }
@@ -137,9 +138,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
   protected updateSelf(props: Props) {
     let nodeDescription: string = "Nothing (empty node)";
-    if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+    if (props.pointNodeGen.nodeType === NodeType.EfficiencyGate) {
       nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`; // TODO
-    } else if (props.pointNodeGen.resourceType !== "Nothing") {
+    } else if (props.pointNodeGen.nodeType !== NodeType.Nothing) {
       nodeDescription = `${props.pointNodeGen.resourceAmount} ${props.pointNodeGen.resourceModifier} ${props.pointNodeGen.resourceType}`;
     }
     this.state.descriptionText = nodeDescription;
@@ -163,13 +164,13 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
     let baseColor: number = 0;
     let topHalfColor: number = 0;
-    if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
+    if (props.pointNodeGen.nodeType === NodeType.Nothing) {
       baseColor = COLORS.nodeBlue; // blue that mixes in with bg
-    } else if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
+    } else if (props.pointNodeGen.nodeType === NodeType.EfficiencyGate) {
       baseColor = COLORS.nodeAqua; // bg color = abcdef
       topHalfColor = multiplyColor(COLORS.nodeAqua, COLORS.gateTint); // grayish white
 
-    } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
+    } else if (props.pointNodeGen.resourceType === ResourceNontrivialType.Mana0) {
       if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
         baseColor = COLORS.nodePink;
       } else if (props.pointNodeGen.resourceModifier === ResourceModifier.Increased0) {

@@ -26,23 +26,31 @@ export class ChunkGenConstants {
 export type PointNodeGen = {
   id: number;
 } & ({
+  nodeType: NodeType.Basic;
   // more data to be generated here - size, color, etc.
   resourceType: ResourceNontrivialType;
   resourceModifier: ResourceModifier;
   resourceAmount: number;
 } | {
-  resourceType: "Nothing"
+  nodeType: NodeType.Nothing;
 } | {
-  resourceType: "EfficiencyGate";
+  nodeType: NodeType.EfficiencyGate;
+  resourceType: ResourceNontrivialType;
   resourceModifier: ResourceModifier;
   resourceAmount: number;
 
   efficiencyGateInfo: {
-    resourceType: ResourceType;
-    resourceAmountThreshold: number;
+    thresholdResourceType: ResourceType;
+    thresholdResourceAmount: number;
     timeUntilLocked: number;
   };
 });
+
+export enum NodeType {
+  Basic = "Basic",
+  Nothing = "Nothing",
+  EfficiencyGate = "EfficiencyGate",
+}
 
 export enum ResourceNontrivialType {
   Mana0 = "Mana0",
@@ -50,13 +58,13 @@ export enum ResourceNontrivialType {
   Mana2 = "Mana2",
 }
 
-export type ResourceType = "Nothing" | "EfficiencyGate" | ResourceNontrivialType;
-// eslint-disable-next-line
-export const ResourceType = {
-  Nothing: "Nothing",
-  EfficiencyGate: "EfficiencyGate",
-  ...ResourceNontrivialType,
-};
+export type ResourceType = ResourceNontrivialType;
+// // eslint-disable-next-line
+// export const ResourceType = {
+//   Nothing: "Nothing",
+//   EfficiencyGate: "EfficiencyGate",
+//   ...ResourceNontrivialType,
+// };
 
 export enum ResourceModifier {
   Flat = "Flat",

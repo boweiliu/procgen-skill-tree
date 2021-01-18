@@ -1,5 +1,6 @@
 import React from "react";
 import { PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
+import { NodeType } from "../data/WorldGenState";
 import { canAllocate } from "../game/Neighbors";
 import { HashSet } from "../lib/util/data_structures/hash";
 
@@ -35,7 +36,7 @@ function NodeDetailComponent({
     hasActiveQuest,
   );
   let nodeDescription: string = "Nothing (empty node)";
-  if (pointNodeGen.resourceType !== "Nothing") {
+  if (pointNodeGen.nodeType !== NodeType.Nothing) {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`;
   }
   return (

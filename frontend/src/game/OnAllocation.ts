@@ -1,4 +1,5 @@
 import { GameState, PlayerSaveState, PointNodeRef, ResourceType } from "../data/GameState";
+import { NodeType } from "../data/WorldGenState";
 import { canAllocate } from "./Neighbors";
 
 export function doTryAllocate(prev: PlayerSaveState, prevGameState: GameState, selfPointNodeRef: PointNodeRef): [PlayerSaveState, boolean] {
@@ -50,7 +51,7 @@ export function checkEfficiencyGate(
     .chunks.get(selfPointNodeRef.chunkCoord)
     ?.pointNodes.get(selfPointNodeRef.pointNodeCoord)!;
   
-  if (self.resourceType !== ResourceType.EfficiencyGate) {
+  if (self.nodeType !== NodeType.EfficiencyGate) {
     return true;
   } else {
     let resourceType = self.resourceType;

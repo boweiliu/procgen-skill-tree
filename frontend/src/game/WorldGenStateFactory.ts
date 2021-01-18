@@ -1,4 +1,5 @@
-import { WorldGenState, ChunkGen, PointNodeGen, ChunkGenConstants, ZLevelGen, ResourceType, ResourceModifier } from "../data/GameState";
+import { WorldGenState, ChunkGen, PointNodeGen, ChunkGenConstants, ZLevelGen, ResourceType, ResourceModifier, ResourceNontrivialType } from "../data/GameState";
+import { NodeType } from "../data/WorldGenState";
 import { HashSet, KeyedHashMap } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { INTMAX32, squirrel3 } from "../lib/util/random";
@@ -102,23 +103,27 @@ export class PointNodeGenFactory {
     const id = squirrel3(args.seed + squirrel3(args.seed + args.location.x) + args.location.y);
 
     let randomFloat = squirrel3(id + 1) / INTMAX32;
-    let resourceType: ResourceType;
+    let resourceType: ResourceNontrivialType = ResourceNontrivialType.Mana2;
+    let nodeType: NodeType = NodeType.Nothing;
     if (randomFloat < 0.0) {
-      resourceType = "Nothing";
+      nodeType = NodeType.Nothing;
     } else if (randomFloat < 0.15) {
-      resourceType = ResourceType.Mana0;
+      nodeType = NodeType.Basic;
+      resourceType = ResourceNontrivialType.Mana0;
     } else if (randomFloat < 0.35) {
-      resourceType = "EfficiencyGate";
+      nodeType = NodeType.EfficiencyGate;
     } else if (randomFloat < -0.35) {
-      resourceType = ResourceType.Mana1;
+      nodeType = NodeType.Basic;
+      resourceType = ResourceNontrivialType.Mana1;
     } else if (randomFloat < -0.60) {
-      resourceType = ResourceType.Mana2;
+      nodeType = NodeType.Basic;
+      resourceType = ResourceNontrivialType.Mana2;
     } else {
-      resourceType = "Nothing";
+      nodeType = NodeType.Nothing;
     }
     // override for root node
     if (args.location.equals(Vector2.Zero) && args.chunk.equals(Vector2.Zero) && args.z === 0) {
-      resourceType = "Nothing";
+      nodeType = NodeType.Nothing;
     }
 
     randomFloat = squirrel3(id + 2) / INTMAX32;
@@ -153,15 +158,25 @@ export class PointNodeGenFactory {
       resourceAmount = randomFloat + 3;
     }
 
-    if (resourceType === "Nothing") {
+    if (nodeType === NodeType.Nothing) {
       return {
-        id, resourceType
+        id, nodeType
       };
-    } else if (resourceType === "EfficiencyGate") {
-      throw new Error();
+    } else if (nodeType === NodeType.EfficiencyGate) {
+      let thresholdResourceType = ResourceNontrivialType.Mana0;
+      let thresholdResourceAmount = 300;
+      let timeUntilLocked = 14;
+      return {
+        id, resourceAmount, resourceModifier, resourceType, nodeType,
+        efficiencyGateInfo: {
+          thresholdResourceAmount,
+          thresholdResourceType,
+          timeUntilLocked,
+        }
+      };
     } else {
       return {
-        id, resourceAmount, resourceModifier, resourceType
+        id, resourceAmount, resourceModifier, resourceType, nodeType,
       };
     }
   }

@@ -1,5 +1,6 @@
 import {
   GameState,
+  ResourceNontrivialType,
   ResourceType,
 } from "../data/GameState";
 import { INTMAX32, squirrel3 } from "../lib/util/random";
@@ -21,7 +22,7 @@ export function createQuest(
 
     // const r = Math.floor(Math.random() * 3) as 0 | 1 | 2;
     // const resource = Object.values(ResourceNontrivialType)[r];
-    const resourceType = ResourceType.Mana0;
+    const resourceType = ResourceNontrivialType.Mana0;
     const currentResourceAmount = prevGameState.computed.playerResourceAmounts?.[resourceType] || 50;
 
     const historicalAmountPerNode = currentResourceAmount / totalAllocatedNodes; // how much benefit, on average, each node gave
