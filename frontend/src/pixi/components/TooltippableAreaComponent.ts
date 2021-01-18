@@ -2,6 +2,7 @@ import * as Pixi from "pixi.js";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
 import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
+import COLORS from "../colors";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
@@ -88,8 +89,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
         this.tooltipContainer.addChild(text);
 
         const box = new Pixi.Graphics();
-        box.lineStyle(1, 0x222222, 1);
-        box.beginFill(0xEEEEEE);
+        box.lineStyle(1, COLORS.tooltipBorderBlack, 1);
+        box.beginFill(COLORS.tooltipFillWhite);
         box.drawRoundedRect(0, 0, text.width + 18, text.height + 18, 4);
         box.zIndex = 0;
         this.tooltipContainer.addChild(box);

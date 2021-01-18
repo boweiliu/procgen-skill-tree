@@ -1,4 +1,5 @@
 import * as Pixi from "pixi.js";
+import COLORS from "../colors";
 import { RenderedChunkConstants } from "../components/ChunkComponent";
 
 export type PointNodeTextureSet = ({ cropFraction: number, texture: Pixi.Texture })[];
@@ -9,7 +10,7 @@ export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeText
   for (let i = 0; i <= 8; i++) {
     const cropFraction = i / 8;
     let g = new Pixi.Graphics();
-    g.beginFill(0xffffff);
+    g.beginFill(COLORS.white);
     g.drawRoundedRect(
       - RenderedChunkConstants.NODE_SIZE_PX / 2,
       - RenderedChunkConstants.NODE_SIZE_PX / 2,
@@ -18,7 +19,7 @@ export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeText
       RenderedChunkConstants.NODE_ROUNDED_PX
     );
     let mask = new Pixi.Graphics();
-    mask.beginFill(0x000000);
+    mask.beginFill(COLORS.black);
     mask.drawRect(
       - RenderedChunkConstants.NODE_SIZE_PX / 2,
       - RenderedChunkConstants.NODE_SIZE_PX / 2,

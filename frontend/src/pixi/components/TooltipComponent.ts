@@ -1,6 +1,7 @@
 import * as Pixi from "pixi.js";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import COLORS from "../colors";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 
@@ -69,8 +70,8 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
     }
 
     this.box = new Pixi.Graphics();
-    this.box.lineStyle(1, 0x222222, 1);
-    this.box.beginFill(0xEEEEEE);
+    this.box.lineStyle(1, COLORS.tooltipBorderBlack, 1);
+    this.box.beginFill(COLORS.tooltipFillWhite);
     this.box.drawRoundedRect(0, 0, this.text.width + 18, this.text.height + 18, 4);
     this.box.zIndex = 0;
     this.container.addChild(this.box);

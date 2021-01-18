@@ -15,6 +15,12 @@ let COLORS = {
 
   nodeAqua: 0xff7777,
   nodeGrey: 0xffaaaa,
+
+  // colors that dont matter too much
+  tooltipBorderBlack: 0x222222,
+  tooltipFillWhite: 0xeeeeee,
+  white: 0xffffff,
+  black: 0x000000,
 };
 
       // baseColor = 0xccee88; // bright yellow green

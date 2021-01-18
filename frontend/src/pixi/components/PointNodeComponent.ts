@@ -165,16 +165,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
       baseColor = COLORS.nodeBlue; // blue that mixes in with bg
     } else if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
-      // baseColor = 0xccee88; // bright yellow green
-      // baseColor = 0xcccccc; // gray almost invisible
       baseColor = COLORS.nodeAqua; // bg color = abcdef
       topHalfColor = COLORS.nodeGrey; // grayish white
 
-      // baseColor = 0xccccee; // lavender almost invisible
-      // baseColor = 0xaacccc; // lavender almost invisible
-      // baseColor = 0xdddddd; // grayish white?
-      // baseColor = 0xaaaaaa; // dark grayish brown
-      // baseColor = 0x777777; // very dark brown
     } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
       if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
         baseColor = COLORS.nodePink;
