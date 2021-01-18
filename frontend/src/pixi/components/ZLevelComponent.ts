@@ -132,7 +132,7 @@ class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
       chunkId: chunkGen.id,
     });
 
-    let childPropsFactory = (props: Props, state: State) => {
+    let childPropsFactory = (props: Props, state: State): ChunkComponentProps => {
       let allocatedPointNodeSubset = new HashSet(
         props.allocatedPointNodeSubset.values().filter((pointNodeRef) => pointNodeRef.chunkCoord.equals(chunkRef.chunkCoord))
       );

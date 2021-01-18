@@ -10,6 +10,7 @@ import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
 import { RootComponentState } from "./RootComponent";
 import { PointNodeTextureSet } from "../textures/PointNodeTexture";
+import COLORS from "../colors";
 
 type Props = {
   delta: number,
@@ -162,12 +163,12 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     let baseColor: number = 0;
     let topHalfColor: number = 0;
     if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
-      baseColor = 0x99bbff; // blue that mixes in with bg
+      baseColor = COLORS.nodeBlue; // blue that mixes in with bg
     } else if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
       // baseColor = 0xccee88; // bright yellow green
       // baseColor = 0xcccccc; // gray almost invisible
-      baseColor = 0xbbccdd; // bg color = abcdef
-      topHalfColor = 0xddffdd; // grayish white
+      baseColor = COLORS.nodeAqua; // bg color = abcdef
+      topHalfColor = COLORS.nodeGrey; // grayish white
 
       // baseColor = 0xccccee; // lavender almost invisible
       // baseColor = 0xaacccc; // lavender almost invisible
@@ -176,9 +177,9 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       // baseColor = 0x777777; // very dark brown
     } else if (props.pointNodeGen.resourceType === ResourceType.Mana0) {
       if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
-        baseColor = 0xeeaaaa; // pink
+        baseColor = COLORS.nodePink;
       } else if (props.pointNodeGen.resourceModifier === ResourceModifier.Increased0) {
-        baseColor = 0xcc88ee; // lavender?
+        baseColor = COLORS.nodeLavender;
       }
     }
     // switch (props.pointNodeGen.resourceType) {

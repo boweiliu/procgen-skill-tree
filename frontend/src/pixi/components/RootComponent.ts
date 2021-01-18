@@ -9,6 +9,7 @@ import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
 import { TooltipInfo } from "./TooltipComponent";
+import COLORS from "../colors";
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
@@ -95,7 +96,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
 
     this.backdrop = new Pixi.Graphics();
     this.backdropStage.addChild(this.backdrop);
-    this.backdrop.beginFill(0xabcdef, 1);
+    this.backdrop.beginFill(COLORS.backgroundBlue, 1);
     // backdrop.alpha = 0.5; // if alpha == 0, Pixi does not register this as a hittable area
     this.backdrop.interactive = true;
     // backdrop.interactiveChildren = true; // not sure what this does
