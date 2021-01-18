@@ -5,6 +5,7 @@ import { GameState, WindowState } from "../data/GameState";
 import { assertOnlyCalledOnce, Const } from "../lib/util/misc";
 import { RootComponent } from "./components/RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import COLORS from "./colors";
 
 type Props = {
   args: {
@@ -67,7 +68,7 @@ export class PixiReactBridge {
       // resolution: 2,
       autoDensity: true,
       powerPreference: "low-power", // the only valid one for webgl
-      backgroundColor: 0xffffff, // immaterial - we recommend setting color in backdrop graphics
+      backgroundColor: COLORS.white, // immaterial - we recommend setting color in backdrop graphics
     });
 
     // test

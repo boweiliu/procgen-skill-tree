@@ -76,7 +76,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     }
 
     const mask = new Pixi.Graphics();
-    mask.beginFill(0x000000);
+    mask.beginFill(COLORS.black);
     mask.drawRect(0, 0, this.topHalfSprite.width, this.topHalfSprite.height /2);
     mask.pivot.x = this.topHalfSprite.width / 2;
     mask.pivot.y = this.topHalfSprite.height / 2;
@@ -138,7 +138,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   protected updateSelf(props: Props) {
     let nodeDescription: string = "Nothing (empty node)";
     if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
-      nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`;
+      nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`; // TODO
     } else if (props.pointNodeGen.resourceType !== ResourceType.Nothing) {
       nodeDescription = `${props.pointNodeGen.resourceAmount} ${props.pointNodeGen.resourceModifier} ${props.pointNodeGen.resourceType}`;
     }
@@ -160,6 +160,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       tint = COLORS.allocatedTint;
     } else {
     }
+
     let baseColor: number = 0;
     let topHalfColor: number = 0;
     if (props.pointNodeGen.resourceType === ResourceType.Nothing) {
