@@ -34,7 +34,7 @@ export function DebugTab({
   const isAllocated = (allocatedPointNodeSet.contains(selectedPointNode));
   const canBeAllocated: string = canAllocate(selectedPointNode, worldGen, allocatedPointNodeSet, playerSave.activeQuest !== undefined);
   let nodeDescription: string = "Nothing (empty node)";
-  if (pointNodeGen.resourceType !== ResourceType.Nothing) {
+  if (pointNodeGen.resourceType !== "Nothing") {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`
   }
   return (

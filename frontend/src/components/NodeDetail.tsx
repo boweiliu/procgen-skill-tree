@@ -35,7 +35,7 @@ function NodeDetailComponent({
     hasActiveQuest,
   );
   let nodeDescription: string = "Nothing (empty node)";
-  if (pointNodeGen.resourceType !== ResourceType.Nothing) {
+  if (pointNodeGen.resourceType !== "Nothing") {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`;
   }
   return (

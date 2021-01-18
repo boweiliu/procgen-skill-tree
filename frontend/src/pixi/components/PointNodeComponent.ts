@@ -139,7 +139,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     let nodeDescription: string = "Nothing (empty node)";
     if (props.pointNodeGen.resourceType === ResourceType.EfficiencyGate) {
       nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`; // TODO
-    } else if (props.pointNodeGen.resourceType !== ResourceType.Nothing) {
+    } else if (props.pointNodeGen.resourceType !== "Nothing") {
       nodeDescription = `${props.pointNodeGen.resourceAmount} ${props.pointNodeGen.resourceModifier} ${props.pointNodeGen.resourceType}`;
     }
     this.state.descriptionText = nodeDescription;

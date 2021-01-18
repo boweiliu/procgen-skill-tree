@@ -153,11 +153,16 @@ export class PointNodeGenFactory {
       resourceAmount = randomFloat + 3;
     }
 
-    return {
-      id,
-      resourceAmount,
-      resourceModifier,
-      resourceType
-    };
+    if (resourceType === "Nothing") {
+      return {
+        id, resourceType
+      };
+    } else if (resourceType === "EfficiencyGate") {
+      throw new Error();
+    } else {
+      return {
+        id, resourceAmount, resourceModifier, resourceType
+      };
+    }
   }
 }

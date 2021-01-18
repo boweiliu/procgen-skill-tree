@@ -25,12 +25,24 @@ export class ChunkGenConstants {
 
 export type PointNodeGen = {
   id: number;
-
+} & ({
   // more data to be generated here - size, color, etc.
-  resourceType: ResourceType;
+  resourceType: ResourceNontrivialType;
   resourceModifier: ResourceModifier;
   resourceAmount: number;
-};
+} | {
+  resourceType: "Nothing"
+} | {
+  resourceType: "EfficiencyGate";
+  resourceModifier: ResourceModifier;
+  resourceAmount: number;
+
+  efficiencyGateInfo: {
+    resourceType: ResourceType;
+    resourceAmountThreshold: number;
+    timeUntilLocked: number;
+  };
+});
 
 export enum ResourceNontrivialType {
   Mana0 = "Mana0",
