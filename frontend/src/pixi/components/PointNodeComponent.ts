@@ -150,14 +150,14 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     let tint: number;
     let centerTint: number;
     if (props.isSelected) {
-      tint = 0xBBBBFF;
-      centerTint = 0xBBBBFF;
+      tint = COLORS.selectedTint;
+      centerTint = COLORS.selectedTint;
     } else {
-      tint = 0xFFFFFF;
-      centerTint = 0xFFFFFF;
+      tint = COLORS.nullTint;
+      centerTint = COLORS.nullTint;
     }
     if (props.isAllocated) {
-      tint = 0x444444;
+      tint = COLORS.allocatedTint;
     } else {
     }
     let baseColor: number = 0;

@@ -16,6 +16,10 @@ let COLORS = {
   nodeAqua: 0xff7777,
   nodeGrey: 0xffaaaa,
 
+  selectedTint: 0xbbbbff,
+  allocatedTint: 0x444444,
+  nullTint: 0xffffff,
+
   // colors that dont matter too much
   tooltipBorderBlack: 0x222222,
   tooltipFillWhite: 0xeeeeee,

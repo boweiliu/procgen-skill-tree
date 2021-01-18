@@ -1,6 +1,7 @@
 import * as Pixi from "pixi.js";
 import { PixiPointFrom } from "../../lib/pixi/pixify";
 import { Vector2 } from "../../lib/util/geometry/vector2";
+import COLORS from "../colors";
 import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
@@ -23,7 +24,7 @@ class ReticleComponent extends LifecycleHandlerBase<Props, State> {
     };
 
     const outerCircle = new Pixi.Graphics();
-    outerCircle.lineStyle(2, 0x000000);
+    outerCircle.lineStyle(2, COLORS.black);
     outerCircle.alpha = 0.5;
     outerCircle.drawCircle(0, 0, 16);
     outerCircle.interactive = true;
