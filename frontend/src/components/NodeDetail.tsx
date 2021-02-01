@@ -41,12 +41,16 @@ function NodeDetailComponent({
   }
   return (
     <>
-      <h1>Stats</h1>
+      <h3>Node contents</h3>
       <div> {nodeDescription} </div>
       <h3>Allocated?</h3>
       {isAllocated ? "yes" : "no"}
-      <h3>Can be allocated?</h3>
-      {canBeAllocated}
+      {isAllocated ? (<></>) : (
+        <>
+          <h3>Can be allocated?</h3>
+          {canBeAllocated === "yes" ? canBeAllocated : "no, " + canBeAllocated}
+        </>
+      )}
     </>
   );
 }
