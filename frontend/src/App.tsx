@@ -62,6 +62,7 @@ function App() {
   tabViews = [
     <StatsOverview 
       playerResourceAmounts={gameState.computed.playerResourceAmounts}
+      playerResourceNodesAggregated={gameState.computed.playerResourceNodesAggregated}
     />,
     <QuestProgress
       spSpentThisQuest={gameState.playerSave.spSpentThisQuest}

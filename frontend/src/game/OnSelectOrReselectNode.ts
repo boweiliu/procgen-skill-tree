@@ -41,7 +41,9 @@ export function selectOrReselectNode(
     if (justSpentSp) {
       // this.state.justSpentSp = false;
       // console.log("just spent SP!");
-      return computePlayerResourceAmounts(prevGameState);
+      let it = computePlayerResourceAmounts(prevGameState);
+      // console.log({ x });
+      return it;
     }
     return prev;
   })

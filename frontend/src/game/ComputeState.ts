@@ -3,9 +3,7 @@ import { NodeType } from "../data/WorldGenState";
 import { HashMap } from "../lib/util/data_structures/hash";
 import { enumKeys } from "../lib/util/misc";
 
-export function computePlayerResourceAmounts(gameState: GameState): ComputedState {
-  let amounts: { [k in ResourceType]?: number } = {};
-
+export function computePlayerResourceNodesAggregated(gameState: GameState): HashMap<ResourceTypeAndModifier, number> {
   let playerResourceNodesAggregated = new HashMap<ResourceTypeAndModifier, number>();
 
   for (let pointNodeRef of gameState.playerSave.allocatedPointNodeHistory) {
@@ -21,9 +19,15 @@ export function computePlayerResourceAmounts(gameState: GameState): ComputedStat
     playerResourceNodesAggregated.put(resourceTypeAndModifier,
       (playerResourceNodesAggregated.get(resourceTypeAndModifier) || 0) + pointNodeGen.resourceAmount);
   }
+  return playerResourceNodesAggregated;
+}
+
+export function computePlayerResourceAmounts(gameState: GameState): ComputedState {
+  let amounts: { [k in ResourceType]?: number } = {};
+
+  let playerResourceNodesAggregated = computePlayerResourceNodesAggregated(gameState);
 
   // Do the +flat, %increased, etc. calculations here
-
   for (let key of enumKeys(ResourceNontrivialType)) {
     // iterate throu
     let amount = playerResourceNodesAggregated.get(new ResourceTypeAndModifier({
