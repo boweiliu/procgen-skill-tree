@@ -19,6 +19,7 @@ import { batchifySetState } from "./lib/util/batchify";
 import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./game/EfficiencyCalculator";
+import StatsOverview from "./components/StatsOverview";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -59,6 +60,9 @@ function App() {
 
   let tabViews: JSX.Element[] = [];
   tabViews = [
+    <StatsOverview 
+      playerResourceAmounts={gameState.computed.playerResourceAmounts}
+    />,
     <QuestProgress
       spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
       createQuestCb={createQuestCb}

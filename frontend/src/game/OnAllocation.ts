@@ -54,9 +54,14 @@ export function checkEfficiencyGate(
   if (self.nodeType !== NodeType.EfficiencyGate) {
     return true;
   } else {
-    let resourceType = self.resourceType;
+    let resourceType = self.efficiencyGateInfo.thresholdResourceType;
     let amount = gameState.computed.playerResourceAmounts?.[resourceType] || 0;
-    // TODO(bowei); refactor then finish this logic
+    if (amount >= self.efficiencyGateInfo.thresholdResourceAmount &&
+      gameState.playerSave.allocatedPointNodeHistory.length <=
+      self.efficiencyGateInfo.timeUntilLocked
+    ) {
+      return true;
+    }
     return false;
   }
 }
