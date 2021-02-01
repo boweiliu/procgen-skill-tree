@@ -35,7 +35,7 @@ if (
   forceRotate = true;
 }
 
-const tabLabels = ["Quest Progress", "Node Details", "Debug"];
+const tabLabels = ["Stats overview", "Quest Progress", "Node Details", "Debug"];
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -63,6 +63,7 @@ function App() {
     <StatsOverview 
       playerResourceAmounts={gameState.computed.playerResourceAmounts}
       playerResourceNodesAggregated={gameState.computed.playerResourceNodesAggregated}
+      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
     />,
     <QuestProgress
       spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
