@@ -93,23 +93,6 @@ function App() {
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
         <PixiComponent originalSetGameState={setGameState} />
-        <Sidebar>
-          <Tabs
-            value={gameState.playerUI.activeTab}
-            labels={tabLabels}
-            onChange={updaters.playerUI.activeTab.getUpdater()}
-          />
-          {tabViews.map((component, i) => {
-            return (
-              <TabContent
-                key={i}
-                showContent={gameState.playerUI.activeTab === i}
-              >
-                {component}
-              </TabContent>
-            );
-          })}
-        </Sidebar>
       </UseGameStateContext.Provider>
       <KeyboardControlComponent
         intent={gameState.intent}

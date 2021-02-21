@@ -41,7 +41,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
   public topHalfSprite: Pixi.Sprite;
-  public hitArea: Pixi.IHitArea;
+  public hitArea!: Pixi.IHitArea;
 
   public tooltippableArea?: TooltippableAreaComponent
 
@@ -105,14 +105,14 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.container.interactive = true;
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
     this.container.buttonMode = true;
-    this.hitArea = new Pixi.Rectangle(
-      - RenderedChunkConstants.NODE_HITAREA_PX / 2,
-      - RenderedChunkConstants.NODE_HITAREA_PX / 2,
-      RenderedChunkConstants.NODE_HITAREA_PX,
-      RenderedChunkConstants.NODE_HITAREA_PX,
-    );
-    // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
-    this.container.hitArea = this.hitArea;
+    // this.hitArea = new Pixi.Rectangle(
+    //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
+    //   - RenderedChunkConstants.NODE_HITAREA_PX / 2,
+    //   RenderedChunkConstants.NODE_HITAREA_PX,
+    //   RenderedChunkConstants.NODE_HITAREA_PX,
+    // );
+    // // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
+    // this.container.hitArea = this.hitArea;
 
     // const tooltippableAreaPropsFactory = (p: Props, s: State) => {
     //   let nodeDescription: string = "Nothing (empty node)";
@@ -229,6 +229,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
   protected didMount() {
     const { updaters } = this._staleProps; // we assume this will never change
+    return;
 
 //     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
 //       this.state.pointerover = event;

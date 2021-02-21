@@ -33,7 +33,7 @@ export class ZLevelGenFactory {
     const id = squirrel3(args.seed + args.z);
     const chunks: KeyedHashMap<Vector2, ChunkGen> = new KeyedHashMap();
 
-    const max = args.startingChunks || 3;
+    const max = args.startingChunks || 2;
     // TODO(bowei): generate more chunks??
     for (let i = -max; i <= max; i++) {
       for (let j = -max; j <= max; j++){

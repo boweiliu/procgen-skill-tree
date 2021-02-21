@@ -73,12 +73,12 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
     //   },
     // });
 
-    this.addChild({
-      childClass: TooltipComponent,
-      propsFactory: (props: Props, state: State) => {
-        return { offset: new Vector2(8, 8), ...props.tooltip };
-      }
-    });
+    // this.addChild({
+    //   childClass: TooltipComponent,
+    //   propsFactory: (props: Props, state: State) => {
+    //     return { offset: new Vector2(8, 8), ...props.tooltip };
+    //   }
+    // });
 
     // this.scoreText = new Pixi.Text('', {
     //   fontFamily: 'PixelMix',
