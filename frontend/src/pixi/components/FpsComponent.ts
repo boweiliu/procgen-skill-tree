@@ -6,6 +6,7 @@ import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
 
 type Props = {
   delta: number;
+  tick: number;
   position: Vector2;
   appSize: Vector2;
 }
@@ -70,10 +71,12 @@ class FpsComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
-    this.container.text = this.state.fpsTracker.getFpsString() + " FPS\n" +
-      this.state.fpsTracker.getUpsString() + " UPS\n" +
-      props.appSize.x + "x" + props.appSize.y;
-    this.container.position = PixiPointFrom(props.position);
+    if (props.tick % 10 === 0) {
+      this.container.text = this.state.fpsTracker.getFpsString() + " FPS\n" +
+        this.state.fpsTracker.getUpsString() + " UPS\n" +
+        props.appSize.x + "x" + props.appSize.y;
+      this.container.position = PixiPointFrom(props.position);
+    }
   }
 }
 

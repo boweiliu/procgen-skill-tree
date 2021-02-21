@@ -43,6 +43,7 @@ class FixedCameraStageComponent extends LifecycleHandlerBase<Props, State> {
       childClass: FpsComponent,
       propsFactory: (props: Props, state: State) => {
         return {
+          tick: props.tick,
           delta: props.delta,
           position: new Vector2(0, 0),
           appSize: props.appSize,
