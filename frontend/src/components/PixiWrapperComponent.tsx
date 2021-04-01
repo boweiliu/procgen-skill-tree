@@ -7,6 +7,7 @@ export function PixiWrapperComponent(props: {
   application: PixiReactBridge,
   windowState: WindowState,
   fireBatchedSetWindowState: () => void,
+  hidden?: boolean,
 }) {
   const { application, windowState } = props;
   const container = useRef<HTMLDivElement>(null);
@@ -49,7 +50,7 @@ export function PixiWrapperComponent(props: {
 
   return (
     <>
-      <div ref={container} />
+      <div ref={container} hidden={props.hidden || false} />
     </>
   );
 }

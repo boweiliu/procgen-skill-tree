@@ -35,8 +35,6 @@ if (
   forceRotate = true;
 }
 
-const tabLabels = ["Stats overview", "Quest Progress", "Node Details", "Debug"];
-
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
 );
@@ -46,6 +44,8 @@ function App() {
     return initialGameState.get();
   });
 
+  let [isPixiHidden, setPixiHidden] = useState(false);
+
   let [batchedSetGameState, fireBatch] = useMemo(
     () => batchifySetState(setGameState),
     [setGameState]
@@ -54,63 +54,15 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-  let createQuestCb = useCallback(() => createQuest(updaters), [
-    updaters,
-  ]);
 
-  let tabViews: JSX.Element[] = [];
-  tabViews = [
-    <StatsOverview 
-      playerResourceAmounts={gameState.computed.playerResourceAmounts}
-      playerResourceNodesAggregated={gameState.computed.playerResourceNodesAggregated}
-      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
-    />,
-    <QuestProgress
-      spSpentThisQuest={gameState.playerSave.spSpentThisQuest}
-      createQuestCb={createQuestCb}
-      activeQuest={gameState.playerSave.activeQuest}
-      playerResourceAmounts={gameState.computed.playerResourceAmounts}
-      updaters={updaters.playerSave}
-      score={gameState.playerSave.score}
-      efficiencyGrade={remapQuestEfficiencyToGrade(computeQuestEfficiencyPercent(gameState.playerSave))}
-      questInitialAmount={gameState.playerSave.questInitialAmount}
-    />,
-    <NodeDetail
-      selectedPointNode={gameState.playerUI.selectedPointNode}
-      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
-      worldGen={gameState.worldGen}
-      hasActiveQuest={gameState.playerSave.activeQuest !== undefined}
-    />,
-    <DebugTab
-      selectedPointNode={gameState.playerUI.selectedPointNode}
-      allocatedPointNodeSet={gameState.playerSave.allocatedPointNodeSet}
-      worldGen={gameState.worldGen}
-      playerSave={gameState.playerSave}
-      computed={gameState.computed}
-    />,
-  ];
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-        <PixiComponent originalSetGameState={setGameState} />
-        <Sidebar>
-          <Tabs
-            value={gameState.playerUI.activeTab}
-            labels={tabLabels}
-            onChange={updaters.playerUI.activeTab.getUpdater()}
-          />
-          {tabViews.map((component, i) => {
-            return (
-              <TabContent
-                key={i}
-                showContent={gameState.playerUI.activeTab === i}
-              >
-                {component}
-              </TabContent>
-            );
-          })}
-        </Sidebar>
+        <PixiComponent originalSetGameState={setGameState} hidden={isPixiHidden} />
       </UseGameStateContext.Provider>
+      <button onClick={() => { setPixiHidden(!isPixiHidden) }}>
+        Toggle pixi
+      </button>
       <KeyboardControlComponent
         intent={gameState.intent}
         updaters={updaters.intent}

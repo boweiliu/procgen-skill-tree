@@ -6,6 +6,7 @@ import { assertOnlyCalledOnce, Const } from "../lib/util/misc";
 import { RootComponent } from "./components/RootComponent";
 import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
 import COLORS from "./colors";
+import createBunnyExample from "./BunnyExample";
 
 type Props = {
   args: {
@@ -122,7 +123,7 @@ export class PixiReactBridge {
       this.renderSelf(this.props);
 
       // test
-      // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+      createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
       this.didMount();
     }
   }

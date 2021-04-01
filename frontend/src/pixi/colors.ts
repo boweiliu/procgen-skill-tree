@@ -1,6 +1,6 @@
 let COLORS = {
   // good colors
-  // backgroundBlue: 0xabcdef,
+  backgroundBlue: 0xabcdef,
   // nodePink: 0xeeaaaa,
   // nodeLavender: 0xcc88ee,
   // nodeBlue: 0x99bbff,
@@ -8,7 +8,7 @@ let COLORS = {
   // nodeGrey: 0xddffdd,
 
   // shitty colors
-  backgroundBlue: 0xffffff,
+  // backgroundBlue: 0xffffff,
   nodePink: 0x999999,
   nodeLavender: 0x777777,
   nodeBlue: 0xdddddd,

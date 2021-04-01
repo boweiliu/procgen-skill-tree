@@ -10,7 +10,7 @@ import { batchifySetState } from "../lib/util/batchify";
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
-export function PixiComponent(props: { originalSetGameState: Function }) {
+export function PixiComponent(props: { originalSetGameState: Function, hidden?: boolean }) {
   // eslint-disable-next-line
   const [_, gameStateUpdaters]  = useContext(UseGameStateContext);
   const [windowState, setWindowState] = useState<WindowState>({
@@ -34,38 +34,12 @@ export function PixiComponent(props: { originalSetGameState: Function }) {
 
   return (
     <>
-      <PixiWrapperComponent application={application} windowState={windowState} fireBatchedSetWindowState={fireBatchedSetWindowState}/>
-      <button onClick={() => {
-        gameStateUpdaters.enqueueUpdate((old) => {
-          let newGameState = new GameStateFactory({}).create(old.worldGen.seed);
-          old.playerSave = newGameState.playerSave;
-          old.playerUI = newGameState.playerUI;
-          old.worldGen = newGameState.worldGen;
-          return old
-        });
-      }}>Reset game state</button>
-      <button onClick={() => {
-        application.pause();
-        application.destroy();
-        setApplication(new PixiReactBridge(undefined, true));
-
-        let newGameState = new GameStateFactory({}).create(+new Date());
-        props.originalSetGameState((old: GameState) => {
-          old.playerSave = newGameState.playerSave;
-          old.playerUI = newGameState.playerUI;
-          old.worldGen = newGameState.worldGen;
-          return old
-        });
-      }}>Get a fresh seed, reset, and rerender</button>
-      <button
-        onClick={() => {
-          application.pause();
-          application.destroy();
-          setApplication(new PixiReactBridge(undefined, true));
-        }}
-      >
-        Rerender pixi application
-      </button>
+      <PixiWrapperComponent
+        application={application}
+        windowState={windowState}
+        fireBatchedSetWindowState={fireBatchedSetWindowState}
+        hidden={props.hidden}
+      />
     </>
   );
 }
