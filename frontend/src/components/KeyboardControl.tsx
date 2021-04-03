@@ -91,6 +91,6 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
     document.removeEventListener("keyup", this.handleKeyup);
   }
   render() {
-    return "hi";
+    return (< > </>)
   }
 }

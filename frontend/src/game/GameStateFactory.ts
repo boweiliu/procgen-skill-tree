@@ -16,7 +16,7 @@ export class GameStateFactory {
 
   public create(seed: number | undefined | null = undefined): GameState {
     if (seed === undefined) {
-      assertOnlyCalledOnce("GameStateFactory.create");
+      // assertOnlyCalledOnce("GameStateFactory.create");
     }
     const mySeed = seed || 0x19283;
 
