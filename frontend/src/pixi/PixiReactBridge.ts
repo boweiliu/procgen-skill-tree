@@ -14,7 +14,6 @@ type Props = {
     isSecondConstructorCall: boolean
   },
   updaters: UpdaterGeneratorType2<GameState>, // aka updaters
-  windowState: Const<WindowState>,
   gameState: Const<GameState>,
 }
 
@@ -99,7 +98,6 @@ export class PixiReactBridge {
 
   updateSelf(props: Props) {
     this.state.appSize = appSizeFromWindowSize(new Vector2(props.gameState.windowState.innerWidth, props.gameState.windowState.innerHeight));
-    // this.state.appSize = appSizeFromWindowSize(new Vector2(props.windowState.innerWidth, props.windowState.innerHeight));
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
@@ -136,7 +134,7 @@ export class PixiReactBridge {
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
       this.updateSelf(this.props);
-      console.log('skipping update since pixi is not visible');
+      // console.log('skipping update since pixi is not visible');
       this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
       return; // skip update loop if pixi is hidden
     }

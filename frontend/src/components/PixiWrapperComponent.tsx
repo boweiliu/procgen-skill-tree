@@ -5,45 +5,28 @@ import { WindowState } from "../data/GameState";
 
 export function PixiWrapperComponent(props: {
   application: PixiReactBridge,
-  windowState: WindowState,
-  fireBatchedSetWindowState: () => void,
 }) {
-  const { application, windowState } = props;
+  const { application } = props;
   const container = useRef<HTMLDivElement>(null);
   const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
-  const fireBatch = () => {
-      fireBatchedSetGameState();
-      props.fireBatchedSetWindowState();
-    }
 
   useEffect(() => {
-    // this block only triggers if a new application instance is created.
-    // first remove old application
-    // const oldLength = container.current!.childNodes.length;
+    // remove old application if it exists
     for (let i = container.current!.childNodes.length - 1; i >= 0; i--) {
       container.current!.removeChild(container.current!.childNodes[i]);
     }
-    // if (oldLength != 0) {
-    //   return;
-    // }
     // add the application
     container.current!.appendChild(application.app.view);
   }, [application]);
 
-  // const prevRef = useRef<Const<GameState>>();
-  // useEffect(() => {
-  //   prevRef.current = gameState;
-  // });
-  // const prevGameState = prevRef.current;
 
   // Trigger component render on first load and also when game state is updated
   application.rerender({
     args: {
-      fireBatch, 
+      fireBatch: fireBatchedSetGameState, 
       isSecondConstructorCall: false,
     },
     updaters: gameStateUpdaters,
-    windowState,
     gameState,
   })
 

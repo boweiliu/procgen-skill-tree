@@ -34,8 +34,6 @@ function App() {
     return initialGameState.get();
   });
 
-  // let [isPixiHidden, setPixiHidden] = useState(true);
-
   let [batchedSetGameState, fireBatch] = useMemo(
     () => batchifySetState(setGameState),
     [setGameState]
@@ -128,8 +126,7 @@ function App() {
       </div>
 
       <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
-        <button style={{ alignSelf: "flex-end" }} onClick={() => {
-          // setPixiHidden(!isPixiHidden);
+        <button onClick={() => {
           updaters.playerUI.isPixiHidden.enqueueUpdate(it => !it);
         }}>
           Toggle pixi
