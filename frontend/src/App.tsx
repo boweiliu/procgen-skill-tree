@@ -2,7 +2,6 @@ import "./App.css";
 
 import classnames from "classnames";
 import React, { useCallback, useMemo, useState } from "react";
-import UAParser from "ua-parser-js";
 import { DebugTab } from "./components/DebugTab";
 import { KeyboardListenerComponent } from "./components/KeyboardListenerComponent";
 import { NodeDetail } from "./components/NodeDetail";
@@ -22,27 +21,13 @@ import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./ga
 import StatsOverview from "./components/StatsOverview";
 import { WindowListenerComponent } from "./components/WIndowListenerComponent";
 
-// TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
-// experience - similar to a native app which is landscape locked.
-// (on mobile in already landscape orientation, and in all desktop, serve ordinary orientation.)
-// also note that android webapp supports manifest.json setting orientation, but not in the browser
-// FOR NOW - ignore this
-const browser = new UAParser().getBrowser();
-let forceRotate = false;
-if (
-  browser.name === "Mobile Safari" &&
-  window.innerWidth < window.innerHeight
-) {
-  forceRotate = true;
-}
-
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
 );
 
 /**
  * Root react component.
- * In charge of creating game state, and hooking up the game display, keyboard control, and window event listeners.
+ * In charge of creating game state, and hooking up the game display, pixi display, keyboard control, and window event listeners.
  */
 function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
@@ -61,12 +46,12 @@ function App() {
   );
 
   return (
-    <div className={classnames({ App: true, "force-landscape": forceRotate })}>
+    <div className={classnames({ App: true })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
         <PixiComponent originalSetGameState={setGameState} hidden={isPixiHidden} />
       </UseGameStateContext.Provider>
 
-      <div id="entire-area" style={{width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div id="entire-area" style={{ width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div id="play-area" style={{
           width: "95%", height: "95%", backgroundColor: "#abcdef",
           overflowY: "scroll", overflowX: "scroll",
@@ -79,78 +64,77 @@ function App() {
           // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
         }}>
           <div id="row" style={{ width: "150%" }}> {/* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */}
-          <div id="allocatable node" style={{
+            <div id="allocatable node" style={{
               width: "640px", height: "640px", backgroundColor: "#446688",
-            // https://stackoverflow.com/questions/10170759/how-to-put-some-divs-in-a-row
-            float: "left", display: "inline-block"
-          }}>
-            node
+              // https://stackoverflow.com/questions/10170759/how-to-put-some-divs-in-a-row
+              float: "left", display: "inline-block"
+            }}>
+              node
           </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#440088",
-            float: "left", display: "inline-block"
-          }}>
-            node2
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#440088",
+              float: "left", display: "inline-block"
+            }}>
+              node2
           </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#880088",
-            float: "left", display: "inline-block"
-          }}>
-            node3
-          </div>
-          </div>
-          <div id="row" style={{ width: "150%"}}>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#446688",
-            float: "left", display: "inline-block"
-          }}>
-            node
-          </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#440088",
-            float: "left", display: "inline-block"
-          }}>
-            node2
-          </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#880088",
-            float: "left", display: "inline-block"
-          }}>
-            node3
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#880088",
+              float: "left", display: "inline-block"
+            }}>
+              node3
           </div>
           </div>
-          <div id="row" style={{ width: "150%"}}>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#446688",
-            float: "left", display: "inline-block"
-          }}>
-            node
+          <div id="row" style={{ width: "150%" }}>
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#446688",
+              float: "left", display: "inline-block"
+            }}>
+              node
           </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#440088",
-            float: "left", display: "inline-block"
-          }}>
-            node2
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#440088",
+              float: "left", display: "inline-block"
+            }}>
+              node2
           </div>
-          <div id="allocatable node" style={{
-            width: "640px", height: "640px", backgroundColor: "#880088",
-            float: "left", display: "inline-block"
-          }}>
-            node3
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#880088",
+              float: "left", display: "inline-block"
+            }}>
+              node3
+          </div>
+          </div>
+          <div id="row" style={{ width: "150%" }}>
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#446688",
+              float: "left", display: "inline-block"
+            }}>
+              node
+          </div>
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#440088",
+              float: "left", display: "inline-block"
+            }}>
+              node2
+          </div>
+            <div id="allocatable node" style={{
+              width: "640px", height: "640px", backgroundColor: "#880088",
+              float: "left", display: "inline-block"
+            }}>
+              node3
           </div>
           </div>
         </div>
       </div>
-        <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
-          <button style={{alignSelf: "flex-end"}} onClick={() => { setPixiHidden(!isPixiHidden) }}>
-            Toggle pixi
-          </button>
-        </div>
+
+      <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
+        <button style={{ alignSelf: "flex-end" }} onClick={() => { setPixiHidden(!isPixiHidden) }}>
+          Toggle pixi
+        </button>
+      </div>
       
-      <KeyboardListenerComponent
-        intent={gameState.intent}
-        updaters={updaters.intent}
-      ></KeyboardListenerComponent>
+      <KeyboardListenerComponent intent={gameState.intent} updaters={updaters.intent}>
+      </KeyboardListenerComponent>
       <WindowListenerComponent updaters={updaters.windowState}>
       </WindowListenerComponent>
     </div>
