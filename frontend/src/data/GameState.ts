@@ -101,4 +101,5 @@ export class ResourceTypeAndModifier {
 export type PlayerUIState = {
   selectedPointNode: PointNodeRef | undefined;
   activeTab: number;
+  isPixiHidden: boolean;
 };

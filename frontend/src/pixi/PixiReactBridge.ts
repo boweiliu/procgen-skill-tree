@@ -134,6 +134,12 @@ export class PixiReactBridge {
   }
 
   baseGameLoop(delta: number) {
+    if (this.props.gameState.playerUI.isPixiHidden) {
+      this.updateSelf(this.props);
+      console.log('skipping update since pixi is not visible');
+      this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
+      return; // skip update loop if pixi is hidden
+    }
     // assume props is up to date
     this.updateSelf(this.props);
     // send props downwards

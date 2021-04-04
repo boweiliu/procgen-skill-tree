@@ -59,6 +59,7 @@ export class GameStateFactory {
       playerUI: {
         selectedPointNode: undefined,
         activeTab: 0,
+        isPixiHidden: true,
       },
       computed: {},
       intent: {

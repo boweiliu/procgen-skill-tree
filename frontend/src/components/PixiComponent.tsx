@@ -10,7 +10,7 @@ import { batchifySetState } from "../lib/util/batchify";
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
-export function PixiComponent(props: { originalSetGameState: Function, hidden?: boolean }) {
+export function PixiComponent(props: { originalSetGameState: Function }) {
   // eslint-disable-next-line
   const [_, gameStateUpdaters]  = useContext(UseGameStateContext);
   const [windowState, setWindowState] = useState<WindowState>({
@@ -39,7 +39,6 @@ export function PixiComponent(props: { originalSetGameState: Function, hidden?: 
         application={application}
         windowState={windowState}
         fireBatchedSetWindowState={fireBatchedSetWindowState}
-        hidden={props.hidden}
       />
     </>
   );

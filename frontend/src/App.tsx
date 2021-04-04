@@ -27,14 +27,14 @@ const initialGameState: Lazy<GameState> = new Lazy(() =>
 
 /**
  * Root react component.
- * In charge of creating game state, and hooking up the game display, pixi display, keyboard control, and window event listeners.
+ * In charge of creating game state, and hooking up the game display, pixi, keyboard control, and window event listeners.
  */
 function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
   });
 
-  let [isPixiHidden, setPixiHidden] = useState(true);
+  // let [isPixiHidden, setPixiHidden] = useState(true);
 
   let [batchedSetGameState, fireBatch] = useMemo(
     () => batchifySetState(setGameState),
@@ -48,7 +48,7 @@ function App() {
   return (
     <div className={classnames({ App: true })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-        <PixiComponent originalSetGameState={setGameState} hidden={isPixiHidden} />
+        <PixiComponent originalSetGameState={setGameState}/>
       </UseGameStateContext.Provider>
 
       <div id="entire-area" style={{ width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -128,7 +128,10 @@ function App() {
       </div>
 
       <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
-        <button style={{ alignSelf: "flex-end" }} onClick={() => { setPixiHidden(!isPixiHidden) }}>
+        <button style={{ alignSelf: "flex-end" }} onClick={() => {
+          // setPixiHidden(!isPixiHidden);
+          updaters.playerUI.isPixiHidden.enqueueUpdate(it => !it);
+        }}>
           Toggle pixi
         </button>
       </div>
