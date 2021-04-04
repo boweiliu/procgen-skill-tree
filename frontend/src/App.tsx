@@ -54,7 +54,7 @@ function App() {
         <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
           <PixiWrapperComponent />
         </UseGameStateContext.Provider>
-        <div id="play-area" hidden={!gameState.playerUI.isPixiHidden} style={{
+        <div id="play-area" style={{
           width: appSize.x,
           height: appSize.y,
           backgroundColor: colorToCss(COLORS.backgroundBlue),
