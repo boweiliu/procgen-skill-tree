@@ -55,6 +55,15 @@ function App() {
     [batchedSetGameState]
   );
 
+  window.onresize = () => {
+    updaters.windowState.enqueueUpdate(old => {
+      console.log("executing window state update in window onresize in app");
+      old.innerWidth = window.innerWidth;
+      old.innerHeight = window.innerHeight;
+      return { ...old };
+    })
+  };
+
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>

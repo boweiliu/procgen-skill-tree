@@ -1,4 +1,4 @@
-import { GameState, PointNodeRef, noIntent } from "../data/GameState";
+import { GameState, PointNodeRef, noIntent, WindowState } from "../data/GameState";
 import { HashSet } from "../lib/util/data_structures/hash";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { assertOnlyCalledOnce } from "../lib/util/misc";
@@ -34,7 +34,13 @@ export class GameStateFactory {
       pointNodeCoord: origin,
     });
 
-    const gameState = {
+    const windowState: WindowState = {
+      orientation: "original",
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+    };
+
+    const gameState: GameState = {
       worldGen: {
         seed: mySeed,
         zLevels: { 0: zLevel },
@@ -60,6 +66,7 @@ export class GameStateFactory {
         newIntent: noIntent,
         endedIntent: noIntent,
       },
+      windowState,
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
     return gameState;

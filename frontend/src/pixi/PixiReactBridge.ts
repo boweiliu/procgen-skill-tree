@@ -98,7 +98,8 @@ export class PixiReactBridge {
   }
 
   updateSelf(props: Props) {
-    this.state.appSize = appSizeFromWindowSize(new Vector2(props.windowState.innerWidth, props.windowState.innerHeight));
+    this.state.appSize = appSizeFromWindowSize(new Vector2(props.gameState.windowState.innerWidth, props.gameState.windowState.innerHeight));
+    // this.state.appSize = appSizeFromWindowSize(new Vector2(props.windowState.innerWidth, props.windowState.innerHeight));
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below

@@ -24,13 +24,14 @@ export function PixiComponent(props: { originalSetGameState: Function, hidden?: 
   // needed to prevent react double-render for some reason (dev mode??)
   const [application, setApplication] = useState(initialApplication.get());
 
-  window.onresize = () => {
-    batchedSetWindowState(old => {
-      old.innerWidth = window.innerWidth;
-      old.innerHeight = window.innerHeight;
-      return { ...old };
-    })
-  };
+  // window.onresize = () => {
+  //   batchedSetWindowState(old => {
+  //     console.log("executing window state update in window onresize in pixicomponent");
+  //     old.innerWidth = window.innerWidth;
+  //     old.innerHeight = window.innerHeight;
+  //     return { ...old };
+  //   })
+  // };
 
   return (
     <>

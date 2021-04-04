@@ -33,6 +33,7 @@ export type GameState = {
   playerUI: PlayerUIState;
   computed: ComputedState;
   intent: PlayerIntentState;
+  windowState: WindowState;
 };
 
 /**
