@@ -49,7 +49,7 @@ function App() {
         <GameAreaComponent hidden={!gameState.playerUI.isPixiHidden} appSize={appSize}/>
       </div>
 
-      <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
+      <div className="pixi-area" >
         <button style={{ zIndex: 300 }} onClick={() => {
           updaters.playerUI.isPixiHidden.enqueueUpdate(it => !it);
         }}>
