@@ -2,22 +2,13 @@ import "./App.css";
 
 import classnames from "classnames";
 import React, { useCallback, useMemo, useState } from "react";
-import { DebugTab } from "./components/DebugTab";
 import { KeyboardListenerComponent } from "./components/KeyboardListenerComponent";
-import { NodeDetail } from "./components/NodeDetail";
-import QuestProgress from "./components/QuestProgress";
-import Sidebar from "./components/Sidebar";
-import TabContent from "./components/TabContent";
-import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
 import { appSizeFromWindowSize, GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
-import { createQuest } from "./game/OnCreateQuest";
 import { batchifySetState } from "./lib/util/batchify";
 import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
-import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./game/EfficiencyCalculator";
-import StatsOverview from "./components/StatsOverview";
 import { WindowListenerComponent } from "./components/WIndowListenerComponent";
 import { PixiWrapperComponent } from "./components/PixiWrapperComponent";
 import { Vector2 } from "./lib/util/geometry/vector2";
@@ -51,14 +42,7 @@ function App() {
   return (
     <div className={classnames({ App: true })}>
 
-      <div id="entire-area" style={{
-        width: "100%",
-        height: "100%",
-        position: "absolute",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
+      <div className="entire-area">
         <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
