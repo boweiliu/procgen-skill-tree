@@ -5,7 +5,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { DebugTab } from "./components/DebugTab";
 import { KeyboardListenerComponent } from "./components/KeyboardListenerComponent";
 import { NodeDetail } from "./components/NodeDetail";
-import { PixiComponent } from "./components/PixiComponent";
 import QuestProgress from "./components/QuestProgress";
 import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
@@ -20,6 +19,7 @@ import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./game/EfficiencyCalculator";
 import StatsOverview from "./components/StatsOverview";
 import { WindowListenerComponent } from "./components/WIndowListenerComponent";
+import { PixiWrapperComponent } from "./components/PixiWrapperComponent";
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -46,7 +46,7 @@ function App() {
   return (
     <div className={classnames({ App: true })}>
       <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-        <PixiComponent originalSetGameState={setGameState}/>
+        <PixiWrapperComponent />
       </UseGameStateContext.Provider>
 
       <div id="entire-area" style={{ width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>

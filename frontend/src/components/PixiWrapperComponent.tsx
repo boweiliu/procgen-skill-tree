@@ -1,12 +1,13 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { UseGameStateContext } from "../contexts";
 import { PixiReactBridge } from "../pixi/PixiReactBridge";
 import { WindowState } from "../data/GameState";
+import { Lazy } from "../lib/util/misc";
 
-export function PixiWrapperComponent(props: {
-  application: PixiReactBridge,
-}) {
-  const { application } = props;
+const initialApplication = new Lazy(() => new PixiReactBridge());
+
+export function PixiWrapperComponent() {
+  const [application, setApplication] = useState(initialApplication.get());
   const container = useRef<HTMLDivElement>(null);
   const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
 
