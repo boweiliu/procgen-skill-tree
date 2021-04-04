@@ -30,8 +30,9 @@ function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
 }
 
 /**
- * TODO(bowei): move the resizing out of this function and into root component,
- * and only handle react/pixi state management in this class
+ * Pixi side of a pixi-react bridge. This class owns a pixi application and receives props updates from react by way of rerender().
+ * Those props updates do not apply immediately but are queued up and apply all at once on the next tick in the baseGameLoop().
+ * Kicks off the pixi component lifecycle handling by updating props on Pixi RootComponent.
  */
 export class PixiReactBridge {
   public app!: Pixi.Application;
@@ -45,6 +46,7 @@ export class PixiReactBridge {
   /**
    * NOTE: for lifecycle convenience, we allow initializing with essentially empty props, and to finish the initialization
    * lazily at the first rerender() call
+   * NOTE: this causes an annoying flash since we don't know the initial window size
    */
   constructor(props?: Props, isSecondConstructorCall: boolean = false) {
     // verify that we are not loading this twice when we expect to load it only once -- bad for performance!!
