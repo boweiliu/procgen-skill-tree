@@ -22,6 +22,7 @@ import { WindowListenerComponent } from "./components/WIndowListenerComponent";
 import { PixiWrapperComponent } from "./components/PixiWrapperComponent";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import COLORS, { colorToCss } from "./pixi/colors";
+import { GameAreaComponent } from "./components/GameAreaComponent";
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -50,10 +51,18 @@ function App() {
   return (
     <div className={classnames({ App: true })}>
 
-      <div id="entire-area" style={{ width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div id="entire-area" style={{
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
         <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-          <PixiWrapperComponent />
+          <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
+        <GameAreaComponent hidden={!gameState.playerUI.isPixiHidden}/>
         <div id="play-area" hidden={!gameState.playerUI.isPixiHidden} style={{
           width: appSize.x,
           height: appSize.y,
