@@ -20,6 +20,7 @@ let COLORS = {
 
   selectedTint: 0xbbbbff,
   allocatedTint: 0x444444,
+  nodeBorder: 0x444444,
   nullTint: 0xffffff,
 
   // colors that dont matter too much

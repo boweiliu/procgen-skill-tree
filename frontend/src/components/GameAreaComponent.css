@@ -15,3 +15,24 @@
       // https://stackoverflow.com/questions/4192847/set-scroll-position
       // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
 */
+
+
+.hex-block {
+    display: flex;
+    float: left;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.hex-block-row {
+    display: block;
+    float: left;
+}
+
+.hex-center {
+    border-style: solid;
+    border-width: 2px;
+    border-color: #444444;
+    border-radius: 50%;
+}
