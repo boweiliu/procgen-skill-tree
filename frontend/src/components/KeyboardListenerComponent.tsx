@@ -35,7 +35,10 @@ const defaultKeyIntentConfig = {
   ">": IntentName.TRAVEL_IN,
 };
 
-export class KeyboardControlComponent extends React.Component<Props, State> {
+/**
+ * Empty react element with listeners for keyboard actions. 
+ */
+export class KeyboardListenerComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {

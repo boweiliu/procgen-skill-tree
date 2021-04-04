@@ -4,7 +4,7 @@ import classnames from "classnames";
 import React, { useCallback, useMemo, useState } from "react";
 import UAParser from "ua-parser-js";
 import { DebugTab } from "./components/DebugTab";
-import { KeyboardControlComponent } from "./components/KeyboardControl";
+import { KeyboardListenerComponent } from "./components/KeyboardListenerComponent";
 import { NodeDetail } from "./components/NodeDetail";
 import { PixiComponent } from "./components/PixiComponent";
 import QuestProgress from "./components/QuestProgress";
@@ -20,6 +20,7 @@ import { Lazy } from "./lib/util/misc";
 import { updaterGenerator2 } from "./lib/util/updaterGenerator";
 import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./game/EfficiencyCalculator";
 import StatsOverview from "./components/StatsOverview";
+import { WindowListenerComponent } from "./components/WIndowListenerComponent";
 
 // TODO(bowei): on mobile, for either ios or android, when in portrait locked orientation, we want to serve a landscape
 // experience - similar to a native app which is landscape locked.
@@ -39,6 +40,10 @@ const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
 );
 
+/**
+ * Root react component.
+ * In charge of creating game state, and hooking up the game display, keyboard control, and window event listeners.
+ */
 function App() {
   const [gameState, setGameState] = useState<GameState>(function factory() {
     return initialGameState.get();
@@ -54,15 +59,6 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-
-  window.onresize = () => {
-    updaters.windowState.enqueueUpdate(old => {
-      console.log("executing window state update in window onresize in app");
-      old.innerWidth = window.innerWidth;
-      old.innerHeight = window.innerHeight;
-      return { ...old };
-    })
-  };
 
   return (
     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
@@ -151,10 +147,12 @@ function App() {
           </button>
         </div>
       
-      <KeyboardControlComponent
+      <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
-      ></KeyboardControlComponent>
+      ></KeyboardListenerComponent>
+      <WindowListenerComponent updaters={updaters.windowState}>
+      </WindowListenerComponent>
     </div>
   );
 }
