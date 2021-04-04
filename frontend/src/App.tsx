@@ -49,8 +49,11 @@ function App() {
         <GameAreaComponent hidden={!gameState.playerUI.isPixiHidden} appSize={appSize}/>
       </div>
 
-      <div className="pixi-area" >
-        <button style={{ zIndex: 300 }} onClick={() => {
+      <div className="debug-overlay">
+        FPS: 1
+      </div>
+      <div className="button-zone" >
+        <button className="button-pixi-toggle" style={{}} onClick={() => {
           updaters.playerUI.isPixiHidden.enqueueUpdate(it => !it);
         }}>
           Toggle pixi

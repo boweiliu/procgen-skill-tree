@@ -37,10 +37,19 @@
   justify-content: center;
 }
 
-.pixi-area {
+.button-zone {
   position: absolute;
   bottom: 0;
   width: 100%;
+  z-index: 300;
+}
+
+.debug-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  /* width: 100%; */
+  z-index: 300;
 }
 
 @keyframes App-logo-spin {
