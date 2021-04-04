@@ -1,7 +1,8 @@
 import {
   HashMap,
 } from "../lib/util/data_structures/hash";
-import { enumKeys } from "../lib/util/misc";
+import { Vector2 } from "../lib/util/geometry/vector2";
+import { Const, enumKeys } from "../lib/util/misc";
 import { PlayerSaveState } from "./PlayerSaveState";
 import { PointNodeRef} from "./PointNodeRef";
 import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
@@ -75,6 +76,16 @@ export type WindowState = {
   innerWidth: number;
   innerHeight: number;
 };
+
+/**
+ * given the dimensions of the entire html window, computes the size of the intended play area -- leaves a 24px border
+ */
+export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
+  return new Vector2({
+    x: Math.min(1920, (window?.x || Infinity) - 24),
+    y: Math.min(1080, (window?.y || Infinity) - 24),
+  });
+}
 
 export type ComputedState = {
   playerResourceAmounts?: { [k in ResourceType]: number };

@@ -27,6 +27,7 @@ let COLORS = {
   tooltipFillWhite: 0xeeeeee,
   white: 0xffffff,
   black: 0x000000,
+  
 };
 
       // baseColor = 0xccee88; // bright yellow green
@@ -38,3 +39,7 @@ let COLORS = {
       // baseColor = 0x777777; // very dark brown
 
 export default COLORS;
+
+export function colorToCss(c: number): string {
+  return "#" + c.toString(16)
+}

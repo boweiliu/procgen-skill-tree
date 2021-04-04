@@ -10,7 +10,7 @@ import Sidebar from "./components/Sidebar";
 import TabContent from "./components/TabContent";
 import Tabs from "./components/Tabs";
 import { UseGameStateContext } from "./contexts";
-import { GameState } from "./data/GameState";
+import { appSizeFromWindowSize, GameState } from "./data/GameState";
 import { GameStateFactory } from "./game/GameStateFactory";
 import { createQuest } from "./game/OnCreateQuest";
 import { batchifySetState } from "./lib/util/batchify";
@@ -20,6 +20,8 @@ import { computeQuestEfficiencyPercent, remapQuestEfficiencyToGrade } from "./ga
 import StatsOverview from "./components/StatsOverview";
 import { WindowListenerComponent } from "./components/WIndowListenerComponent";
 import { PixiWrapperComponent } from "./components/PixiWrapperComponent";
+import { Vector2 } from "./lib/util/geometry/vector2";
+import COLORS, { colorToCss } from "./pixi/colors";
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -43,15 +45,19 @@ function App() {
     [batchedSetGameState]
   );
 
+  let appSize = appSizeFromWindowSize(new Vector2(gameState.windowState.innerWidth, gameState.windowState.innerHeight));
+
   return (
     <div className={classnames({ App: true })}>
-      <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
-        <PixiWrapperComponent />
-      </UseGameStateContext.Provider>
 
       <div id="entire-area" style={{ width: "100%", height: "100%", position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div id="play-area" style={{
-          width: "95%", height: "95%", backgroundColor: "#abcdef",
+        <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
+          <PixiWrapperComponent />
+        </UseGameStateContext.Provider>
+        <div id="play-area" hidden={!gameState.playerUI.isPixiHidden} style={{
+          width: appSize.x,
+          height: appSize.y,
+          backgroundColor: colorToCss(COLORS.backgroundBlue),
           overflowY: "scroll", overflowX: "scroll",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
