@@ -37,7 +37,7 @@ export function PixiWrapperComponent() {
 
   return (
     <>
-      <div ref={container} hidden={gameState.playerUI.isPixiHidden} />
+      <div ref={container} hidden={gameState.playerUI.isPixiHidden} style={{ }} />
     </>
   );
 }

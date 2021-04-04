@@ -54,7 +54,7 @@ function App() {
         <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
           <PixiWrapperComponent />
         </UseGameStateContext.Provider>
-        <div id="play-area" style={{
+        <div id="play-area" hidden={!gameState.playerUI.isPixiHidden} style={{
           width: appSize.x,
           height: appSize.y,
           backgroundColor: colorToCss(COLORS.backgroundBlue),
@@ -132,7 +132,7 @@ function App() {
       </div>
 
       <div id="pixi toggle" style={{ position: "absolute", bottom: 0, width: "100%" }} >
-        <button onClick={() => {
+        <button style={{ zIndex: 300 }} onClick={() => {
           updaters.playerUI.isPixiHidden.enqueueUpdate(it => !it);
         }}>
           Toggle pixi
