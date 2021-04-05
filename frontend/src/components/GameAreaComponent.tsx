@@ -10,10 +10,8 @@ import { appSizeFromWindowSize } from '../data/GameState';
  *
  *
  */
-export function GameAreaComponent(props: {
-  hidden: boolean;
-  appSize: Vector2;
-}) {
+export const GameAreaComponent = React.memo(GameArea);
+function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
   // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
@@ -63,10 +61,17 @@ export function GameAreaComponent(props: {
     if (e.target.scrollleft > props.appSize.x * (virtualGrids - 1.25)) {
       newScrollLeft -= gridWidth * 2;
     }
-    console.log(e.target);
-    console.log(e.target.scrollTop);
-    console.log(e.target.scrollLeft);
-    e.target.scrollTo(newScrollLeft, newScrollTop);
+    // console.log(e.target);
+    // console.log(e.target.scrollTop);
+    // console.log(e.target.scrollLeft);
+
+    if (
+      e.target.scrollTop !== newScrollTop ||
+      e.target.scrollLeft !== newScrollLeft
+    ) {
+      console.log('jump!');
+      e.target.scrollTo(newScrollLeft, newScrollTop);
+    }
   }, []);
 
   /**
@@ -122,7 +127,9 @@ export function GameAreaComponent(props: {
   );
 }
 
-function Row({
+const Row = React.memo(RowComponent);
+
+function RowComponent({
   rowIdx,
   numBlocksPerRow,
   hexCenterStyle,
