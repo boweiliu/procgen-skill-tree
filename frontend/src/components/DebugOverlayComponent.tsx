@@ -28,10 +28,11 @@ function ReactFps() {
   const reactFpsTracker = useRef(new FpsTracker());
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setCounter(it => it + 1);
       reactFpsTracker.current.tick(0);
-    }, 5)
+    }, 5);
+    return () => clearTimeout(timer);
   }, [counter]);
 
   const fpsString = useMemo(() => reactFpsTracker.current.getFpsString(), [counter]);
