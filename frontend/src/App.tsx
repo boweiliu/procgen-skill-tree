@@ -37,14 +37,23 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-
+    /*
   let appSize = appSizeFromWindowSize(
     new Vector2(
       gameState.windowState.innerWidth,
       gameState.windowState.innerHeight
     )
   );
-
+  /*/
+  const appSize = useMemo(() => {
+    return appSizeFromWindowSize(
+      new Vector2(
+        gameState.windowState.innerWidth,
+        gameState.windowState.innerHeight
+      )
+    );
+  }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
+    //*/
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
