@@ -36,12 +36,12 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
   useEffect(() => console.log(`got ${numBlocksPerRow} x ${numPairsOfRows * 2} hex grid`), [numBlocksPerRow, numPairsOfRows]);
 
 /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
-  let makeRow = () => {
+  let makeRow = (rowIdx: number) => {
     return (
       <div className="hex-block-row">
-        {Array(numBlocksPerRow).fill(0).map(() => (
-          <div className="hex-block" style={hexBlockStyle}>
-            <div className="hex-center" style={hexCenterStyle}>
+        {Array(numBlocksPerRow).fill(0).map((it, idx, arr) => (
+          <div id={`hex-block-${rowIdx}-${idx}`} className="hex-block" style={hexBlockStyle}>
+            <div id={`hex-center-${rowIdx}-${idx}`} className="hex-center" style={hexCenterStyle}>
             </div>
           </div>
         ))}
@@ -49,13 +49,13 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
       </div>
     );
   }
-  let makeOffsetRow = () => {
+  let makeOffsetRow = (rowIdx: number) => {
     return (
       <div className="hex-block-row">
         <div className="hex-block" style={hexHalfBlockStyle}> </div>
-        {Array(numBlocksPerRow).fill(0).map(() => (
-          <div className="hex-block" style={hexBlockStyle}>
-            <div className="hex-center" style={hexCenterStyle}>
+        {Array(numBlocksPerRow).fill(0).map((it, idx, arr) => (
+          <div id={`hex-block-${rowIdx}-${idx}`} className="hex-block" style={hexBlockStyle}>
+            <div id={`hex-center-${rowIdx}-${idx}`} className="hex-center" style={hexCenterStyle}>
             </div>
           </div>
         ))}
@@ -72,6 +72,7 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
    * https://developer.mozilla.org/en-US/docs/Web/API/Event/target
    * https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
    * https://stackoverflow.com/questions/55546973/react-onmouseenter-event-triggering-on-child-element
+   * https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
    */
   return (
     <div className="game-area" hidden={props.hidden} style={{
@@ -87,10 +88,10 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
       }} onClick={(e: React.MouseEvent) => {
         console.log(e);
       }}>
-        {Array(numPairsOfRows).fill(0).map(() => (
+        {Array(numPairsOfRows).fill(0).map((it, idx, arr) => (
           <>
-            {makeRow()}
-            {makeOffsetRow()}
+            {makeRow(idx * 2)}
+            {makeOffsetRow(idx * 2 + 1)}
           </>
         ))}
       </div>
