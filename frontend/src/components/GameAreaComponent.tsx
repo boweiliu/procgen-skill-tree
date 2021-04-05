@@ -62,6 +62,17 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
       </div>
     );
   }
+  /**
+   * See pointer/mouse, over/enter/out/leave, event propagation documentation
+   * https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_event_mouseenter_mouseover#:~:text=mouseenter%20and%20mouseover.-,The%20mouseover%20event%20triggers%20when%20the%20mouse%20pointer%20enters%20the,moved%20over%20the%20div%20element.
+   * https://stackoverflow.com/questions/4697758/prevent-onmouseout-when-hovering-child-element-of-the-parent-absolute-div-withou
+   * https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
+   * https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Examples#example_5_event_propagation
+   * https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation
+   * https://developer.mozilla.org/en-US/docs/Web/API/Event/target
+   * https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+   * https://stackoverflow.com/questions/55546973/react-onmouseenter-event-triggering-on-child-element
+   */
   return (
     <div className="game-area" hidden={props.hidden} style={{
       width: props.appSize.x,
@@ -71,6 +82,10 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
       <div className="virtual-game-area" style={{
         width: virtualAreaSize.x,
         height: virtualAreaSize.y,
+      }} onPointerOver={(e: React.PointerEvent) => {
+        console.log(e);
+      }} onClick={(e: React.MouseEvent) => {
+        console.log(e);
       }}>
         {Array(numPairsOfRows).fill(0).map(() => (
           <>
