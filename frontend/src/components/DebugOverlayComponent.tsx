@@ -8,6 +8,9 @@ import { FpsTracker } from "../lib/util/fpsTracker";
 import { WindowState } from "../data/GameState";
 
 
+/**
+ * Small overlay in the top left which displays window dimensions and fps.
+ */
 export function DebugOverlayComponent(props: { tick: number, windowState: WindowState }) {
   const pixiFpsTracker = useRef(new FpsTracker());
   useEffect(() => {

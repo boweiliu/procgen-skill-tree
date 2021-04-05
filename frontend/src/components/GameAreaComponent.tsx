@@ -4,6 +4,7 @@ import classnames from "classnames";
 import React, { useCallback, useMemo, useState } from "react";
 import COLORS, { colorToCss } from "../pixi/colors";
 import { Vector2 } from "../lib/util/geometry/vector2";
+import { appSizeFromWindowSize } from "../data/GameState";
 
 
 /**
@@ -14,24 +15,28 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
   // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
-  let gridWidth = 268;
-  let gridHeight = 232;
+  const gridWidth = 268;
+  const gridHeight = 232;
 
-  let hexCenterRadius = 20;
-  let hexBlockStyle = { width: gridWidth + "px", height: gridHeight + "px" };
-  let hexHalfBlockStyle = { width: gridWidth/2 + "px", height: gridHeight + "px" };
-  let hexCenterStyle = {
+  const hexCenterRadius = 20;
+  const hexBlockStyle = { width: gridWidth + "px", height: gridHeight + "px" };
+  const hexHalfBlockStyle = { width: gridWidth/2 + "px", height: gridHeight + "px" };
+  const hexCenterStyle = {
     width: (hexCenterRadius * 2) + "px",
     height: (hexCenterRadius * 2) + "px",
     backgroundColor: colorToCss(COLORS.nodePink),
     borderColor: colorToCss(COLORS.nodeBorder),
   }
 
+  // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
+  const virtualAreaSize = props.appSize.multiply(2);
+  const numBlocksPerRow = Math.floor((virtualAreaSize.x / gridWidth) - 0.5);
+
 /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   let makeRow = () => {
     return (
       <div className="hex-block-row">
-        {Array(13).fill(0).map(() => (
+        {Array(numBlocksPerRow).fill(0).map(() => (
           <div className="hex-block" style={hexBlockStyle}>
             <div className="hex-center" style={hexCenterStyle}>
             </div>
@@ -45,7 +50,7 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
     return (
       <div className="hex-block-row">
         <div className="hex-block" style={hexHalfBlockStyle}> </div>
-        {Array(13).fill(0).map(() => (
+        {Array(numBlocksPerRow).fill(0).map(() => (
           <div className="hex-block" style={hexBlockStyle}>
             <div className="hex-center" style={hexCenterStyle}>
             </div>
