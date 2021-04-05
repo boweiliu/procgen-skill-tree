@@ -31,6 +31,7 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
   // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
   const virtualAreaSize = props.appSize.multiply(2);
   const numBlocksPerRow = Math.floor((virtualAreaSize.x / gridWidth) - 0.5);
+  const numPairsOfRows = Math.floor(virtualAreaSize.y / gridHeight / 2);
 
 /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   let makeRow = () => {
@@ -65,17 +66,16 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
       height: props.appSize.y,
       backgroundColor: colorToCss(COLORS.backgroundBlue),
     }}>
-      <div className="virtual-game-area" style={{ width: "200%", height: "200%" }}> 
-        {makeRow()}
-        {makeOffsetRow()}
-        {makeRow()}
-        {makeOffsetRow()}
-        {makeRow()}
-        {makeOffsetRow()}
-        {makeRow()}
-        {makeOffsetRow()}
-        {makeRow()}
-        {makeOffsetRow()}
+      <div className="virtual-game-area" style={{
+        width: virtualAreaSize.x,
+        height: virtualAreaSize.y,
+      }}>
+        {Array(numPairsOfRows).fill(0).map(() => (
+          <>
+            {makeRow()}
+            {makeOffsetRow()}
+          </>
+        ))}
       </div>
     </div>
   );
