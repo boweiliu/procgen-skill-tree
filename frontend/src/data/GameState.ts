@@ -29,6 +29,7 @@ export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType } from "./W
  * That data should belong in state owned by subcomponents.
  */
 export type GameState = {
+  tick: number;
   worldGen: WorldGenState;
   playerSave: PlayerSaveState;
   playerUI: PlayerUIState;

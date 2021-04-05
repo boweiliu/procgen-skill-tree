@@ -41,6 +41,7 @@ export class GameStateFactory {
     };
 
     const gameState: GameState = {
+      tick: 0,
       worldGen: {
         seed: mySeed,
         zLevels: { 0: zLevel },

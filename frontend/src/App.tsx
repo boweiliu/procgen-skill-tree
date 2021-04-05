@@ -14,6 +14,7 @@ import { PixiWrapperComponent } from "./components/PixiWrapperComponent";
 import { Vector2 } from "./lib/util/geometry/vector2";
 import COLORS, { colorToCss } from "./pixi/colors";
 import { GameAreaComponent } from "./components/GameAreaComponent";
+import { DebugOverlayComponent } from "./components/DebugOverlayComponent";
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -50,7 +51,7 @@ function App() {
       </div>
 
       <div className="debug-overlay">
-        FPS: 1
+        <DebugOverlayComponent tick={gameState.tick} windowState={gameState.windowState} />
       </div>
       <div className="button-zone" >
         <button className="button-pixi-toggle" style={{}} onClick={() => {

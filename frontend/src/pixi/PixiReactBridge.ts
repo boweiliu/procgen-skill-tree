@@ -100,12 +100,14 @@ export class PixiReactBridge {
 
   updateSelf(props: Props) {
     this.state.appSize = appSizeFromWindowSize(new Vector2(props.gameState.windowState.innerWidth, props.gameState.windowState.innerHeight));
+    // console.log({ tick: props.gameState.tick });
+    props.updaters.tick.enqueueUpdate((it) => it + 1);
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   // props should be a referentially distinct object from props the last time this was called
   rerender(props: Props) {
-    console.log("base app rerender called", { playerUI: props.gameState.playerUI });
+    // console.log("base app rerender called", { playerUI: props.gameState.playerUI });
     this.props = props;
     if (!this.rootComponent) {
       // finish initialization
@@ -124,7 +126,7 @@ export class PixiReactBridge {
       this.renderSelf(this.props);
 
       // test
-      createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+      // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
       this.didMount();
     }
   }
