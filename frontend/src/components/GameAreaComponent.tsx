@@ -1,7 +1,7 @@
 import "./GameAreaComponent.css"
 
 import classnames from "classnames";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import COLORS, { colorToCss } from "../pixi/colors";
 import { Vector2 } from "../lib/util/geometry/vector2";
 import { appSizeFromWindowSize } from "../data/GameState";
@@ -33,6 +33,7 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
   // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
   const numBlocksPerRow = Math.floor((virtualAreaSize.x / gridWidth) - 0.5);
   const numPairsOfRows = Math.floor(virtualAreaSize.y / gridHeight / 2);
+  useEffect(() => console.log(`got ${numBlocksPerRow} x ${numPairsOfRows * 2} hex grid`), [numBlocksPerRow, numPairsOfRows]);
 
 /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   let makeRow = () => {
