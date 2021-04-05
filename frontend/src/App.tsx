@@ -8,7 +8,10 @@ import { appSizeFromWindowSize, GameState } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';
 import { batchifySetState } from './lib/util/batchify';
 import { Lazy } from './lib/util/misc';
-import { updaterGenerator2 } from './lib/util/updaterGenerator';
+import {
+  updaterGenerator2,
+  UpdaterGeneratorType2,
+} from './lib/util/updaterGenerator';
 import { WindowListenerComponent } from './components/WIndowListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
 import { Vector2 } from './lib/util/geometry/vector2';
@@ -37,7 +40,7 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-    /*
+  /*
   let appSize = appSizeFromWindowSize(
     new Vector2(
       gameState.windowState.innerWidth,
@@ -53,11 +56,18 @@ function App() {
       )
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
-    //*/
+  //*/
+  const gameStateContextValue = useMemo(() => {
+    return [gameState, updaters, fireBatch] as [
+      GameState,
+      UpdaterGeneratorType2<GameState, GameState>,
+      () => void
+    ];
+  }, [gameState, updaters, fireBatch]);
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
-        <UseGameStateContext.Provider value={[gameState, updaters, fireBatch]}>
+        <UseGameStateContext.Provider value={gameStateContextValue}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
         <GameAreaComponent
