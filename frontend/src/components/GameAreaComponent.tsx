@@ -28,8 +28,9 @@ export function GameAreaComponent(props: { hidden: boolean, appSize: Vector2 }) 
     borderColor: colorToCss(COLORS.nodeBorder),
   }
 
+  // 200% - 120 FPS; 300% - 75 FPS; 500% - 30 FPS
+  const virtualAreaSize = props.appSize.multiply(3);
   // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
-  const virtualAreaSize = props.appSize.multiply(2);
   const numBlocksPerRow = Math.floor((virtualAreaSize.x / gridWidth) - 0.5);
   const numPairsOfRows = Math.floor(virtualAreaSize.y / gridHeight / 2);
 
