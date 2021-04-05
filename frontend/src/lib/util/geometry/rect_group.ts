@@ -1,6 +1,5 @@
-import { Rect } from "./rect";
-import { Vector2 } from "./vector2";
-
+import { Rect } from './rect';
+import { Vector2 } from './vector2';
 
 export class RectGroup {
   private _rects: Rect[];
@@ -38,13 +37,13 @@ export class RectGroup {
   }
 
   add(delta: Vector2): RectGroup {
-    const newRects = this._rects.map(rect => rect.add(delta));
+    const newRects = this._rects.map((rect) => rect.add(delta));
 
     return new RectGroup(newRects);
   }
 
   subtract(delta: Vector2): RectGroup {
-    const newRects = this._rects.map(rect => rect.subtract(delta));
+    const newRects = this._rects.map((rect) => rect.subtract(delta));
 
     return new RectGroup(newRects);
   }

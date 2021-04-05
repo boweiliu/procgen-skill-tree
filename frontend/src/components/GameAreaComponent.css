@@ -35,7 +35,7 @@
   border-radius: 50%;
 }
 
-.hex-center:hover>.hover-only {
+.hex-center:hover > .hover-only {
   display: block;
 }
 .hover-only {

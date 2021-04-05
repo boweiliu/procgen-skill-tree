@@ -1,8 +1,8 @@
-import React from "react";
-import { PointNodeRef, ResourceType, WorldGenState } from "../data/GameState";
-import { NodeType } from "../data/WorldGenState";
-import { canAllocate } from "../game/Neighbors";
-import { HashSet } from "../lib/util/data_structures/hash";
+import React from 'react';
+import { PointNodeRef, ResourceType, WorldGenState } from '../data/GameState';
+import { NodeType } from '../data/WorldGenState';
+import { canAllocate } from '../game/Neighbors';
+import { HashSet } from '../lib/util/data_structures/hash';
 
 type Props = {
   selectedPointNode?: PointNodeRef;
@@ -33,9 +33,9 @@ function NodeDetailComponent({
     selectedPointNode,
     worldGen,
     allocatedPointNodeSet,
-    hasActiveQuest,
+    hasActiveQuest
   );
-  let nodeDescription: string = "Nothing (empty node)";
+  let nodeDescription: string = 'Nothing (empty node)';
   if (pointNodeGen.nodeType !== NodeType.Nothing) {
     nodeDescription = `${pointNodeGen.resourceAmount} ${pointNodeGen.resourceModifier} ${pointNodeGen.resourceType}`;
   }
@@ -44,11 +44,13 @@ function NodeDetailComponent({
       <h3>Node contents</h3>
       <div> {nodeDescription} </div>
       <h3>Allocated?</h3>
-      {isAllocated ? "yes" : "no"}
-      {isAllocated ? (<></>) : (
+      {isAllocated ? 'yes' : 'no'}
+      {isAllocated ? (
+        <></>
+      ) : (
         <>
           <h3>Can be allocated?</h3>
-          {canBeAllocated === "yes" ? canBeAllocated : "no, " + canBeAllocated}
+          {canBeAllocated === 'yes' ? canBeAllocated : 'no, ' + canBeAllocated}
         </>
       )}
     </>

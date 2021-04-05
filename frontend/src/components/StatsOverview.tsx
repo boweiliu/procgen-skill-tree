@@ -1,9 +1,17 @@
-import "./StatsOverview.css";
+import './StatsOverview.css';
 
-import classnames from "classnames";
-import React, { useState } from "react";
-import { GameState, PointNodeRef, Quest, ResourceModifier, ResourceNontrivialType, ResourceType, ResourceTypeAndModifier } from "../data/GameState";
-import { HashMap, HashSet } from "../lib/util/data_structures/hash";
+import classnames from 'classnames';
+import React, { useState } from 'react';
+import {
+  GameState,
+  PointNodeRef,
+  Quest,
+  ResourceModifier,
+  ResourceNontrivialType,
+  ResourceType,
+  ResourceTypeAndModifier,
+} from '../data/GameState';
+import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 
 type Props = {
   playerResourceAmounts?: { [k in ResourceType]: number };
@@ -29,40 +37,36 @@ function StatsOverviewComponent({
       <br></br>
       <table className={classnames({ table: true })}>
         <tr>
+          <td>Flat</td>
           <td>
-            Flat
-                </td>
-          <td>
-            +{playerResourceNodesAggregated?.get(
-              new ResourceTypeAndModifier({ type: resourceType, modifier: ResourceModifier.Flat })
+            +
+            {playerResourceNodesAggregated?.get(
+              new ResourceTypeAndModifier({
+                type: resourceType,
+                modifier: ResourceModifier.Flat,
+              })
             ) || 0}
           </td>
         </tr>
         <tr>
-          <td>
-            % increased
-                </td>
+          <td>% increased</td>
           <td>
             {playerResourceNodesAggregated?.get(
-              new ResourceTypeAndModifier({ type: resourceType, modifier: ResourceModifier.Increased0 })
-            ) || 0}{'%'}
+              new ResourceTypeAndModifier({
+                type: resourceType,
+                modifier: ResourceModifier.Increased0,
+              })
+            ) || 0}
+            {'%'}
           </td>
         </tr>
         <tr>
-          <td>
-            Total
-                </td>
-          <td>
-            {playerResourceAmounts?.[resourceType]}
-          </td>
+          <td>Total</td>
+          <td>{playerResourceAmounts?.[resourceType]}</td>
         </tr>
         <tr>
-          <td>
-            SP spent
-                </td>
-          <td>
-            {allocatedPointNodeSet.size()}
-          </td>
+          <td>SP spent</td>
+          <td>{allocatedPointNodeSet.size()}</td>
         </tr>
       </table>
     </>

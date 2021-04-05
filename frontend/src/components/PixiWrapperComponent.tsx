@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { UseGameStateContext } from "../contexts";
-import { PixiReactBridge } from "../pixi/PixiReactBridge";
-import { WindowState } from "../data/GameState";
-import { Lazy } from "../lib/util/misc";
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { UseGameStateContext } from '../contexts';
+import { PixiReactBridge } from '../pixi/PixiReactBridge';
+import { WindowState } from '../data/GameState';
+import { Lazy } from '../lib/util/misc';
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
 
@@ -10,10 +10,12 @@ const initialApplication = new Lazy(() => new PixiReactBridge());
  * React side of a pixi-react bridge. This react component owns the div which own the canvas element,
  * and send rerender props updates to pixi application when react causes state to be updated.
  */
-export function PixiWrapperComponent(props: {hidden: boolean}) {
+export function PixiWrapperComponent(props: { hidden: boolean }) {
   const [application, setApplication] = useState(initialApplication.get());
   const container = useRef<HTMLDivElement>(null);
-  const [gameState, gameStateUpdaters, fireBatchedSetGameState]  = useContext(UseGameStateContext);
+  const [gameState, gameStateUpdaters, fireBatchedSetGameState] = useContext(
+    UseGameStateContext
+  );
 
   useEffect(() => {
     // remove old application if it exists
@@ -24,20 +26,19 @@ export function PixiWrapperComponent(props: {hidden: boolean}) {
     container.current!.appendChild(application.app.view);
   }, [application]);
 
-
   // Trigger component render on first load and also when game state is updated
   application.rerender({
     args: {
-      fireBatch: fireBatchedSetGameState, 
+      fireBatch: fireBatchedSetGameState,
       isSecondConstructorCall: false,
     },
     updaters: gameStateUpdaters,
     gameState,
-  })
+  });
 
   return (
     <>
-      <div ref={container} hidden={props.hidden} style={{ }} />
+      <div ref={container} hidden={props.hidden} style={{}} />
     </>
   );
 }

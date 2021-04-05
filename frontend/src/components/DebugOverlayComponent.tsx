@@ -1,29 +1,39 @@
-import "./DebugOverlayComponent.css"
+import './DebugOverlayComponent.css';
 
-import classnames from "classnames";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import COLORS, { colorToCss } from "../pixi/colors";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { FpsTracker } from "../lib/util/fpsTracker";
-import { WindowState } from "../data/GameState";
-
+import classnames from 'classnames';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import COLORS, { colorToCss } from '../pixi/colors';
+import { Vector2 } from '../lib/util/geometry/vector2';
+import { FpsTracker } from '../lib/util/fpsTracker';
+import { WindowState } from '../data/GameState';
 
 /**
  * Small overlay in the top left which displays window dimensions and fps.
  */
-export function DebugOverlayComponent(props: { tick: number, windowState: WindowState }) {
+export function DebugOverlayComponent(props: {
+  tick: number;
+  windowState: WindowState;
+}) {
   const pixiFpsTracker = useRef(new FpsTracker());
   useEffect(() => {
     pixiFpsTracker.current.tick(0);
-  }, [props.tick])
+  }, [props.tick]);
 
   return (
-    <div className='text'>
-      <div>{props.windowState.innerWidth}x{props.windowState.innerHeight}</div>
+    <div className="text">
+      <div>
+        {props.windowState.innerWidth}x{props.windowState.innerHeight}
+      </div>
       <ReactFps />
       <div>UPS: {pixiFpsTracker.current.getFpsString()}</div>
     </div>
-  )
+  );
 }
 
 function ReactFps() {
@@ -32,14 +42,15 @@ function ReactFps() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCounter(it => it + 1);
+      setCounter((it) => it + 1);
       reactFpsTracker.current.tick(0);
     }, 5);
     return () => clearTimeout(timer);
   }, [counter]);
 
-  const fpsString = useMemo(() => reactFpsTracker.current.getFpsString(), [counter]);
+  const fpsString = useMemo(() => reactFpsTracker.current.getFpsString(), [
+    counter,
+  ]);
 
-  return (<div>RPS: {fpsString}</div>);
-
+  return <div>RPS: {fpsString}</div>;
 }

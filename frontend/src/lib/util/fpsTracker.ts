@@ -1,4 +1,3 @@
-
 const logRowsToKeep: number = 60; // last 1 seconds, at 60 fps
 
 /**
@@ -17,24 +16,28 @@ export class FpsTracker {
    * @param ticksSinceLastUpdate should be the delta in ticks since the last update - will probably be a decimal close to 1
    */
   public tick(ticksSinceLastUpdate: number) {
-    let lastFrameTime = this.frameTimestampsInTicks[this.frameTimestampsInTicks.length - 1];
+    let lastFrameTime = this.frameTimestampsInTicks[
+      this.frameTimestampsInTicks.length - 1
+    ];
     this.frameTimestampsInTicks.push(lastFrameTime + ticksSinceLastUpdate);
-    
+
     // rotate logs
     if (this.frameTimestampsInTicks.length > logRowsToKeep + 60) {
       this.frameTimestampsInTicks = this.frameTimestampsInTicks.slice(60);
     }
 
     // do the same but track real time
-    this.frameTimestampsInTime.push((new Date()).getTime());
+    this.frameTimestampsInTime.push(new Date().getTime());
     if (this.frameTimestampsInTime.length > logRowsToKeep + 60) {
       this.frameTimestampsInTime = this.frameTimestampsInTime.slice(60);
     }
   }
 
   // [0, 3, 4] -> 30 fps
-  public getUps() : number {
-    let ticksDiff = this.frameTimestampsInTicks[this.frameTimestampsInTicks.length - 1] - this.frameTimestampsInTicks[0];
+  public getUps(): number {
+    let ticksDiff =
+      this.frameTimestampsInTicks[this.frameTimestampsInTicks.length - 1] -
+      this.frameTimestampsInTicks[0];
     let framesDiff = this.frameTimestampsInTicks.length - 1;
 
     let framesPerTick = framesDiff / ticksDiff;
@@ -46,7 +49,9 @@ export class FpsTracker {
   }
 
   public getFps(): number {
-    let timeDiff = this.frameTimestampsInTime[this.frameTimestampsInTime.length - 1] - this.frameTimestampsInTime[0];
+    let timeDiff =
+      this.frameTimestampsInTime[this.frameTimestampsInTime.length - 1] -
+      this.frameTimestampsInTime[0];
     let framesDiff = this.frameTimestampsInTime.length - 1;
 
     let framesPerMilli = framesDiff / timeDiff;

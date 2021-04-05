@@ -1,6 +1,6 @@
-import { HashSet } from "../lib/util/data_structures/hash";
-import { PointNodeRef } from "./PointNodeRef";
-import { ResourceType } from "./WorldGenState";
+import { HashSet } from '../lib/util/data_structures/hash';
+import { PointNodeRef } from './PointNodeRef';
+import { ResourceType } from './WorldGenState';
 
 export type PlayerSaveState = {
   activeQuest: Quest | undefined;

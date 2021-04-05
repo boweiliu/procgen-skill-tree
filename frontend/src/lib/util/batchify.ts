@@ -1,24 +1,30 @@
 /**
- * 
+ *
  * @param fn an arbitrary callback which performs some operation with side effects.
- * @returns a tuple: [batchedFn, fireBatch]. 
+ * @returns a tuple: [batchedFn, fireBatch].
  * batchedFn takes the same arguments as fn, but the side effects are delayed until fireBatch is called.
  * if batchedFn is called multiple times, those invocations are stored in order, and then popped off in order when fireBatch is called.
  */
-export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: A) => void), () => void] {
+export function batchify<A extends any[]>(
+  fn: (...args: A) => void
+): [(...args: A) => void, () => void] {
   let batch: A[] = [];
 
-  return [(...args: A) => {
-    batch.push(args);
-    // console.log({ stack: new Error().stack, batchSize: batch.length });
-    // console.log({ batchSize: batch.length });
-  }, (() => {
-      if (batch.length !== 0) { console.log({ fired: batch.length }); }
+  return [
+    (...args: A) => {
+      batch.push(args);
+      // console.log({ stack: new Error().stack, batchSize: batch.length });
+      // console.log({ batchSize: batch.length });
+    },
+    () => {
+      if (batch.length !== 0) {
+        console.log({ fired: batch.length });
+      }
       for (let a of batch) {
         fn(...a);
       }
       batch = [];
-    })
+    },
   ];
 }
 
@@ -29,13 +35,15 @@ export function batchify<A extends any[]>(fn: (...args: A)=> void): [((...args: 
  */
 export function batchifySetState<T>(
   fn: (arg: T) => void
-): [((arg: T) => void), () => void] {
+): [(arg: T) => void, () => void] {
   let batch: T[] = [];
 
-  return [(arg: T) => {
-    batch.push(arg);
-    // console.log({ batchSize: batch.length });
-  }, (() => {
+  return [
+    (arg: T) => {
+      batch.push(arg);
+      // console.log({ batchSize: batch.length });
+    },
+    () => {
       if (batch.length === 0) {
         return;
       }
@@ -53,6 +61,6 @@ export function batchifySetState<T>(
         }
         return next;
       });
-  })]
+    },
+  ];
 }
-

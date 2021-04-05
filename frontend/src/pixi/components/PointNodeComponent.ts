@@ -1,49 +1,55 @@
-import * as Pixi from "pixi.js";
-import { RenderedChunkConstants } from "./ChunkComponent";
-import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { GameState, PointNodeGen, PointNodeRef, ResourceModifier, ResourceType } from "../../data/GameState";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { multiplyColor } from "../../lib/util/misc";
-import { TooltippableAreaComponent } from "./TooltippableAreaComponent";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
-import { selectOrReselectNode } from "../../game/OnSelectOrReselectNode";
-import { RootComponentState } from "./RootComponent";
-import { PointNodeTextureSet } from "../textures/PointNodeTexture";
-import COLORS from "../colors";
-import { NodeType, ResourceNontrivialType } from "../../data/WorldGenState";
+import * as Pixi from 'pixi.js';
+import { RenderedChunkConstants } from './ChunkComponent';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import {
+  GameState,
+  PointNodeGen,
+  PointNodeRef,
+  ResourceModifier,
+  ResourceType,
+} from '../../data/GameState';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { multiplyColor } from '../../lib/util/misc';
+import { TooltippableAreaComponent } from './TooltippableAreaComponent';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
+import { selectOrReselectNode } from '../../game/OnSelectOrReselectNode';
+import { RootComponentState } from './RootComponent';
+import { PointNodeTextureSet } from '../textures/PointNodeTexture';
+import COLORS from '../colors';
+import { NodeType, ResourceNontrivialType } from '../../data/WorldGenState';
 
 type Props = {
-  delta: number,
+  delta: number;
   args: {
-    pointNodeTexture: PointNodeTextureSet,
-    position: Vector2,
-    markForceUpdate: (childInstance: any) => void,
-  },
-  selfPointNodeRef: PointNodeRef,
-  updaters: UpdaterGeneratorType2<GameState>,
-  tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'],
-  pointNodeGen: PointNodeGen,
-  isSelected: boolean,
-  isAllocated: boolean
+    pointNodeTexture: PointNodeTextureSet;
+    position: Vector2;
+    markForceUpdate: (childInstance: any) => void;
+  };
+  selfPointNodeRef: PointNodeRef;
+  updaters: UpdaterGeneratorType2<GameState>;
+  tooltipUpdaters: UpdaterGeneratorType2<RootComponentState>['tooltip'];
+  pointNodeGen: PointNodeGen;
+  isSelected: boolean;
+  isAllocated: boolean;
 };
 
 type State = {
-  numClicks: number // debug
+  numClicks: number; // debug
   descriptionText: string;
-}
+};
 
 class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
 
-  public sprite: Pixi.Sprite
+  public sprite: Pixi.Sprite;
   public halfwayCenterSprite: Pixi.Sprite;
   public centerSprite: Pixi.Sprite;
   public topHalfSprite: Pixi.Sprite;
   public hitArea: Pixi.IHitArea;
 
-  public tooltippableArea?: TooltippableAreaComponent
+  public tooltippableArea?: TooltippableAreaComponent;
 
   constructor(props: Props) {
     super(props);
@@ -55,7 +61,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.container = new Pixi.Container();
 
     let defaultTexture = props.args.pointNodeTexture.find((it) => {
-      return (it.cropFraction >= 0.990);
+      return it.cropFraction >= 0.99;
     })?.texture;
     this.container.sortableChildren = true;
     this.sprite = new Pixi.Sprite(defaultTexture);
@@ -64,9 +70,11 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     this.sprite.zIndex = -2;
     this.container.addChild(this.sprite);
 
-    this.topHalfSprite = new Pixi.Sprite(props.args.pointNodeTexture.find((it) => {
-      return(it.cropFraction >= 0.499);
-    })?.texture);
+    this.topHalfSprite = new Pixi.Sprite(
+      props.args.pointNodeTexture.find((it) => {
+        return it.cropFraction >= 0.499;
+      })?.texture
+    );
     this.topHalfSprite.anchor.x = 0.5;
     this.topHalfSprite.anchor.y = 0.5;
     this.topHalfSprite.zIndex = -1;
@@ -78,7 +86,12 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
 
     const mask = new Pixi.Graphics();
     mask.beginFill(COLORS.black);
-    mask.drawRect(0, 0, this.topHalfSprite.width, this.topHalfSprite.height /2);
+    mask.drawRect(
+      0,
+      0,
+      this.topHalfSprite.width,
+      this.topHalfSprite.height / 2
+    );
     mask.pivot.x = this.topHalfSprite.width / 2;
     mask.pivot.y = this.topHalfSprite.height / 2;
     mask.zIndex = 30;
@@ -106,10 +119,10 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     // NOTE(bowei): ive tested, the following 2 settings don't significantly affect FPS
     this.container.buttonMode = true;
     this.hitArea = new Pixi.Rectangle(
-      - RenderedChunkConstants.NODE_HITAREA_PX / 2,
-      - RenderedChunkConstants.NODE_HITAREA_PX / 2,
+      -RenderedChunkConstants.NODE_HITAREA_PX / 2,
+      -RenderedChunkConstants.NODE_HITAREA_PX / 2,
       RenderedChunkConstants.NODE_HITAREA_PX,
-      RenderedChunkConstants.NODE_HITAREA_PX,
+      RenderedChunkConstants.NODE_HITAREA_PX
     );
     // note: hitarea breaks child onhover: https://github.com/pixijs/pixi.js/issues/5837
     this.container.hitArea = this.hitArea;
@@ -137,7 +150,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected updateSelf(props: Props) {
-    let nodeDescription: string = "Nothing (empty node)";
+    let nodeDescription: string = 'Nothing (empty node)';
     if (props.pointNodeGen.nodeType === NodeType.EfficiencyGate) {
       nodeDescription = `Unlocks at 300 Mana0 in 14 or fewer allocations`; // TODO
     } else if (props.pointNodeGen.nodeType !== NodeType.Nothing) {
@@ -169,11 +182,14 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     } else if (props.pointNodeGen.nodeType === NodeType.EfficiencyGate) {
       baseColor = COLORS.nodeAqua; // bg color = abcdef
       topHalfColor = multiplyColor(COLORS.nodeAqua, COLORS.gateTint); // grayish white
-
-    } else if (props.pointNodeGen.resourceType === ResourceNontrivialType.Mana0) {
+    } else if (
+      props.pointNodeGen.resourceType === ResourceNontrivialType.Mana0
+    ) {
       if (props.pointNodeGen.resourceModifier === ResourceModifier.Flat) {
         baseColor = COLORS.nodePink;
-      } else if (props.pointNodeGen.resourceModifier === ResourceModifier.Increased0) {
+      } else if (
+        props.pointNodeGen.resourceModifier === ResourceModifier.Increased0
+      ) {
         baseColor = COLORS.nodeLavender;
       }
     }
@@ -199,8 +215,8 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     // TESTING
     let textureToFind = Math.floor(Math.random() * 9) / 8 - 0.001;
     this.topHalfSprite.texture = props.args.pointNodeTexture.find(
-      (it) => (it.cropFraction >= textureToFind)
-    )?.texture!
+      (it) => it.cropFraction >= textureToFind
+    )?.texture!;
 
     // NOTE(bowei): careful, we dont want to set the scale of our tooltip to be bigger
     if (props.selfPointNodeRef.pointNodeCoord.equals(Vector2.Zero)) {
@@ -208,9 +224,16 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
-  protected shouldUpdate(staleProps: Props, staleState: State, props: Props, state: State): boolean {
-    for (let key of (Object.keys(staleProps) as (keyof Props)[])) {
-      if (key === 'delta' || key === 'args' || key === 'updaters') { continue; }
+  protected shouldUpdate(
+    staleProps: Props,
+    staleState: State,
+    props: Props,
+    state: State
+  ): boolean {
+    for (let key of Object.keys(staleProps) as (keyof Props)[]) {
+      if (key === 'delta' || key === 'args' || key === 'updaters') {
+        continue;
+      }
       if (staleProps[key] !== props[key]) {
         console.log(`node shouldUpdate differed in ${key}, returning true`);
         return true;
@@ -230,35 +253,49 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   protected didMount() {
     const { updaters } = this._staleProps; // we assume this will never change
 
-//     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
-//       this.state.pointerover = event;
-//     })
-//     this.container.addListener('pointerout', () => {
-//       this.state.pointerover = undefined;
-//     })
-// 
+    //     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
+    //       this.state.pointerover = event;
+    //     })
+    //     this.container.addListener('pointerout', () => {
+    //       this.state.pointerover = undefined;
+    //     })
+    //
 
-    this.container.addListener("pointerdown", (event: Pixi.InteractionEvent) => {
-      this._staleProps.args.markForceUpdate(this);
-      this.state.numClicks++;
-      selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
-      // event.stopPropagation();
-    });
+    this.container.addListener(
+      'pointerdown',
+      (event: Pixi.InteractionEvent) => {
+        this._staleProps.args.markForceUpdate(this);
+        this.state.numClicks++;
+        selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
+        // event.stopPropagation();
+      }
+    );
 
-    this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
-      // this._staleProps.args.markForceUpdate(this);
+    this.container.addListener(
+      'pointerover',
+      (event: Pixi.InteractionEvent) => {
+        // this._staleProps.args.markForceUpdate(this);
 
-      // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
-      const localPosition = event.data.getLocalPosition(this.container);
-      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
-      // const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
+        // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
+        const localPosition = event.data.getLocalPosition(this.container);
+        const position = new Vector2(
+          this.container.worldTransform.tx,
+          this.container.worldTransform.ty
+        );
+        // const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
 
-      this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
-        const next = { ...prev, visible: true, text: this.state.descriptionText, position: position.add(localPosition) };
-        // console.log({ next });
-        return next;
-      })
-    });
+        this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
+          const next = {
+            ...prev,
+            visible: true,
+            text: this.state.descriptionText,
+            position: position.add(localPosition),
+          };
+          // console.log({ next });
+          return next;
+        });
+      }
+    );
 
     this.container.addListener('pointerout', (event: Pixi.InteractionEvent) => {
       // this._staleProps.args.markForceUpdate(this);
@@ -266,22 +303,30 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       this._staleProps.tooltipUpdaters.enqueueUpdate((prev) => {
         const next = { ...prev, visible: false, text: '' };
         return next;
-      })
+      });
     });
 
-    this.container.addListener('pointermove', (event: Pixi.InteractionEvent) => {
-      // this._staleProps.args.markForceUpdate(this);
+    this.container.addListener(
+      'pointermove',
+      (event: Pixi.InteractionEvent) => {
+        // this._staleProps.args.markForceUpdate(this);
 
-      // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
-      const localPosition = event.data.getLocalPosition(this.container);
-      const position = new Vector2(this.container.worldTransform.tx, this.container.worldTransform.ty);
+        // source: https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/tooltip.js
+        const localPosition = event.data.getLocalPosition(this.container);
+        const position = new Vector2(
+          this.container.worldTransform.tx,
+          this.container.worldTransform.ty
+        );
 
-      this._staleProps.tooltipUpdaters.position.enqueueUpdate(position.add(localPosition));
-    })
+        this._staleProps.tooltipUpdaters.position.enqueueUpdate(
+          position.add(localPosition)
+        );
+      }
+    );
   }
 
   public toString(): string {
-    return "PointNodeCompoent " + this._staleProps.selfPointNodeRef.toString();
+    return 'PointNodeCompoent ' + this._staleProps.selfPointNodeRef.toString();
   }
 }
 

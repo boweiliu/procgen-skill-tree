@@ -1,12 +1,12 @@
-import * as Pixi from "pixi.js";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import * as Pixi from 'pixi.js';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
-  args: {},
-  appSize: Vector2,
-}
-type State = {}
+  args: {};
+  appSize: Vector2;
+};
+type State = {};
 
 class DraggableBackdropComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Graphics;
@@ -18,7 +18,7 @@ class DraggableBackdropComponent extends LifecycleHandlerBase<Props, State> {
     this.container = new Pixi.Graphics();
   }
 
-  protected renderSelf() { }
+  protected renderSelf() {}
 }
 
 const wrapped = engageLifecycle(DraggableBackdropComponent);

@@ -1,26 +1,26 @@
-import * as Pixi from "pixi.js";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { GameState, WindowState } from "../data/GameState";
+import * as Pixi from 'pixi.js';
+import { Vector2 } from '../lib/util/geometry/vector2';
+import { GameState, WindowState } from '../data/GameState';
 // eslint-disable-next-line
-import { assertOnlyCalledOnce, Const } from "../lib/util/misc";
-import { RootComponent } from "./components/RootComponent";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
-import COLORS from "./colors";
-import createBunnyExample from "./BunnyExample";
+import { assertOnlyCalledOnce, Const } from '../lib/util/misc';
+import { RootComponent } from './components/RootComponent';
+import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
+import COLORS from './colors';
+import createBunnyExample from './BunnyExample';
 
 type Props = {
   args: {
-    fireBatch: () => void,
-    isSecondConstructorCall: boolean
-  },
-  updaters: UpdaterGeneratorType2<GameState>, // aka updaters
-  gameState: Const<GameState>,
-}
+    fireBatch: () => void;
+    isSecondConstructorCall: boolean;
+  };
+  updaters: UpdaterGeneratorType2<GameState>; // aka updaters
+  gameState: Const<GameState>;
+};
 
 type State = {
-  appSize: Vector2,
-  originalAppSize: Vector2,
-}
+  appSize: Vector2;
+  originalAppSize: Vector2;
+};
 
 function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   return new Vector2({
@@ -57,8 +57,8 @@ export class PixiReactBridge {
     let appSize = new Vector2(800, 600);
     this.state = {
       appSize,
-      originalAppSize: appSize
-    }
+      originalAppSize: appSize,
+    };
 
     this.app = new Pixi.Application({
       width: this.state.appSize.x,
@@ -69,7 +69,7 @@ export class PixiReactBridge {
       // resolution: 0.5,
       // resolution: 2,
       autoDensity: true,
-      powerPreference: "low-power", // the only valid one for webgl
+      powerPreference: 'low-power', // the only valid one for webgl
       backgroundColor: COLORS.white, // immaterial - we recommend setting color in backdrop graphics
     });
 
@@ -81,7 +81,11 @@ export class PixiReactBridge {
     this.app.ticker.remove(this.onTick);
   }
   public destroy() {
-    this.app.destroy(true, { children: true, texture: true, baseTexture: true });
+    this.app.destroy(true, {
+      children: true,
+      texture: true,
+      baseTexture: true,
+    });
   }
 
   public didMount() {
@@ -99,7 +103,12 @@ export class PixiReactBridge {
   }
 
   updateSelf(props: Props) {
-    this.state.appSize = appSizeFromWindowSize(new Vector2(props.gameState.windowState.innerWidth, props.gameState.windowState.innerHeight));
+    this.state.appSize = appSizeFromWindowSize(
+      new Vector2(
+        props.gameState.windowState.innerWidth,
+        props.gameState.windowState.innerHeight
+      )
+    );
     // console.log({ tick: props.gameState.tick });
     props.updaters.tick.enqueueUpdate((it) => it + 1);
   }
@@ -114,13 +123,13 @@ export class PixiReactBridge {
       this.rootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,
-          markForceUpdate: () => { },
+          markForceUpdate: () => {},
         },
         updaters: this.props.updaters,
         delta: 0,
         gameState: this.props.gameState,
         appSize: this.state.appSize,
-      })
+      });
       this.app.stage.addChild(this.rootComponent.container);
 
       this.renderSelf(this.props);
@@ -148,14 +157,14 @@ export class PixiReactBridge {
     this.rootComponent?.update({
       args: {
         renderer: this.app.renderer,
-        markForceUpdate: () => { },
+        markForceUpdate: () => {},
       },
       updaters: this.props.updaters,
       delta,
       gameState: this.props.gameState,
       appSize: this.state.appSize,
     });
-    
+
     this.renderSelf(this.props);
     this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }

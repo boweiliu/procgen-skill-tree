@@ -1,6 +1,5 @@
-import { KeyedHashMap } from "../lib/util/data_structures/hash";
-import { Vector2 } from "../lib/util/geometry/vector2";
-
+import { KeyedHashMap } from '../lib/util/data_structures/hash';
+import { Vector2 } from '../lib/util/geometry/vector2';
 
 export type WorldGenState = {
   seed: number;
@@ -25,37 +24,41 @@ export class ChunkGenConstants {
 
 export type PointNodeGen = {
   id: number;
-} & ({
-  nodeType: NodeType.Basic;
-  // more data to be generated here - size, color, etc.
-  resourceType: ResourceNontrivialType;
-  resourceModifier: ResourceModifier;
-  resourceAmount: number;
-} | {
-  nodeType: NodeType.Nothing;
-} | {
-  nodeType: NodeType.EfficiencyGate;
-  resourceType: ResourceNontrivialType;
-  resourceModifier: ResourceModifier;
-  resourceAmount: number;
+} & (
+  | {
+      nodeType: NodeType.Basic;
+      // more data to be generated here - size, color, etc.
+      resourceType: ResourceNontrivialType;
+      resourceModifier: ResourceModifier;
+      resourceAmount: number;
+    }
+  | {
+      nodeType: NodeType.Nothing;
+    }
+  | {
+      nodeType: NodeType.EfficiencyGate;
+      resourceType: ResourceNontrivialType;
+      resourceModifier: ResourceModifier;
+      resourceAmount: number;
 
-  efficiencyGateInfo: {
-    thresholdResourceType: ResourceType;
-    thresholdResourceAmount: number;
-    timeUntilLocked: number;
-  };
-});
+      efficiencyGateInfo: {
+        thresholdResourceType: ResourceType;
+        thresholdResourceAmount: number;
+        timeUntilLocked: number;
+      };
+    }
+);
 
 export enum NodeType {
-  Basic = "Basic",
-  Nothing = "Nothing",
-  EfficiencyGate = "EfficiencyGate",
+  Basic = 'Basic',
+  Nothing = 'Nothing',
+  EfficiencyGate = 'EfficiencyGate',
 }
 
 export enum ResourceNontrivialType {
-  Mana0 = "Mana0",
-  Mana1 = "Mana1",
-  Mana2 = "Mana2",
+  Mana0 = 'Mana0',
+  Mana1 = 'Mana1',
+  Mana2 = 'Mana2',
 }
 
 export type ResourceType = ResourceNontrivialType;
@@ -67,10 +70,9 @@ export type ResourceType = ResourceNontrivialType;
 // };
 
 export enum ResourceModifier {
-  Flat = "Flat",
-  Increased0 = "% increased",
-  AfterIncreased0 = "added after % increased",
-  Increased1 = "% increased multiplier",
-  AfterIncreased1 = "added after % increased multiplier",
+  Flat = 'Flat',
+  Increased0 = '% increased',
+  AfterIncreased0 = 'added after % increased',
+  Increased1 = '% increased multiplier',
+  AfterIncreased1 = 'added after % increased multiplier',
 }
-

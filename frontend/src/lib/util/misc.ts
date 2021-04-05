@@ -72,7 +72,7 @@ export class Util {
     str: string,
     mapObj: { [key: string]: string }
   ): string {
-    const re = new RegExp(Object.keys(mapObj).join("|"), "gi");
+    const re = new RegExp(Object.keys(mapObj).join('|'), 'gi');
 
     return str.replace(re, (matched) => {
       return mapObj[matched.toLowerCase()];
@@ -114,23 +114,23 @@ export class Util {
 
   public static FormatDate(d: Date): string {
     const monthName = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ][d.getMonth()];
 
-    return `${monthName} ${d.getDate()}, ${("00" + d.getHours()).substr(-2)}:${(
-      "00" + d.getMinutes()
-    ).substr(-2)}:${("00" + d.getSeconds()).substr(-2)}`;
+    return `${monthName} ${d.getDate()}, ${('00' + d.getHours()).substr(-2)}:${(
+      '00' + d.getMinutes()
+    ).substr(-2)}:${('00' + d.getSeconds()).substr(-2)}`;
   }
 
   public static FlattenByOne<T>(arr: T[][]): T[] {
@@ -146,8 +146,8 @@ export class Util {
   public static PadString(
     string: string,
     length: number,
-    intersperse = "",
-    character = " "
+    intersperse = '',
+    character = ' '
   ) {
     return string + intersperse + character.repeat(length - string.length);
   }
@@ -177,9 +177,9 @@ export function assertOnlyCalledOnce(id: string | number) {
       assertOnlyCalledOnceData[k][1] = 2;
     } else {
       throw new Error(
-        "Error, called more than twice with same id: " +
+        'Error, called more than twice with same id: ' +
           k +
-          " , callback the first time was : " +
+          ' , callback the first time was : ' +
           assertOnlyCalledOnceData[k]
       );
     }
@@ -202,7 +202,7 @@ export class Lazy<T> {
   private _factory: () => T;
 
   constructor(
-    factory: () => T,
+    factory: () => T
     // structure?: T extends { [key: string]: any } ? T : void
   ) {
     this._factory = factory;
@@ -238,12 +238,12 @@ export function LazyProxy<
 >(factory: () => T): Const<T> {
   return (new Proxy(new Lazy(factory), {
     get: (target, property, receiver) => {
-      if (property === "toJSON") {
+      if (property === 'toJSON') {
         return () => {
           if (target.wasConstructed()) {
             return target.get();
           } else {
-            return "[Object Lazy]";
+            return '[Object Lazy]';
           }
         };
       }
@@ -260,12 +260,11 @@ export function LazyProxy<
        */
 
       return Object.getOwnPropertyDescriptor(target.get(), property);
-      
     },
     has: (target, property) => {
       // This is called when iterating over array i.e. array.forEach()
-      return property in target.get()
-    }
+      return property in target.get();
+    },
   }) as unknown) as Const<T>;
 }
 

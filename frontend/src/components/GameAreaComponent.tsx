@@ -33,8 +33,9 @@ export function GameAreaComponent(props: {
     borderColor: colorToCss(COLORS.nodeBorder),
   };
 
+  const virtualGrids = 3;
   // 200% - 120 FPS; 300% - 75 FPS; 500% - 30 FPS
-  const virtualAreaSize = props.appSize.multiply(3);
+  const virtualAreaSize = props.appSize.multiply(virtualGrids);
   // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
   const numBlocksPerRow = Math.floor(virtualAreaSize.x / gridWidth - 0.5);
   const numPairsOfRows = Math.floor(virtualAreaSize.y / gridHeight / 2);
@@ -43,6 +44,30 @@ export function GameAreaComponent(props: {
       console.log(`got ${numBlocksPerRow} x ${numPairsOfRows * 2} hex grid`),
     [numBlocksPerRow, numPairsOfRows]
   );
+
+  const handleScroll = useCallback((e) => {
+    // const scrollRoom = virtualAreaSize.subtract(props.appSize);
+    // const scrollMod = scrollRoom.divide(virtualGrids);
+    // handle scroll
+    let newScrollTop = e.target.scrollTop;
+    let newScrollLeft = e.target.scrollLeft;
+    if (e.target.scrollTop < props.appSize.y * 0.25) {
+      newScrollTop += gridHeight * 2;
+    }
+    if (e.target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
+      newScrollTop -= gridHeight * 2;
+    }
+    if (e.target.scrollLeft < props.appSize.x * 0.25) {
+      newScrollLeft += gridWidth * 2;
+    }
+    if (e.target.scrollleft > props.appSize.x * (virtualGrids - 1.25)) {
+      newScrollLeft -= gridWidth * 2;
+    }
+    console.log(e.target);
+    console.log(e.target.scrollTop);
+    console.log(e.target.scrollLeft);
+    e.target.scrollTo(newScrollLeft, newScrollTop);
+  }, []);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -65,6 +90,7 @@ export function GameAreaComponent(props: {
         height: props.appSize.y,
         backgroundColor: colorToCss(COLORS.backgroundBlue),
       }}
+      onScroll={handleScroll}
     >
       <div
         className="virtual-game-area"
@@ -102,12 +128,14 @@ function Row({
   hexCenterStyle,
   hexHalfBlockStyle,
   hexBlockStyle,
+  children,
 }: {
   rowIdx: number;
   numBlocksPerRow: number;
   hexCenterStyle: any;
   hexHalfBlockStyle: any;
   hexBlockStyle: any;
+  children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   const odd = !!(rowIdx % 2);
@@ -129,6 +157,7 @@ function Row({
               className="hex-center"
               style={hexCenterStyle}
             >
+              {children}
               <div
                 className="hover-only"
                 style={{

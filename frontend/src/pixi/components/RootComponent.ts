@@ -1,40 +1,42 @@
-import * as Pixi from "pixi.js";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { ChunkGenConstants, GameState, IntentName} from "../../data/GameState";
-import { generatePointNodeTexture, PointNodeTextureSet } from "../textures/PointNodeTexture";
-import { ZLevelGenFactory } from "../../game/WorldGenStateFactory";
-import { Const, Lazy } from "../../lib/util/misc";
-import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { ZLevelComponent, ZLevelComponentProps } from "./ZLevelComponent";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
-import { FixedCameraStageComponent } from "./FixedCameraStageComponent";
-import { TooltipInfo } from "./TooltipComponent";
-import COLORS from "../colors";
+import * as Pixi from 'pixi.js';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { ChunkGenConstants, GameState, IntentName } from '../../data/GameState';
+import {
+  generatePointNodeTexture,
+  PointNodeTextureSet,
+} from '../textures/PointNodeTexture';
+import { ZLevelGenFactory } from '../../game/WorldGenStateFactory';
+import { Const, Lazy } from '../../lib/util/misc';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import { ZLevelComponent, ZLevelComponentProps } from './ZLevelComponent';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
+import { FixedCameraStageComponent } from './FixedCameraStageComponent';
+import { TooltipInfo } from './TooltipComponent';
+import COLORS from '../colors';
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
   tick: number;
   playerCurrentZ: number;
   tooltip: TooltipInfo;
-}
+};
 
 type Props = {
   args: {
-    renderer: Pixi.Renderer,
-    markForceUpdate: (childInstance: any) => void,
-  },
-  updaters: UpdaterGeneratorType2<GameState>,
-  delta: number,
-  gameState: Const<GameState>,
-  appSize: Vector2
-}
+    renderer: Pixi.Renderer;
+    markForceUpdate: (childInstance: any) => void;
+  };
+  updaters: UpdaterGeneratorType2<GameState>;
+  delta: number;
+  gameState: Const<GameState>;
+  appSize: Vector2;
+};
 
 class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
   private stateUpdaters: UpdaterGeneratorType2<State>;
   protected fireStateUpdaters: () => void;
-
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
@@ -50,17 +52,22 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     super(props);
     this.container = new Pixi.Container();
     this.container.sortableChildren = true;
-    ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
-      this.useState<State, RootComponent2>(this, {
-        pointNodeTexture: new Lazy(() => generatePointNodeTexture(props.args.renderer)),
-        tick: 0,
-        playerCurrentZ: 0,
-        tooltip: {
-          visible: false,
-          position: undefined,
-          text: '',
-        }
-      }));
+    ({
+      state: this.state,
+      stateUpdaters: this.stateUpdaters,
+      fireStateUpdaters: this.fireStateUpdaters,
+    } = this.useState<State, RootComponent2>(this, {
+      pointNodeTexture: new Lazy(() =>
+        generatePointNodeTexture(props.args.renderer)
+      ),
+      tick: 0,
+      playerCurrentZ: 0,
+      tooltip: {
+        visible: false,
+        position: undefined,
+        text: '',
+      },
+    }));
 
     const fixedCameraStagePropsFactory = (props: Props, state: State) => {
       return {
@@ -72,15 +79,17 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         gameState: props.gameState,
         appSize: props.appSize,
         tick: state.tick,
-        tooltip: { ...state.tooltip }
+        tooltip: { ...state.tooltip },
       };
-    }
-    this.fixedCameraStage = new FixedCameraStageComponent(fixedCameraStagePropsFactory(props, this.state));
+    };
+    this.fixedCameraStage = new FixedCameraStageComponent(
+      fixedCameraStagePropsFactory(props, this.state)
+    );
     this.addChild({
       childClass: FixedCameraStageComponent,
       instance: this.fixedCameraStage,
       propsFactory: fixedCameraStagePropsFactory,
-    })
+    });
 
     this.actionStage = new Pixi.Sprite();
     this.actionStage.zIndex = 0;
@@ -118,7 +127,6 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     const { updaters } = this._staleProps;
   }
 }
-
 
 const wrapped = engageLifecycle(RootComponent2);
 // eslint-disable-next-line

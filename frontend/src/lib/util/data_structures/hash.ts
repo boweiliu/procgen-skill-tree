@@ -3,7 +3,7 @@
  * rather than allowing any keyType.toString() to be a valid key, and without going through the trouble of declaring distinguishable
  * types for each key type we want to use). Also serves as a slightly different version of ES6 native Set(), which is hardcoded
  * to use === for object referential equality.
- * 
+ *
  * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
  * TODO: write StrictHashSet<K extends {hash(): string, equals(k: K): boolean}> to handle custom equality checks
  */
@@ -44,7 +44,7 @@ export class HashSet<K extends { hash(): string }> {
 
   clone(): HashSet<K> {
     let n = new HashSet<K>();
-    n._values = this._values.clone()
+    n._values = this._values.clone();
     return n;
   }
 
@@ -83,7 +83,7 @@ export class HashSet<K extends { hash(): string }> {
  * rather than allowing any keyType.toString() to be a valid key, and without going through the trouble of declaring distinguishable
  * types for each key type we want to use). Also serves as a slightly different version of ES6 native Map(), which is hardcoded
  * to use === for object referential equality.
- * 
+ *
  * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
  * TODO: write StrictHashMap<K extends {hash(): string, equals(K): boolean}> to handle custom equality checks
  */
@@ -137,9 +137,14 @@ export class HashMap<K extends { hash(): string }, V> {
   }
 }
 
-export class HashableHashMap<K extends { hash(): string }, V extends { hash(): string }> extends HashMap<K, V> {
+export class HashableHashMap<
+  K extends { hash(): string },
+  V extends { hash(): string }
+> extends HashMap<K, V> {
   hash(): string {
-    const hashes: number[] = Object.entries(this._values).map(([s, v]) => hashCode(s) + hashCode(v.hash()));
+    const hashes: number[] = Object.entries(this._values).map(
+      ([s, v]) => hashCode(s) + hashCode(v.hash())
+    );
     let code: number = hashes.reduce((pv, cv) => pv + cv);
     return code.toString();
   }
@@ -149,7 +154,7 @@ export class HashableHashMap<K extends { hash(): string }, V extends { hash(): s
  * Same as HashMap, but actually stores the keys used to key the hashmap, instead of just their hashes.
  * Allows iteration over the full key-value pair set.
  */
-export class KeyedHashMap<K extends { hash(): string }, V>{
+export class KeyedHashMap<K extends { hash(): string }, V> {
   private _kvalues: { [key: string]: [K, V] } = {};
 
   put(key: K, value: V) {
@@ -170,19 +175,19 @@ export class KeyedHashMap<K extends { hash(): string }, V>{
   }
 
   keys(): K[] {
-    return Object.keys(this._kvalues).map(key => this._kvalues[key][0]);
+    return Object.keys(this._kvalues).map((key) => this._kvalues[key][0]);
   }
 
-  entries(): ([K, V])[] {
-    return Object.keys(this._kvalues).map(key => this._kvalues[key]);
+  entries(): [K, V][] {
+    return Object.keys(this._kvalues).map((key) => this._kvalues[key]);
   }
 
   values(): V[] {
-    return Object.keys(this._kvalues).map(key => this._kvalues[key][1]);
+    return Object.keys(this._kvalues).map((key) => this._kvalues[key][1]);
   }
 
   hashKeyset(): string {
-    const hashes: number[] = Object.keys(this._kvalues).map(s => hashCode(s));
+    const hashes: number[] = Object.keys(this._kvalues).map((s) => hashCode(s));
     let code: number = hashes.reduce((pv, cv) => pv + cv);
     return code.toString();
   }
@@ -213,7 +218,7 @@ export class DefaultHashMap<K extends { hash(): string }, V> {
   get(key: K): V {
     if (this._values[key.hash()] === undefined) {
       this._values[key.hash()] = this._makeDefault();
-    } 
+    }
 
     return this._values[key.hash()];
   }
@@ -223,7 +228,7 @@ export class DefaultHashMap<K extends { hash(): string }, V> {
 export function hashCode(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) {
-    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
   }
   return h;
 }
@@ -232,29 +237,29 @@ export function hashCode(s: string): number {
 //   interface Array<T extends { hash(): string }> {
 //     hash(): string
 //   }
-// 
+//
 //   interface Number {
 //     hash(): string
 //   }
-// 
+//
 //   interface String {
 //     hash(): String
 //   }
 // }
-// 
+//
 // Array.prototype.hash = function () {
 //   return hashArray(this);
 // }
-// 
+//
 // Number.prototype.hash = function () {
 //   return this.toString();
 // }
-// 
+//
 // String.prototype.hash = function () {
 //   return this;
 // }
-// 
+//
 // function hashArray<T extends { hash(): string }>(arr: T[]): string {
 //   return arr.map(elt => hashCode(elt.hash())).reduce((pv, cv) => 31 * pv + cv).hash();
 // }
-// 
+//

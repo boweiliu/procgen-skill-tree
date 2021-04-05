@@ -1,9 +1,14 @@
-import { GameState, PointNodeRef, noIntent, WindowState } from "../data/GameState";
-import { HashSet } from "../lib/util/data_structures/hash";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { assertOnlyCalledOnce } from "../lib/util/misc";
-import { computePlayerResourceAmounts } from "./ComputeState";
-import { ZLevelGenFactory } from "./WorldGenStateFactory";
+import {
+  GameState,
+  PointNodeRef,
+  noIntent,
+  WindowState,
+} from '../data/GameState';
+import { HashSet } from '../lib/util/data_structures/hash';
+import { Vector2 } from '../lib/util/geometry/vector2';
+import { assertOnlyCalledOnce } from '../lib/util/misc';
+import { computePlayerResourceAmounts } from './ComputeState';
+import { ZLevelGenFactory } from './WorldGenStateFactory';
 
 export type GameStateConfig = any;
 
@@ -35,7 +40,7 @@ export class GameStateFactory {
     });
 
     const windowState: WindowState = {
-      orientation: "original",
+      orientation: 'original',
       innerWidth: window.innerWidth,
       innerHeight: window.innerHeight,
     };

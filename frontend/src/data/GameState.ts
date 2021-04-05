@@ -1,16 +1,29 @@
+import { HashMap } from '../lib/util/data_structures/hash';
+import { Vector2 } from '../lib/util/geometry/vector2';
+import { Const, enumKeys } from '../lib/util/misc';
+import { PlayerSaveState } from './PlayerSaveState';
+import { PointNodeRef } from './PointNodeRef';
 import {
-  HashMap,
-} from "../lib/util/data_structures/hash";
-import { Vector2 } from "../lib/util/geometry/vector2";
-import { Const, enumKeys } from "../lib/util/misc";
-import { PlayerSaveState } from "./PlayerSaveState";
-import { PointNodeRef} from "./PointNodeRef";
-import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
+  ResourceModifier,
+  ResourceNontrivialType,
+  ResourceType,
+  WorldGenState,
+} from './WorldGenState';
 
-export { PointNodeRef, ChunkRef } from "./PointNodeRef";
-export type { PlayerSaveState, Quest } from "./PlayerSaveState";
-export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen, ResourceType } from "./WorldGenState";
-export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType } from "./WorldGenState";
+export { PointNodeRef, ChunkRef } from './PointNodeRef';
+export type { PlayerSaveState, Quest } from './PlayerSaveState';
+export type {
+  WorldGenState,
+  ChunkGen,
+  ZLevelGen,
+  PointNodeGen,
+  ResourceType,
+} from './WorldGenState';
+export {
+  ChunkGenConstants,
+  ResourceModifier,
+  ResourceNontrivialType,
+} from './WorldGenState';
 
 /**
  * Data owned by the master "App" component, to be made available as props to ALL subcomponents (both pixi and react); react uses context providers to make this easier
@@ -54,14 +67,14 @@ export type Intent = {
 
 export enum IntentName {
   // Default intent - does nothing
-  NOOP = "NOOP",
+  NOOP = 'NOOP',
 
-  PAN_NORTH = "PAN_NORTH",
-  PAN_SOUTH = "PAN_SOUTH",
-  PAN_WEST = "PAN_WEST",
-  PAN_EAST = "PAN_EAST",
-  TRAVEL_IN = "TRAVEL_IN",
-  TRAVEL_OUT = "TRAVEL_OUT",
+  PAN_NORTH = 'PAN_NORTH',
+  PAN_SOUTH = 'PAN_SOUTH',
+  PAN_WEST = 'PAN_WEST',
+  PAN_EAST = 'PAN_EAST',
+  TRAVEL_IN = 'TRAVEL_IN',
+  TRAVEL_OUT = 'TRAVEL_OUT',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
@@ -73,7 +86,7 @@ export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
  * current window settings -- allows for dynamic resizing and also rotation on mobile web
  */
 export type WindowState = {
-  orientation: "original" | "rotated"; // rotated === we are forcing landscape-in-portrait
+  orientation: 'original' | 'rotated'; // rotated === we are forcing landscape-in-portrait
   innerWidth: number;
   innerHeight: number;
 };
@@ -106,7 +119,7 @@ export class ResourceTypeAndModifier {
   }
 
   public hash(): string {
-    return this.type.toString() + "," + this.modifier.toString();
+    return this.type.toString() + ',' + this.modifier.toString();
   }
 }
 

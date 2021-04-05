@@ -1,10 +1,15 @@
-import * as Pixi from "pixi.js";
-import COLORS from "../colors";
-import { RenderedChunkConstants } from "../components/ChunkComponent";
+import * as Pixi from 'pixi.js';
+import COLORS from '../colors';
+import { RenderedChunkConstants } from '../components/ChunkComponent';
 
-export type PointNodeTextureSet = ({ cropFraction: number, texture: Pixi.Texture })[];
+export type PointNodeTextureSet = {
+  cropFraction: number;
+  texture: Pixi.Texture;
+}[];
 
-export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeTextureSet {
+export function generatePointNodeTexture(
+  renderer: Pixi.Renderer
+): PointNodeTextureSet {
   // generate sprite textures for 0 to 100% vertical cropped in increments of 1/8
   let textureSet: PointNodeTextureSet = [];
   for (let i = 0; i <= 8; i++) {
@@ -12,8 +17,8 @@ export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeText
     let g = new Pixi.Graphics();
     g.beginFill(COLORS.white);
     g.drawRoundedRect(
-      - RenderedChunkConstants.NODE_SIZE_PX / 2,
-      - RenderedChunkConstants.NODE_SIZE_PX / 2,
+      -RenderedChunkConstants.NODE_SIZE_PX / 2,
+      -RenderedChunkConstants.NODE_SIZE_PX / 2,
       RenderedChunkConstants.NODE_SIZE_PX,
       RenderedChunkConstants.NODE_SIZE_PX,
       RenderedChunkConstants.NODE_ROUNDED_PX
@@ -21,8 +26,8 @@ export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeText
     let mask = new Pixi.Graphics();
     mask.beginFill(COLORS.black);
     mask.drawRect(
-      - RenderedChunkConstants.NODE_SIZE_PX / 2,
-      - RenderedChunkConstants.NODE_SIZE_PX / 2,
+      -RenderedChunkConstants.NODE_SIZE_PX / 2,
+      -RenderedChunkConstants.NODE_SIZE_PX / 2,
       RenderedChunkConstants.NODE_SIZE_PX,
       RenderedChunkConstants.NODE_SIZE_PX * cropFraction
     );
@@ -37,7 +42,8 @@ export function generatePointNodeTexture(renderer: Pixi.Renderer): PointNodeText
     // sprite.y = 300;
     // this.app.stage.addChild(sprite);
     textureSet.push({
-      cropFraction, texture
+      cropFraction,
+      texture,
     });
   }
   return textureSet;
