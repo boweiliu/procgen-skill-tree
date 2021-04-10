@@ -1,7 +1,7 @@
 import './GameAreaComponent.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import COLORS, { colorToCss } from '../pixi/colors';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { appSizeFromWindowSize } from '../data/GameState';
@@ -73,7 +73,16 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
       console.log('jump!');
       target.scrollTo(newScrollLeft, newScrollTop);
     }
-  }, []);
+  }, [props.appSize.x, props.appSize.y]);
+
+
+  const container = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (container.current != null) {
+      container.current.scrollTop = props.appSize.y * (virtualGrids / 2);
+      container.current.scrollLeft = props.appSize.x * (virtualGrids / 2);
+    }
+  }, [container, container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -89,6 +98,7 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
    */
   return (
     <div
+      ref={container}
       className="game-area"
       hidden={props.hidden}
       style={{
