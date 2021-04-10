@@ -1,6 +1,6 @@
 let COLORS = {
   // good colors
-  backgroundBlue: 0xabcdef,
+  backgroundBlue: 0x222222,
   // nodePink: 0xeeaaaa,
   // nodeLavender: 0xcc88ee,
   // nodeBlue: 0x99bbff,
@@ -9,7 +9,7 @@ let COLORS = {
 
   // shitty colors
   // backgroundBlue: 0xffffff,
-  nodePink: 0x999999,
+  nodePink: 0x332244,
   nodeLavender: 0x777777,
   nodeBlue: 0xdddddd,
 
@@ -20,7 +20,7 @@ let COLORS = {
 
   selectedTint: 0xbbbbff,
   allocatedTint: 0x444444,
-  nodeBorder: 0x444444,
+  nodeBorder: 0x666666,
   nullTint: 0xffffff,
 
   // colors that dont matter too much

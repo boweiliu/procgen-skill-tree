@@ -43,34 +43,35 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
     [numBlocksPerRow, numPairsOfRows]
   );
 
-  const handleScroll = useCallback((e) => {
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement, UIEvent>) => {
     // const scrollRoom = virtualAreaSize.subtract(props.appSize);
     // const scrollMod = scrollRoom.divide(virtualGrids);
     // handle scroll
-    let newScrollTop = e.target.scrollTop;
-    let newScrollLeft = e.target.scrollLeft;
-    if (e.target.scrollTop < props.appSize.y * 0.25) {
+    const target = e.target! as Element;
+    let newScrollTop = target.scrollTop;
+    let newScrollLeft = target.scrollLeft;
+    if (target.scrollTop < props.appSize.y * 0.25) {
       newScrollTop += gridHeight * 2;
     }
-    if (e.target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
+    if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
       newScrollTop -= gridHeight * 2;
     }
-    if (e.target.scrollLeft < props.appSize.x * 0.25) {
+    if (target.scrollLeft < props.appSize.x * 0.25) {
       newScrollLeft += gridWidth * 2;
     }
-    if (e.target.scrollleft > props.appSize.x * (virtualGrids - 1.25)) {
+    if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
       newScrollLeft -= gridWidth * 2;
     }
-    // console.log(e.target);
-    // console.log(e.target.scrollTop);
-    // console.log(e.target.scrollLeft);
+    // console.log(target);
+    // console.log(target.scrollTop);
+    // console.log(target.scrollLeft);
 
     if (
-      e.target.scrollTop !== newScrollTop ||
-      e.target.scrollLeft !== newScrollLeft
+      target.scrollTop !== newScrollTop ||
+      target.scrollLeft !== newScrollLeft
     ) {
       console.log('jump!');
-      e.target.scrollTo(newScrollLeft, newScrollTop);
+      target.scrollTo(newScrollLeft, newScrollTop);
     }
   }, []);
 
