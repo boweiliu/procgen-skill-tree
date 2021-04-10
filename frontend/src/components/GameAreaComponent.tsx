@@ -11,6 +11,7 @@ import { appSizeFromWindowSize } from '../data/GameState';
  *
  */
 export const GameAreaComponent = React.memo(GameArea);
+
 function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
@@ -18,7 +19,7 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
   const gridWidth = 268;
   const gridHeight = 232;
 
-  const hexCenterRadius = 20;
+  const hexCenterRadius = 32;
   const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
   const hexHalfBlockStyle = {
     width: gridWidth / 2 + 'px',
@@ -30,6 +31,18 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
     backgroundColor: colorToCss(COLORS.nodePink),
     borderColor: colorToCss(COLORS.nodeBorder),
   };
+  const hexCenterLockStyle = {
+    width: (hexCenterRadius * 0.5 + 4) + 'px',
+    height: (hexCenterRadius * 2 + 4) + 'px',
+    // backgroundColor: colorToCss(COLORS.nodePink),
+    // borderColor: colorToCss(COLORS.nodeBorder),
+  };
+  const hexCenterLockBlockStyle = {
+    width: hexCenterRadius + 'px',
+    height: hexCenterRadius * 2 + 'px',
+    backgroundColor: colorToCss(COLORS.nodePink),
+    borderColor: colorToCss(COLORS.nodeBorder),
+  }
 
   const virtualGrids = 3;
   // 200% - 120 FPS; 300% - 75 FPS; 500% - 30 FPS
@@ -130,6 +143,8 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
               numBlocksPerRow={numBlocksPerRow}
               hexHalfBlockStyle={hexHalfBlockStyle}
               hexCenterStyle={hexCenterStyle}
+              hexCenterLockStyle={hexCenterLockStyle}
+              hexCenterLockBlockStyle={hexCenterLockBlockStyle}
               hexBlockStyle={hexBlockStyle}
             />
           ))}
@@ -144,13 +159,17 @@ function RowComponent({
   rowIdx,
   numBlocksPerRow,
   hexCenterStyle,
+  hexCenterLockStyle,
+hexCenterLockBlockStyle,
   hexHalfBlockStyle,
   hexBlockStyle,
   children,
 }: {
   rowIdx: number;
   numBlocksPerRow: number;
-  hexCenterStyle: any;
+    hexCenterStyle: any;
+    hexCenterLockStyle: any;
+    hexCenterLockBlockStyle: any;
   hexHalfBlockStyle: any;
   hexBlockStyle: any;
   children?: React.ReactNode;
@@ -163,33 +182,61 @@ function RowComponent({
       {odd && <div className="hex-block" style={hexHalfBlockStyle} />}
       {Array(numBlocksPerRow)
         .fill(0)
-        .map((it, idx, arr) => (
-          <div
-            id={`hex-block-${rowIdx}-${idx}`}
-            className="hex-block"
-            style={hexBlockStyle}
-            key={idx}
-          >
+        .map((it, idx, arr) => {
+          const isLocked = (idx === 12 && rowIdx === 4);
+          return (
             <div
-              id={`hex-center-${rowIdx}-${idx}`}
-              className="hex-center"
-              style={hexCenterStyle}
+              id={`hex-block-${rowIdx}-${idx}`}
+              className="hex-block"
+              style={hexBlockStyle}
+              key={idx}
             >
-              {children}
+              {isLocked ? (
+                <div
+                  id={`hex-lock-${rowIdx}-${idx}`}
+                  style={{ zIndex: 3, ...hexCenterLockStyle }}
+                >
+                  <div
+                    className="hex-center-lock-left"
+                    style={hexCenterLockBlockStyle}
+                  >
+                  </div>
+                </div>
+              ) : null}
               <div
-                className="hover-only"
-                style={{
-                  borderStyle: 'solid',
-                  minWidth: 'fit-content',
-                  padding: '3px',
-                  background: 'rgba(255,255,255,0.3)',
-                }}
+                id={`hex-center-${rowIdx}-${idx}`}
+                className="hex-center"
+                style={hexCenterStyle}
               >
-                I am usually hidden!
+                {children}
+                <div
+                  className="hover-only"
+                  style={{
+                    borderStyle: 'solid',
+                    minWidth: 'fit-content',
+                    padding: '3px',
+                    background: 'rgba(255,255,255,0.3)',
+                  }}
+                >
+                  I am usually hidden!
               </div>
+              </div>
+
+              {isLocked ? (
+                <div
+                  id={`hex-lock-${rowIdx}-${idx}`}
+                  style={{ zIndex: 3, ...hexCenterLockStyle }}
+                >
+                  <div
+                    className="hex-center-lock-right"
+                    style={hexCenterLockBlockStyle}
+                  >
+                  </div>
+                </div>
+              ) : null}
             </div>
-          </div>
-        ))}
+          );
+        })}
       {!odd && <div className="hex-block" style={hexHalfBlockStyle} />}
     </div>
   );
