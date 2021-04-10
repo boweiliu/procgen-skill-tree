@@ -1,7 +1,13 @@
 import './GameAreaComponent.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import COLORS, { colorToCss } from '../pixi/colors';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { appSizeFromWindowSize } from '../data/GameState';
@@ -32,17 +38,18 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
     borderColor: colorToCss(COLORS.nodeBorder),
   };
   const hexCenterLockStyle = {
-    width: (hexCenterRadius * 0.5 + 4) + 'px',
-    height: (hexCenterRadius * 2 + 4) + 'px',
+    marginLeft: `-${hexCenterRadius * 2}px`,
+    width: hexCenterRadius * 2 + 'px',
+    height: hexCenterRadius * 2 + 'px',
     // backgroundColor: colorToCss(COLORS.nodePink),
     // borderColor: colorToCss(COLORS.nodeBorder),
   };
   const hexCenterLockBlockStyle = {
-    width: hexCenterRadius + 'px',
+    width: hexCenterRadius - 12 + 'px',
     height: hexCenterRadius * 2 + 'px',
     backgroundColor: colorToCss(COLORS.nodePink),
     borderColor: colorToCss(COLORS.nodeBorder),
-  }
+  };
 
   const virtualGrids = 3;
   // 200% - 120 FPS; 300% - 75 FPS; 500% - 30 FPS
@@ -56,38 +63,40 @@ function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
     [numBlocksPerRow, numPairsOfRows]
   );
 
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-    // const scrollRoom = virtualAreaSize.subtract(props.appSize);
-    // const scrollMod = scrollRoom.divide(virtualGrids);
-    // handle scroll
-    const target = e.target! as Element;
-    let newScrollTop = target.scrollTop;
-    let newScrollLeft = target.scrollLeft;
-    if (target.scrollTop < props.appSize.y * 0.25) {
-      newScrollTop += gridHeight * 2;
-    }
-    if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
-      newScrollTop -= gridHeight * 2;
-    }
-    if (target.scrollLeft < props.appSize.x * 0.25) {
-      newScrollLeft += gridWidth * 2;
-    }
-    if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
-      newScrollLeft -= gridWidth * 2;
-    }
-    // console.log(target);
-    // console.log(target.scrollTop);
-    // console.log(target.scrollLeft);
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      // const scrollRoom = virtualAreaSize.subtract(props.appSize);
+      // const scrollMod = scrollRoom.divide(virtualGrids);
+      // handle scroll
+      const target = e.target! as Element;
+      let newScrollTop = target.scrollTop;
+      let newScrollLeft = target.scrollLeft;
+      if (target.scrollTop < props.appSize.y * 0.25) {
+        newScrollTop += gridHeight * 2;
+      }
+      if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
+        newScrollTop -= gridHeight * 2;
+      }
+      if (target.scrollLeft < props.appSize.x * 0.25) {
+        newScrollLeft += gridWidth * 2;
+      }
+      if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
+        newScrollLeft -= gridWidth * 2;
+      }
+      // console.log(target);
+      // console.log(target.scrollTop);
+      // console.log(target.scrollLeft);
 
-    if (
-      target.scrollTop !== newScrollTop ||
-      target.scrollLeft !== newScrollLeft
-    ) {
-      console.log('jump!');
-      target.scrollTo(newScrollLeft, newScrollTop);
-    }
-  }, [props.appSize.x, props.appSize.y]);
-
+      if (
+        target.scrollTop !== newScrollTop ||
+        target.scrollLeft !== newScrollLeft
+      ) {
+        console.log('jump!');
+        target.scrollTo(newScrollLeft, newScrollTop);
+      }
+    },
+    [props.appSize.x, props.appSize.y]
+  );
 
   const container = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -160,22 +169,24 @@ function RowComponent({
   numBlocksPerRow,
   hexCenterStyle,
   hexCenterLockStyle,
-hexCenterLockBlockStyle,
+  hexCenterLockBlockStyle,
   hexHalfBlockStyle,
   hexBlockStyle,
   children,
 }: {
   rowIdx: number;
   numBlocksPerRow: number;
-    hexCenterStyle: any;
-    hexCenterLockStyle: any;
-    hexCenterLockBlockStyle: any;
+  hexCenterStyle: any;
+  hexCenterLockStyle: any;
+  hexCenterLockBlockStyle: any;
   hexHalfBlockStyle: any;
   hexBlockStyle: any;
   children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   const odd = !!(rowIdx % 2);
+  const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
+  const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
 
   return (
     <div className="hex-block-row">
@@ -183,7 +194,7 @@ hexCenterLockBlockStyle,
       {Array(numBlocksPerRow)
         .fill(0)
         .map((it, idx, arr) => {
-          const isLocked = (idx === 12 && rowIdx === 4);
+          const isLocked = idx === 12 && rowIdx === 4;
           return (
             <div
               id={`hex-block-${rowIdx}-${idx}`}
@@ -191,18 +202,6 @@ hexCenterLockBlockStyle,
               style={hexBlockStyle}
               key={idx}
             >
-              {isLocked ? (
-                <div
-                  id={`hex-lock-${rowIdx}-${idx}`}
-                  style={{ zIndex: 3, ...hexCenterLockStyle }}
-                >
-                  <div
-                    className="hex-center-lock-left"
-                    style={hexCenterLockBlockStyle}
-                  >
-                  </div>
-                </div>
-              ) : null}
               <div
                 id={`hex-center-${rowIdx}-${idx}`}
                 className="hex-center"
@@ -219,19 +218,18 @@ hexCenterLockBlockStyle,
                   }}
                 >
                   I am usually hidden!
+                </div>
               </div>
-              </div>
-
               {isLocked ? (
                 <div
                   id={`hex-lock-${rowIdx}-${idx}`}
-                  style={{ zIndex: 3, ...hexCenterLockStyle }}
+                  style={{
+                    // zIndex: 3,
+                    ...hexCenterLockStyle,
+                  }}
                 >
-                  <div
-                    className="hex-center-lock-right"
-                    style={hexCenterLockBlockStyle}
-                  >
-                  </div>
+                  <div className="hex-center-lock-left" style={leftLock} />
+                  <div className="hex-center-lock-right" style={rightLock} />
                 </div>
               ) : null}
             </div>
