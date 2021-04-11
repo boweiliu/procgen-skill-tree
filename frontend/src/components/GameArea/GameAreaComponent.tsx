@@ -41,6 +41,10 @@ export type NodeData = {
   };
   toolTipText: string;
 };
+type UpdateStatusCb = (args: {
+  virtualDims: Vector2;
+  newStatus: NodeAllocatedStatus;
+}) => void;
 
 function GameArea(props: {
   hidden: boolean;
@@ -54,10 +58,7 @@ function GameArea(props: {
   };
   virtualGridStatusMap: KeyedHashMap<Vector2, NodeAllocatedStatus>;
   // specify virtual coordinates of the node and the new status to cause an update.
-  updateNodeStatusCb: (args: {
-    virtualDims: Vector2;
-    newStatus: NodeAllocatedStatus;
-  }) => void;
+  updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
@@ -201,6 +202,7 @@ function GameArea(props: {
                 .map((x, index, arr) => (
                   <Node
                     node={props.virtualGridInfo.map.get(new Vector2(x, y))}
+                    status={props.virtualGridStatusMap.get(new Vector2(x, y))}
                     key={index}
                     hexBlockStyle={hexBlockStyle}
                     idx={index}
@@ -208,6 +210,7 @@ function GameArea(props: {
                     hexCenterStyle={hexCenterStyle}
                     hexCenterLockStyle={hexCenterLockStyle}
                     hexCenterLockBlockStyle={hexCenterLockBlockStyle}
+                    onUpdateStatus={props.updateNodeStatusCb}
                   />
                 ))}
             </Row>
@@ -277,7 +280,7 @@ function CellComponent({
         className="hex-center"
         style={hexCenterStyle}
       >
-        {children}
+        {/* {children} */}
         <div
           className="hover-only"
           style={{
@@ -287,7 +290,7 @@ function CellComponent({
             background: 'rgba(255,255,255,0.3)',
           }}
         >
-          I am usually hidden!
+          {children}
         </div>
       </div>
       {isLocked ? (
@@ -316,10 +319,14 @@ function NodeComponent({
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
   node,
+  status,
+  onUpdateStatus,
 }: {
   node?: NodeData;
+  status?: NodeAllocatedStatus;
   idx: number;
   hexCenterLockBlockStyle: any;
+  onUpdateStatus: UpdateStatusCb;
 
   rowIdx: number;
   children?: React.ReactNode;
@@ -327,15 +334,15 @@ function NodeComponent({
   hexCenterLockStyle: any;
   hexBlockStyle: any;
 }) {
-  if (node !== undefined) {
-    console.log('YAAAAAY');
-    console.log(node);
-  }
   const handleClick = useCallback(
     (e) => {
       e.preventDefault();
       console.log(`clicked`);
-      console.log(node);
+      console.log(status);
+      onUpdateStatus({
+        virtualDims: new Vector2(idx, rowIdx),
+        newStatus: NodeAllocatedStatus.TAKEN,
+      });
     },
     [node]
   );
@@ -349,6 +356,8 @@ function NodeComponent({
       hexCenterStyle={hexCenterStyle}
       hexCenterLockStyle={hexCenterLockStyle}
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-    />
+    >
+      {status}
+    </Cell>
   );
 }

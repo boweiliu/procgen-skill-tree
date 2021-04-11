@@ -121,7 +121,6 @@ function Component(props: {
     };
   }, [gameState.playerUI.virtualGridLocation]);
 
-
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
       const { virtualDims, newStatus } = args;
