@@ -115,8 +115,8 @@ function Component(props: {
   );
 
   const locationToVirtualDims = useCallback(
-    (location: Vector3) => {
-      return null;
+    (location: Vector3): Vector2 | undefined => {
+      return undefined;
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
