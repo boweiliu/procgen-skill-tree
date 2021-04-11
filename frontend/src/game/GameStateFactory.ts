@@ -6,6 +6,7 @@ import {
 } from '../data/GameState';
 import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
+import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
 import { computePlayerResourceAmounts } from './ComputeState';
 import { ZLevelGenFactory } from './WorldGenStateFactory';
@@ -68,7 +69,7 @@ export class GameStateFactory {
         selectedPointNode: undefined,
         activeTab: 0,
         isPixiHidden: true,
-        virtualGridLocation: new Vector2(0, 0),
+        virtualGridLocation: new Vector3(0, 0, 0),
       },
       computed: {},
       intent: {

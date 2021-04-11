@@ -1,6 +1,6 @@
 import { EPSILON } from '../epsilon_math';
 import { Util } from '../misc';
-import { Vector2 } from './vector2';
+import { IVector2, Vector2 } from './vector2';
 
 export interface IVector3 {
   x: number;
@@ -51,6 +51,10 @@ export class Vector3 {
 
   static IsVector3(x: any): x is Vector3 {
     return x instanceof Vector3;
+  }
+
+  static FromVector2(p: IVector2, z: number) {
+    return new Vector3(p.x, p.y, z);
   }
 
   // static Random(highX: number, highY: number, lowX = 0, lowY = 0) {

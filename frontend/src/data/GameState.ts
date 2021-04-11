@@ -1,5 +1,6 @@
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
+import { Vector3 } from '../lib/util/geometry/vector3';
 import { Const, enumKeys } from '../lib/util/misc';
 import { PlayerSaveState } from './PlayerSaveState';
 import { PointNodeRef } from './PointNodeRef';
@@ -132,6 +133,5 @@ export type PlayerUIState = {
 
   isPixiHidden: boolean;
 
-  // not actually a vector2
-  virtualGridLocation: Vector2;
+  virtualGridLocation: Vector3;
 };

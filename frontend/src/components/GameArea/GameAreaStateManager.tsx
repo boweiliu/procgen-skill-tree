@@ -62,14 +62,12 @@ function Component(props: {
   );
 
   const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
-  const virtualGridStatusMap = useMemo(
-    () => new Map<Vector2, NodeAllocatedStatus>(),
-    []
-  );
-
-  for (let row = 0; row < virtualGridDims.x; row++) {
-    for (let col = 0; col < virtualGridDims.y; col++) {}
-  }
+  const virtualGridStatusMap = useMemo(() => {
+    for (let row = 0; row < virtualGridDims.x; row++) {
+      for (let col = 0; col < virtualGridDims.y; col++) {}
+    }
+    return new Map<Vector2, NodeAllocatedStatus>();
+  }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
 
   const handleJump = useCallback((args: { direction: Vector2 }) => {
     // jumpOffset =
@@ -84,10 +82,31 @@ function Component(props: {
 
   const virtualDimsToLocation = useCallback(
     (virtualDims: Vector2) => {
+      const virtualCenter = virtualGridDims.divide(2).floor();
+      const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
+      let relativeLocation = new Vector2();
       // TODO(bowei):
-      return Vector3.Zero;
+      if (offsetFromVirtualCenter.y % 2 === 0) {
+        // calculate the effect of y
+        relativeLocation = relativeLocation
+          .add(new Vector2(1, 2))
+          .multiply(offsetFromVirtualCenter.y / 2);
+        // now add in the x offset
+        relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
+      } else {
+      }
+      return gameState.playerUI.virtualGridLocation.add(
+        Vector3.FromVector2(relativeLocation, 0)
+      );
     },
-    [gameState.playerUI.virtualGridLocation]
+    [gameState.playerUI.virtualGridLocation, virtualGridDims]
+  );
+
+  const locationToVirtualDims = useCallback(
+    (location: Vector3) => {
+      return null;
+    },
+    [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
   const handleUpdateNodeStatus = useCallback(
