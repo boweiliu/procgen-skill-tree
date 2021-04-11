@@ -61,25 +61,6 @@ function Component(props: {
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
 
-  const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
-  const virtualGridStatusMap = useMemo(() => {
-    for (let row = 0; row < virtualGridDims.x; row++) {
-      for (let col = 0; col < virtualGridDims.y; col++) {}
-    }
-    return new Map<Vector2, NodeAllocatedStatus>();
-  }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
-
-  const handleJump = useCallback((args: { direction: Vector2 }) => {
-    // jumpOffset =
-  }, []);
-
-  const virtualGridInfo = useMemo(() => {
-    return {
-      map: virtualGridDataMap,
-      jumpOffset: undefined,
-    };
-  }, [gameState.playerUI.virtualGridLocation]);
-
   const virtualDimsToLocation = useCallback(
     (virtualDims: Vector2) => {
       const virtualCenter = virtualGridDims.divide(2).floor();
@@ -103,11 +84,43 @@ function Component(props: {
   );
 
   const locationToVirtualDims = useCallback(
-    (location: Vector3) => {
-      return null;
+    (location: Vector3): Vector2 | undefined => {
+      return undefined;
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
+
+  const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
+  const virtualGridStatusMap: KeyedHashMap<
+    Vector2,
+    NodeAllocatedStatus
+  > = useMemo(() => {
+    const map = new KeyedHashMap<Vector2, NodeAllocatedStatus>();
+    for (let row = 0; row < virtualGridDims.x; row++) {
+      for (let col = 0; col < virtualGridDims.y; col++) {
+        const virtualVec = new Vector2(row, col);
+        const location = virtualDimsToLocation(virtualVec);
+        map.put(
+          virtualVec,
+          gameState.playerSave.allocationStatusMap.get(location) ||
+            NodeAllocatedStatus.HIDDEN
+        );
+      }
+    }
+    return map;
+  }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
+
+  const handleJump = useCallback((args: { direction: Vector2 }) => {
+    // jumpOffset =
+  }, []);
+
+  const virtualGridInfo = useMemo(() => {
+    return {
+      map: virtualGridDataMap,
+      jumpOffset: undefined,
+    };
+  }, [gameState.playerUI.virtualGridLocation]);
+
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
