@@ -53,7 +53,10 @@ function GameArea(props: {
   };
   virtualGridStatusMap: Map<Vector2, NodeAllocatedStatus>;
   // specify virtual coordinates of the node and the new status to cause an update.
-  updateNodeStatusCb: (args: { virtualDims: Vector2, newStatus: NodeAllocatedStatus }) => void;
+  updateNodeStatusCb: (args: {
+    virtualDims: Vector2;
+    newStatus: NodeAllocatedStatus;
+  }) => void;
   triggerJumpCb: (args: { direction: Vector2 }) => void;
 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
@@ -76,8 +79,8 @@ function GameArea(props: {
   };
   const hexCenterLockStyle = {
     marginLeft: `-${hexCenterRadius * 2}px`,
-    width: (hexCenterRadius * 2) + 'px',
-    height: (hexCenterRadius * 5) + 'px',
+    width: hexCenterRadius * 2 + 'px',
+    height: hexCenterRadius * 5 + 'px',
     // backgroundColor: colorToCss(COLORS.nodePink),
     // borderColor: colorToCss(COLORS.nodeBorder),
   };

@@ -1,0 +1,8 @@
+**/*.svg
+**/*.png
+src/assets/*
+src/assets/
+src/assets
+/src/assets/*
+/src/assets/
+/src/assets

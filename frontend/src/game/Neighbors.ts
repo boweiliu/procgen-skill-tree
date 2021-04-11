@@ -9,8 +9,10 @@ import {
 import { Vector2 } from '../lib/util/geometry/vector2';
 
 enum Direction {
-  NORTH = 'NORTH',
-  SOUTH = 'SOUTH',
+  NORTHWEST = 'NORTHWEST',
+  SOUTHWEST = 'SOUTHWEST',
+  NORTHEAST = 'NORTHEAST',
+  SOUTHEAST = 'SOUTHEAST',
   EAST = 'EAST',
   WEST = 'WEST',
   UP = 'UP',

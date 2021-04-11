@@ -19,7 +19,7 @@
     "build": "react-scripts build",
     "deploy": "gh-pages -d build",
     "test": "react-scripts test",
-    "lintfix": "prettier src/* --write",
+    "lintfix": "prettier -c src --write",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
