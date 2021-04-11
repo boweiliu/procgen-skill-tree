@@ -8,9 +8,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import COLORS, { colorToCss } from '../../pixi/colors';
-import { Vector2 } from '../../lib/util/geometry/vector2';
 import { appSizeFromWindowSize } from '../../data/GameState';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import COLORS, { colorToCss } from '../../pixi/colors';
 
 /**
  *
