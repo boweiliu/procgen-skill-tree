@@ -23,7 +23,7 @@ const PER_Z_SCALE_FACTOR = 4;
  * x-axis is along 0 -> 1
  * y-axis is along 0 -> 2
  * z-axis is vertical
- * 
+ *
  * @param base 0
  */
 export function getCoordNeighbors(
