@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
+import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import {
@@ -57,7 +58,7 @@ function Component(props: {
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
 
-  const virtualGridDataMap = new Map<Vector2, NodeData>();
+  const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
   const virtualGridStatusMap = useMemo(
     () => new Map<Vector2, NodeAllocatedStatus>(),
     []
@@ -78,7 +79,7 @@ function Component(props: {
     };
   }, [gameState.playerUI.virtualGridLocation]);
   const handleUpdateNodeStatus = useCallback(() => {}, []);
-  
+
   return (
     <>
       <GameAreaComponent
