@@ -62,13 +62,20 @@ function Component(props: {
   );
 
   const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
-  const virtualGridStatusMap: KeyedHashMap<Vector2, NodeAllocatedStatus> = useMemo(() => {
+  const virtualGridStatusMap: KeyedHashMap<
+    Vector2,
+    NodeAllocatedStatus
+  > = useMemo(() => {
     const map = new KeyedHashMap<Vector2, NodeAllocatedStatus>();
     for (let row = 0; row < virtualGridDims.x; row++) {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
         const location = virtualDimsToLocation(virtualVec);
-        map.put(virtualVec, gameState.playerSave.allocationStatusMap.get(location) || NodeAllocatedStatus.HIDDEN);
+        map.put(
+          virtualVec,
+          gameState.playerSave.allocationStatusMap.get(location) ||
+            NodeAllocatedStatus.HIDDEN
+        );
       }
     }
     return map;
