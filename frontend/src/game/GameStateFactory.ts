@@ -66,6 +66,7 @@ export class GameStateFactory {
         selectedPointNode: undefined,
         activeTab: 0,
         isPixiHidden: true,
+        virtualGridLocation: new Vector2(0, 0),
       },
       computed: {},
       intent: {

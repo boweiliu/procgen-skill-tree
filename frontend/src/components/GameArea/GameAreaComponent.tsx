@@ -8,9 +8,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import COLORS, { colorToCss } from '../pixi/colors';
-import { Vector2 } from '../lib/util/geometry/vector2';
-import { appSizeFromWindowSize } from '../data/GameState';
+import COLORS, { colorToCss } from '../../pixi/colors';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { appSizeFromWindowSize } from '../../data/GameState';
 
 /**
  *
@@ -18,7 +18,44 @@ import { appSizeFromWindowSize } from '../data/GameState';
  */
 export const GameAreaComponent = React.memo(GameArea);
 
-function GameArea(props: { hidden: boolean; appSize: Vector2 }) {
+export enum NodeAllocatedStatus {
+  ALLOCATED = 'ALLOCATED',
+  INVISIBLE = 'INVISIBLE',
+  ALLOCATABLE = 'ALLOCATABLE',
+  UNALLOCATABLE = 'UNALLOCATABLE',
+}
+
+export enum LockStatus {
+  PERMALOCKED = 'PERMALOCKED',
+  TICKING = 'TICKING',
+  UNLOCKED = 'UNLOCKED',
+}
+
+export type NodeData = {
+  shortText: string;
+  lockData?: {
+    shortTextTarget: string;
+    shortTextTimer: string;
+    lockStatus: LockStatus;
+  };
+  toolTipText: string;
+};
+
+function GameArea(props: {
+  hidden: boolean;
+  appSize: Vector2;
+  // virtualSize: Vector2; // in pixels
+  virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
+  // this object reference is guaranteed to be stable unless jump cb is called
+  virtualGridInfo: {
+    map: Map<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
+    jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
+  };
+  virtualGridStatusMap: Map<Vector2, NodeAllocatedStatus>;
+  // specify virtual coordinates of the node and the new status to cause an update.
+  updateNodeStatusCb: (args: { virtualDims: Vector2, newStatus: NodeAllocatedStatus }) => void;
+  triggerJumpCb: () => void;
+}) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
   // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388

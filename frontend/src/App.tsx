@@ -16,7 +16,7 @@ import { WindowListenerComponent } from './components/WIndowListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
 import { Vector2 } from './lib/util/geometry/vector2';
 import COLORS, { colorToCss } from './pixi/colors';
-import { GameAreaComponent } from './components/GameAreaComponent';
+import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
@@ -40,14 +40,6 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-  /*
-  let appSize = appSizeFromWindowSize(
-    new Vector2(
-      gameState.windowState.innerWidth,
-      gameState.windowState.innerHeight
-    )
-  );
-  /*/
   const appSize = useMemo(() => {
     return appSizeFromWindowSize(
       new Vector2(
@@ -64,6 +56,10 @@ function App() {
       () => void
     ];
   }, [gameState, updaters, fireBatch]);
+
+  const gameAreaStateManager: any | null = null;
+  gameAreaStateManager?.makeProps({ gameState, appSize });
+
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
@@ -73,6 +69,7 @@ function App() {
         <GameAreaComponent
           hidden={!gameState.playerUI.isPixiHidden}
           appSize={appSize}
+          {...gameAreaStateManager?.makeProps(gameState)}
         />
       </div>
 
