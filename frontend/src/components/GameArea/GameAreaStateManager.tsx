@@ -56,15 +56,23 @@ function Component(props: {
     }
   }
 
+  const triggerJumpCb = (args: { direction: Vector2 }) => {
+    // jumpOffset = 
+  }
+
+  const virtualGridInfo = useMemo(() => {
+    return {
+      map: virtualGridDataMap,
+      jumpOffset: undefined
+    };
+  }, [gameState.playerUI.virtualGridLocation])
+
   return (<>
     <GameAreaComponent
       hidden={!gameState.playerUI.isPixiHidden}
       appSize={appSize}
       virtualGridDims={virtualGridDims}
-      virtualGridInfo={{
-        map: virtualGridDataMap,
-        jumpOffset: undefined,
-      }}
+      virtualGridInfo={virtualGridInfo}
       virtualGridStatusMap={virtualGridStatusMap}
       updateNodeStatusCb={() => { }}
       triggerJumpCb={() => { }}
