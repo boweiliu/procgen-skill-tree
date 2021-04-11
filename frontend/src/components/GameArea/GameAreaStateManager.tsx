@@ -5,9 +5,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import COLORS, { colorToCss } from '../../pixi/colors';
+import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { appSizeFromWindowSize, GameState } from '../../data/GameState';
+import COLORS, { colorToCss } from '../../pixi/colors';
 import {
   GameAreaComponent,
   NodeAllocatedStatus,
@@ -58,9 +58,9 @@ function Component(props: {
     for (let col = 0; col < virtualGridDims.y; col++) {}
   }
 
-  const triggerJumpCb = (args: { direction: Vector2 }) => {
+  const handleJump = useCallback((args: { direction: Vector2 }) => {
     // jumpOffset =
-  };
+  }, []);
 
   const virtualGridInfo = useMemo(() => {
     return {
@@ -78,7 +78,7 @@ function Component(props: {
         virtualGridInfo={virtualGridInfo}
         virtualGridStatusMap={virtualGridStatusMap}
         updateNodeStatusCb={() => {}}
-        triggerJumpCb={() => {}}
+        onJump={handleJump}
       />
       {props.children}
     </>

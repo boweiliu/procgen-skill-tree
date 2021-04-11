@@ -8,9 +8,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import COLORS, { colorToCss } from '../../pixi/colors';
-import { Vector2 } from '../../lib/util/geometry/vector2';
 import { appSizeFromWindowSize } from '../../data/GameState';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import COLORS, { colorToCss } from '../../pixi/colors';
 
 /**
  *
@@ -57,7 +57,7 @@ function GameArea(props: {
     virtualDims: Vector2;
     newStatus: NodeAllocatedStatus;
   }) => void;
-  triggerJumpCb: (args: { direction: Vector2 }) => void;
+  onJump: (args: { direction: Vector2 }) => void;
 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209

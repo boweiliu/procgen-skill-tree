@@ -2,23 +2,23 @@ import './App.css';
 
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
+import { DebugOverlayComponent } from './components/DebugOverlayComponent';
+import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
+import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
+import { PixiWrapperComponent } from './components/PixiWrapperComponent';
+import { WindowListenerComponent } from './components/WIndowListenerComponent';
 import { UseGameStateContext } from './contexts';
-import { appSizeFromWindowSize, GameState } from './data/GameState';
+import { GameState, appSizeFromWindowSize } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';
 import { batchifySetState } from './lib/util/batchify';
+import { Vector2 } from './lib/util/geometry/vector2';
 import { Lazy } from './lib/util/misc';
 import {
-  updaterGenerator2,
   UpdaterGeneratorType2,
+  updaterGenerator2,
 } from './lib/util/updaterGenerator';
-import { WindowListenerComponent } from './components/WIndowListenerComponent';
-import { PixiWrapperComponent } from './components/PixiWrapperComponent';
-import { Vector2 } from './lib/util/geometry/vector2';
 import COLORS, { colorToCss } from './pixi/colors';
-import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
-import { DebugOverlayComponent } from './components/DebugOverlayComponent';
-import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
