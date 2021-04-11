@@ -18,6 +18,7 @@ import { Vector2 } from './lib/util/geometry/vector2';
 import COLORS, { colorToCss } from './pixi/colors';
 import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
+import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -57,8 +58,8 @@ function App() {
     ];
   }, [gameState, updaters, fireBatch]);
 
-  const gameAreaStateManager: any | null = null;
-  gameAreaStateManager?.makeProps({ gameState, appSize });
+  // const gameAreaStateManager: any | null = null;
+  // gameAreaStateManager?.makeProps({ gameState, appSize });
 
   return (
     <div className={classnames({ App: true })}>
@@ -66,11 +67,14 @@ function App() {
         <UseGameStateContext.Provider value={gameStateContextValue}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
-        <GameAreaComponent
-          hidden={!gameState.playerUI.isPixiHidden}
-          appSize={appSize}
-          {...gameAreaStateManager?.makeProps(gameState)}
-        />
+        <GameAreaStateManager
+          gameState={gameState}
+        >
+          {/*<GameAreaComponent
+            hidden={!gameState.playerUI.isPixiHidden}
+            appSize={appSize}
+          />*/}
+        </GameAreaStateManager>
       </div>
 
       <div className="debug-overlay">

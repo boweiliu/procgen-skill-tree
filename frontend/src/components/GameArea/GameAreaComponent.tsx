@@ -54,7 +54,7 @@ function GameArea(props: {
   virtualGridStatusMap: Map<Vector2, NodeAllocatedStatus>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: (args: { virtualDims: Vector2, newStatus: NodeAllocatedStatus }) => void;
-  triggerJumpCb: () => void;
+  triggerJumpCb: (args: { direction: Vector2 }) => void;
 }) {
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
