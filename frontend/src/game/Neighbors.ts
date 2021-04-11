@@ -36,7 +36,6 @@ export function getNeighbors(
   return neighbors;
 }
 
-// TODO(bowei): support vertical neighbors
 export function getNeighborsMap(
   selfPointNodeRef: PointNodeRef,
   worldGen: WorldGenState
@@ -105,66 +104,66 @@ export function getNeighborsMap(
       });
     }
   }
-  // +y is down
-  if (selfPointNodeRef.pointNodeCoord.y === ChunkGenConstants.CHUNK_HALF_DIM) {
-    let chunkCoord = selfPointNodeRef.chunkCoord.addY(1);
-    let chunk = zLevel.chunks.get(chunkCoord);
-    if (chunk) {
-      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(
-        -ChunkGenConstants.CHUNK_HALF_DIM
-      );
-      let nbor = chunk.pointNodes.get(pointNodeCoord);
-      if (nbor) {
-        neighbors.SOUTH = new PointNodeRef({
-          z: selfPointNodeRef.z,
-          chunkCoord,
-          pointNodeCoord,
-          pointNodeId: nbor.id,
-        });
-      }
-    }
-  } else {
-    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(1);
-    let nbor = myChunk.pointNodes.get(pointNodeCoord);
-    if (nbor) {
-      neighbors.SOUTH = new PointNodeRef({
-        z: selfPointNodeRef.z,
-        chunkCoord: selfPointNodeRef.chunkCoord,
-        pointNodeCoord,
-        pointNodeId: nbor.id,
-      });
-    }
-  }
-  // -y is up
-  if (selfPointNodeRef.pointNodeCoord.y === -ChunkGenConstants.CHUNK_HALF_DIM) {
-    let chunkCoord = selfPointNodeRef.chunkCoord.addY(-1);
-    let chunk = zLevel.chunks.get(chunkCoord);
-    if (chunk) {
-      let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(
-        ChunkGenConstants.CHUNK_HALF_DIM
-      );
-      let nbor = chunk.pointNodes.get(pointNodeCoord);
-      if (nbor) {
-        neighbors.NORTH = new PointNodeRef({
-          z: selfPointNodeRef.z,
-          chunkCoord,
-          pointNodeCoord,
-          pointNodeId: nbor.id,
-        });
-      }
-    }
-  } else {
-    let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(-1);
-    let nbor = myChunk.pointNodes.get(pointNodeCoord);
-    if (nbor) {
-      neighbors.NORTH = new PointNodeRef({
-        z: selfPointNodeRef.z,
-        chunkCoord: selfPointNodeRef.chunkCoord,
-        pointNodeCoord,
-        pointNodeId: nbor.id,
-      });
-    }
-  }
+  // // +y is down
+  // if (selfPointNodeRef.pointNodeCoord.y === ChunkGenConstants.CHUNK_HALF_DIM) {
+  //   let chunkCoord = selfPointNodeRef.chunkCoord.addY(1);
+  //   let chunk = zLevel.chunks.get(chunkCoord);
+  //   if (chunk) {
+  //     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(
+  //       -ChunkGenConstants.CHUNK_HALF_DIM
+  //     );
+  //     let nbor = chunk.pointNodes.get(pointNodeCoord);
+  //     if (nbor) {
+  //       neighbors.SOUTH = new PointNodeRef({
+  //         z: selfPointNodeRef.z,
+  //         chunkCoord,
+  //         pointNodeCoord,
+  //         pointNodeId: nbor.id,
+  //       });
+  //     }
+  //   }
+  // } else {
+  //   let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(1);
+  //   let nbor = myChunk.pointNodes.get(pointNodeCoord);
+  //   if (nbor) {
+  //     neighbors.SOUTH = new PointNodeRef({
+  //       z: selfPointNodeRef.z,
+  //       chunkCoord: selfPointNodeRef.chunkCoord,
+  //       pointNodeCoord,
+  //       pointNodeId: nbor.id,
+  //     });
+  //   }
+  // }
+  // // -y is up
+  // if (selfPointNodeRef.pointNodeCoord.y === -ChunkGenConstants.CHUNK_HALF_DIM) {
+  //   let chunkCoord = selfPointNodeRef.chunkCoord.addY(-1);
+  //   let chunk = zLevel.chunks.get(chunkCoord);
+  //   if (chunk) {
+  //     let pointNodeCoord = selfPointNodeRef.pointNodeCoord.withY(
+  //       ChunkGenConstants.CHUNK_HALF_DIM
+  //     );
+  //     let nbor = chunk.pointNodes.get(pointNodeCoord);
+  //     if (nbor) {
+  //       neighbors.NORTH = new PointNodeRef({
+  //         z: selfPointNodeRef.z,
+  //         chunkCoord,
+  //         pointNodeCoord,
+  //         pointNodeId: nbor.id,
+  //       });
+  //     }
+  //   }
+  // } else {
+  //   let pointNodeCoord = selfPointNodeRef.pointNodeCoord.addY(-1);
+  //   let nbor = myChunk.pointNodes.get(pointNodeCoord);
+  //   if (nbor) {
+  //     neighbors.NORTH = new PointNodeRef({
+  //       z: selfPointNodeRef.z,
+  //       chunkCoord: selfPointNodeRef.chunkCoord,
+  //       pointNodeCoord,
+  //       pointNodeId: nbor.id,
+  //     });
+  //   }
+  // }
 
   // progress zlevels
   // up is only available if we are the center of our chunk
