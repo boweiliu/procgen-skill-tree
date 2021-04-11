@@ -192,14 +192,15 @@ function GameArea(props: {
           console.log(e);
         }}
       >
-        {Array(numPairsOfRows * 2)
+        {Array(props.virtualGridDims.y)
           .fill(0)
-          .map((it, idx, arr) => (
+          .map((y, idx, arr) => (
             <Row key={idx} rowIdx={idx} hexHalfBlockStyle={hexHalfBlockStyle}>
-              {Array(numBlocksPerRow)
+              {Array(props.virtualGridDims.x)
                 .fill(0)
-                .map((it, index, arr) => (
-                  <Cell
+                .map((x, index, arr) => (
+                  <Node
+                    node={props.virtualGridInfo.map.get(new Vector2(x, y))}
                     key={index}
                     hexBlockStyle={hexBlockStyle}
                     idx={index}
@@ -248,6 +249,7 @@ function CellComponent({
   hexCenterStyle,
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
+  onClick,
 }: {
   idx: number;
   hexCenterLockBlockStyle: any;
@@ -257,12 +259,14 @@ function CellComponent({
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
+  onClick: React.MouseEventHandler;
 }) {
   const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
   const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
   const isLocked = idx === 12 && rowIdx === 4;
   return (
     <div
+      onClick={onClick}
       id={`hex-block-${rowIdx}-${idx}`}
       className="hex-block"
       style={hexBlockStyle}
@@ -299,5 +303,52 @@ function CellComponent({
         </div>
       ) : null}
     </div>
+  );
+}
+
+const Node = React.memo(NodeComponent);
+function NodeComponent({
+  idx,
+  rowIdx,
+  children,
+  hexBlockStyle,
+  hexCenterStyle,
+  hexCenterLockStyle,
+  hexCenterLockBlockStyle,
+  node,
+}: {
+  node?: NodeData;
+  idx: number;
+  hexCenterLockBlockStyle: any;
+
+  rowIdx: number;
+  children?: React.ReactNode;
+  hexCenterStyle: any;
+  hexCenterLockStyle: any;
+  hexBlockStyle: any;
+}) {
+  if (node !== undefined) {
+    console.log('YAAAAAY');
+    console.log(node);
+  }
+  const handleClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      console.log(`clicked`);
+      console.log(node);
+    },
+    [node]
+  );
+  return (
+    <Cell
+      onClick={handleClick}
+      key={idx}
+      hexBlockStyle={hexBlockStyle}
+      idx={idx}
+      rowIdx={rowIdx}
+      hexCenterStyle={hexCenterStyle}
+      hexCenterLockStyle={hexCenterLockStyle}
+      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
+    />
   );
 }
