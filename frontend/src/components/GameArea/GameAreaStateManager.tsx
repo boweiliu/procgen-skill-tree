@@ -46,13 +46,22 @@ function Component(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
-  const virtualGridDims = new Vector2(
-    Math.floor((appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5),
-    Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
+  const virtualGridDims = useMemo(
+    () =>
+      new Vector2(
+        Math.floor(
+          (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
+        ),
+        Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
+      ),
+    [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
 
   const virtualGridDataMap = new Map<Vector2, NodeData>();
-  const virtualGridStatusMap = new Map<Vector2, NodeAllocatedStatus>();
+  const virtualGridStatusMap = useMemo(
+    () => new Map<Vector2, NodeAllocatedStatus>(),
+    []
+  );
 
   for (let row = 0; row < virtualGridDims.x; row++) {
     for (let col = 0; col < virtualGridDims.y; col++) {}
@@ -68,7 +77,8 @@ function Component(props: {
       jumpOffset: undefined,
     };
   }, [gameState.playerUI.virtualGridLocation]);
-
+  const handleUpdateNodeStatus = useCallback(() => {}, []);
+  
   return (
     <>
       <GameAreaComponent
@@ -77,7 +87,7 @@ function Component(props: {
         virtualGridDims={virtualGridDims}
         virtualGridInfo={virtualGridInfo}
         virtualGridStatusMap={virtualGridStatusMap}
-        updateNodeStatusCb={() => {}}
+        updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
       />
       {props.children}

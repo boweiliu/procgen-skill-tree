@@ -199,6 +199,7 @@ function GameArea(props: {
                 .fill(0)
                 .map((it, index, arr) => (
                   <Node
+                    key={index}
                     hexBlockStyle={hexBlockStyle}
                     idx={index}
                     rowIdx={idx}
