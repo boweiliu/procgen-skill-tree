@@ -1,8 +1,13 @@
-import { HashSet } from '../lib/util/data_structures/hash';
+import { NodeAllocatedStatus } from '../components/GameArea/GameAreaComponent';
+import { HashMap, HashSet } from '../lib/util/data_structures/hash';
+import { Vector3 } from '../lib/util/geometry/vector3';
 import { PointNodeRef } from './PointNodeRef';
 import { ResourceType } from './WorldGenState';
 
 export type PlayerSaveState = {
+  /**
+   * DEPRECATED
+   */
   activeQuest: Quest | undefined;
   spSpentThisQuest: number | undefined;
   questProgressHistory: number[];
@@ -16,6 +21,12 @@ export type PlayerSaveState = {
   allocatedPointNodeSet: HashSet<PointNodeRef>;
   // history[-1] == most recent, histoery[0] == oldest
   allocatedPointNodeHistory: PointNodeRef[];
+
+  /**
+   * NOT DEPRECATED
+   */
+
+  allocationStatusMap: HashMap<Vector3, NodeAllocatedStatus>;
 };
 
 export type Quest = {

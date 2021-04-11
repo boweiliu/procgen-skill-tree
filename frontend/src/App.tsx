@@ -67,7 +67,10 @@ function App() {
         <UseGameStateContext.Provider value={gameStateContextValue}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
-        <GameAreaStateManager gameState={gameState}>
+        <GameAreaStateManager
+          gameState={gameState}
+          updaters={updaters}
+        >
           {/*<GameAreaComponent
             hidden={!gameState.playerUI.isPixiHidden}
             appSize={appSize}

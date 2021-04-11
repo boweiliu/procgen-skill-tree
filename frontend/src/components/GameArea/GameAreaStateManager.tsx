@@ -7,6 +7,8 @@ import React, {
 } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import {
   GameAreaComponent,
@@ -33,6 +35,7 @@ export const virtualAreaScaleMultiplier = 3.0;
 
 function Component(props: {
   gameState: GameState;
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
   children?: React.ReactNode;
 }) {
   const { gameState, children } = props;
@@ -77,7 +80,21 @@ function Component(props: {
       jumpOffset: undefined,
     };
   }, [gameState.playerUI.virtualGridLocation]);
-  const handleUpdateNodeStatus = useCallback(() => {}, []);
+
+  const virtualDimsToLocation = useCallback((virtualDims: Vector2) => {
+    // TODO(bowei):
+    return Vector3.Zero;
+  }, [gameState.playerUI.virtualGridLocation])
+
+
+  const handleUpdateNodeStatus = useCallback((args: { virtualDims: Vector2, newStatus: NodeAllocatedStatus }) => {
+    const { virtualDims, newStatus } = args;
+    return props.updaters.playerSave.allocationStatusMap.enqueueUpdate((it) => {
+      const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
+      it.put(nodeLocation, newStatus);
+      return it;
+    });
+  }, [props.updaters]);
   
   return (
     <>

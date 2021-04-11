@@ -4,7 +4,7 @@ import {
   noIntent,
   WindowState,
 } from '../data/GameState';
-import { HashSet } from '../lib/util/data_structures/hash';
+import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
 import { computePlayerResourceAmounts } from './ComputeState';
@@ -61,6 +61,8 @@ export class GameStateFactory {
         allocatedPointNodeSet: new HashSet([pointNodeRef]),
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
+
+        allocationStatusMap: new HashMap(),
       },
       playerUI: {
         selectedPointNode: undefined,
