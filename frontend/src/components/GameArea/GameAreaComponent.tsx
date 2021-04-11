@@ -19,16 +19,16 @@ import { appSizeFromWindowSize } from '../../data/GameState';
 export const GameAreaComponent = React.memo(GameArea);
 
 export enum NodeAllocatedStatus {
-  ALLOCATED = 'ALLOCATED',
-  INVISIBLE = 'INVISIBLE',
-  ALLOCATABLE = 'ALLOCATABLE',
-  UNALLOCATABLE = 'UNALLOCATABLE',
+  TAKEN = 'TAKEN',
+  HIDDEN = 'HIDDEN',
+  AVAILABLE = 'AVAILABLE',
+  UNREACHABLE = 'UNREACHABLE',
 }
 
 export enum LockStatus {
-  PERMALOCKED = 'PERMALOCKED',
+  CLOSED = 'CLOSED',
   TICKING = 'TICKING',
-  UNLOCKED = 'UNLOCKED',
+  OPEN = 'OPEN',
 }
 
 export type NodeData = {
