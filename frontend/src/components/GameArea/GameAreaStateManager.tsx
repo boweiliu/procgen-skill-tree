@@ -5,12 +5,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import COLORS, { colorToCss } from '../../pixi/colors';
+import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { appSizeFromWindowSize, GameState } from '../../data/GameState';
-import { GameAreaComponent, NodeAllocatedStatus, NodeData } from './GameAreaComponent';
+import COLORS, { colorToCss } from '../../pixi/colors';
+import {
+  GameAreaComponent,
+  NodeAllocatedStatus,
+  NodeData,
+} from './GameAreaComponent';
 
-export const GameAreaStateManager = React.memo(Component)
+export const GameAreaStateManager = React.memo(Component);
 
 /**
  * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
@@ -28,8 +32,8 @@ export const hexGridPx = new Vector2(268, 232);
 export const virtualAreaScaleMultiplier = 3.0;
 
 function Component(props: {
-  gameState: GameState,
-  children?: React.ReactNode,
+  gameState: GameState;
+  children?: React.ReactNode;
 }) {
   const { gameState, children } = props;
 
@@ -43,40 +47,40 @@ function Component(props: {
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
   const virtualGridDims = new Vector2(
-    Math.floor(appSize.x * virtualAreaScaleMultiplier / hexGridPx.x - 0.5),
-    Math.floor(appSize.y * virtualAreaScaleMultiplier / hexGridPx.y)
+    Math.floor((appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5),
+    Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
   );
 
   const virtualGridDataMap = new Map<Vector2, NodeData>();
   const virtualGridStatusMap = new Map<Vector2, NodeAllocatedStatus>();
 
   for (let row = 0; row < virtualGridDims.x; row++) {
-    for (let col = 0; col < virtualGridDims.y; col++) {
-
-    }
+    for (let col = 0; col < virtualGridDims.y; col++) {}
   }
 
-  const triggerJumpCb = (args: { direction: Vector2 }) => {
-    // jumpOffset = 
-  }
+  const handleJump = useCallback((args: { direction: Vector2 }) => {
+    // jumpOffset =
+  }, []);
 
   const virtualGridInfo = useMemo(() => {
     return {
       map: virtualGridDataMap,
-      jumpOffset: undefined
+      jumpOffset: undefined,
     };
-  }, [gameState.playerUI.virtualGridLocation])
+  }, [gameState.playerUI.virtualGridLocation]);
 
-  return (<>
-    <GameAreaComponent
-      hidden={!gameState.playerUI.isPixiHidden}
-      appSize={appSize}
-      virtualGridDims={virtualGridDims}
-      virtualGridInfo={virtualGridInfo}
-      virtualGridStatusMap={virtualGridStatusMap}
-      updateNodeStatusCb={() => { }}
-      triggerJumpCb={() => { }}
-    />
-    {props.children}
-  </>);
+  return (
+    <>
+      <GameAreaComponent
+        hidden={!gameState.playerUI.isPixiHidden}
+        appSize={appSize}
+        virtualGridDims={virtualGridDims}
+        virtualGridInfo={virtualGridInfo}
+        virtualGridStatusMap={virtualGridStatusMap}
+        updateNodeStatusCb={() => {}}
+        onJump={handleJump}
+      />
+      {props.children}
+    </>
+  );
 }
