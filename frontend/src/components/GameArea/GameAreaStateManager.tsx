@@ -61,6 +61,35 @@ function Component(props: {
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
 
+  const virtualDimsToLocation = useCallback(
+    (virtualDims: Vector2) => {
+      const virtualCenter = virtualGridDims.divide(2).floor();
+      const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
+      let relativeLocation = new Vector2();
+      // TODO(bowei):
+      if (offsetFromVirtualCenter.y % 2 === 0) {
+        // calculate the effect of y
+        relativeLocation = relativeLocation
+          .add(new Vector2(1, 2))
+          .multiply(offsetFromVirtualCenter.y / 2);
+        // now add in the x offset
+        relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
+      } else {
+      }
+      return gameState.playerUI.virtualGridLocation.add(
+        Vector3.FromVector2(relativeLocation, 0)
+      );
+    },
+    [gameState.playerUI.virtualGridLocation, virtualGridDims]
+  );
+
+  const locationToVirtualDims = useCallback(
+    (location: Vector3): Vector2 | undefined => {
+      return undefined;
+    },
+    [gameState.playerUI.virtualGridLocation, virtualGridDims]
+  );
+
   const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
   const virtualGridStatusMap: KeyedHashMap<
     Vector2,
@@ -92,34 +121,6 @@ function Component(props: {
     };
   }, [gameState.playerUI.virtualGridLocation]);
 
-  const virtualDimsToLocation = useCallback(
-    (virtualDims: Vector2) => {
-      const virtualCenter = virtualGridDims.divide(2).floor();
-      const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
-      let relativeLocation = new Vector2();
-      // TODO(bowei):
-      if (offsetFromVirtualCenter.y % 2 === 0) {
-        // calculate the effect of y
-        relativeLocation = relativeLocation
-          .add(new Vector2(1, 2))
-          .multiply(offsetFromVirtualCenter.y / 2);
-        // now add in the x offset
-        relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
-      } else {
-      }
-      return gameState.playerUI.virtualGridLocation.add(
-        Vector3.FromVector2(relativeLocation, 0)
-      );
-    },
-    [gameState.playerUI.virtualGridLocation, virtualGridDims]
-  );
-
-  const locationToVirtualDims = useCallback(
-    (location: Vector3): Vector2 | undefined => {
-      return undefined;
-    },
-    [gameState.playerUI.virtualGridLocation, virtualGridDims]
-  );
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
