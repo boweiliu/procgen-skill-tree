@@ -110,20 +110,25 @@ function GameArea(props: {
       // const scrollRoom = virtualAreaSize.subtract(props.appSize);
       // const scrollMod = scrollRoom.divide(virtualGrids);
       // handle scroll
+      let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop;
       let newScrollLeft = target.scrollLeft;
       if (target.scrollTop < props.appSize.y * 0.25) {
         newScrollTop += gridHeight * 2;
+        direction.y -= 1;
       }
       if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
         newScrollTop -= gridHeight * 2;
+        direction.y += 1;
       }
       if (target.scrollLeft < props.appSize.x * 0.25) {
         newScrollLeft += gridWidth * 2;
+        direction.x -= 1;
       }
       if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
         newScrollLeft -= gridWidth * 2;
+        direction.x += 1;
       }
       // console.log(target);
       // console.log(target.scrollTop);
@@ -135,6 +140,7 @@ function GameArea(props: {
       ) {
         console.log('jump!');
         target.scrollTo(newScrollLeft, newScrollTop);
+        props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
     [props.appSize.x, props.appSize.y]
@@ -188,16 +194,21 @@ function GameArea(props: {
         {Array(numPairsOfRows * 2)
           .fill(0)
           .map((it, idx, arr) => (
-            <Row
-              key={idx}
-              rowIdx={idx}
-              numBlocksPerRow={numBlocksPerRow}
-              hexHalfBlockStyle={hexHalfBlockStyle}
-              hexCenterStyle={hexCenterStyle}
-              hexCenterLockStyle={hexCenterLockStyle}
-              hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-              hexBlockStyle={hexBlockStyle}
-            />
+            <Row key={idx} rowIdx={idx} hexHalfBlockStyle={hexHalfBlockStyle}>
+              {Array(numBlocksPerRow)
+                .fill(0)
+                .map((it, index, arr) => (
+                  <Node
+                    key={index}
+                    hexBlockStyle={hexBlockStyle}
+                    idx={index}
+                    rowIdx={idx}
+                    hexCenterStyle={hexCenterStyle}
+                    hexCenterLockStyle={hexCenterLockStyle}
+                    hexCenterLockBlockStyle={hexCenterLockBlockStyle}
+                  />
+                ))}
+            </Row>
           ))}
       </div>
     </div>
@@ -208,76 +219,84 @@ const Row = React.memo(RowComponent);
 
 function RowComponent({
   rowIdx,
-  numBlocksPerRow,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
   hexHalfBlockStyle,
-  hexBlockStyle,
   children,
 }: {
   rowIdx: number;
-  numBlocksPerRow: number;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexCenterLockBlockStyle: any;
   hexHalfBlockStyle: any;
-  hexBlockStyle: any;
   children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   const odd = !!(rowIdx % 2);
-  const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
-  const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
 
   return (
     <div className="hex-block-row">
       {odd && <div className="hex-block" style={hexHalfBlockStyle} />}
-      {Array(numBlocksPerRow)
-        .fill(0)
-        .map((it, idx, arr) => {
-          const isLocked = idx === 12 && rowIdx === 4;
-          return (
-            <div
-              id={`hex-block-${rowIdx}-${idx}`}
-              className="hex-block"
-              style={hexBlockStyle}
-              key={idx}
-            >
-              <div
-                id={`hex-center-${rowIdx}-${idx}`}
-                className="hex-center"
-                style={hexCenterStyle}
-              >
-                {children}
-                <div
-                  className="hover-only"
-                  style={{
-                    borderStyle: 'solid',
-                    minWidth: 'fit-content',
-                    padding: '3px',
-                    background: 'rgba(255,255,255,0.3)',
-                  }}
-                >
-                  I am usually hidden!
-                </div>
-              </div>
-              {isLocked ? (
-                <div
-                  id={`hex-lock-${rowIdx}-${idx}`}
-                  style={{
-                    // zIndex: 3,
-                    ...hexCenterLockStyle,
-                  }}
-                >
-                  <div className="hex-center-lock-left" style={leftLock} />
-                  <div className="hex-center-lock-right" style={rightLock} />
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+      {children}
       {!odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+    </div>
+  );
+}
+
+const Node = React.memo(NodeComponent);
+function NodeComponent({
+  idx,
+  rowIdx,
+  children,
+  hexBlockStyle,
+  hexCenterStyle,
+  hexCenterLockStyle,
+  hexCenterLockBlockStyle,
+}: {
+  idx: number;
+  hexCenterLockBlockStyle: any;
+
+  rowIdx: number;
+  children?: React.ReactNode;
+  hexCenterStyle: any;
+  hexCenterLockStyle: any;
+  hexBlockStyle: any;
+}) {
+  const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
+  const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
+  const isLocked = idx === 12 && rowIdx === 4;
+  return (
+    <div
+      id={`hex-block-${rowIdx}-${idx}`}
+      className="hex-block"
+      style={hexBlockStyle}
+      key={idx}
+    >
+      <div
+        id={`hex-center-${rowIdx}-${idx}`}
+        className="hex-center"
+        style={hexCenterStyle}
+      >
+        {children}
+        <div
+          className="hover-only"
+          style={{
+            borderStyle: 'solid',
+            minWidth: 'fit-content',
+            padding: '3px',
+            background: 'rgba(255,255,255,0.3)',
+          }}
+        >
+          I am usually hidden!
+        </div>
+      </div>
+      {isLocked ? (
+        <div
+          id={`hex-lock-${rowIdx}-${idx}`}
+          style={{
+            // zIndex: 3,
+            ...hexCenterLockStyle,
+          }}
+        >
+          <div className="hex-center-lock-left" style={leftLock} />
+          <div className="hex-center-lock-right" style={rightLock} />
+        </div>
+      ) : null}
     </div>
   );
 }
