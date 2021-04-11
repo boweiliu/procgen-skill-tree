@@ -29,7 +29,7 @@ export class Vector3 {
   constructor(
     propsOrX: IVector3 | number = { x: 0, y: 0, z: 0 },
     y?: number,
-    z?: number,
+    z?: number
   ) {
     if (typeof propsOrX === 'number') {
       this._x = propsOrX;
@@ -125,13 +125,13 @@ export class Vector3 {
         x: this.x + pOrX,
         y: this.y + y!,
         z: this.z + z!,
-      })
+      });
     } else {
       return new Vector3({
         x: this.x + pOrX.x,
         y: this.y + pOrX.y,
         z: this.z + pOrX.z,
-      })
+      });
     }
   }
 
@@ -199,10 +199,7 @@ export class Vector3 {
   //   });
   // }
 
-  scale(
-    about: IVector3,
-    amount: IVector3,
-  ): Vector3 {
+  scale(about: IVector3, amount: IVector3): Vector3 {
     return new Vector3({
       x: (this.x - about.x) * amount.x + about.x,
       y: (this.y - about.y) * amount.y + about.y,
@@ -301,7 +298,7 @@ export class Vector3 {
   pairXY(): Vector2 {
     return new Vector2({
       x: this.x,
-      y: this.y
+      y: this.y,
     });
   }
 
@@ -364,7 +361,11 @@ export class Vector3 {
   // }
 
   static Deserialize(obj: any): Vector3 {
-    if (!obj.hasOwnProperty('x') || !obj.hasOwnProperty('y') || !obj.hasOwnProperty('z')) {
+    if (
+      !obj.hasOwnProperty('x') ||
+      !obj.hasOwnProperty('y') ||
+      !obj.hasOwnProperty('z')
+    ) {
       console.error('Failed deserializing vector3');
     }
 
