@@ -52,7 +52,7 @@ function GameArea(props: {
     map: KeyedHashMap<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
     jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   };
-  virtualGridStatusMap: Map<Vector2, NodeAllocatedStatus>;
+  virtualGridStatusMap: KeyedHashMap<Vector2, NodeAllocatedStatus>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: (args: {
     virtualDims: Vector2;
