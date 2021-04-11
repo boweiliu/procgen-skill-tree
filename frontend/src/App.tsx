@@ -7,7 +7,7 @@ import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
 import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
-import { WindowListenerComponent } from './components/WIndowListenerComponent';
+import { WindowListenerComponent } from './components/WindowListenerComponent';
 import { UseGameStateContext } from './contexts';
 import { GameState, appSizeFromWindowSize } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';

@@ -9,6 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { appSizeFromWindowSize } from '../../data/GameState';
+import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 
@@ -48,7 +49,7 @@ function GameArea(props: {
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
   virtualGridInfo: {
-    map: Map<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
+    map: KeyedHashMap<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
     jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   };
   virtualGridStatusMap: Map<Vector2, NodeAllocatedStatus>;
@@ -198,7 +199,7 @@ function GameArea(props: {
               {Array(numBlocksPerRow)
                 .fill(0)
                 .map((it, index, arr) => (
-                  <Node
+                  <Cell
                     key={index}
                     hexBlockStyle={hexBlockStyle}
                     idx={index}
@@ -238,8 +239,8 @@ function RowComponent({
   );
 }
 
-const Node = React.memo(NodeComponent);
-function NodeComponent({
+const Cell = React.memo(CellComponent);
+function CellComponent({
   idx,
   rowIdx,
   children,

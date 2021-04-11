@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
+import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -60,7 +61,7 @@ function Component(props: {
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
 
-  const virtualGridDataMap = new Map<Vector2, NodeData>();
+  const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
   const virtualGridStatusMap = useMemo(
     () => new Map<Vector2, NodeAllocatedStatus>(),
     []
