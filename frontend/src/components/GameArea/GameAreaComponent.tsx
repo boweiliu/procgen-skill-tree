@@ -110,20 +110,25 @@ function GameArea(props: {
       // const scrollRoom = virtualAreaSize.subtract(props.appSize);
       // const scrollMod = scrollRoom.divide(virtualGrids);
       // handle scroll
+      let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop;
       let newScrollLeft = target.scrollLeft;
       if (target.scrollTop < props.appSize.y * 0.25) {
         newScrollTop += gridHeight * 2;
+        direction.y -= 1;
       }
       if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
         newScrollTop -= gridHeight * 2;
+        direction.y += 1;
       }
       if (target.scrollLeft < props.appSize.x * 0.25) {
         newScrollLeft += gridWidth * 2;
+        direction.x -= 1;
       }
       if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
         newScrollLeft -= gridWidth * 2;
+        direction.x += 1;
       }
       // console.log(target);
       // console.log(target.scrollTop);
@@ -135,6 +140,7 @@ function GameArea(props: {
       ) {
         console.log('jump!');
         target.scrollTo(newScrollLeft, newScrollTop);
+        props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
     [props.appSize.x, props.appSize.y]
