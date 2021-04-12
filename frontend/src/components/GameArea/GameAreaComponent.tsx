@@ -40,6 +40,8 @@ export type NodeData = {
     lockStatus: LockStatus;
   };
   toolTipText: string;
+  status: NodeAllocatedStatus;
+  id: string;
 };
 type UpdateStatusCb = (args: {
   virtualDims: Vector2;
@@ -56,7 +58,7 @@ function GameArea(props: {
     map: KeyedHashMap<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
     jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   };
-  virtualGridStatusMap: KeyedHashMap<Vector2, NodeAllocatedStatus>;
+  virtualGridStatusMap: KeyedHashMap<Vector2, NodeData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
@@ -196,23 +198,33 @@ function GameArea(props: {
         {Array(props.virtualGridDims.y)
           .fill(0)
           .map((_, rowIdx, arr) => (
-            <Row key={rowIdx} rowIdx={rowIdx} hexHalfBlockStyle={hexHalfBlockStyle}>
+            <Row
+              key={rowIdx}
+              rowIdx={rowIdx}
+              hexHalfBlockStyle={hexHalfBlockStyle}
+            >
               {Array(props.virtualGridDims.x)
                 .fill(0)
-                .map((_, index, arr) => (
-                  <Node
-                    node={props.virtualGridInfo.map.get(new Vector2(index, rowIdx))}
-                    status={props.virtualGridStatusMap.get(new Vector2(index, rowIdx))}
-                    key={index}
-                    hexBlockStyle={hexBlockStyle}
-                    idx={index}
-                    rowIdx={rowIdx}
-                    hexCenterStyle={hexCenterStyle}
-                    hexCenterLockStyle={hexCenterLockStyle}
-                    hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-                    onUpdateStatus={props.updateNodeStatusCb}
-                  />
-                ))}
+                .map((_, index, arr) => {
+                  return (
+                    <Node
+                      node={props.virtualGridInfo.map.get(
+                        new Vector2(index, rowIdx)
+                      )}
+                      status={props.virtualGridStatusMap.get(
+                        new Vector2(index, rowIdx)
+                      )?.status}
+                      key={index}
+                      hexBlockStyle={hexBlockStyle}
+                      idx={index}
+                      rowIdx={rowIdx}
+                      hexCenterStyle={hexCenterStyle}
+                      hexCenterLockStyle={hexCenterLockStyle}
+                      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
+                      onUpdateStatus={props.updateNodeStatusCb}
+                    />
+                  );
+                })}
             </Row>
           ))}
       </div>

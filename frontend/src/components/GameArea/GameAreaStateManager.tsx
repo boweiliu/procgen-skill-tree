@@ -113,25 +113,26 @@ function Component(props: {
   );
 
   const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
-  const virtualGridStatusMap: KeyedHashMap<
-    Vector2,
-    NodeAllocatedStatus
-  > = useMemo(() => {
-    const map = new KeyedHashMap<Vector2, NodeAllocatedStatus>();
+  const virtualGridStatusMap: KeyedHashMap<Vector2, NodeData> =
+    useMemo(() => {
+    const map = new KeyedHashMap<Vector2, NodeData>();
     for (let row = 0; row < virtualGridDims.x; row++) {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
         const location = virtualDimsToLocation(virtualVec);
-        const maybeStatus = gameState.playerSave.allocationStatusMap.get(
-          location
-        );
-        if (maybeStatus) {
-          console.log({ virtualVec, location, maybeStatus });
+        const maybeStatus = gameState.playerSave.allocationStatusMap.get(location);
+        const nodeStatus = maybeStatus || NodeAllocatedStatus.HIDDEN;
+        const id = location.hash();
+        const nodeData: NodeData = {
+          shortText: id,
+          toolTipText: nodeStatus.toString(),
+          status: nodeStatus,
+          id, 
         }
-        map.put(virtualVec, maybeStatus || NodeAllocatedStatus.HIDDEN);
+        map.put(virtualVec, nodeData);
       }
     }
-    console.log({ map });
+    // console.log({ map });
     return map;
   }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
 
