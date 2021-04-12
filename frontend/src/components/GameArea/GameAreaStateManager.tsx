@@ -60,22 +60,40 @@ function Component(props: {
       ),
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
+  useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
 
   const virtualDimsToLocation = useCallback(
     (virtualDims: Vector2) => {
       const virtualCenter = virtualGridDims.divide(2).floor();
       const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
-      let relativeLocation = new Vector2();
+      let relativeLocation = new Vector2(0, 0);
       // TODO(bowei):
       if (offsetFromVirtualCenter.y % 2 === 0) {
         // calculate the effect of y
-        relativeLocation = relativeLocation
-          .add(new Vector2(1, 2))
-          .multiply(offsetFromVirtualCenter.y / 2);
-        // now add in the x offset
-        relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
+        relativeLocation = (new Vector2(1, 2)).multiply(offsetFromVirtualCenter.y / 2);
+      } else if (virtualCenter.y % 2 == 0) {
+        // half block is not in the center row
+        /**
+         * 0: O - O - O
+         * 1:   O - O - O
+         * 2: O - O - O <- virtualCenter.y
+         * 3:   O - O - O <- offsetFromVirtualCenter.y == 1
+         */
+        relativeLocation = (new Vector2(0, -1))
+          .add((new Vector2(1, 2)).multiply((offsetFromVirtualCenter.y - 1) / 2));
       } else {
+        // half block is in the center row
+        /**
+         * 0: O - O - O
+         * 1:   O - O - O <- virtualCenter.y
+         * 2: O - O - O <- offsetFromVirtualCenter.y == 1
+         * 3:   O - O - O
+         */
+        relativeLocation = (new Vector2(1, 1))
+          .add((new Vector2(1, 2)).multiply((offsetFromVirtualCenter.y - 1) / 2));
       }
+      // now add in the x offset
+      relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
       return gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(relativeLocation, 0)
       );
@@ -100,13 +118,15 @@ function Component(props: {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
         const location = virtualDimsToLocation(virtualVec);
+        const maybeStatus = gameState.playerSave.allocationStatusMap.get(location);
+        if (maybeStatus) { console.log({ virtualVec, location, maybeStatus }); }
         map.put(
           virtualVec,
-          gameState.playerSave.allocationStatusMap.get(location) ||
-            NodeAllocatedStatus.HIDDEN
+          maybeStatus || NodeAllocatedStatus.HIDDEN
         );
       }
     }
+    console.log({ map });
     return map;
   }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
 
@@ -123,12 +143,14 @@ function Component(props: {
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
+      // console.log({ got: 'here' });
       const { virtualDims, newStatus } = args;
       return props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
         (it) => {
           const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
           it.put(nodeLocation, newStatus);
-          return it;
+          // console.log({ it });
+          return it.clone();
         }
       );
     },

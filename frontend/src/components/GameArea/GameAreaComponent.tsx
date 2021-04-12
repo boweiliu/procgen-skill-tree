@@ -338,7 +338,7 @@ function NodeComponent({
     (e) => {
       e.preventDefault();
       console.log(`clicked`);
-      console.log(status);
+      console.log({ idx, rowIdx, status });
       onUpdateStatus({
         virtualDims: new Vector2(idx, rowIdx),
         newStatus: NodeAllocatedStatus.TAKEN,
