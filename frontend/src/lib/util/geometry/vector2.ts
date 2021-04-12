@@ -156,7 +156,7 @@ export class Vector2 {
 
     return new Vector2({
       x: newX,
-      y: this.y
+      y: this.y,
     });
   }
 
