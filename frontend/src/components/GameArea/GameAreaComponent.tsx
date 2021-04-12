@@ -211,9 +211,11 @@ function GameArea(props: {
                       node={props.virtualGridInfo.map.get(
                         new Vector2(index, rowIdx)
                       )}
-                      status={props.virtualGridStatusMap.get(
-                        new Vector2(index, rowIdx)
-                      )?.status}
+                      status={
+                        props.virtualGridStatusMap.get(
+                          new Vector2(index, rowIdx)
+                        )?.status
+                      }
                       key={index}
                       hexBlockStyle={hexBlockStyle}
                       idx={index}
