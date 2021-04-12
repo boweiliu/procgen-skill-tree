@@ -156,7 +156,8 @@ function Component(props: {
       const jumpOffset = jumpAmounts.multiply(args.direction);
       console.log({ jumpOffset });
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-        return it.addX(jumpOffset.x)
+        return it
+          .addX(jumpOffset.x)
           .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
       });
       setJumpOffset(jumpOffset.multiply(1));
