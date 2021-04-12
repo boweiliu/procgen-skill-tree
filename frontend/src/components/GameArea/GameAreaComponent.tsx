@@ -194,10 +194,10 @@ function GameArea(props: {
           }
         }
         onPointerOver={(e: React.PointerEvent) => {
-          console.log(e);
+          // console.log(e);
         }}
         onClick={(e: React.MouseEvent) => {
-          console.log(e);
+          // console.log(e);
         }}
       >
         {Array(props.virtualGridDims.y)
