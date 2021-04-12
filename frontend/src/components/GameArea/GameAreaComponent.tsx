@@ -283,9 +283,15 @@ function CellComponent({
   const rightLock = { ...hexCenterLockBlockStyle };
 
   const isLocked = idx === 12 && rowIdx === 4;
-  const fillColor = (status === NodeAllocatedStatus.TAKEN) ? colorToCss(COLORS.grayBlack) : colorToCss(COLORS.nodePink);
-  const borderColor = (status === NodeAllocatedStatus.TAKEN || status === NodeAllocatedStatus.UNREACHABLE
-  ) ? colorToCss(COLORS.borderBlack) : colorToCss(COLORS.borderWhite);
+  const fillColor =
+    status === NodeAllocatedStatus.TAKEN
+      ? colorToCss(COLORS.grayBlack)
+      : colorToCss(COLORS.nodePink);
+  const borderColor =
+    status === NodeAllocatedStatus.TAKEN ||
+    status === NodeAllocatedStatus.UNREACHABLE
+      ? colorToCss(COLORS.borderBlack)
+      : colorToCss(COLORS.borderWhite);
 
   return (
     <div
@@ -384,7 +390,7 @@ function NodeComponent({
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
-    text?: string;
+  text?: string;
 }) {
   const handleClick = useCallback(
     (e) => {
