@@ -321,6 +321,7 @@ function CellComponent({
               paddingBottom: '2px',
               maxWidth: '48px',
               overflow: 'hidden',
+              cursor: 'default',
             }}
           >
             {text}
