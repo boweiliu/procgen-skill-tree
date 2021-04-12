@@ -1,15 +1,8 @@
 import './GameAreaComponent.css';
 
 import classnames from 'classnames';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { appSizeFromWindowSize } from '../../data/GameState';
-import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 
@@ -62,6 +55,7 @@ function GameArea(props: {
   onJump: (args: { direction: Vector2 }) => void;
 }) {
   useEffect(() => {
+    // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
     if (!jumpOffset) return;
     const ref = container.current;
@@ -205,17 +199,13 @@ function GameArea(props: {
       >
         {Array(props.virtualGridDims.y)
           .fill(0)
-          .map((_, rowIdx, arr) => (
-            <Row
-              key={rowIdx}
-              rowIdx={rowIdx}
-              hexHalfBlockStyle={hexHalfBlockStyle}
-            >
+          .map((_, y) => (
+            <Row key={y} rowIdx={y} hexHalfBlockStyle={hexHalfBlockStyle}>
               {Array(props.virtualGridDims.x)
                 .fill(0)
-                .map((_, index, arr) => {
+                .map((_, x) => {
                   const node = props.virtualGridStatusMap.get(
-                    new Vector2(index, rowIdx)
+                    new Vector2(x, y)
                   );
                   return (
                     <Node
@@ -224,8 +214,8 @@ function GameArea(props: {
                       status={node?.status}
                       text={node?.shortText}
                       hexBlockStyle={hexBlockStyle}
-                      idx={index}
-                      rowIdx={rowIdx}
+                      idx={x}
+                      rowIdx={y}
                       hexCenterStyle={hexCenterStyle}
                       hexCenterLockStyle={hexCenterLockStyle}
                       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
