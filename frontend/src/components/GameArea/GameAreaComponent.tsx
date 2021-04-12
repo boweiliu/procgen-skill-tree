@@ -213,7 +213,7 @@ function GameArea(props: {
                   return (
                     <Node
                       nodeData={nodeData}
-                      key={nodeData.id}
+                      key={nodeData?.id ?? `loading${x}`}
                       node={nodeData}
                       status={nodeData.status}
                       text={nodeData.shortText}
@@ -304,7 +304,6 @@ function CellComponent({
       id={`hex-block-${rowIdx}-${idx}`}
       className="hex-block"
       style={hexBlockStyle}
-      key={idx}
     >
       <div
         id={`hex-center-${rowIdx}-${idx}`}
@@ -413,7 +412,6 @@ function NodeComponent({
   return (
     <Cell
       onClick={handleClick}
-      key={idx}
       hexBlockStyle={hexBlockStyle}
       idx={idx}
       rowIdx={rowIdx}
