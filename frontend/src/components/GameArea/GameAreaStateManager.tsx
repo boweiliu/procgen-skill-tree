@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { updateRestTypeNode } from 'typescript';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -72,7 +73,7 @@ function Component(props: {
     // TODO(bowei):
     if (offsetFromVirtualCenter.y % 2 === 0) {
       // calculate the effect of y
-      relativeLocation = new Vector2(1, 2).multiply(
+      relativeLocation = new Vector2(-1, -2).multiply(
         offsetFromVirtualCenter.y / 2
       );
     } else if (virtualCenter.y % 2 == 0) {
@@ -84,7 +85,7 @@ function Component(props: {
        * 3:   O - O - O <- offsetFromVirtualCenter.y == 1
        */
       relativeLocation = new Vector2(0, -1).add(
-        new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+        new Vector2(-1, -2).multiply((offsetFromVirtualCenter.y - 1) / 2)
       );
     } else {
       // half block is in the center row
@@ -94,8 +95,8 @@ function Component(props: {
        * 2: O - O - O <- offsetFromVirtualCenter.y == 1
        * 3:   O - O - O
        */
-      relativeLocation = new Vector2(1, 1).add(
-        new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+      relativeLocation = new Vector2(-1, -1).add(
+        new Vector2(-1, -2).multiply((offsetFromVirtualCenter.y - 1) / 2)
       );
     }
     // now add in the x offset
@@ -140,10 +141,16 @@ function Component(props: {
   }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
 
   const handleJump = useCallback((args: { direction: Vector2 }) => {
-    setJumpOffset(new Vector2(0, 0));
-    // jumpOffset =
-    //
-  }, []);
+    // direction: bottom right == (1,1)
+    console.log({ direction: args.direction });
+    const jumpAmounts = virtualGridDims.multiply(0.75).floor().clampX(1, virtualGridDims.x - 1).clampY(1, virtualGridDims.y - 1);
+    const jumpOffset = jumpAmounts.multiply(args.direction);
+    props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+      return it;
+    });
+    console.log({ jumpOffset });
+    setJumpOffset(jumpOffset.multiply(1));
+  }, [virtualGridDims]);
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {

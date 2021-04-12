@@ -144,6 +144,22 @@ export class Vector2 {
     });
   }
 
+  clampX(low: number, high: number): Vector2 {
+    let newX = this.x;
+
+    if (newX < low) {
+      newX = low;
+    }
+    if (newX > high) {
+      newX = high;
+    }
+
+    return new Vector2({
+      x: newX,
+      y: this.y
+    });
+  }
+
   clampY(low: number, high: number): Vector2 {
     let newY = this.y;
 
