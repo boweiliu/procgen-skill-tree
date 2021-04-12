@@ -270,11 +270,21 @@ export class LockFactory {
     seed: number;
     location: Vector3;
   }): LockData | undefined {
+    const id = squirrel3(
+      args.seed +
+        args.location.x +
+        args.location.y +
+        squirrel3(args.seed + args.location.x + args.location.z)
+    );
+
     let lockData: LockData = {
-      shortTextTarget: '',
-      shortTextTimer: '',
+      shortTextTarget: '1🟢',
+      shortTextTimer: '2⌛',
       lockStatus: LockStatus.TICKING,
     };
+    if (id % 2 === 0) {
+      return lockData;
+    }
 
     return undefined;
   }

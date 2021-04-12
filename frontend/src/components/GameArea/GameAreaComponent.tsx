@@ -214,7 +214,6 @@ function GameArea(props: {
                     <Node
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
-                      node={nodeData}
                       status={nodeData.status}
                       text={nodeData.shortText}
                       hexBlockStyle={hexBlockStyle}
@@ -287,7 +286,7 @@ function CellComponent({
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
 
-  const isLocked = idx === 12 && rowIdx === 4;
+  const isLocked = (idx === 12 && rowIdx === 4) || !!nodeData.lockData;
   const fillColor =
     status === NodeAllocatedStatus.TAKEN
       ? colorToCss(COLORS.grayBlack)
@@ -297,6 +296,9 @@ function CellComponent({
     status === NodeAllocatedStatus.UNREACHABLE
       ? colorToCss(COLORS.borderBlack)
       : colorToCss(COLORS.borderWhite);
+  const lockBorderColor = isLocked
+    ? colorToCss(COLORS.borderBlack)
+    : borderColor;
 
   return (
     <div
@@ -354,14 +356,18 @@ function CellComponent({
         >
           <div
             className="hex-center-lock-left"
-            style={{ ...leftLock, borderColor }}
+            style={{ ...leftLock, borderColor: lockBorderColor }}
           >
-            <div className="tiny-text">3f</div>
+            <div className="tiny-text">
+              {nodeData.lockData?.shortTextTarget}
+            </div>
           </div>
           <div
             className="hex-center-lock-right"
-            style={{ ...rightLock, borderColor }}
-          ></div>
+            style={{ ...rightLock, borderColor: lockBorderColor }}
+          >
+            <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
+          </div>
         </div>
       ) : null}
     </div>
@@ -377,13 +383,11 @@ function NodeComponent({
   hexCenterStyle,
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
-  node,
   status,
   text,
   onUpdateStatus,
   nodeData,
 }: {
-  node?: NodeData;
   status: NodeAllocatedStatus;
   idx: number;
   hexCenterLockBlockStyle: any;

@@ -128,10 +128,12 @@ function Component(props: {
         );
         const nodeStatus = maybeStatus || NodeAllocatedStatus.HIDDEN;
         const id = location.hash();
+        const lockData = gameState.worldGen.lockMap.get(location);
         const nodeData: NodeData = {
           shortText: id,
           toolTipText: nodeStatus.toString(),
           status: nodeStatus,
+          lockData,
           id,
         };
         map.put(virtualVec, nodeData);
@@ -141,6 +143,7 @@ function Component(props: {
     return map;
   }, [
     gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.lockMap,
     virtualGridDims,
     virtualDimsToLocation,
   ]);
@@ -174,12 +177,16 @@ function Component(props: {
       const prevStatus =
         gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeAllocatedStatus.HIDDEN;
-      if (
-        newStatus === NodeAllocatedStatus.TAKEN &&
-        prevStatus !== NodeAllocatedStatus.AVAILABLE
-      ) {
-        console.log('cant do that', prevStatus);
-        return;
+      if (newStatus === NodeAllocatedStatus.TAKEN) {
+        if (prevStatus !== NodeAllocatedStatus.AVAILABLE) {
+          console.log('cant do that', prevStatus);
+          return;
+        }
+        const maybeLock = gameState.worldGen.lockMap.get(nodeLocation);
+        if (!!maybeLock) {
+          console.log('is locked', maybeLock);
+          return;
+        }
       }
       return props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
         (prevMap, prevGameState) => {
@@ -210,6 +217,7 @@ function Component(props: {
       props.updaters,
       virtualDimsToLocation,
       gameState.playerSave.allocationStatusMap,
+      gameState.worldGen.lockMap,
     ]
   );
 
