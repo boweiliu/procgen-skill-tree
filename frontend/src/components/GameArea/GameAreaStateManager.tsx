@@ -62,48 +62,51 @@ function Component(props: {
   );
   useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
 
-  const virtualDimsToLocation = useCallback(
-    (virtualDims: Vector2) => {
-      const virtualCenter = virtualGridDims.divide(2).floor();
-      const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
-      let relativeLocation = new Vector2(0, 0);
-      // TODO(bowei):
-      if (offsetFromVirtualCenter.y % 2 === 0) {
-        // calculate the effect of y
-        relativeLocation = new Vector2(1, 2).multiply(
-          offsetFromVirtualCenter.y / 2
-        );
-      } else if (virtualCenter.y % 2 == 0) {
-        // half block is not in the center row
-        /**
-         * 0: O - O - O
-         * 1:   O - O - O
-         * 2: O - O - O <- virtualCenter.y
-         * 3:   O - O - O <- offsetFromVirtualCenter.y == 1
-         */
-        relativeLocation = new Vector2(0, -1).add(
-          new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
-        );
-      } else {
-        // half block is in the center row
-        /**
-         * 0: O - O - O
-         * 1:   O - O - O <- virtualCenter.y
-         * 2: O - O - O <- offsetFromVirtualCenter.y == 1
-         * 3:   O - O - O
-         */
-        relativeLocation = new Vector2(1, 1).add(
-          new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
-        );
-      }
-      // now add in the x offset
-      relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
-      return gameState.playerUI.virtualGridLocation.add(
-        Vector3.FromVector2(relativeLocation, 0)
+  function virtualDimsToLocation(
+    // useCallback(
+    virtualDims: Vector2
+  ) {
+    const virtualCenter = virtualGridDims.divide(2).floor();
+    const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
+    let relativeLocation = new Vector2(0, 0);
+    // TODO(bowei):
+    if (offsetFromVirtualCenter.y % 2 === 0) {
+      // calculate the effect of y
+      relativeLocation = new Vector2(1, 2).multiply(
+        offsetFromVirtualCenter.y / 2
       );
-    },
-    [gameState.playerUI.virtualGridLocation, virtualGridDims]
-  );
+    } else if (virtualCenter.y % 2 == 0) {
+      // half block is not in the center row
+      /**
+       * 0: O - O - O
+       * 1:   O - O - O
+       * 2: O - O - O <- virtualCenter.y
+       * 3:   O - O - O <- offsetFromVirtualCenter.y == 1
+       */
+      relativeLocation = new Vector2(0, -1).add(
+        new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+      );
+    } else {
+      // half block is in the center row
+      /**
+       * 0: O - O - O
+       * 1:   O - O - O <- virtualCenter.y
+       * 2: O - O - O <- offsetFromVirtualCenter.y == 1
+       * 3:   O - O - O
+       */
+      relativeLocation = new Vector2(1, 1).add(
+        new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+      );
+    }
+    // now add in the x offset
+    relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
+    return gameState.playerUI.virtualGridLocation.add(
+      Vector3.FromVector2(relativeLocation, 0)
+    );
+  }
+  // ,
+  //   [gameState.playerUI.virtualGridLocation, virtualGridDims]
+  // );
 
   const locationToVirtualDims = useCallback(
     (location: Vector3): Vector2 | undefined => {
