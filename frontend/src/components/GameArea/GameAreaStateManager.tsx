@@ -171,8 +171,13 @@ function Component(props: {
       // console.log({ got: 'here' });
       const { virtualDims, newStatus } = args;
       const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
-      const prevStatus = gameState.playerSave.allocationStatusMap.get(nodeLocation) || NodeAllocatedStatus.HIDDEN;
-      if (newStatus === NodeAllocatedStatus.TAKEN && prevStatus !== NodeAllocatedStatus.AVAILABLE) {
+      const prevStatus =
+        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
+        NodeAllocatedStatus.HIDDEN;
+      if (
+        newStatus === NodeAllocatedStatus.TAKEN &&
+        prevStatus !== NodeAllocatedStatus.AVAILABLE
+      ) {
         console.log('cant do that', prevStatus);
         return;
       }
@@ -180,13 +185,16 @@ function Component(props: {
         (prevMap) => {
           prevMap.put(nodeLocation, newStatus);
           if (newStatus === NodeAllocatedStatus.TAKEN) {
-            getWithinDistance(nodeLocation, 1).forEach(n => {
+            getWithinDistance(nodeLocation, 1).forEach((n) => {
               if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
                 prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
               }
             });
-            getWithinDistance(nodeLocation, 3).forEach(n => {
-              if ((prevMap.get(n) || NodeAllocatedStatus.HIDDEN) === NodeAllocatedStatus.HIDDEN) {
+            getWithinDistance(nodeLocation, 3).forEach((n) => {
+              if (
+                (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
+                NodeAllocatedStatus.HIDDEN
+              ) {
                 prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
               }
             });
@@ -196,7 +204,11 @@ function Component(props: {
         }
       );
     },
-    [props.updaters, virtualDimsToLocation, gameState.playerSave.allocationStatusMap]
+    [
+      props.updaters,
+      virtualDimsToLocation,
+      gameState.playerSave.allocationStatusMap,
+    ]
   );
 
   return (

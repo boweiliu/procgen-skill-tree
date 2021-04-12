@@ -53,16 +53,16 @@ export function getCoordNeighbors(
 }
 
 /**
- * 
+ *
  * @param base
- * @param maxDistance 
- * @param minDistance 
+ * @param maxDistance
+ * @param minDistance
  * @returns all vector3 coords that are <= maxDistance and >= minDistance.
  */
 export function getWithinDistance(
   base: Vector3,
   maxDistance: number,
-  minDistance?: number,
+  minDistance?: number
 ): Vector3[] {
   let touched: HashSet<Vector3> = new HashSet();
   touched.put(base);
@@ -83,7 +83,7 @@ export function getWithinDistance(
   }
 
   let result: Vector3[] = [];
-  for (let dd = (minDistance || 0); dd <= maxDistance; dd++) {
+  for (let dd = minDistance || 0; dd <= maxDistance; dd++) {
     result = result.concat(byDist[dd]);
   }
   return result;
