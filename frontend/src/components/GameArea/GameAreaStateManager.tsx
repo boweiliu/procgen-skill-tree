@@ -70,7 +70,9 @@ function Component(props: {
       // TODO(bowei):
       if (offsetFromVirtualCenter.y % 2 === 0) {
         // calculate the effect of y
-        relativeLocation = (new Vector2(1, 2)).multiply(offsetFromVirtualCenter.y / 2);
+        relativeLocation = new Vector2(1, 2).multiply(
+          offsetFromVirtualCenter.y / 2
+        );
       } else if (virtualCenter.y % 2 == 0) {
         // half block is not in the center row
         /**
@@ -79,8 +81,9 @@ function Component(props: {
          * 2: O - O - O <- virtualCenter.y
          * 3:   O - O - O <- offsetFromVirtualCenter.y == 1
          */
-        relativeLocation = (new Vector2(0, -1))
-          .add((new Vector2(1, 2)).multiply((offsetFromVirtualCenter.y - 1) / 2));
+        relativeLocation = new Vector2(0, -1).add(
+          new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+        );
       } else {
         // half block is in the center row
         /**
@@ -89,8 +92,9 @@ function Component(props: {
          * 2: O - O - O <- offsetFromVirtualCenter.y == 1
          * 3:   O - O - O
          */
-        relativeLocation = (new Vector2(1, 1))
-          .add((new Vector2(1, 2)).multiply((offsetFromVirtualCenter.y - 1) / 2));
+        relativeLocation = new Vector2(1, 1).add(
+          new Vector2(1, 2).multiply((offsetFromVirtualCenter.y - 1) / 2)
+        );
       }
       // now add in the x offset
       relativeLocation = relativeLocation.addX(offsetFromVirtualCenter.x);
@@ -118,12 +122,13 @@ function Component(props: {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
         const location = virtualDimsToLocation(virtualVec);
-        const maybeStatus = gameState.playerSave.allocationStatusMap.get(location);
-        if (maybeStatus) { console.log({ virtualVec, location, maybeStatus }); }
-        map.put(
-          virtualVec,
-          maybeStatus || NodeAllocatedStatus.HIDDEN
+        const maybeStatus = gameState.playerSave.allocationStatusMap.get(
+          location
         );
+        if (maybeStatus) {
+          console.log({ virtualVec, location, maybeStatus });
+        }
+        map.put(virtualVec, maybeStatus || NodeAllocatedStatus.HIDDEN);
       }
     }
     console.log({ map });
