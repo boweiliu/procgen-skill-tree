@@ -207,15 +207,16 @@ function GameArea(props: {
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, x) => {
-                  const node = props.virtualGridStatusMap.get(
+                  const nodeData = props.virtualGridStatusMap.get(
                     new Vector2(x, y)
                   )!;
                   return (
                     <Node
-                      key={node?.id}
-                      node={node}
-                      status={node.status}
-                      text={node.shortText}
+                      nodeData={nodeData}
+                      key={nodeData.id}
+                      node={nodeData}
+                      status={nodeData.status}
+                      text={nodeData.shortText}
                       hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
@@ -268,6 +269,7 @@ function CellComponent({
   onClick,
   status,
   text,
+  nodeData,
 }: {
   idx: number;
   hexCenterLockBlockStyle: any;
@@ -280,6 +282,7 @@ function CellComponent({
   onClick: React.MouseEventHandler;
   text?: string;
   status: NodeAllocatedStatus;
+  nodeData: NodeData;
 }) {
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
@@ -325,18 +328,7 @@ function CellComponent({
             marginLeft: '-2px',
           }}
         >
-          <div
-            style={{
-              // font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top. this fills it in symmetrically on the left and bottom.
-              paddingLeft: '2px',
-              paddingBottom: '2px',
-              maxWidth: '48px',
-              overflow: 'hidden',
-              cursor: 'default',
-            }}
-          >
-            {text}
-          </div>
+          <div className="tiny-text">{text}</div>
         </div>
         <div
           className="hover-only"
@@ -355,6 +347,7 @@ function CellComponent({
       {isLocked ? (
         <div
           id={`hex-lock-${rowIdx}-${idx}`}
+          hidden={status === NodeAllocatedStatus.HIDDEN}
           style={{
             // zIndex: 3,
             ...hexCenterLockStyle,
@@ -363,11 +356,13 @@ function CellComponent({
           <div
             className="hex-center-lock-left"
             style={{ ...leftLock, borderColor }}
-          />
+          >
+            <div className="tiny-text">3f</div>
+          </div>
           <div
             className="hex-center-lock-right"
             style={{ ...rightLock, borderColor }}
-          />
+          ></div>
         </div>
       ) : null}
     </div>
@@ -387,6 +382,7 @@ function NodeComponent({
   status,
   text,
   onUpdateStatus,
+  nodeData,
 }: {
   node?: NodeData;
   status: NodeAllocatedStatus;
@@ -400,6 +396,7 @@ function NodeComponent({
   hexCenterLockStyle: any;
   hexBlockStyle: any;
   text?: string;
+  nodeData: NodeData;
 }) {
   const handleClick = useCallback(
     (e) => {
@@ -425,6 +422,7 @@ function NodeComponent({
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
       text={text}
       status={status}
+      nodeData={nodeData}
     >
       {status}
     </Cell>
