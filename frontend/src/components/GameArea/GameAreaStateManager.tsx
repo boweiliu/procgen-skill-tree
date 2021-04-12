@@ -61,12 +61,9 @@ function Component(props: {
       ),
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
-  useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
+  // useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
 
-  function virtualDimsToLocation(
-    // useCallback(
-    virtualDims: Vector2
-  ) {
+  const virtualDimsToLocation = useCallback( ( virtualDims: Vector2): Vector3 => {
     const virtualCenter = virtualGridDims.divide(2).floor();
     const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
     let relativeLocation = new Vector2(0, 0);
@@ -104,7 +101,7 @@ function Component(props: {
     return gameState.playerUI.virtualGridLocation.add(
       Vector3.FromVector2(relativeLocation, 0)
     );
-  }
+  }, [gameState.playerUI.virtualGridLocation, virtualGridDims])
   // ,
   //   [gameState.playerUI.virtualGridLocation, virtualGridDims]
   // );
@@ -138,17 +135,21 @@ function Component(props: {
     }
     // console.log({ map });
     return map;
-  }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
+  }, [gameState.playerSave.allocationStatusMap, virtualGridDims, virtualDimsToLocation]);
 
   const handleJump = useCallback((args: { direction: Vector2 }) => {
-    // direction: bottom right == (1,1)
+    // direction: if we hit bottom right of screen, direction == (1,1)
     console.log({ direction: args.direction });
-    const jumpAmounts = virtualGridDims.multiply(0.75).floor().clampX(1, virtualGridDims.x - 1).clampY(1, virtualGridDims.y - 1);
+    let jumpAmounts = virtualGridDims
+      .multiply(0.5).floor();
+    jumpAmounts = jumpAmounts
+      .clampX(1, virtualGridDims.x - 1).clampY(2, Math.floor((virtualGridDims.y - 1)/2) * 2);
     const jumpOffset = jumpAmounts.multiply(args.direction);
-    props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-      return it;
-    });
     console.log({ jumpOffset });
+    props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+      return it
+        .addX(jumpOffset.x);
+    });
     setJumpOffset(jumpOffset.multiply(1));
   }, [virtualGridDims]);
 
@@ -165,7 +166,7 @@ function Component(props: {
         }
       );
     },
-    [props.updaters]
+    [props.updaters, virtualDimsToLocation]
   );
 
   return (
