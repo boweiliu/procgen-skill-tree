@@ -49,7 +49,7 @@ function Component(props: {
       )
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
-
+  const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
   const virtualGridDims = useMemo(
     () =>
       new Vector2(
@@ -140,7 +140,9 @@ function Component(props: {
   }, [gameState.playerSave.allocationStatusMap, virtualGridDims]);
 
   const handleJump = useCallback((args: { direction: Vector2 }) => {
+    setJumpOffset(new Vector2(0, 0));
     // jumpOffset =
+    //
   }, []);
 
   const handleUpdateNodeStatus = useCallback(
@@ -165,7 +167,7 @@ function Component(props: {
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
         virtualGridDims={virtualGridDims}
-        jumpOffset={undefined}
+        jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}
         updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
