@@ -149,13 +149,15 @@ function Component(props: {
       // direction: if we hit bottom right of screen, direction == (1,1)
       console.log({ direction: args.direction });
       let jumpAmounts = virtualGridDims.multiply(0.5).floor();
+      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
       const jumpOffset = jumpAmounts.multiply(args.direction);
       console.log({ jumpOffset });
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-        return it.addX(jumpOffset.x);
+        return it.addX(jumpOffset.x)
+          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
       });
       setJumpOffset(jumpOffset.multiply(1));
     },
