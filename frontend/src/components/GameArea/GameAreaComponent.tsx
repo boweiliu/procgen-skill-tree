@@ -54,15 +54,23 @@ function GameArea(props: {
   // virtualSize: Vector2; // in pixels
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
-  virtualGridInfo: {
-    map: KeyedHashMap<Vector2, NodeData>; // map of virtual grid dim -> data about the node.
-    jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
-  };
+
+  jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   virtualGridStatusMap: KeyedHashMap<Vector2, NodeData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
 }) {
+  useEffect(() => {
+    const jumpOffset = props.jumpOffset;
+    if (!jumpOffset) return;
+    const ref = container.current;
+    if (!ref) return;
+    ref.scrollTo(
+      ref.scrollLeft + jumpOffset.x * gridWidth,
+      ref.scrollTop + jumpOffset.y * gridHeight
+    );
+  }, [props.jumpOffset]);
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
   // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
   // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
@@ -206,17 +214,18 @@ function GameArea(props: {
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, index, arr) => {
+                  const node = props.virtualGridStatusMap.get(
+                    new Vector2(index, rowIdx)
+                  );
                   return (
                     <Node
-                      node={props.virtualGridInfo.map.get(
-                        new Vector2(index, rowIdx)
-                      )}
+                      key={node?.id}
+                      node={node}
                       status={
                         props.virtualGridStatusMap.get(
                           new Vector2(index, rowIdx)
                         )?.status
                       }
-                      key={index}
                       hexBlockStyle={hexBlockStyle}
                       idx={index}
                       rowIdx={rowIdx}
@@ -358,7 +367,7 @@ function NodeComponent({
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
-    [node]
+    [onUpdateStatus, status, idx, rowIdx]
   );
   return (
     <Cell
