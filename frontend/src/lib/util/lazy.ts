@@ -1,3 +1,4 @@
+import { HashMap } from './data_structures/hash';
 import { Const } from './misc';
 
 /**
@@ -77,4 +78,89 @@ export function LazyProxy<
       return property in target.get();
     },
   }) as unknown) as Const<T>;
+}
+
+/**
+ * Similar to HashMap, except it allows setting a factory function to be used for missing keys.
+ * Also memoizes the result.
+ *
+ * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
+ */
+export class LazyHashMap<K extends { hash(): string }, V> {
+  protected _values: HashMap<K, V>;
+  protected _factory: (k: K) => V;
+
+  constructor(factory: (k: K) => V) {
+    this._values = new HashMap();
+    this._factory = factory;
+  }
+
+  // setFactory(factory: (k: K) => V) : LazyHashMap<K, V> {
+  //   this._factory = factory;
+  //   return this;
+  // }
+
+  put(key: K, value: V) {
+    this._values.put(key, value);
+  }
+
+  // remove(key: K): void {
+  //   this._values.remove(key);
+  // }
+
+  peek(key: K): V | undefined {
+    return this._values.get(key);
+  }
+
+  get(key: K): V {
+    if (this._values.contains(key)) {
+      return this._values.get(key)!;
+    } else {
+      const value = this._factory(key);
+      this._values.put(key, value);
+      return value;
+    }
+  }
+
+  precompute(key: K) {
+    if (this._values.contains(key)) {
+      return;
+    } else {
+      const value = this._factory(key);
+      this._values.put(key, value);
+    }
+  }
+
+  // returns true if the key was already instantiated
+  contains(key: K): boolean {
+    return this._values.contains(key);
+  }
+
+  values(): V[] {
+    return this._values.values();
+  }
+
+  // *[Symbol.iterator]() {
+  //   // construct a new iterator. note that as usual editing the object during iteration is not supported
+  //   for (let key of Object.keys(this._values)) {
+  //     yield key;
+  //   }
+  // }
+
+  // hashes only the keys - use HashableHashMap if you know that the value type here is also hashable
+  // hashKeyset(): string {
+  //   const hashes: number[] = Object.keys(this._values).map(s => hashCode(s));
+  //   let code: number = hashes.reduce((pv, cv) => pv + cv);
+  //   return code.toString();
+  // }
+
+  size(): number {
+    return this._values.size();
+  }
+
+  clone(): LazyHashMap<K, V> {
+    let n = new LazyHashMap<K, V>(this._factory);
+    n._values = this._values.clone();
+    return n;
+  }
 }

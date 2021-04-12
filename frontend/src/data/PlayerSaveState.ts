@@ -4,7 +4,7 @@ import {
 } from '../components/GameArea/GameAreaComponent';
 import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { Lazy } from '../lib/util/lazy';
+import { Lazy, LazyHashMap } from '../lib/util/lazy';
 import { PointNodeRef } from './PointNodeRef';
 import { ResourceType } from './WorldGenState';
 
@@ -30,8 +30,9 @@ export type PlayerSaveState = {
    * NOT DEPRECATED
    */
 
+  // this should actually be LazyHashMap with default === HIDDEN
   allocationStatusMap: HashMap<Vector3, NodeAllocatedStatus>;
-  lockMap: HashMap<Vector3, LockData | undefined | Lazy<LockData | undefined>>;
+  // lockMap: LazyHashMap<Vector3, LockData | undefined>;
 };
 
 export type Quest = {

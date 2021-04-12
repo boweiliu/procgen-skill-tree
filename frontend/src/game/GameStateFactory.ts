@@ -10,10 +10,10 @@ import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
-import { Lazy } from '../lib/util/lazy';
+import { Lazy, LazyHashMap } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
 import { getCoordNeighbors, getWithinDistance } from './HexGrid';
-import { ZLevelGenFactory } from './WorldGenStateFactory';
+import { LockFactory, ZLevelGenFactory } from './WorldGenStateFactory';
 
 export type GameStateConfig = any;
 
@@ -50,11 +50,18 @@ export class GameStateFactory {
       innerHeight: window.innerHeight,
     };
 
+    const lockFactory = new LockFactory({});
+    const lockDataMap = new LazyHashMap<Vector3, LockData | undefined>((k) =>
+      lockFactory.create({ seed: mySeed, location: k })
+    );
+
     const gameState: GameState = {
       tick: 0,
       worldGen: {
         seed: mySeed,
+        // deprecated
         zLevels: { 0: zLevel },
+        lockMap: lockDataMap,
       },
       playerSave: {
         // justAllocated: undefined,
@@ -69,23 +76,23 @@ export class GameStateFactory {
 
         allocationStatusMap: (() => {
           const map = new HashMap<Vector3, NodeAllocatedStatus>();
-          getWithinDistance(Vector3.Zero, 3).forEach((it) => {
-            map.put(it, NodeAllocatedStatus.UNREACHABLE);
-          });
-          getWithinDistance(Vector3.Zero, 1).forEach((it) => {
-            map.put(it, NodeAllocatedStatus.AVAILABLE);
-          });
+          // getWithinDistance(Vector3.Zero, 3).forEach((it) => {
+          //   map.put(it, NodeAllocatedStatus.UNREACHABLE);
+          //   lockDataMap.get(it); // instantiate lock data map
+          // });
+          // getWithinDistance(Vector3.Zero, 1).forEach((it) => {
+          //   map.put(it, NodeAllocatedStatus.AVAILABLE);
+          // });
           map.put(Vector3.Zero, NodeAllocatedStatus.TAKEN);
           return map;
         })(),
 
-        lockMap: (() => {
-          const map = new HashMap<
-            Vector3,
-            LockData | undefined | Lazy<LockData | undefined>
-          >();
-          return map;
-        })(),
+        // lockMap: (() => {
+        //   const map = new LazyHashMap<Vector3, LockData | undefined>(
+        //     (k: Vector3) => lockFactory.create({ seed: mySeed, location: k })
+        //   );
+        //   return map;
+        // })(),
       },
       playerUI: {
         selectedPointNode: undefined,
@@ -102,6 +109,27 @@ export class GameStateFactory {
       windowState,
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
+
+    /**
+     * Initialize fog of war and visible locks
+     */
+    let prevMap = gameState.playerSave.allocationStatusMap;
+    let nodeLocation = Vector3.Zero;
+    getWithinDistance(nodeLocation, 3).forEach((n) => {
+      if (
+        (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
+        NodeAllocatedStatus.HIDDEN
+      ) {
+        gameState.worldGen.lockMap.precompute(n);
+        prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+      }
+    });
+    getWithinDistance(nodeLocation, 1).forEach((n) => {
+      if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
+        prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+      }
+    });
+
     return gameState;
   }
 }

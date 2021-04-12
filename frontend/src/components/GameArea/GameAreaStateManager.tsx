@@ -182,7 +182,7 @@ function Component(props: {
         return;
       }
       return props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
-        (prevMap) => {
+        (prevMap, prevGameState) => {
           prevMap.put(nodeLocation, newStatus);
           if (newStatus === NodeAllocatedStatus.TAKEN) {
             getWithinDistance(nodeLocation, 1).forEach((n) => {
@@ -195,6 +195,8 @@ function Component(props: {
                 (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
                 NodeAllocatedStatus.HIDDEN
               ) {
+                // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+                prevGameState.worldGen.lockMap.precompute(n);
                 prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
               }
             });

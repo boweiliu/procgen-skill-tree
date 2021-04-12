@@ -1,9 +1,15 @@
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
+import { Vector3 } from '../lib/util/geometry/vector3';
+import { LazyHashMap } from '../lib/util/lazy';
+import { LockData } from './PlayerSaveState';
 
 export type WorldGenState = {
   seed: number;
+  // DEPRECATED
   zLevels: { [z: number]: ZLevelGen };
+
+  lockMap: LazyHashMap<Vector3, LockData | undefined>;
 };
 
 export type ZLevelGen = {

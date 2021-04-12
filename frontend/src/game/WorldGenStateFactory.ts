@@ -1,3 +1,4 @@
+import { LockStatus } from '../components/GameArea/GameAreaComponent';
 import {
   WorldGenState,
   ChunkGen,
@@ -8,9 +9,11 @@ import {
   ResourceModifier,
   ResourceNontrivialType,
 } from '../data/GameState';
+import { LockData } from '../data/PlayerSaveState';
 import { NodeType } from '../data/WorldGenState';
 import { HashSet, KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
+import { Vector3 } from '../lib/util/geometry/vector3';
 import { INTMAX32, squirrel3 } from '../lib/util/random';
 
 export type WorldGenStateConfig = any;
@@ -251,5 +254,28 @@ export class PointNodeGenFactory {
         nodeType,
       };
     }
+  }
+}
+
+type LockFactoryConfig = {};
+
+export class LockFactory {
+  public config: LockFactoryConfig;
+
+  constructor(config: LockFactoryConfig) {
+    this.config = config;
+  }
+
+  public create(args: {
+    seed: number;
+    location: Vector3;
+  }): LockData | undefined {
+    let lockData: LockData = {
+      shortTextTarget: '',
+      shortTextTimer: '',
+      lockStatus: LockStatus.TICKING,
+    };
+
+    return undefined;
   }
 }
