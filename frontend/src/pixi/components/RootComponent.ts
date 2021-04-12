@@ -6,7 +6,8 @@ import {
   PointNodeTextureSet,
 } from '../textures/PointNodeTexture';
 import { ZLevelGenFactory } from '../../game/WorldGenStateFactory';
-import { Const, Lazy } from '../../lib/util/misc';
+import { Const } from '../../lib/util/misc';
+import { Lazy } from '../../lib/util/lazy';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { ZLevelComponent, ZLevelComponentProps } from './ZLevelComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';

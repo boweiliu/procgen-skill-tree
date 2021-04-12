@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { UseGameStateContext } from '../contexts';
 import { PixiReactBridge } from '../pixi/PixiReactBridge';
 import { WindowState } from '../data/GameState';
-import { Lazy } from '../lib/util/misc';
+import { Lazy } from '../lib/util/lazy';
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
 

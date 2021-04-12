@@ -5,10 +5,12 @@ import {
   noIntent,
   WindowState,
 } from '../data/GameState';
+import { LockData } from '../data/PlayerSaveState';
 import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
+import { Lazy } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
 import { getCoordNeighbors, getWithinDistance } from './HexGrid';
 import { ZLevelGenFactory } from './WorldGenStateFactory';
@@ -74,6 +76,14 @@ export class GameStateFactory {
             map.put(it, NodeAllocatedStatus.AVAILABLE);
           });
           map.put(Vector3.Zero, NodeAllocatedStatus.TAKEN);
+          return map;
+        })(),
+
+        lockMap: (() => {
+          const map = new HashMap<
+            Vector3,
+            LockData | undefined | Lazy<LockData | undefined>
+          >();
           return map;
         })(),
       },

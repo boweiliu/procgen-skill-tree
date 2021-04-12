@@ -13,7 +13,7 @@ import { GameState, appSizeFromWindowSize } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';
 import { batchifySetState } from './lib/util/batchify';
 import { Vector2 } from './lib/util/geometry/vector2';
-import { Lazy } from './lib/util/misc';
+import { Lazy } from './lib/util/lazy';
 import {
   UpdaterGeneratorType2,
   updaterGenerator2,
