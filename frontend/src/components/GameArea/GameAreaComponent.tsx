@@ -213,8 +213,8 @@ function GameArea(props: {
                       node={props.virtualGridInfo.map.get(
                         new Vector2(index, rowIdx)
                       )}
-                      status={ nodeData?.status }
-                      text={ nodeData?.shortText }
+                      status={nodeData?.status}
+                      text={nodeData?.shortText}
                       key={index}
                       hexBlockStyle={hexBlockStyle}
                       idx={index}
@@ -276,8 +276,8 @@ function CellComponent({
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
-    onClick: React.MouseEventHandler;
-    text?: string;
+  onClick: React.MouseEventHandler;
+  text?: string;
 }) {
   const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
   const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
@@ -295,23 +295,27 @@ function CellComponent({
         className="hex-center"
         style={hexCenterStyle}
       >
-        <div style={{
-          display: 'flex',
-          width: hexCenterStyle.width,
-          height: hexCenterStyle.height,
-          alignItems: 'center',
-          justifyContent: 'center',
-          // otherwise the border width screws up centering here
-          marginTop: '-2px',
-          marginLeft: '-2px',
-        }}>
-          <div style={{
-            // font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top. this fills it in symmetrically on the left and bottom.
-            paddingLeft: '2px',
-            paddingBottom: '2px',
-            maxWidth: '48px',
-            overflow: 'hidden',
-          }}>
+        <div
+          style={{
+            display: 'flex',
+            width: hexCenterStyle.width,
+            height: hexCenterStyle.height,
+            alignItems: 'center',
+            justifyContent: 'center',
+            // otherwise the border width screws up centering here
+            marginTop: '-2px',
+            marginLeft: '-2px',
+          }}
+        >
+          <div
+            style={{
+              // font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top. this fills it in symmetrically on the left and bottom.
+              paddingLeft: '2px',
+              paddingBottom: '2px',
+              maxWidth: '48px',
+              overflow: 'hidden',
+            }}
+          >
             {text}
           </div>
         </div>
@@ -369,8 +373,8 @@ function NodeComponent({
   children?: React.ReactNode;
   hexCenterStyle: any;
   hexCenterLockStyle: any;
-    hexBlockStyle: any;
-    text?: string;
+  hexBlockStyle: any;
+  text?: string;
 }) {
   const handleClick = useCallback(
     (e) => {
