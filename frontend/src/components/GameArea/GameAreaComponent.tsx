@@ -100,18 +100,6 @@ function GameArea(props: {
     borderColor: colorToCss(COLORS.nodeBorder),
   };
 
-  const virtualGrids = 3;
-  // 200% - 120 FPS; 300% - 75 FPS; 500% - 30 FPS
-  const virtualAreaSize = props.appSize.multiply(virtualGrids);
-  // if appSize >= 11.5 * gridWidth then we can fit 11 hex blocks per row
-  const numBlocksPerRow = Math.floor(virtualAreaSize.x / gridWidth - 0.5);
-  const numPairsOfRows = Math.floor(virtualAreaSize.y / gridHeight / 2);
-  useEffect(
-    () =>
-      console.log(`got ${numBlocksPerRow} x ${numPairsOfRows * 2} hex grid`),
-    [numBlocksPerRow, numPairsOfRows]
-  );
-
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // const scrollRoom = virtualAreaSize.subtract(props.appSize);
@@ -121,19 +109,25 @@ function GameArea(props: {
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop;
       let newScrollLeft = target.scrollLeft;
-      if (target.scrollTop < props.appSize.y * 0.25) {
+      if (target.scrollTop < gridHeight) {
         newScrollTop += gridHeight * 2;
         direction.y -= 1;
       }
-      if (target.scrollTop > props.appSize.y * (virtualGrids - 1.25)) {
+      if (
+        target.scrollTop >
+        (props.virtualGridDims.y - 1) * gridHeight - props.appSize.y
+      ) {
         newScrollTop -= gridHeight * 2;
         direction.y += 1;
       }
-      if (target.scrollLeft < props.appSize.x * 0.25) {
+      if (target.scrollLeft < gridWidth * 1.5) {
         newScrollLeft += gridWidth * 2;
         direction.x -= 1;
       }
-      if (target.scrollLeft > props.appSize.x * (virtualGrids - 1.25)) {
+      if (
+        target.scrollLeft >
+        (props.virtualGridDims.x - 2) * gridWidth - props.appSize.x
+      ) {
         newScrollLeft -= gridWidth * 2;
         direction.x += 1;
       }
@@ -154,12 +148,18 @@ function GameArea(props: {
   );
 
   const container = useRef<HTMLDivElement>(null);
+  const previousContainer = useRef<HTMLDivElement>(null) as any;
   useEffect(() => {
-    if (container.current != null) {
-      container.current.scrollTop = props.appSize.y * (virtualGrids / 2);
-      container.current.scrollLeft = props.appSize.x * (virtualGrids / 2);
+    if (
+      container.current != null &&
+      container.current !== previousContainer.current
+    ) {
+      container.current.scrollTop = (props.virtualGridDims.y * gridHeight) / 3;
+      container.current.scrollLeft =
+        ((props.virtualGridDims.x + 0.5) * gridWidth) / 3;
     }
-  }, [container, container.current]);
+    previousContainer.current = container.current;
+  }, [container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -187,10 +187,12 @@ function GameArea(props: {
     >
       <div
         className="virtual-game-area"
-        style={{
-          width: virtualAreaSize.x,
-          height: virtualAreaSize.y,
-        }}
+        style={
+          {
+            // width: virtualAreaSize.x,
+            // height: virtualAreaSize.y,
+          }
+        }
         onPointerOver={(e: React.PointerEvent) => {
           console.log(e);
         }}

@@ -26,6 +26,7 @@
 .hex-block-row {
   display: block;
   float: left;
+  min-width: max-content;
 }
 
 .hex-center {
