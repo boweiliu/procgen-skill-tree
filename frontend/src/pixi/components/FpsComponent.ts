@@ -1,18 +1,18 @@
-import * as Pixi from "pixi.js";
-import { FpsTracker } from "../../lib/util/fpsTracker";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import * as Pixi from 'pixi.js';
+import { FpsTracker } from '../../lib/util/fpsTracker';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
   delta: number;
   position: Vector2;
   appSize: Vector2;
-}
+};
 
 type State = {
-  fpsTracker: FpsTracker
-}
+  fpsTracker: FpsTracker;
+};
 
 // export class FpsComponent {
 //   public container: Pixi.Text;
@@ -61,7 +61,7 @@ class FpsComponent extends LifecycleHandlerBase<Props, State> {
       // align: 'right'
     });
     this.state = {
-      fpsTracker: new FpsTracker()
+      fpsTracker: new FpsTracker(),
     };
   }
 
@@ -70,9 +70,14 @@ class FpsComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
-    this.container.text = this.state.fpsTracker.getFpsString() + " FPS\n" +
-      this.state.fpsTracker.getUpsString() + " UPS\n" +
-      props.appSize.x + "x" + props.appSize.y;
+    this.container.text =
+      this.state.fpsTracker.getFpsString() +
+      ' FPS\n' +
+      this.state.fpsTracker.getUpsString() +
+      ' UPS\n' +
+      props.appSize.x +
+      'x' +
+      props.appSize.y;
     this.container.position = PixiPointFrom(props.position);
   }
 }

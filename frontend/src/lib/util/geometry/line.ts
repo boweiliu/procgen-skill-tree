@@ -1,6 +1,6 @@
-import { Vector2 } from "./vector2"
-import { Graphics } from "pixi.js";
-import { epsGreaterThan, epsLessThan } from "../epsilon_math";
+import { Vector2 } from './vector2';
+import { Graphics } from 'pixi.js';
+import { epsGreaterThan, epsLessThan } from '../epsilon_math';
 
 export class Line {
   private _x1: number;
@@ -8,13 +8,25 @@ export class Line {
   private _y1: number;
   private _y2: number;
 
-  public get x1(): number { return this._x1; }
-  public get x2(): number { return this._x2; }
-  public get y1(): number { return this._y1; }
-  public get y2(): number { return this._y2; }
+  public get x1(): number {
+    return this._x1;
+  }
+  public get x2(): number {
+    return this._x2;
+  }
+  public get y1(): number {
+    return this._y1;
+  }
+  public get y2(): number {
+    return this._y2;
+  }
 
-  public get start(): Vector2 { return new Vector2({ x: this.x1, y: this.y1 }); }
-  public get end()  : Vector2 { return new Vector2({ x: this.x2, y: this.y2 }); }
+  public get start(): Vector2 {
+    return new Vector2({ x: this.x1, y: this.y1 });
+  }
+  public get end(): Vector2 {
+    return new Vector2({ x: this.x2, y: this.y2 });
+  }
 
   public get angleInDegrees(): number {
     const cx = this._x1;
@@ -37,10 +49,13 @@ export class Line {
     return theta;
   }
 
-  public serialized = "";
+  public serialized = '';
 
-  constructor(props: { x1: number, x2: number, y1: number, y2: number } |
-                     { start: Vector2, end: Vector2 }) {
+  constructor(
+    props:
+      | { x1: number; x2: number; y1: number; y2: number }
+      | { start: Vector2; end: Vector2 }
+  ) {
     let x1, x2, y1, y2;
 
     if ('x1' in props) {
@@ -60,13 +75,13 @@ export class Line {
     this._x2 = x2;
     this._y2 = y2;
 
-    this.serialized = `${ this.x1 }|${ this.x2 }|${ this.y1 }|${ this.y2 }`;
+    this.serialized = `${this.x1}|${this.x2}|${this.y1}|${this.y2}`;
   }
 
   public get length(): number {
     return Math.sqrt(
       (this.x2 - this.x1) * (this.x2 - this.x1) +
-      (this.y2 - this.y1) * (this.y2 - this.y1)
+        (this.y2 - this.y1) * (this.y2 - this.y1)
     );
   }
 
@@ -92,17 +107,25 @@ export class Line {
   }
 
   sharesAVertexWith(other: Line): Vector2 | null {
-    if (this.start.equals(other.start)) { return this.start; }
-    if (this.start.equals(other.end))   { return this.start; }
+    if (this.start.equals(other.start)) {
+      return this.start;
+    }
+    if (this.start.equals(other.end)) {
+      return this.start;
+    }
 
-    if (this.end.equals(other.start)) { return this.end; }
-    if (this.end.equals(other.end))   { return this.end; }
+    if (this.end.equals(other.start)) {
+      return this.end;
+    }
+    if (this.end.equals(other.end)) {
+      return this.end;
+    }
 
     return null;
   }
 
   static DeserializeLine(s: string): Line {
-    const [ x1, x2, y1, y2 ] = s.split("|").map(x => Number(x));
+    const [x1, x2, y1, y2] = s.split('|').map((x) => Number(x));
 
     return new Line({ x1, x2, y1, y2 });
   }
@@ -118,21 +141,17 @@ export class Line {
   // Must be horizontally/vertically oriented lines
   // Does not consider intersection, only overlap
   getOverlap(other: Line): Line | undefined {
-    const orientedByX = (
-      this.x1 === this.x2 &&
-      this.x1 === other.x1 &&
-      this.x1 === other.x2
-    );
+    const orientedByX =
+      this.x1 === this.x2 && this.x1 === other.x1 && this.x1 === other.x2;
 
-    const orientedByY = (
-      this.y1 === this.y2 &&
-      this.y1 === other.y1 &&
-      this.y1 === other.y2
-    );
+    const orientedByY =
+      this.y1 === this.y2 && this.y1 === other.y1 && this.y1 === other.y2;
 
-    if (!orientedByX && !orientedByY) { return undefined; }
+    if (!orientedByX && !orientedByY) {
+      return undefined;
+    }
 
-    const summedLength  = this.length + other.length;
+    const summedLength = this.length + other.length;
     const overallLength = new Line({
       x1: Math.min(this.x1, other.x1),
       y1: Math.min(this.y1, other.y1),
@@ -153,7 +172,7 @@ export class Line {
         y1: Math.max(this.y1, other.y1),
         y2: Math.min(this.y2, other.y2),
       });
-    } else /* if (orientedByY) */ {
+    } /* if (orientedByY) */ else {
       return new Line({
         y1: this.y1,
         y2: this.y2,
@@ -166,21 +185,17 @@ export class Line {
   // A----B----C----D
   // AD - BC returns AB and CD.
   getNonOverlappingSections(other: Line): Line[] | undefined {
-    const orientedByX = (
-      this.x1 === this.x2 &&
-      this.x1 === other.x1 &&
-      this.x1 === other.x2
-    );
+    const orientedByX =
+      this.x1 === this.x2 && this.x1 === other.x1 && this.x1 === other.x2;
 
-    const orientedByY = (
-      this.y1 === this.y2 &&
-      this.y1 === other.y1 &&
-      this.y1 === other.y2
-    );
+    const orientedByY =
+      this.y1 === this.y2 && this.y1 === other.y1 && this.y1 === other.y2;
 
-    if (!orientedByX && !orientedByY) { return undefined; }
+    if (!orientedByX && !orientedByY) {
+      return undefined;
+    }
 
-    const summedLength  = new Line(this).length + new Line(other).length;
+    const summedLength = new Line(this).length + new Line(other).length;
     const overallLength = new Line({
       x1: Math.min(this.x1, other.x1),
       y1: Math.min(this.y1, other.y1),
@@ -196,14 +211,34 @@ export class Line {
 
     if (orientedByX) {
       return [
-        new Line({ x1: this.x1, x2: this.x2, y1: Math.min(this.y1, other.y1), y2: Math.max(this.y1, other.y1), }),
-        new Line({ x1: this.x1, x2: this.x2, y1: Math.min(this.y2, other.y2), y2: Math.max(this.y2, other.y2), }),
-      ].filter(l => !l.isDegenerate);
-    } else /* if (orientedByY) */ {
+        new Line({
+          x1: this.x1,
+          x2: this.x2,
+          y1: Math.min(this.y1, other.y1),
+          y2: Math.max(this.y1, other.y1),
+        }),
+        new Line({
+          x1: this.x1,
+          x2: this.x2,
+          y1: Math.min(this.y2, other.y2),
+          y2: Math.max(this.y2, other.y2),
+        }),
+      ].filter((l) => !l.isDegenerate);
+    } /* if (orientedByY) */ else {
       return [
-        new Line({ y1: this.y1, y2: this.y2, x1: Math.min(this.x1, other.x1), x2: Math.max(this.x1, other.x1), }),
-        new Line({ y1: this.y1, y2: this.y2, x1: Math.min(this.x2, other.x2), x2: Math.max(this.x2, other.x2), }),
-      ].filter(l => !l.isDegenerate);
+        new Line({
+          y1: this.y1,
+          y2: this.y2,
+          x1: Math.min(this.x1, other.x1),
+          x2: Math.max(this.x1, other.x1),
+        }),
+        new Line({
+          y1: this.y1,
+          y2: this.y2,
+          x1: Math.min(this.x2, other.x2),
+          x2: Math.max(this.x2, other.x2),
+        }),
+      ].filter((l) => !l.isDegenerate);
     }
   }
 
@@ -230,31 +265,32 @@ export class Line {
 
   toJSON(): any {
     return {
-      x1     : this.x1,
-      x2     : this.x2,
-      y1     : this.y1,
-      y2     : this.y2,
-      reviver: "Line",
+      x1: this.x1,
+      x2: this.x2,
+      y1: this.y1,
+      y2: this.y2,
+      reviver: 'Line',
     };
   }
 
   toString(): string {
-    return `Line: [(${ this.x1 },${ this.y1 }) -> (${ this.x2 },${ this.y2 })]`;
+    return `Line: [(${this.x1},${this.y1}) -> (${this.x2},${this.y2})]`;
   }
 
   equals(other: Line | null) {
-    if (other === null) { return false; }
+    if (other === null) {
+      return false;
+    }
 
     return (
-      this.x1 === other.x1 &&
-      this.x2 === other.x2 &&
-      this.y1 === other.y1 &&
-      this.y2 === other.y2
-    ) || (
-      this.x1 === other.x2 &&
-      this.x2 === other.x1 &&
-      this.y1 === other.y2 &&
-      this.y2 === other.y1
+      (this.x1 === other.x1 &&
+        this.x2 === other.x2 &&
+        this.y1 === other.y1 &&
+        this.y2 === other.y2) ||
+      (this.x1 === other.x2 &&
+        this.x2 === other.x1 &&
+        this.y1 === other.y2 &&
+        this.y2 === other.y1)
     );
   }
 
@@ -278,12 +314,12 @@ export class Line {
 
   static Deserialize(obj: any): Line {
     if (
-      !obj.hasOwnProperty("x1") ||
-      !obj.hasOwnProperty("y1") ||
-      !obj.hasOwnProperty("x2") ||
-      !obj.hasOwnProperty("y2")) {
-
-      console.error("Failed deserializing Rect");
+      !obj.hasOwnProperty('x1') ||
+      !obj.hasOwnProperty('y1') ||
+      !obj.hasOwnProperty('x2') ||
+      !obj.hasOwnProperty('y2')
+    ) {
+      console.error('Failed deserializing Rect');
     }
 
     return new Line({
@@ -310,7 +346,7 @@ export class Line {
     graphics.lineTo(this.x2, this.y2);
   }
 
-  /** 
+  /**
    * Returns the point where these two lines, if extended arbitrarily, would
    * intersect.
    */
@@ -320,16 +356,9 @@ export class Line {
     const p3 = other.start;
     const p4 = other.end;
 
-    const s = (
-      (p4.x - p3.x) * 
-      (p1.y - p3.y) - 
-      (p4.y - p3.y) * 
-      (p1.x - p3.x)) / (
-      (p4.y - p3.y) * 
-      (p2.x - p1.x) - 
-      (p4.x - p3.x) * 
-      (p2.y - p1.y)
-    );
+    const s =
+      ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) /
+      ((p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y));
 
     const x = p1.x + s * (p2.x - p1.x);
     const y = p1.y + s * (p2.y - p1.y);
@@ -347,21 +376,18 @@ export class Line {
     const y = lineIntersection.y;
 
     if (
-      (
-        // within us
+      // within us
 
-        epsGreaterThan(x, Math.min(this.x1, this.x2)) &&
-        epsLessThan   (x, Math.max(this.x1, this.x2)) &&
-        epsGreaterThan(y, Math.min(this.y1, this.y2)) &&
-        epsLessThan   (y, Math.max(this.y1, this.y2))
-      ) && (
-        // within other
+      epsGreaterThan(x, Math.min(this.x1, this.x2)) &&
+      epsLessThan(x, Math.max(this.x1, this.x2)) &&
+      epsGreaterThan(y, Math.min(this.y1, this.y2)) &&
+      epsLessThan(y, Math.max(this.y1, this.y2)) &&
+      // within other
 
-        epsGreaterThan(x, Math.min(other.x1, other.x2)) &&
-        epsLessThan   (x, Math.max(other.x1, other.x2)) &&
-        epsGreaterThan(y, Math.min(other.y1, other.y2)) &&
-        epsLessThan   (y, Math.max(other.y1, other.y2))
-      )
+      epsGreaterThan(x, Math.min(other.x1, other.x2)) &&
+      epsLessThan(x, Math.max(other.x1, other.x2)) &&
+      epsGreaterThan(y, Math.min(other.y1, other.y2)) &&
+      epsLessThan(y, Math.max(other.y1, other.y2))
     ) {
       return lineIntersection;
     }
@@ -370,18 +396,15 @@ export class Line {
   }
 
   normalize(): Line {
-    const mag = Math.sqrt(
-      (this.x1 - this.x2) ** 2 +
-      (this.y1 - this.y2) ** 2
-    );
+    const mag = Math.sqrt((this.x1 - this.x2) ** 2 + (this.y1 - this.y2) ** 2);
 
     return new Line({
       start: this.start,
       end: new Vector2({
         x: this.start.x + (this.end.x - this.start.x) / mag,
         y: this.start.x + (this.end.y - this.start.y) / mag,
-      })
-    })
+      }),
+    });
   }
 
   hash(): string {
@@ -389,9 +412,9 @@ export class Line {
   }
 
   add(x: Vector2): Line {
-    return new Line({ 
+    return new Line({
       start: this.start.add(x),
       end: this.end.add(x),
-    })
+    });
   }
 }

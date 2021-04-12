@@ -1,19 +1,22 @@
-import "./QuestProgress.css";
+import './QuestProgress.css';
 
-import classnames from "classnames";
-import React, { useState } from "react";
-import { GameState, Quest, ResourceType } from "../data/GameState";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
-import { Grade, remapEfficiencyGradeToNumber } from "../game/EfficiencyCalculator";
+import classnames from 'classnames';
+import React, { useState } from 'react';
+import { GameState, Quest, ResourceType } from '../data/GameState';
+import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
+import {
+  Grade,
+  remapEfficiencyGradeToNumber,
+} from '../game/EfficiencyCalculator';
 
 type Props = {
   spSpentThisQuest: number | undefined;
   createQuestCb: () => void;
   activeQuest: Quest | undefined;
   playerResourceAmounts?: { [k in ResourceType]: number };
-  updaters: UpdaterGeneratorType2<GameState, GameState>["playerSave"];
+  updaters: UpdaterGeneratorType2<GameState, GameState>['playerSave'];
   efficiencyGrade: Grade;
-  score: GameState["playerSave"]["score"];
+  score: GameState['playerSave']['score'];
   questInitialAmount: number;
 };
 type QuestScoreReward = {
@@ -29,7 +32,6 @@ type ScoreComponent = {
   scoreReason: string;
 };
 
-
 export default React.memo(QuestProgressComponent);
 
 function calculateQuestScoreReward(grade: Grade): QuestScoreReward {
@@ -41,7 +43,7 @@ function calculateQuestScoreReward(grade: Grade): QuestScoreReward {
     {
       scoreReason: `Efficiency: "${grade}"`,
       scoreAmount: remapEfficiencyGradeToNumber(grade) * 25,
-    }
+    },
   ];
   const total = scoreComponents.reduce((pv, cv) => pv + cv.scoreAmount, 0);
   return {
@@ -67,10 +69,13 @@ function QuestProgressComponent({
    */
   const isQuestComplete =
     activeQuest &&
-    (playerResourceAmounts?.[activeQuest.resourceType] || 0) >= activeQuest.resourceAmount;
+    (playerResourceAmounts?.[activeQuest.resourceType] || 0) >=
+      activeQuest.resourceAmount;
 
   const [didAcceptRewards, setDidAcceptRewards] = useState(true);
-  const [scoreReward, setScoreReward] = useState<QuestScoreReward | undefined>();
+  const [scoreReward, setScoreReward] = useState<
+    QuestScoreReward | undefined
+  >();
 
   const handleStartQuest = () => {
     createQuestCb();
@@ -95,13 +100,22 @@ function QuestProgressComponent({
 
   return (
     <>
-      {<Score doClaimRewards={doClaimRewards} scoreReward={scoreReward} didAcceptRewards={didAcceptRewards}/>}
+      {
+        <Score
+          doClaimRewards={doClaimRewards}
+          scoreReward={scoreReward}
+          didAcceptRewards={didAcceptRewards}
+        />
+      }
       {activeQuest === undefined ? (
         <>
-          <h2>No active quest
-          </h2>
+          <h2>No active quest</h2>
           <br></br>
-          <button className="button" onClick={handleStartQuest} disabled={!didAcceptRewards}>
+          <button
+            className="button"
+            onClick={handleStartQuest}
+            disabled={!didAcceptRewards}
+          >
             {didAcceptRewards ? 'Start a quest' : 'Claim rewards first!'}
           </button>
           <br></br>
@@ -110,60 +124,47 @@ function QuestProgressComponent({
         </>
       ) : (
         <>
-            <h2> Active quest: </h2>
-            <table className={classnames({ table: true })}>
-              <tr>
-                <td>
-                  Initial
-                </td>
-                <td>
-                  {questInitialAmount} {activeQuest.resourceType}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Current
-                </td>
-                <td>
-                  {playerResourceAmounts?.[activeQuest.resourceType]} {activeQuest.resourceType}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Target
-                </td>
-                <td>
-                  {activeQuest.resourceAmount} {activeQuest.resourceType}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  SP spent
-                </td>
-                <td>
-                  {spSpentThisQuest === undefined ? "" : spSpentThisQuest}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Efficiency
-                </td>
-                <td>
-                  {efficiencyGrade}
-                </td>
-              </tr>
-            </table>
+          <h2> Active quest: </h2>
+          <table className={classnames({ table: true })}>
+            <tr>
+              <td>Initial</td>
+              <td>
+                {questInitialAmount} {activeQuest.resourceType}
+              </td>
+            </tr>
+            <tr>
+              <td>Current</td>
+              <td>
+                {playerResourceAmounts?.[activeQuest.resourceType]}{' '}
+                {activeQuest.resourceType}
+              </td>
+            </tr>
+            <tr>
+              <td>Target</td>
+              <td>
+                {activeQuest.resourceAmount} {activeQuest.resourceType}
+              </td>
+            </tr>
+            <tr>
+              <td>SP spent</td>
+              <td>{spSpentThisQuest === undefined ? '' : spSpentThisQuest}</td>
+            </tr>
+            <tr>
+              <td>Efficiency</td>
+              <td>{efficiencyGrade}</td>
+            </tr>
+          </table>
 
-            {isQuestComplete ? (
-              <>
-                <br></br>
-                <button className="button" onClick={doFinishQuest}>
-                  Finish quest
-                  </button>
-              </>
-            ) : (
-                <></>
-              )}
+          {isQuestComplete ? (
+            <>
+              <br></br>
+              <button className="button" onClick={doFinishQuest}>
+                Finish quest
+              </button>
+            </>
+          ) : (
+            <></>
+          )}
         </>
       )}
     </>
@@ -175,12 +176,12 @@ function Score({
   doClaimRewards,
   didAcceptRewards,
 }: {
-    scoreReward: QuestScoreReward | undefined;
-    doClaimRewards: () => void;
-    didAcceptRewards: boolean;
+  scoreReward: QuestScoreReward | undefined;
+  doClaimRewards: () => void;
+  didAcceptRewards: boolean;
 }) {
   if (scoreReward === undefined) {
-    return (<> </>);
+    return <> </>;
   }
 
   return (
@@ -193,19 +194,16 @@ function Score({
           <tr>
             <td> +{it.scoreAmount} score </td>
             <td> {it.scoreReason} </td>
-          </tr>))
-        }
+          </tr>
+        ))}
       </table>
       <br></br>
-      {(
-        didAcceptRewards ? (<> </>) : 
-          (
-      <button
-        className="button"
-        onClick={() => doClaimRewards()}>
-        Claim rewards!
-      </button>
-          )
+      {didAcceptRewards ? (
+        <> </>
+      ) : (
+        <button className="button" onClick={() => doClaimRewards()}>
+          Claim rewards!
+        </button>
       )}
     </>
   );

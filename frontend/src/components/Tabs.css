@@ -8,9 +8,8 @@
 }
 .tab-label:hover {
   font-weight: 700;
-  color:inherit;
+  color: inherit;
 }
 .inactive {
- color:rgba(0,0,0,.4)
+  color: rgba(0, 0, 0, 0.4);
 }
-

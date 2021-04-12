@@ -1,15 +1,30 @@
+import { HashMap } from '../lib/util/data_structures/hash';
+import { Vector2 } from '../lib/util/geometry/vector2';
+import { Vector3 } from '../lib/util/geometry/vector3';
+import { Const, enumKeys } from '../lib/util/misc';
+import { PlayerSaveState } from './PlayerSaveState';
+import { PointNodeRef } from './PointNodeRef';
 import {
-  HashMap,
-} from "../lib/util/data_structures/hash";
-import { enumKeys } from "../lib/util/misc";
-import { PlayerSaveState } from "./PlayerSaveState";
-import { PointNodeRef} from "./PointNodeRef";
-import { ResourceModifier, ResourceNontrivialType, ResourceType, WorldGenState } from "./WorldGenState";
+  ResourceModifier,
+  ResourceNontrivialType,
+  ResourceType,
+  WorldGenState,
+} from './WorldGenState';
 
-export { PointNodeRef, ChunkRef } from "./PointNodeRef";
-export type { PlayerSaveState, Quest } from "./PlayerSaveState";
-export type { WorldGenState, ChunkGen, ZLevelGen,PointNodeGen,   } from "./WorldGenState";
-export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType, ResourceType } from "./WorldGenState";
+export { PointNodeRef, ChunkRef } from './PointNodeRef';
+export type { PlayerSaveState, Quest } from './PlayerSaveState';
+export type {
+  WorldGenState,
+  ChunkGen,
+  ZLevelGen,
+  PointNodeGen,
+  ResourceType,
+} from './WorldGenState';
+export {
+  ChunkGenConstants,
+  ResourceModifier,
+  ResourceNontrivialType,
+} from './WorldGenState';
 
 /**
  * Data owned by the master "App" component, to be made available as props to ALL subcomponents (both pixi and react); react uses context providers to make this easier
@@ -28,11 +43,13 @@ export { ChunkGenConstants, ResourceModifier, ResourceNontrivialType, ResourceTy
  * That data should belong in state owned by subcomponents.
  */
 export type GameState = {
+  tick: number;
   worldGen: WorldGenState;
   playerSave: PlayerSaveState;
   playerUI: PlayerUIState;
   computed: ComputedState;
   intent: PlayerIntentState;
+  windowState: WindowState;
 };
 
 /**
@@ -51,14 +68,14 @@ export type Intent = {
 
 export enum IntentName {
   // Default intent - does nothing
-  NOOP = "NOOP",
+  NOOP = 'NOOP',
 
-  PAN_NORTH = "PAN_NORTH",
-  PAN_SOUTH = "PAN_SOUTH",
-  PAN_WEST = "PAN_WEST",
-  PAN_EAST = "PAN_EAST",
-  TRAVEL_IN = "TRAVEL_IN",
-  TRAVEL_OUT = "TRAVEL_OUT",
+  PAN_NORTH = 'PAN_NORTH',
+  PAN_SOUTH = 'PAN_SOUTH',
+  PAN_WEST = 'PAN_WEST',
+  PAN_EAST = 'PAN_EAST',
+  TRAVEL_IN = 'TRAVEL_IN',
+  TRAVEL_OUT = 'TRAVEL_OUT',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
@@ -70,10 +87,20 @@ export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
  * current window settings -- allows for dynamic resizing and also rotation on mobile web
  */
 export type WindowState = {
-  orientation: "original" | "rotated"; // rotated === we are forcing landscape-in-portrait
+  orientation: 'original' | 'rotated'; // rotated === we are forcing landscape-in-portrait
   innerWidth: number;
   innerHeight: number;
 };
+
+/**
+ * given the dimensions of the entire html window, computes the size of the intended play area -- leaves a 24px border
+ */
+export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
+  return new Vector2({
+    x: Math.min(1920, (window?.x || Infinity) - 24),
+    y: Math.min(1080, (window?.y || Infinity) - 24),
+  });
+}
 
 export type ComputedState = {
   playerResourceAmounts?: { [k in ResourceType]: number };
@@ -93,11 +120,18 @@ export class ResourceTypeAndModifier {
   }
 
   public hash(): string {
-    return this.type.toString() + "," + this.modifier.toString();
+    return this.type.toString() + ',' + this.modifier.toString();
   }
 }
 
 export type PlayerUIState = {
+  // deprecated
   selectedPointNode: PointNodeRef | undefined;
+
+  // deprecated
   activeTab: number;
+
+  isPixiHidden: boolean;
+
+  virtualGridLocation: Vector3;
 };

@@ -1,7 +1,7 @@
-import { GameState, PointNodeRef } from "../data/GameState";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
-import { computePlayerResourceAmounts } from "./ComputeState";
-import { afterMaybeSpendingSp, doTryAllocate } from "./OnAllocation";
+import { GameState, PointNodeRef } from '../data/GameState';
+import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
+import { computePlayerResourceAmounts } from './ComputeState';
+import { afterMaybeSpendingSp, doTryAllocate } from './OnAllocation';
 
 export function selectOrReselectNode(
   updaters: UpdaterGeneratorType2<GameState>,
@@ -24,7 +24,11 @@ export function selectOrReselectNode(
   updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
     if (justTriedToAllocate) {
       justTriedToAllocate = false;
-      let [next, succeeded] = doTryAllocate(prev, prevGameState, selfPointNodeRef);
+      let [next, succeeded] = doTryAllocate(
+        prev,
+        prevGameState,
+        selfPointNodeRef
+      );
       if (succeeded) {
         justSpentSp = true;
         return next;
@@ -41,10 +45,12 @@ export function selectOrReselectNode(
     if (justSpentSp) {
       // this.state.justSpentSp = false;
       // console.log("just spent SP!");
-      return computePlayerResourceAmounts(prevGameState);
+      let it = computePlayerResourceAmounts(prevGameState);
+      // console.log({ x });
+      return it;
     }
     return prev;
-  })
+  });
 
   updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
     if (justSpentSp) {
@@ -53,7 +59,7 @@ export function selectOrReselectNode(
       return afterMaybeSpendingSp(prev, prevGameState);
     }
     return prev;
-  })
+  });
 
   // if we failed to allocate, shift the active tab so the player can see why
   updaters.playerUI.activeTab.enqueueUpdate((prev, prevGameState) => {

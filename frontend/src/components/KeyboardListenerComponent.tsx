@@ -1,6 +1,6 @@
-import React from "react";
-import { GameState, IntentName, PlayerIntentState } from "../data/GameState";
-import { UpdaterGeneratorType2 } from "../lib/util/updaterGenerator";
+import React from 'react';
+import { GameState, IntentName, PlayerIntentState } from '../data/GameState';
+import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
 type Props = {
   updaters: UpdaterGeneratorType2<PlayerIntentState, GameState>;
@@ -31,18 +31,21 @@ const defaultKeyIntentConfig = {
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
   ArrowRight: IntentName.PAN_EAST,
-  "<": IntentName.TRAVEL_OUT,
-  ">": IntentName.TRAVEL_IN,
+  '<': IntentName.TRAVEL_OUT,
+  '>': IntentName.TRAVEL_IN,
 };
 
-export class KeyboardControlComponent extends React.Component<Props, State> {
+/**
+ * Empty react element with listeners for keyboard actions.
+ */
+export class KeyboardListenerComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
       keyIntentConfig: defaultKeyIntentConfig,
     };
-    document.addEventListener("keydown", this.handleKeydown);
-    document.addEventListener("keyup", this.handleKeyup);
+    document.addEventListener('keydown', this.handleKeydown);
+    document.addEventListener('keyup', this.handleKeyup);
   }
 
   // NOTE(bowei): does using e.repeat here break when window loses focus??
@@ -87,10 +90,10 @@ export class KeyboardControlComponent extends React.Component<Props, State> {
     }
   };
   componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeydown);
-    document.removeEventListener("keyup", this.handleKeyup);
+    document.removeEventListener('keydown', this.handleKeydown);
+    document.removeEventListener('keyup', this.handleKeyup);
   }
   render() {
-    return "hi";
+    return <> </>;
   }
 }

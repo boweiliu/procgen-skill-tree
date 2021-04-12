@@ -1,4 +1,4 @@
-import { Vector2 } from "../lib/util/geometry/vector2";
+import { Vector2 } from '../lib/util/geometry/vector2';
 
 export class PointNodeRef {
   public z: number;
@@ -28,7 +28,13 @@ export class PointNodeRef {
   }
 
   public toString(): string {
-    return this.z + "," + this.chunkCoord.toString() + "," + this.pointNodeCoord.toString()
+    return (
+      this.z +
+      ',' +
+      this.chunkCoord.toString() +
+      ',' +
+      this.pointNodeCoord.toString()
+    );
   }
 }
 

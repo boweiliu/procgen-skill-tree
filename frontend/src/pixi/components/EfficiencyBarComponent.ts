@@ -1,18 +1,18 @@
-import * as Pixi from "pixi.js";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import * as Pixi from 'pixi.js';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
-  args: {},
-  updaters: {},
-  delta: number,
-  tick: number,
-  position: Vector2,
-  efficiencyPercent: number // needs to be between 0 and 100
-}
+  args: {};
+  updaters: {};
+  delta: number;
+  tick: number;
+  position: Vector2;
+  efficiencyPercent: number; // needs to be between 0 and 100
+};
 
-type State = {}
+type State = {};
 
 /**
  * Reference code for pixi gradient or blur filters:
@@ -27,11 +27,11 @@ type State = {}
  * https://www.html5gamedevs.com/topic/25539-create-gradient-filter-on-sprite/
  * https://filters.pixijs.download/main/docs/index.html
  * https://pixijs.io/examples/#/textures/gradient-resource.js
- * 
+ *
  */
 class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  public state: State = {}
+  public state: State = {};
 
   private cornerRadius: number = 10;
   private boundingBoxWidth: number = 100;
@@ -46,7 +46,7 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public filter!: Pixi.filters.BlurFilter;
   public barFill: Pixi.Graphics;
   public mask: Pixi.Graphics;
-    // object documentation: https://pixijs.download/dev/docs/PIXI.TextStyle.html
+  // object documentation: https://pixijs.download/dev/docs/PIXI.TextStyle.html
 
   public titleText: Pixi.Text;
   private textStyle: Partial<Pixi.TextStyle> = {
@@ -71,23 +71,30 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addChild(this.titleText);
 
     this.boundingBox = new Pixi.Graphics();
-    this.boundingBox.beginFill(0xDDEEFF); // background color is the blue AACCEE, this is very light bluer than that
+    this.boundingBox.beginFill(0xddeeff); // background color is the blue AACCEE, this is very light bluer than that
     this.boundingBox.drawRoundedRect(
-      0, 0,
+      0,
+      0,
       this.boundingBoxWidth,
       this.textHeight + this.innerBarHeight + this.paddingBottom,
       this.cornerRadius
     ); // outerbar = the box containing the efficiency text + bar. 100px is just enough width for the word "Efficiency". 236px height was chosen arbitrarily
     this.boundingBox.zIndex = -1;
-    this.boundingBox.alpha = .8; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
+    this.boundingBox.alpha = 0.8; // let a bit of the background poke through. TODO: actually blur the background?? cant figure out how to do it
     this.container.addChild(this.boundingBox);
 
     this.innerBar = new Pixi.Graphics();
-    this.innerBar.beginFill(0xFFFFFF);
-    this.innerBar.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // we want the inner bar (containing the actual efficiency colors) to be 40 wide and 200 tall. round the corners at the same radius as the outer box.
+    this.innerBar.beginFill(0xffffff);
+    this.innerBar.drawRoundedRect(
+      0,
+      0,
+      this.innerBarWidth,
+      this.innerBarHeight,
+      this.cornerRadius
+    ); // we want the inner bar (containing the actual efficiency colors) to be 40 wide and 200 tall. round the corners at the same radius as the outer box.
     // this.innerBar.x = 12;
-    this.innerBar.pivot.x = this.innerBarWidth/2; // this is our width over 2
-    this.innerBar.x = this.boundingBoxWidth/2; // this is outer bar width / 2
+    this.innerBar.pivot.x = this.innerBarWidth / 2; // this is our width over 2
+    this.innerBar.x = this.boundingBoxWidth / 2; // this is outer bar width / 2
     this.innerBar.y = this.textHeight; // this is just enough space below the "Efficiency" text to look nice
     this.innerBar.zIndex = 3;
     this.container.addChild(this.innerBar);
@@ -96,16 +103,16 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     const barFillContainer = new Pixi.Container();
     this.barFill = new Pixi.Graphics();
     // source: https://www.schemecolor.com/red-orange-green-gradient.php
-    this.barFill.beginFill(0x69B34C);
-    this.barFill.drawRect(0, 0, this.innerBarWidth, this.innerBarHeight/5);
-    this.barFill.beginFill(0xACB334);
-    this.barFill.drawRect(0, 40, this.innerBarWidth, this.innerBarHeight/5);
-    this.barFill.beginFill(0xFAB733);
-    this.barFill.drawRect(0, 80, this.innerBarWidth, this.innerBarHeight/5);
-    this.barFill.beginFill(0xFF8E15);
-    this.barFill.drawRect(0, 120, this.innerBarWidth, this.innerBarHeight/5);
-    this.barFill.beginFill(0xFF4E11);
-    this.barFill.drawRect(0, 160, this.innerBarWidth, this.innerBarHeight/5);
+    this.barFill.beginFill(0x69b34c);
+    this.barFill.drawRect(0, 0, this.innerBarWidth, this.innerBarHeight / 5);
+    this.barFill.beginFill(0xacb334);
+    this.barFill.drawRect(0, 40, this.innerBarWidth, this.innerBarHeight / 5);
+    this.barFill.beginFill(0xfab733);
+    this.barFill.drawRect(0, 80, this.innerBarWidth, this.innerBarHeight / 5);
+    this.barFill.beginFill(0xff8e15);
+    this.barFill.drawRect(0, 120, this.innerBarWidth, this.innerBarHeight / 5);
+    this.barFill.beginFill(0xff4e11);
+    this.barFill.drawRect(0, 160, this.innerBarWidth, this.innerBarHeight / 5);
     this.barFill.pivot.x = this.innerBarWidth / 2;
     this.barFill.x = this.boundingBoxWidth / 2;
     this.barFill.y = this.textHeight; // same positioning as innerBar
@@ -121,19 +128,31 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     // this mask moves up and down
     this.mask = new Pixi.Graphics();
     this.mask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
-    this.mask.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
+    this.mask.drawRoundedRect(
+      0,
+      0,
+      this.innerBarWidth,
+      this.innerBarHeight,
+      this.cornerRadius
+    ); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
     this.mask.zIndex = 30; // doesnt matter
-    this.mask.pivot.x = this.innerBarWidth/2; // left-right center in ourselves
-    this.mask.x = this.boundingBoxWidth/2; // center in the boundingBox
+    this.mask.pivot.x = this.innerBarWidth / 2; // left-right center in ourselves
+    this.mask.x = this.boundingBoxWidth / 2; // center in the boundingBox
     this.mask.y = this.textHeight; // same positioning as inner bar
 
     // this mask does not
     const fixedMask = new Pixi.Graphics();
     fixedMask.beginFill(0x000000, 1); // color and alpha literally dont matter cuz its a mmask
-    fixedMask.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
+    fixedMask.drawRoundedRect(
+      0,
+      0,
+      this.innerBarWidth,
+      this.innerBarHeight,
+      this.cornerRadius
+    ); // same dims as the inner bar. note that this doesnt take into account the line style of width 2, so it will cause the filling to leak over into the line style. to fix this barBorder is reapplied over the top to cover the leaks.
     fixedMask.zIndex = 31; // doesnt matter
-    fixedMask.pivot.x = this.innerBarWidth/2; // left-right center in ourselves
-    fixedMask.x = this.boundingBoxWidth/2; // center in the boundingBox
+    fixedMask.pivot.x = this.innerBarWidth / 2; // left-right center in ourselves
+    fixedMask.x = this.boundingBoxWidth / 2; // center in the boundingBox
     fixedMask.y = this.textHeight; // same positioning as inner bar
 
     maskContainer.addChild(this.mask);
@@ -145,12 +164,18 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
     this.container.addChild(fixedMask);
     barFillContainer.mask = fixedMask;
 
-    // another copy of innerbar, except this time the fill is transparent; we just need the line style to be redrawn so that 
+    // another copy of innerbar, except this time the fill is transparent; we just need the line style to be redrawn so that
     // the inner filling mask leakage gets hidden
     this.barBorder = new Pixi.Graphics();
     this.barBorder.lineStyle(2, 0x000000, 1);
     // this.barBorder.beginFill(0x000000, 0);
-    this.barBorder.drawRoundedRect(0, 0, this.innerBarWidth, this.innerBarHeight, this.cornerRadius);
+    this.barBorder.drawRoundedRect(
+      0,
+      0,
+      this.innerBarWidth,
+      this.innerBarHeight,
+      this.cornerRadius
+    );
     this.barBorder.pivot.x = this.innerBarWidth / 2;
     this.barBorder.x = this.boundingBoxWidth / 2;
     this.barBorder.y = this.textHeight;
@@ -161,7 +186,8 @@ class EfficiencyBarComponent extends LifecycleHandlerBase<Props, State> {
   public renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.position);
 
-    if (props.tick < 60 && props.tick % 10 === 5) { // poll for document webfonts loaded; TODO, substitute for listening to actual fonts ready event
+    if (props.tick < 60 && props.tick % 10 === 5) {
+      // poll for document webfonts loaded; TODO, substitute for listening to actual fonts ready event
       this.titleText.updateText(false); // false == force reload text even when text has not changed. needed to get new fonts
     }
 

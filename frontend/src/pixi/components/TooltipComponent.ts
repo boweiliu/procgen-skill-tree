@@ -1,20 +1,20 @@
-import * as Pixi from "pixi.js";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
-
+import * as Pixi from 'pixi.js';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import COLORS from '../colors';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 export type TooltipInfo = {
   text: string;
   position: Vector2 | undefined; // should be nonnull if visible === true
   visible: boolean;
-}
+};
 
 type Props = {
-  offset: Vector2,
+  offset: Vector2;
 } & TooltipInfo;
 
-type State = {} 
+type State = {};
 
 class TooltipComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
@@ -50,8 +50,13 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
     // this.container.addChild(this.box);
   }
 
-  protected shouldUpdate(prevProps: Props, prevState: State, props: Props, state: State): boolean {
-    for (let key of (Object.keys(prevProps) as (keyof Props)[])) {
+  protected shouldUpdate(
+    prevProps: Props,
+    prevState: State,
+    props: Props,
+    state: State
+  ): boolean {
+    for (let key of Object.keys(prevProps) as (keyof Props)[]) {
       if (prevProps[key] !== props[key]) {
         return true;
       }
@@ -61,7 +66,9 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
 
   protected renderSelf(props: Props) {
     this.container.visible = props.visible;
-    this.container.position = PixiPointFrom(props.offset.add(props?.position || Vector2.Zero));
+    this.container.position = PixiPointFrom(
+      props.offset.add(props?.position || Vector2.Zero)
+    );
     this.text.text = props.text;
 
     if (this.box) {
@@ -69,9 +76,15 @@ class TooltipComponent extends LifecycleHandlerBase<Props, State> {
     }
 
     this.box = new Pixi.Graphics();
-    this.box.lineStyle(1, 0x222222, 1);
-    this.box.beginFill(0xEEEEEE);
-    this.box.drawRoundedRect(0, 0, this.text.width + 18, this.text.height + 18, 4);
+    this.box.lineStyle(1, COLORS.tooltipBorderBlack, 1);
+    this.box.beginFill(COLORS.tooltipFillWhite);
+    this.box.drawRoundedRect(
+      0,
+      0,
+      this.text.width + 18,
+      this.text.height + 18,
+      4
+    );
     this.box.zIndex = 0;
     this.container.addChild(this.box);
   }

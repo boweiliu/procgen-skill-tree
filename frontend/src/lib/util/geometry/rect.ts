@@ -1,5 +1,5 @@
-import { Line } from "./line";
-import { Vector2, IVector2 } from "./vector2";
+import { Line } from './line';
+import { Vector2, IVector2 } from './vector2';
 
 /**
  * Immutable rectangle class.
@@ -238,7 +238,7 @@ export class Rect {
   }
 
   static DeserializeRect(s: string): Rect {
-    const [x, y, w, h] = s.split("|").map((x) => Number(x));
+    const [x, y, w, h] = s.split('|').map((x) => Number(x));
 
     return new Rect({ x, y, width: w, height: h });
   }
@@ -413,7 +413,7 @@ export class Rect {
       y: this.y,
       w: this.width,
       h: this.height,
-      reviver: "Rect",
+      reviver: 'Rect',
     };
   }
 
@@ -472,12 +472,12 @@ export class Rect {
 
   static Deserialize(obj: any): Rect {
     if (
-      !obj.hasOwnProperty("x") ||
-      !obj.hasOwnProperty("y") ||
-      !obj.hasOwnProperty("w") ||
-      !obj.hasOwnProperty("h")
+      !obj.hasOwnProperty('x') ||
+      !obj.hasOwnProperty('y') ||
+      !obj.hasOwnProperty('w') ||
+      !obj.hasOwnProperty('h')
     ) {
-      console.error("Failed deserializing Rect");
+      console.error('Failed deserializing Rect');
     }
 
     return new Rect({

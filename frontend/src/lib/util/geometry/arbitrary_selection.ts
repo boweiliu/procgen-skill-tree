@@ -15,29 +15,41 @@ export class ArbitrarySelection {
   }
 
   public get x(): number {
-    if (this.cover.length === 0) { return 0; }
+    if (this.cover.length === 0) {
+      return 0;
+    }
 
-    return Util.MinBy(this.cover, r => r.x)!.x;
+    return Util.MinBy(this.cover, (r) => r.x)!.x;
   }
 
   public get y(): number {
-    if (this.cover.length === 0) { return 0; }
+    if (this.cover.length === 0) {
+      return 0;
+    }
 
-    return Util.MinBy(this.cover, r => r.y)!.y;
+    return Util.MinBy(this.cover, (r) => r.y)!.y;
   }
 
   public get w(): number {
-    if (this.cover.length === 0) { return 0; }
+    if (this.cover.length === 0) {
+      return 0;
+    }
 
-    return Util.MaxBy(this.cover, r => r.right)!.right -
-           Util.MinBy(this.cover, r => r.x)!.x;
+    return (
+      Util.MaxBy(this.cover, (r) => r.right)!.right -
+      Util.MinBy(this.cover, (r) => r.x)!.x
+    );
   }
 
   public get h(): number {
-    if (this.cover.length === 0) { return 0; }
+    if (this.cover.length === 0) {
+      return 0;
+    }
 
-    return Util.MaxBy(this.cover, r => r.bottom)!.bottom -
-           Util.MinBy(this.cover, r => r.y)!.y;
+    return (
+      Util.MaxBy(this.cover, (r) => r.bottom)!.bottom -
+      Util.MinBy(this.cover, (r) => r.y)!.y
+    );
   }
 
   public get pos(): Vector2 {
@@ -63,8 +75,12 @@ export class ArbitrarySelection {
   }
 
   addRect(rectToAdd: Rect): void {
-    const subsumingRects = this.cover.filter(r => r.completelyContains(rectToAdd));
-    const intersectingRects = this.cover.filter(r => r.intersects(rectToAdd, { edgesOnlyIsAnIntersection: false }));
+    const subsumingRects = this.cover.filter((r) =>
+      r.completelyContains(rectToAdd)
+    );
+    const intersectingRects = this.cover.filter((r) =>
+      r.intersects(rectToAdd, { edgesOnlyIsAnIntersection: false })
+    );
 
     if (subsumingRects.length > 0) {
       return;
@@ -79,7 +95,9 @@ export class ArbitrarySelection {
   }
 
   subtractRect(rectToSubtract: Rect): void {
-    const intersectingRects = this.cover.filter(r => r.intersects(rectToSubtract, { edgesOnlyIsAnIntersection: false }));
+    const intersectingRects = this.cover.filter((r) =>
+      r.intersects(rectToSubtract, { edgesOnlyIsAnIntersection: false })
+    );
 
     for (const rect of intersectingRects) {
       // rectToSubtract completely contains rect
@@ -105,12 +123,35 @@ export class ArbitrarySelection {
       // -------------------------
 
       const newRects = [
-        { x: rect.x                               , y: rect.y                               , width: rect.width                                                   , height: subrectToRemove.y - rect.y }, // A
-        { x: rect.x                               , y: subrectToRemove.y                    , width: subrectToRemove.x - rect.x                               , height: subrectToRemove.height }, // B
-        { x: subrectToRemove.x + subrectToRemove.width, y: subrectToRemove.y                    , width: rect.x + rect.width - (subrectToRemove.width + subrectToRemove.x), height: subrectToRemove.height }, // C
-        { x: rect.x                               , y: subrectToRemove.y + subrectToRemove.height, width: rect.width                                                   , height: rect.y + rect.height - (subrectToRemove.y + subrectToRemove.height) }, // D
-      ].filter(r => r.width > 0 && r.height > 0)
-       .map(r => new Rect(r));
+        {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: subrectToRemove.y - rect.y,
+        }, // A
+        {
+          x: rect.x,
+          y: subrectToRemove.y,
+          width: subrectToRemove.x - rect.x,
+          height: subrectToRemove.height,
+        }, // B
+        {
+          x: subrectToRemove.x + subrectToRemove.width,
+          y: subrectToRemove.y,
+          width:
+            rect.x + rect.width - (subrectToRemove.width + subrectToRemove.x),
+          height: subrectToRemove.height,
+        }, // C
+        {
+          x: rect.x,
+          y: subrectToRemove.y + subrectToRemove.height,
+          width: rect.width,
+          height:
+            rect.y + rect.height - (subrectToRemove.y + subrectToRemove.height),
+        }, // D
+      ]
+        .filter((r) => r.width > 0 && r.height > 0)
+        .map((r) => new Rect(r));
 
       this.cover = this.cover.concat(newRects);
     }
@@ -129,10 +170,12 @@ export class ArbitrarySelection {
   // O(n^2) scc algorithm until someone convinces me I need a faster one
   getConnectedComponents(): Rect[][] {
     const components: Rect[][] = [];
-    const seenRects: { [key: string]: boolean } = {}
+    const seenRects: { [key: string]: boolean } = {};
 
     for (const rect of this.cover) {
-      if (seenRects[rect.serialize()]) { continue; }
+      if (seenRects[rect.serialize()]) {
+        continue;
+      }
 
       const component = this.getConnectedComponentFrom(rect);
 
@@ -147,16 +190,20 @@ export class ArbitrarySelection {
   }
 
   private getConnectedComponentFrom(start: Rect): Rect[] {
-    const component: { [key: string]: boolean } = { };
+    const component: { [key: string]: boolean } = {};
     let edge = [start];
 
     while (edge.length > 0) {
       let newEdge: Rect[] = [];
 
       for (const rect of edge) {
-        if (component[rect.serialize()]) { continue; }
+        if (component[rect.serialize()]) {
+          continue;
+        }
 
-        const intersectingRects = this.cover.filter(r => r.intersects(rect, { edgesOnlyIsAnIntersection: true }));
+        const intersectingRects = this.cover.filter((r) =>
+          r.intersects(rect, { edgesOnlyIsAnIntersection: true })
+        );
 
         component[rect.serialize()] = true;
         newEdge = newEdge.concat(intersectingRects);
@@ -165,7 +212,7 @@ export class ArbitrarySelection {
       edge = newEdge;
     }
 
-    return Object.keys(component).map(r => Rect.DeserializeRect(r));
+    return Object.keys(component).map((r) => Rect.DeserializeRect(r));
   }
 
   getOutlines(): Line[][] {
@@ -180,7 +227,7 @@ export class ArbitrarySelection {
       const outline = this.getOutlineFor(c);
       const outlineComponents = this.getComponentsOfOutline(outline);
 
-      result = result.concat(outlineComponents)
+      result = result.concat(outlineComponents);
     }
 
     this.oldOutlines = result;
@@ -208,12 +255,18 @@ export class ArbitrarySelection {
 
     for (let i = 0; i < allLines.length; i++) {
       const line1 = allLines[i];
-      if (!line1) { continue; }
+      if (!line1) {
+        continue;
+      }
 
       for (let j = 0; j < allLines.length; j++) {
         const line2 = allLines[j];
-        if (!line2) { continue; }
-        if (line1 === line2) { continue; }
+        if (!line2) {
+          continue;
+        }
+        if (line1 === line2) {
+          continue;
+        }
 
         const intersection = line1.getOverlap(line2);
 
@@ -230,7 +283,7 @@ export class ArbitrarySelection {
       }
     }
 
-    return allLines.filter(l => l !== undefined) as Line[];
+    return allLines.filter((l) => l !== undefined) as Line[];
   }
 
   private getComponentsOfOutline(outline: Line[]): Line[][] {
@@ -241,8 +294,12 @@ export class ArbitrarySelection {
       const idx1 = line.x1 * MAX_SIZE + line.y1;
       const idx2 = line.x2 * MAX_SIZE + line.y2;
 
-      if (!lookupTable[idx1]) { lookupTable[idx1] = []; }
-      if (!lookupTable[idx2]) { lookupTable[idx2] = []; }
+      if (!lookupTable[idx1]) {
+        lookupTable[idx1] = [];
+      }
+      if (!lookupTable[idx2]) {
+        lookupTable[idx2] = [];
+      }
 
       lookupTable[idx1].push(line);
       lookupTable[idx2].push(line);
@@ -252,17 +309,25 @@ export class ArbitrarySelection {
     let visited: { [key: string]: boolean } = {};
 
     for (const line of outline) {
-      if (visited[line.serialized]) { continue; }
+      if (visited[line.serialized]) {
+        continue;
+      }
       visited[line.serialized] = true;
 
       const sequence = [line];
 
       while (true) {
         const current = sequence[sequence.length - 1];
-        const candidates = lookupTable[current.x1 * MAX_SIZE + current.y1].concat(lookupTable[current.x2 * MAX_SIZE + current.y2]);
-        const next = candidates.filter(l => l !== current && !visited[l.serialized])[0];
+        const candidates = lookupTable[
+          current.x1 * MAX_SIZE + current.y1
+        ].concat(lookupTable[current.x2 * MAX_SIZE + current.y2]);
+        const next = candidates.filter(
+          (l) => l !== current && !visited[l.serialized]
+        )[0];
 
-        if (!next) { break; }
+        if (!next) {
+          break;
+        }
 
         visited[next.serialized] = true;
         sequence.push(next);
@@ -290,27 +355,33 @@ export class ArbitrarySelection {
 
     for (let x = 0; x < canvasSize.x; x++) {
       for (let y = 0; y < canvasSize.y; y++) {
-        if (covered[x * MAX_SIZE + y] !== false) { continue; }
+        if (covered[x * MAX_SIZE + y] !== false) {
+          continue;
+        }
 
         let squareSize = 2;
 
-        outer:
-        for (; squareSize < MAX_SIZE; squareSize++) {
+        outer: for (; squareSize < MAX_SIZE; squareSize++) {
           const endSquareX = x + squareSize;
           const endSquareY = y + squareSize;
 
           for (let bottomLineX = x; bottomLineX < endSquareX; bottomLineX++) {
-            if (covered[bottomLineX * MAX_SIZE + (y + squareSize - 1)] === undefined ||
-                covered[bottomLineX * MAX_SIZE + (y + squareSize - 1)] === true)  {
+            if (
+              covered[bottomLineX * MAX_SIZE + (y + squareSize - 1)] ===
+                undefined ||
+              covered[bottomLineX * MAX_SIZE + (y + squareSize - 1)] === true
+            ) {
               squareSize--;
               break outer;
             }
           }
 
           for (let bottomLineY = y; bottomLineY < endSquareY; bottomLineY++) {
-            if (covered[(x + squareSize - 1) * MAX_SIZE + bottomLineY] === undefined ||
-                covered[(x + squareSize - 1) * MAX_SIZE + bottomLineY] === true) {
-
+            if (
+              covered[(x + squareSize - 1) * MAX_SIZE + bottomLineY] ===
+                undefined ||
+              covered[(x + squareSize - 1) * MAX_SIZE + bottomLineY] === true
+            ) {
               squareSize--;
               break outer;
             }
@@ -323,12 +394,14 @@ export class ArbitrarySelection {
           }
         }
 
-        rects.push(new Rect({
-          x: x,
-          y: y,
-          width: squareSize,
-          height: squareSize,
-        }));
+        rects.push(
+          new Rect({
+            x: x,
+            y: y,
+            width: squareSize,
+            height: squareSize,
+          })
+        );
       }
     }
 
@@ -347,15 +420,21 @@ export class ArbitrarySelection {
   }
 
   translate(p: Vector2): void {
-    this.cover = this.cover.map(x => x.translate(p));
-    this.oldOutlines = this.oldOutlines.map(l => l.map(ll => ll.translate(p)));
+    this.cover = this.cover.map((x) => x.translate(p));
+    this.oldOutlines = this.oldOutlines.map((l) =>
+      l.map((ll) => ll.translate(p))
+    );
   }
 
   contains(p: Vector2): boolean {
-    if (this.cover.length === 0) { return true; }
+    if (this.cover.length === 0) {
+      return true;
+    }
 
     for (const r of this.cover) {
-      if (r.contains(p)) { return true; }
+      if (r.contains(p)) {
+        return true;
+      }
     }
 
     return false;

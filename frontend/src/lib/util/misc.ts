@@ -72,7 +72,7 @@ export class Util {
     str: string,
     mapObj: { [key: string]: string }
   ): string {
-    const re = new RegExp(Object.keys(mapObj).join("|"), "gi");
+    const re = new RegExp(Object.keys(mapObj).join('|'), 'gi');
 
     return str.replace(re, (matched) => {
       return mapObj[matched.toLowerCase()];
@@ -114,23 +114,23 @@ export class Util {
 
   public static FormatDate(d: Date): string {
     const monthName = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ][d.getMonth()];
 
-    return `${monthName} ${d.getDate()}, ${("00" + d.getHours()).substr(-2)}:${(
-      "00" + d.getMinutes()
-    ).substr(-2)}:${("00" + d.getSeconds()).substr(-2)}`;
+    return `${monthName} ${d.getDate()}, ${('00' + d.getHours()).substr(-2)}:${(
+      '00' + d.getMinutes()
+    ).substr(-2)}:${('00' + d.getSeconds()).substr(-2)}`;
   }
 
   public static FlattenByOne<T>(arr: T[][]): T[] {
@@ -146,8 +146,8 @@ export class Util {
   public static PadString(
     string: string,
     length: number,
-    intersperse = "",
-    character = " "
+    intersperse = '',
+    character = ' '
   ) {
     return string + intersperse + character.repeat(length - string.length);
   }
@@ -177,9 +177,9 @@ export function assertOnlyCalledOnce(id: string | number) {
       assertOnlyCalledOnceData[k][1] = 2;
     } else {
       throw new Error(
-        "Error, called more than twice with same id: " +
+        'Error, called more than twice with same id: ' +
           k +
-          " , callback the first time was : " +
+          ' , callback the first time was : ' +
           assertOnlyCalledOnceData[k]
       );
     }
@@ -187,86 +187,6 @@ export function assertOnlyCalledOnce(id: string | number) {
     const stacktrace = new Error().stack!;
     assertOnlyCalledOnceData[k] = [stacktrace, 1];
   }
-}
-
-/**
- * Class representing a value which is only computed when used.
- *
- * Usage: const lazy = new Lazy(() => thingThatReturnsSomething()).
- * Then thingThatReturnsSomething() will only get called on the first time lazy.get() is called.
- * On the second and subsequent times, lazy.get() will return the same object - the factory method is not called again.
- */
-export class Lazy<T> {
-  private _wasConstructed: boolean = false;
-  private _value: T | undefined = undefined;
-  private _factory: () => T;
-
-  constructor(
-    factory: () => T,
-    // structure?: T extends { [key: string]: any } ? T : void
-  ) {
-    this._factory = factory;
-  }
-  public get(): T {
-    // T might have undefined as a valid value
-    if (this._value !== undefined || this._wasConstructed === true) {
-      return this._value!;
-    } else {
-      this._value = this._factory();
-      this._wasConstructed = true;
-      return this._value;
-    }
-  }
-  public wasConstructed(): boolean {
-    return this._wasConstructed;
-  }
-  // public async getAsync(): Promise<T> {
-  //   if (this._value !== undefined || this._wasConstructed === true) {
-  //     return Promise.resolve(this._value!);
-  //   } else {
-  //     return new Promise<T>((resolve, reject) => {
-  //       this._value = this._factory();
-  //       this._wasConstructed = true;
-  //       resolve(this._value);
-  //     });
-  //   }
-  // }
-}
-
-export function LazyProxy<
-  T extends { [key: string]: any } | { [i: number]: any }
->(factory: () => T): Const<T> {
-  return (new Proxy(new Lazy(factory), {
-    get: (target, property, receiver) => {
-      if (property === "toJSON") {
-        return () => {
-          if (target.wasConstructed()) {
-            return target.get();
-          } else {
-            return "[Object Lazy]";
-          }
-        };
-      }
-      const targetValue = target.get();
-      return Reflect.get(targetValue, property);
-    },
-    ownKeys: (target) => {
-      const targetValue = target.get();
-      return Reflect.ownKeys(targetValue);
-    },
-    getOwnPropertyDescriptor: (target, property) => {
-      /**
-       * https://stackoverflow.com/questions/40352613/why-does-object-keys-and-object-getownpropertynames-produce-different-output
-       */
-
-      return Object.getOwnPropertyDescriptor(target.get(), property);
-      
-    },
-    has: (target, property) => {
-      // This is called when iterating over array i.e. array.forEach()
-      return property in target.get()
-    }
-  }) as unknown) as Const<T>;
 }
 
 /**

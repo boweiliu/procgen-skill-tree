@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from 'crypto';
 
 /**
  * NOTE(bowei): we use a hash function that is NOT md5 -
@@ -9,22 +9,22 @@ import crypto from "crypto";
 
 // NOTE(bowei): untested
 export function splitmix64(seed: bigint, i: bigint) {
-    let z: bigint = seed + i * BigInt("0x9e3779b97f4a7c15");
-    z = ( z ^ ( z >> BigInt(30) ) ) * BigInt("0xBF58476D1CE4E5B9");
-    z = ( z ^ ( z >> BigInt(27) ) ) * BigInt(0x94D049BB133111EB);
-    return z ^ ( z >> BigInt(31) );
+  let z: bigint = seed + i * BigInt('0x9e3779b97f4a7c15');
+  z = (z ^ (z >> BigInt(30))) * BigInt('0xBF58476D1CE4E5B9');
+  z = (z ^ (z >> BigInt(27))) * BigInt(0x94d049bb133111eb);
+  return z ^ (z >> BigInt(31));
 }
 
 export const INTMAX32 = 2 ** 32;
 export function squirrel3(i: number) {
   let n = (i + INTMAX32) % INTMAX32;
-    n = Math.imul(n, 0xb5297a4d);
-    n ^= n >>> 8;
-    n += 0x68e31da4;
-    n ^= n << 8;
-    n = Math.imul(n, 0x1b56c4e9);
-    n ^= n >>> 8;
-    return (n + INTMAX32) % INTMAX32;
+  n = Math.imul(n, 0xb5297a4d);
+  n ^= n >>> 8;
+  n += 0x68e31da4;
+  n ^= n << 8;
+  n = Math.imul(n, 0x1b56c4e9);
+  n ^= n >>> 8;
+  return (n + INTMAX32) % INTMAX32;
 }
 export const PRIME32 = 0x3233f2cd; // not used ; useful for hashing integers; a 32 bit prime
 
@@ -39,14 +39,14 @@ export class HashState {
    */
   constructor(seed?: string) {
     const buffer = crypto
-      .createHash("md5")
-      .update((seed || "").toString())
+      .createHash('md5')
+      .update((seed || '').toString())
       .digest();
     this.seed = buffer;
   }
 
   public peekRandom(): number {
-    const buffer = crypto.createHash("md5").update(this.seed).digest();
+    const buffer = crypto.createHash('md5').update(this.seed).digest();
     return Number(this.bufferToBigInt(buffer) % BigInt(2 ** 32)) % 2 ** 32;
   }
 
@@ -56,7 +56,7 @@ export class HashState {
   }
 
   public stepSeed(seed: string) {
-    const buffer = crypto.createHash("md5").update(seed.toString()).digest();
+    const buffer = crypto.createHash('md5').update(seed.toString()).digest();
     this.seed = this.bigIntToBuffer(
       this.bufferToBigInt(this.seed) + this.bufferToBigInt(buffer)
     );

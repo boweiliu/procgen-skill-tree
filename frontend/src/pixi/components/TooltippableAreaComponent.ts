@@ -1,31 +1,31 @@
-import * as Pixi from "pixi.js";
-import { PixiPointFrom } from "../../lib/pixi/pixify";
-import { Vector2 } from "../../lib/util/geometry/vector2";
-import { UpdaterGeneratorType2 } from "../../lib/util/updaterGenerator";
-import { engageLifecycle, LifecycleHandlerBase } from "./LifecycleHandler";
+import * as Pixi from 'pixi.js';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import COLORS from '../colors';
+import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
   args: {
-    markForceUpdate: (childInstance: any) => void,
-  },
+    markForceUpdate: (childInstance: any) => void;
+  };
   hitArea: Pixi.IHitArea;
   text: string;
   delaySeconds?: number;
-}
+};
 
 type State = {
   isActive: boolean;
-
-}
+};
 
 /**
  * For a interesting reference implementation, see https://www.iwm-tuebingen.de/iwmbrowser/lib/pixi/button.html
  */
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
-  public state: State
+  public state: State;
   public container: Pixi.Container;
-  private stateUpdaters: UpdaterGeneratorType2<State>
-  protected fireStateUpdaters: () => void
+  private stateUpdaters: UpdaterGeneratorType2<State>;
+  protected fireStateUpdaters: () => void;
 
   public hitAreaDrawn?: Pixi.Graphics; // debug
 
@@ -56,10 +56,13 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
 
     this.tooltipContainer = null;
 
-    ({ state: this.state, stateUpdaters: this.stateUpdaters, fireStateUpdaters: this.fireStateUpdaters } =
-      this.useState<State, TooltippableAreaComponent>(this, {
-        isActive: false
-      }));
+    ({
+      state: this.state,
+      stateUpdaters: this.stateUpdaters,
+      fireStateUpdaters: this.fireStateUpdaters,
+    } = this.useState<State, TooltippableAreaComponent>(this, {
+      isActive: false,
+    }));
   }
 
   protected renderSelf(props: Props) {
@@ -88,8 +91,8 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
         this.tooltipContainer.addChild(text);
 
         const box = new Pixi.Graphics();
-        box.lineStyle(1, 0x222222, 1);
-        box.beginFill(0xEEEEEE);
+        box.lineStyle(1, COLORS.tooltipBorderBlack, 1);
+        box.beginFill(COLORS.tooltipFillWhite);
         box.drawRoundedRect(0, 0, text.width + 18, text.height + 18, 4);
         box.zIndex = 0;
         this.tooltipContainer.addChild(box);
@@ -121,7 +124,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
       // console.log('fired onPointerOver in toolltippable');
       return true;
     });
-  }
+  };
 
   public onPointerOut = (event: Pixi.InteractionEvent) => {
     this._staleProps.args.markForceUpdate(this);
@@ -130,7 +133,7 @@ class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
       // console.log('fired onPointerOut in tooltippable')
       return false;
     });
-  }
+  };
 }
 
 const wrapped = engageLifecycle(TooltippableAreaComponent);

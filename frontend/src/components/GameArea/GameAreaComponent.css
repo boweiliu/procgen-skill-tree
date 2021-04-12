@@ -1,0 +1,72 @@
+.game-area {
+  overflow-x: scroll;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  white-space: nowrap;
+}
+
+.game-area::-webkit-scrollbar {
+  /* display: none; */
+}
+/**
+      // see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
+      // https://stackoverflow.com/questions/4192847/set-scroll-position
+      // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
+*/
+
+.hex-block {
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.hex-block-row {
+  display: block;
+  float: left;
+  min-width: max-content;
+}
+
+.hex-center {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #444444;
+  border-radius: 50%;
+}
+
+.hex-center:hover > .hover-only {
+  display: block;
+}
+.hover-only {
+  display: none;
+}
+
+.hex-center-lock-left {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #444444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hex-center-lock-right {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #444444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tiny-text {
+  /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
+  this fills it in symmetrically on the left and bottom.*/
+  padding-left: 2px;
+  padding-bottom: 2px;
+  max-width: 48px;
+  overflow: hidden;
+  cursor: default;
+}
