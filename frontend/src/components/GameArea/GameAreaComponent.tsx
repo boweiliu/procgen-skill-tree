@@ -357,8 +357,14 @@ function CellComponent({
             ...hexCenterLockStyle,
           }}
         >
-          <div className="hex-center-lock-left" style={{ ...leftLock, borderColor }} />
-          <div className="hex-center-lock-right" style={{ ...rightLock, borderColor }} />
+          <div
+            className="hex-center-lock-left"
+            style={{ ...leftLock, borderColor }}
+          />
+          <div
+            className="hex-center-lock-right"
+            style={{ ...rightLock, borderColor }}
+          />
         </div>
       ) : null}
     </div>
