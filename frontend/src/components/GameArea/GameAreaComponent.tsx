@@ -151,7 +151,7 @@ function GameArea(props: {
         target.scrollLeft !== newScrollLeft
       ) {
         console.log('jump!');
-        target.scrollTo(newScrollLeft, newScrollTop);
+        // target.scrollTo(newScrollLeft, newScrollTop);
         props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
