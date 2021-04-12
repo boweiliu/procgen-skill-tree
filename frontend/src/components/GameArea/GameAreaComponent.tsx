@@ -337,7 +337,7 @@ function CellComponent({
             borderStyle: 'solid',
             marginTop: '-16px',
             marginLeft: '48px',
-            minWidth: 'fit-content',
+            minWidth: 'max-content',
             padding: '3px',
             background: 'rgba(255,255,255,0.3)',
           }}
