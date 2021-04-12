@@ -112,7 +112,6 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridDataMap = new KeyedHashMap<Vector2, NodeData>();
   const virtualGridStatusMap: KeyedHashMap<Vector2, NodeData> = useMemo(() => {
     const map = new KeyedHashMap<Vector2, NodeData>();
     for (let row = 0; row < virtualGridDims.x; row++) {
@@ -141,13 +140,6 @@ function Component(props: {
     // jumpOffset =
   }, []);
 
-  const virtualGridInfo = useMemo(() => {
-    return {
-      map: virtualGridDataMap,
-      jumpOffset: undefined,
-    };
-  }, [gameState.playerUI.virtualGridLocation]);
-
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
       // console.log({ got: 'here' });
@@ -170,7 +162,7 @@ function Component(props: {
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
         virtualGridDims={virtualGridDims}
-        virtualGridInfo={virtualGridInfo}
+        jumpOffset={undefined}
         virtualGridStatusMap={virtualGridStatusMap}
         updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
