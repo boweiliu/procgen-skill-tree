@@ -81,8 +81,8 @@ function GameArea(props: {
   const hexCenterStyle = {
     width: hexCenterRadius * 2 + 'px',
     height: hexCenterRadius * 2 + 'px',
-    backgroundColor: colorToCss(COLORS.nodePink),
-    borderColor: colorToCss(COLORS.nodeBorder),
+    // backgroundColor: colorToCss(COLORS.nodePink),
+    // borderColor: colorToCss(COLORS.nodeBorder),
   };
   const hexCenterLockStyle = {
     marginLeft: `-${hexCenterRadius * 2}px`,
@@ -97,7 +97,7 @@ function GameArea(props: {
     height: hexCenterRadius + 'px',
     marginTop: hexCenterRadius + 'px',
     backgroundColor: colorToCss(COLORS.nodePink),
-    borderColor: colorToCss(COLORS.nodeBorder),
+    // borderColor: colorToCss(COLORS.nodeBorder),
   };
 
   const handleScroll = useCallback(
@@ -209,13 +209,13 @@ function GameArea(props: {
                 .map((_, x) => {
                   const node = props.virtualGridStatusMap.get(
                     new Vector2(x, y)
-                  );
+                  )!;
                   return (
                     <Node
                       key={node?.id}
                       node={node}
-                      status={node?.status}
-                      text={node?.shortText}
+                      status={node.status}
+                      text={node.shortText}
                       hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
@@ -266,6 +266,7 @@ function CellComponent({
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
   onClick,
+  status,
   text,
 }: {
   idx: number;
@@ -278,10 +279,22 @@ function CellComponent({
   hexBlockStyle: any;
   onClick: React.MouseEventHandler;
   text?: string;
+  status: NodeAllocatedStatus;
 }) {
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
+
   const isLocked = idx === 12 && rowIdx === 4;
+  const fillColor =
+    status === NodeAllocatedStatus.TAKEN
+      ? colorToCss(COLORS.grayBlack)
+      : colorToCss(COLORS.nodePink);
+  const borderColor =
+    status === NodeAllocatedStatus.TAKEN ||
+    status === NodeAllocatedStatus.UNREACHABLE
+      ? colorToCss(COLORS.borderBlack)
+      : colorToCss(COLORS.borderWhite);
+
   return (
     <div
       onClick={onClick}
@@ -293,7 +306,11 @@ function CellComponent({
       <div
         id={`hex-center-${rowIdx}-${idx}`}
         className="hex-center"
-        style={hexCenterStyle}
+        style={{
+          ...hexCenterStyle,
+          backgroundColor: fillColor,
+          borderColor: borderColor,
+        }}
       >
         <div
           style={{
@@ -342,8 +359,14 @@ function CellComponent({
             ...hexCenterLockStyle,
           }}
         >
-          <div className="hex-center-lock-left" style={leftLock} />
-          <div className="hex-center-lock-right" style={rightLock} />
+          <div
+            className="hex-center-lock-left"
+            style={{ ...leftLock, borderColor }}
+          />
+          <div
+            className="hex-center-lock-right"
+            style={{ ...rightLock, borderColor }}
+          />
         </div>
       ) : null}
     </div>
@@ -365,7 +388,7 @@ function NodeComponent({
   onUpdateStatus,
 }: {
   node?: NodeData;
-  status?: NodeAllocatedStatus;
+  status: NodeAllocatedStatus;
   idx: number;
   hexCenterLockBlockStyle: any;
   onUpdateStatus: UpdateStatusCb;
@@ -400,6 +423,7 @@ function NodeComponent({
       hexCenterLockStyle={hexCenterLockStyle}
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
       text={text}
+      status={status}
     >
       {status}
     </Cell>

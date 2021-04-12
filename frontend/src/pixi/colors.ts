@@ -27,6 +27,9 @@ let COLORS = {
   tooltipBorderBlack: 0x222222,
   tooltipFillWhite: 0xeeeeee,
   white: 0xffffff,
+  grayBlack: 0x1d1d1d,
+  borderBlack: 0x111111,
+  borderWhite: 0x666666,
   black: 0x000000,
 };
 
