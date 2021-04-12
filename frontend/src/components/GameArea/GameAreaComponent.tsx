@@ -195,18 +195,18 @@ function GameArea(props: {
       >
         {Array(props.virtualGridDims.y)
           .fill(0)
-          .map((y, idx, arr) => (
-            <Row key={idx} rowIdx={idx} hexHalfBlockStyle={hexHalfBlockStyle}>
+          .map((_, rowIdx, arr) => (
+            <Row key={rowIdx} rowIdx={rowIdx} hexHalfBlockStyle={hexHalfBlockStyle}>
               {Array(props.virtualGridDims.x)
                 .fill(0)
-                .map((x, index, arr) => (
+                .map((_, index, arr) => (
                   <Node
-                    node={props.virtualGridInfo.map.get(new Vector2(x, y))}
-                    status={props.virtualGridStatusMap.get(new Vector2(x, y))}
+                    node={props.virtualGridInfo.map.get(new Vector2(index, rowIdx))}
+                    status={props.virtualGridStatusMap.get(new Vector2(index, rowIdx))}
                     key={index}
                     hexBlockStyle={hexBlockStyle}
                     idx={index}
-                    rowIdx={idx}
+                    rowIdx={rowIdx}
                     hexCenterStyle={hexCenterStyle}
                     hexCenterLockStyle={hexCenterLockStyle}
                     hexCenterLockBlockStyle={hexCenterLockBlockStyle}
