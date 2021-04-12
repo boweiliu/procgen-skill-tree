@@ -57,12 +57,13 @@ function GameArea(props: {
   useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
+    console.log({ receivedJumpOffset: jumpOffset });
     if (!jumpOffset) return;
     const ref = container.current;
     if (!ref) return;
     ref.scrollTo(
-      ref.scrollLeft + jumpOffset.x * gridWidth,
-      ref.scrollTop + jumpOffset.y * gridHeight
+      ref.scrollLeft - jumpOffset.x * gridWidth,
+      ref.scrollTop - jumpOffset.y * gridHeight
     );
   }, [props.jumpOffset]);
   // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
@@ -276,8 +277,8 @@ function CellComponent({
   onClick: React.MouseEventHandler;
   text?: string;
 }) {
-  const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
-  const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
+  const leftLock = { ...hexCenterLockBlockStyle };
+  const rightLock = { ...hexCenterLockBlockStyle };
   const isLocked = idx === 12 && rowIdx === 4;
   return (
     <div
