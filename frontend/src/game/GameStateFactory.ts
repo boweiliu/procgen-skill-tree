@@ -1,3 +1,4 @@
+import { NodeAllocatedStatus } from '../components/GameArea/GameAreaComponent';
 import {
   GameState,
   PointNodeRef,
@@ -9,6 +10,7 @@ import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
 import { computePlayerResourceAmounts } from './ComputeState';
+import { getCoordNeighbors, getWithinDistance } from './HexGrid';
 import { ZLevelGenFactory } from './WorldGenStateFactory';
 
 export type GameStateConfig = any;
@@ -63,7 +65,17 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
-        allocationStatusMap: new HashMap(),
+        allocationStatusMap: (() => {
+          const map = new HashMap<Vector3, NodeAllocatedStatus>();
+          getWithinDistance(Vector3.Zero, 3).forEach((it) => {
+            map.put(it, NodeAllocatedStatus.UNREACHABLE);
+          });
+          getWithinDistance(Vector3.Zero, 1).forEach((it) => {
+            map.put(it, NodeAllocatedStatus.AVAILABLE);
+          });
+          map.put(Vector3.Zero, NodeAllocatedStatus.TAKEN);
+          return map;
+        })(),
       },
       playerUI: {
         selectedPointNode: undefined,

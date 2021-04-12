@@ -1,3 +1,4 @@
+import { HashSet } from '../lib/util/data_structures/hash';
 import { IVector3, Vector3 } from '../lib/util/geometry/vector3';
 
 export enum Direction {
@@ -14,7 +15,7 @@ export enum Direction {
 /**
  * Moving 1 unit of grid on a z level corresponds to moving this many units of grid in the same direction on the z level below.
  */
-const PER_Z_SCALE_FACTOR = 4;
+const PER_Z_SCALE_FACTOR = 6;
 
 /**
  *   2   3
@@ -49,4 +50,41 @@ export function getCoordNeighbors(
   }
 
   return neighbors;
+}
+
+/**
+ * 
+ * @param base
+ * @param maxDistance 
+ * @param minDistance 
+ * @returns all vector3 coords that are <= maxDistance and >= minDistance.
+ */
+export function getWithinDistance(
+  base: Vector3,
+  maxDistance: number,
+  minDistance?: number,
+): Vector3[] {
+  let touched: HashSet<Vector3> = new HashSet();
+  touched.put(base);
+  const byDist: Vector3[][] = [[base]];
+
+  for (let d = 1; d <= maxDistance; d++) {
+    byDist.push([]);
+    for (let vec of byDist[d - 1]) {
+      const considering = Object.values(getCoordNeighbors(vec));
+      for (const n of considering) {
+        if (!n) continue;
+        if (touched.get(n)) continue;
+
+        touched.put(n);
+        byDist[d].push(n);
+      }
+    }
+  }
+
+  let result: Vector3[] = [];
+  for (let dd = (minDistance || 0); dd <= maxDistance; dd++) {
+    result = result.concat(byDist[dd]);
+  }
+  return result;
 }

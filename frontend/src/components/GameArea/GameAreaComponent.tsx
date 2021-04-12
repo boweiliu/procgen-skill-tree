@@ -311,6 +311,7 @@ function CellComponent({
           backgroundColor: fillColor,
           borderColor: borderColor,
         }}
+        hidden={(status === NodeAllocatedStatus.HIDDEN)}
       >
         <div
           style={{

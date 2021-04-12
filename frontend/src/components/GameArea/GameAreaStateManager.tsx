@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { updateRestTypeNode } from 'typescript';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
+import { getCoordNeighbors, getWithinDistance } from '../../game/HexGrid';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -148,7 +149,7 @@ function Component(props: {
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
       console.log({ direction: args.direction });
-      let jumpAmounts = virtualGridDims.multiply(0.5).floor();
+      let jumpAmounts = virtualGridDims.multiply(0.45).floor();
       jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
@@ -169,16 +170,33 @@ function Component(props: {
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
       // console.log({ got: 'here' });
       const { virtualDims, newStatus } = args;
+      const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
+      const prevStatus = gameState.playerSave.allocationStatusMap.get(nodeLocation) || NodeAllocatedStatus.HIDDEN;
+      if (newStatus === NodeAllocatedStatus.TAKEN && prevStatus !== NodeAllocatedStatus.AVAILABLE) {
+        console.log('cant do that', prevStatus);
+        return;
+      }
       return props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
-        (it) => {
-          const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
-          it.put(nodeLocation, newStatus);
+        (prevMap) => {
+          prevMap.put(nodeLocation, newStatus);
+          if (newStatus === NodeAllocatedStatus.TAKEN) {
+            getWithinDistance(nodeLocation, 1).forEach(n => {
+              if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
+                prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+              }
+            });
+            getWithinDistance(nodeLocation, 3).forEach(n => {
+              if ((prevMap.get(n) || NodeAllocatedStatus.HIDDEN) === NodeAllocatedStatus.HIDDEN) {
+                prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+              }
+            });
+          }
           // console.log({ it });
-          return it.clone();
+          return prevMap.clone();
         }
       );
     },
-    [props.updaters, virtualDimsToLocation]
+    [props.updaters, virtualDimsToLocation, gameState.playerSave.allocationStatusMap]
   );
 
   return (
