@@ -29,7 +29,7 @@ let COLORS = {
   white: 0xffffff,
   grayBlack: 0x1d1d1d,
   borderBlack: 0x111111,
-  borderWhite: 0x555555,
+  borderWhite: 0x666666,
   black: 0x000000,
 };
 

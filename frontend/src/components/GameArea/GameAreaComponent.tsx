@@ -97,7 +97,7 @@ function GameArea(props: {
     height: hexCenterRadius + 'px',
     marginTop: hexCenterRadius + 'px',
     backgroundColor: colorToCss(COLORS.nodePink),
-    borderColor: colorToCss(COLORS.nodeBorder),
+    // borderColor: colorToCss(COLORS.nodeBorder),
   };
 
   const virtualGrids = 3;
@@ -357,8 +357,8 @@ function CellComponent({
             ...hexCenterLockStyle,
           }}
         >
-          <div className="hex-center-lock-left" style={leftLock} />
-          <div className="hex-center-lock-right" style={rightLock} />
+          <div className="hex-center-lock-left" style={{ ...leftLock, borderColor }} />
+          <div className="hex-center-lock-right" style={{ ...rightLock, borderColor }} />
         </div>
       ) : null}
     </div>
