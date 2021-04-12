@@ -206,16 +206,15 @@ function GameArea(props: {
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, index, arr) => {
+                  const virtualVec = new Vector2(index, rowIdx);
+                  const nodeData = props.virtualGridStatusMap.get(virtualVec);
                   return (
                     <Node
                       node={props.virtualGridInfo.map.get(
                         new Vector2(index, rowIdx)
                       )}
-                      status={
-                        props.virtualGridStatusMap.get(
-                          new Vector2(index, rowIdx)
-                        )?.status
-                      }
+                      status={ nodeData?.status }
+                      text={ nodeData?.shortText }
                       key={index}
                       hexBlockStyle={hexBlockStyle}
                       idx={index}
@@ -267,6 +266,7 @@ function CellComponent({
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
   onClick,
+  text,
 }: {
   idx: number;
   hexCenterLockBlockStyle: any;
@@ -276,7 +276,8 @@ function CellComponent({
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
-  onClick: React.MouseEventHandler;
+    onClick: React.MouseEventHandler;
+    text?: string;
 }) {
   const leftLock = { float: 'left', ...hexCenterLockBlockStyle };
   const rightLock = { float: 'right', ...hexCenterLockBlockStyle };
@@ -294,11 +295,32 @@ function CellComponent({
         className="hex-center"
         style={hexCenterStyle}
       >
-        {/* {children} */}
+        <div style={{
+          display: 'flex',
+          width: hexCenterStyle.width,
+          height: hexCenterStyle.height,
+          alignItems: 'center',
+          justifyContent: 'center',
+          // otherwise the border width screws up centering here
+          marginTop: '-2px',
+          marginLeft: '-2px',
+        }}>
+          <div style={{
+            // font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top. this fills it in symmetrically on the left and bottom.
+            paddingLeft: '2px',
+            paddingBottom: '2px',
+            maxWidth: '48px',
+            overflow: 'hidden',
+          }}>
+            {text}
+          </div>
+        </div>
         <div
           className="hover-only"
           style={{
             borderStyle: 'solid',
+            marginTop: '-16px',
+            marginLeft: '48px',
             minWidth: 'fit-content',
             padding: '3px',
             background: 'rgba(255,255,255,0.3)',
@@ -334,6 +356,7 @@ function NodeComponent({
   hexCenterLockBlockStyle,
   node,
   status,
+  text,
   onUpdateStatus,
 }: {
   node?: NodeData;
@@ -346,7 +369,8 @@ function NodeComponent({
   children?: React.ReactNode;
   hexCenterStyle: any;
   hexCenterLockStyle: any;
-  hexBlockStyle: any;
+    hexBlockStyle: any;
+    text?: string;
 }) {
   const handleClick = useCallback(
     (e) => {
@@ -370,6 +394,7 @@ function NodeComponent({
       hexCenterStyle={hexCenterStyle}
       hexCenterLockStyle={hexCenterLockStyle}
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
+      text={text}
     >
       {status}
     </Cell>
