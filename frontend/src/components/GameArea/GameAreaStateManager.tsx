@@ -120,6 +120,7 @@ function Component(props: {
   );
 
   const virtualGridStatusMap: KeyedHashMap<Vector2, NodeData> = useMemo(() => {
+    const startTime = +new Date();
     const map = new KeyedHashMap<Vector2, NodeData>();
     for (let row = 0; row < virtualGridDims.x; row++) {
       for (let col = 0; col < virtualGridDims.y; col++) {
@@ -146,6 +147,10 @@ function Component(props: {
       }
     }
     // console.log({ map });
+    const elapsed = +new Date() - startTime;
+    if (elapsed > 100) {
+      window.alert('compute took ' + elapsed.toString());
+    }
     return map;
   }, [
     gameState.playerSave.allocationStatusMap,
@@ -157,14 +162,14 @@ function Component(props: {
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
-      console.log({ direction: args.direction });
+      // console.log({ direction: args.direction });
       let jumpAmounts = virtualGridDims.multiply(0.45).floor();
       jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
       const jumpOffset = jumpAmounts.multiply(args.direction);
-      console.log({ jumpOffset });
+      // console.log({ jumpOffset });
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
         return it
           .addX(jumpOffset.x)
@@ -215,6 +220,7 @@ function Component(props: {
       <GameAreaComponent
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
+        intent={gameState.intent}
         virtualGridDims={virtualGridDims}
         jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}

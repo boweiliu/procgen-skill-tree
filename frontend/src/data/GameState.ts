@@ -79,8 +79,8 @@ export enum IntentName {
   PAN_SOUTH = 'PAN_SOUTH',
   PAN_WEST = 'PAN_WEST',
   PAN_EAST = 'PAN_EAST',
-  TRAVEL_IN = 'TRAVEL_IN',
-  TRAVEL_OUT = 'TRAVEL_OUT',
+  TRAVEL_UPSTAIRS = 'TRAVEL_UPSTAIRS',
+  TRAVEL_DOWNSTAIRS = 'TRAVEL_DOWNSTAIRS',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
