@@ -196,25 +196,6 @@ function Component(props: {
         (prevMap, prevGameState) => {
           prevMap.put(nodeLocation, newStatus);
           return prevMap.clone();
-          if (newStatus === NodeAllocatedStatus.TAKEN) {
-            getWithinDistance(nodeLocation, 1).forEach((n) => {
-              if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
-                prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
-              }
-            });
-            getWithinDistance(nodeLocation, 3).forEach((n) => {
-              if (
-                (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-                NodeAllocatedStatus.HIDDEN
-              ) {
-                // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-                prevGameState.worldGen.lockMap.precompute(n);
-                prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
-              }
-            });
-          }
-          // console.log({ it });
-          return prevMap.clone();
         }
       );
       props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
