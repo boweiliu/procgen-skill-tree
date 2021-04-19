@@ -5,10 +5,11 @@ import { LazyHashMap } from '../lib/util/lazy';
 import { LockData } from './PlayerSaveState';
 
 export type WorldGenState = {
-  seed: number;
   // DEPRECATED
   zLevels: { [z: number]: ZLevelGen };
 
+  // NOT DEPRECATED
+  seed: number;
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
 };
 

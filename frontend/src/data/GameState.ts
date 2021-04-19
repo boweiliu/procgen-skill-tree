@@ -1,3 +1,7 @@
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+} from '../components/GameArea/GameAreaComponent';
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
@@ -103,8 +107,13 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
 }
 
 export type ComputedState = {
+  // DEPRECATED
   playerResourceAmounts?: { [k in ResourceType]: number };
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
+
+  // NOT DEPRECATED
+  fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
+  lockStatusMap?: HashMap<Vector3, LockStatus>;
 };
 
 export class ResourceTypeAndModifier {

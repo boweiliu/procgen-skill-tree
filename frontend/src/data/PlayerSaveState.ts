@@ -2,7 +2,11 @@ import {
   LockStatus,
   NodeAllocatedStatus,
 } from '../components/GameArea/GameAreaComponent';
-import { HashMap, HashSet } from '../lib/util/data_structures/hash';
+import {
+  HashMap,
+  HashSet,
+  KeyedHashMap,
+} from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { Lazy, LazyHashMap } from '../lib/util/lazy';
 import { PointNodeRef } from './PointNodeRef';
@@ -31,7 +35,7 @@ export type PlayerSaveState = {
    */
 
   // this should actually be LazyHashMap with default === HIDDEN
-  allocationStatusMap: HashMap<Vector3, NodeAllocatedStatus>;
+  allocationStatusMap: KeyedHashMap<Vector3, NodeAllocatedStatus>;
   // lockMap: LazyHashMap<Vector3, LockData | undefined>;
 };
 

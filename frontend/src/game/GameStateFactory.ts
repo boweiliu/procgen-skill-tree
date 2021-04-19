@@ -6,7 +6,11 @@ import {
   WindowState,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
-import { HashMap, HashSet } from '../lib/util/data_structures/hash';
+import {
+  HashMap,
+  HashSet,
+  KeyedHashMap,
+} from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
@@ -75,7 +79,7 @@ export class GameStateFactory {
         score: 0,
 
         allocationStatusMap: (() => {
-          const map = new HashMap<Vector3, NodeAllocatedStatus>();
+          const map = new KeyedHashMap<Vector3, NodeAllocatedStatus>();
           // getWithinDistance(Vector3.Zero, 3).forEach((it) => {
           //   map.put(it, NodeAllocatedStatus.UNREACHABLE);
           //   lockDataMap.get(it); // instantiate lock data map
@@ -109,11 +113,21 @@ export class GameStateFactory {
       windowState,
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
+    gameState.computed.lockStatusMap = new HashMap();
+    gameState.computed.fogOfWarStatusMap = new HashMap();
 
     /**
      * Initialize fog of war and visible locks
      */
-    let prevMap = gameState.playerSave.allocationStatusMap;
+    // let prevMap = gameState.playerSave.allocationStatusMap;
+    let prevMap = gameState.computed.fogOfWarStatusMap;
+    gameState.playerSave.allocationStatusMap.entries().forEach((it) => {
+      const [k, v] = it;
+      if (v === NodeAllocatedStatus.TAKEN) {
+        prevMap.put(k, NodeAllocatedStatus.VISIBLE);
+      }
+    });
+    // bfs
     let nodeLocation = Vector3.Zero;
     getWithinDistance(nodeLocation, 3).forEach((n) => {
       if (

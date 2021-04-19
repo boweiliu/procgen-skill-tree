@@ -13,9 +13,13 @@ import COLORS, { colorToCss } from '../../pixi/colors';
 export const GameAreaComponent = React.memo(GameArea);
 
 export enum NodeAllocatedStatus {
+  // DEPRECATED
   TAKEN = 'TAKEN',
+
+  // NOT DEPRECATED
+  VISIBLE = 'VISIBLE',
   HIDDEN = 'HIDDEN',
-  AVAILABLE = 'AVAILABLE',
+  AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
   UNREACHABLE = 'UNREACHABLE',
 }
 

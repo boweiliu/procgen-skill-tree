@@ -123,10 +123,14 @@ function Component(props: {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
         const location = virtualDimsToLocation(virtualVec);
-        const maybeStatus = gameState.playerSave.allocationStatusMap.get(
+        const maybeStatus = gameState.computed.fogOfWarStatusMap?.get(location);
+        const takenStatus = gameState.playerSave.allocationStatusMap.get(
           location
         );
-        const nodeStatus = maybeStatus || NodeAllocatedStatus.HIDDEN;
+        const nodeStatus =
+          takenStatus === NodeAllocatedStatus.TAKEN
+            ? NodeAllocatedStatus.TAKEN
+            : maybeStatus || NodeAllocatedStatus.HIDDEN;
         const id = location.hash();
         const lockData = gameState.worldGen.lockMap.get(location);
         const nodeData: NodeData = {
@@ -175,7 +179,7 @@ function Component(props: {
       const { virtualDims, newStatus } = args;
       const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
       const prevStatus =
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
+        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeAllocatedStatus.HIDDEN;
       if (newStatus === NodeAllocatedStatus.TAKEN) {
         if (prevStatus !== NodeAllocatedStatus.AVAILABLE) {
@@ -188,9 +192,10 @@ function Component(props: {
           return;
         }
       }
-      return props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
+      props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
         (prevMap, prevGameState) => {
           prevMap.put(nodeLocation, newStatus);
+          return prevMap.clone();
           if (newStatus === NodeAllocatedStatus.TAKEN) {
             getWithinDistance(nodeLocation, 1).forEach((n) => {
               if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
@@ -212,11 +217,38 @@ function Component(props: {
           return prevMap.clone();
         }
       );
+      props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
+        (prevMap, prevGameState) => {
+          if (!prevMap) {
+            return prevMap;
+          }
+          prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+          getWithinDistance(nodeLocation, 1).forEach((n) => {
+            if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
+              prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+            }
+          });
+          getWithinDistance(nodeLocation, 3).forEach((n) => {
+            if (
+              (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
+              NodeAllocatedStatus.HIDDEN
+            ) {
+              // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+              prevGameState.worldGen.lockMap.precompute(n);
+              prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+            }
+          });
+
+          return prevMap.clone();
+        }
+      );
     },
     [
       props.updaters,
       virtualDimsToLocation,
       gameState.playerSave.allocationStatusMap,
+      gameState.computed.fogOfWarStatusMap,
+      gameState.computed.lockStatusMap,
       gameState.worldGen.lockMap,
     ]
   );
