@@ -27,6 +27,26 @@ export class AllocateNodeAction {
       return prevMap.clone();
     });
 
+    // before updating Fog of war, first unlock any locks
+    this.updaters.computed.lockStatusMap?.enqueueUpdate(
+      (prevMap, prevGameState) => {
+        if (!prevMap) {
+          return prevMap;
+        }
+
+        for (let [
+          location,
+          lockData,
+        ] of prevGameState.worldGen.lockMap.entries()) {
+          // compute lock status
+          const newStatus = LockStatus.TICKING;
+          prevMap.put(location, newStatus);
+        }
+
+        return prevMap.clone();
+      }
+    );
+
     this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
       (prevMap, prevGameState) => {
         if (!prevMap) {
@@ -43,8 +63,9 @@ export class AllocateNodeAction {
         // const validLocks = prevGameState.worldGen.lockMap
         const validLocks: IReadonlySet<Vector3> = {
           contains: (v: Vector3) => {
-            const maybeLock = prevGameState.worldGen.lockMap.get(v);
-            if (maybeLock && maybeLock.lockStatus !== LockStatus.OPEN) {
+            // const maybeLock = prevGameState.worldGen.lockMap.get(v);
+            const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
+            if (maybeLock && maybeLock !== LockStatus.OPEN) {
               return true;
             }
             return false;

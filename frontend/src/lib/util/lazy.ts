@@ -1,4 +1,4 @@
-import { HashMap } from './data_structures/hash';
+import { HashMap, KeyedHashMap } from './data_structures/hash';
 import { Const } from './misc';
 
 /**
@@ -87,11 +87,11 @@ export function LazyProxy<
  * NOTE: this assume hash() is a strong test for equality, i.e. 2 objects are considered equal if and only if their hashes are the same!!!
  */
 export class LazyHashMap<K extends { hash(): string }, V> {
-  protected _values: HashMap<K, V>;
+  protected _values: KeyedHashMap<K, V>;
   protected _factory: (k: K) => V;
 
   constructor(factory: (k: K) => V) {
-    this._values = new HashMap();
+    this._values = new KeyedHashMap();
     this._factory = factory;
   }
 
@@ -138,6 +138,14 @@ export class LazyHashMap<K extends { hash(): string }, V> {
 
   values(): V[] {
     return this._values.values();
+  }
+
+  keys(): K[] {
+    return this._values.keys();
+  }
+
+  entries(): [K, V][] {
+    return this._values.entries();
   }
 
   // *[Symbol.iterator]() {

@@ -111,39 +111,64 @@ export class GameStateFactory {
      * Initialize fog of war and visible locks
      */
     // let prevMap = gameState.playerSave.allocationStatusMap;
-    let prevMap = gameState.computed.fogOfWarStatusMap;
-    let nodeLocation = Vector3.Zero;
-    let newStatus = NodeAllocatedStatus.TAKEN;
-    const prevGameState = gameState;
-
-    prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
-
-    getWithinDistance(nodeLocation, 1).forEach((n) => {
-      prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+    // first precompute the nearby lock states
+    getWithinDistance(Vector3.Zero, 3).forEach((n) => {
+      gameState.worldGen.lockMap.precompute(n);
     });
+    // fill in lock statuses with computed statuses
+    {
+      let prevMap = gameState.computed.lockStatusMap;
+      let nodeLocation = Vector3.Zero;
+      const prevGameState = gameState;
 
-    // make sure we make use of lock state
-    // getWithinDistance(nodeLocation, 3).forEach((n) => {
-    // const validLocks = prevGameState.worldGen.lockMap
-    const validLocks: IReadonlySet<Vector3> = {
-      contains: (v: Vector3) => {
-        const maybeLock = prevGameState.worldGen.lockMap.get(v);
-        if (maybeLock && maybeLock.lockStatus !== LockStatus.OPEN) {
-          return true;
+      for (let [
+        location,
+        lockData,
+      ] of prevGameState.worldGen.lockMap.entries()) {
+        if (lockData) {
+          // compute lock status
+          const newStatus = LockStatus.TICKING;
+          prevMap.put(location, newStatus);
         }
-        return false;
-      },
-    };
-    getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
-      if (
-        (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-        NodeAllocatedStatus.HIDDEN
-      ) {
-        // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-        // prevGameState.worldGen.lockMap.precompute(n);
-        prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
       }
-    });
+    }
+    // now fog of war flow vision based on computed lock statuses
+    {
+      let prevMap = gameState.computed.fogOfWarStatusMap;
+      let nodeLocation = Vector3.Zero;
+      let newStatus = NodeAllocatedStatus.TAKEN;
+      const prevGameState = gameState;
+
+      prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+
+      getWithinDistance(nodeLocation, 1).forEach((n) => {
+        prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+      });
+
+      // make sure we make use of lock state
+      // getWithinDistance(nodeLocation, 3).forEach((n) => {
+      // const validLocks = prevGameState.worldGen.lockMap
+      const validLocks: IReadonlySet<Vector3> = {
+        contains: (v: Vector3) => {
+          // const maybeLock = prevGameState.worldGen.lockMap.get(v);
+          const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
+          if (maybeLock && maybeLock !== LockStatus.OPEN) {
+            return true;
+          }
+          return false;
+        },
+      };
+      getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
+        if (
+          (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
+          NodeAllocatedStatus.HIDDEN
+        ) {
+          // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+          // prevGameState.worldGen.lockMap.precompute(n);
+          prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+        }
+      });
+    }
 
     return gameState;
   }

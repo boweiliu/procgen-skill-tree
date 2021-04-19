@@ -45,6 +45,7 @@ export type Quest = {
   resourceAmount: number;
 };
 
+// NOT DEPRECATED
 export type LockData = {
   shortTextTarget: string;
   shortTextTimer: string;
