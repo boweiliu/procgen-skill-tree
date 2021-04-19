@@ -31,8 +31,8 @@ const defaultKeyIntentConfig = {
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
   ArrowRight: IntentName.PAN_EAST,
-  '<': IntentName.TRAVEL_OUT,
-  '>': IntentName.TRAVEL_IN,
+  '<': IntentName.TRAVEL_UPSTAIRS,
+  '>': IntentName.TRAVEL_DOWNSTAIRS,
 };
 
 /**
@@ -50,6 +50,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
 
   // NOTE(bowei): does using e.repeat here break when window loses focus??
   handleKeydown = (e: KeyboardEvent) => {
+    // console.log("key down", new Date());
     const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];

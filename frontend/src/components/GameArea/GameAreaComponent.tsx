@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
+import { IntentName, PlayerIntentState } from '../../data/GameState';
 
 /**
  *
@@ -48,6 +49,7 @@ type UpdateStatusCb = (args: {
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
+  intent: PlayerIntentState;
   // virtualSize: Vector2; // in pixels
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
@@ -106,6 +108,7 @@ function GameArea(props: {
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      // console.log("NOW IN handlescroll");
       // const scrollRoom = virtualAreaSize.subtract(props.appSize);
       // const scrollMod = scrollRoom.divide(virtualGrids);
       // handle scroll
@@ -164,6 +167,51 @@ function GameArea(props: {
     }
     previousContainer.current = container.current;
   }, [container.current]);
+
+  // control scroll with keyboard
+  useEffect(() => {
+    let lastTime: number | null = null;
+    const SCROLL_INTERVAL_MS = 16;
+    const VELOCITY = 0.5;
+    const action = () => {
+      const ref = container.current;
+      if (!ref) return;
+      let direction = Vector2.Zero;
+      if (props.intent.activeIntent[IntentName.PAN_EAST]) {
+        direction = direction.addX(1);
+      }
+      if (props.intent.activeIntent[IntentName.PAN_WEST]) {
+        direction = direction.addX(-1);
+      }
+      if (props.intent.activeIntent[IntentName.PAN_NORTH]) {
+        direction = direction.addY(1);
+      }
+      if (props.intent.activeIntent[IntentName.PAN_SOUTH]) {
+        direction = direction.addY(-1);
+      }
+      // if (!direction.equals(Vector2.Zero)) {
+      //   // window.alert(" got direction " +  direction.toString() + props.intent.toString());
+      //   console.log(" got direction ", new Date(), direction, props.intent);
+      // }
+      if (lastTime === null) {
+        direction = direction.multiply(SCROLL_INTERVAL_MS); // assume 1 tick
+        lastTime = +new Date();
+      } else {
+        const elapsed = +new Date() - lastTime;
+        direction = direction.multiply(elapsed);
+        lastTime = +new Date();
+      }
+      direction = direction.multiply(VELOCITY);
+      // direction = direction.multiply(10);
+      ref.scrollTo(
+        ref.scrollLeft + direction.x,
+        ref.scrollTop - direction.y // scroll is measured from the top left
+      );
+    };
+    const interval = setInterval(action, SCROLL_INTERVAL_MS);
+    action();
+    return () => clearInterval(interval);
+  }, [props.intent.activeIntent, props.intent.newIntent, container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation

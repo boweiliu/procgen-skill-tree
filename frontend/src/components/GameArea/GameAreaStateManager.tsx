@@ -215,6 +215,7 @@ function Component(props: {
       <GameAreaComponent
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
+        intent={gameState.intent}
         virtualGridDims={virtualGridDims}
         jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}
