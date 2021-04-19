@@ -80,13 +80,6 @@ export class GameStateFactory {
 
         allocationStatusMap: (() => {
           const map = new KeyedHashMap<Vector3, NodeAllocatedStatus>();
-          // getWithinDistance(Vector3.Zero, 3).forEach((it) => {
-          //   map.put(it, NodeAllocatedStatus.UNREACHABLE);
-          //   lockDataMap.get(it); // instantiate lock data map
-          // });
-          // getWithinDistance(Vector3.Zero, 1).forEach((it) => {
-          //   map.put(it, NodeAllocatedStatus.AVAILABLE);
-          // });
           map.put(Vector3.Zero, NodeAllocatedStatus.TAKEN);
           return map;
         })(),
