@@ -276,13 +276,15 @@ export class LockFactory {
         args.location.y +
         squirrel3(args.seed + args.location.x + args.location.z)
     );
+    const p = id / INTMAX32;
 
     let lockData: LockData = {
       shortTextTarget: '1🟢',
       shortTextTimer: '2⌛',
       lockStatus: LockStatus.TICKING,
     };
-    if (id % 2 === 0) {
+    // locks occur at frequency 0.4
+    if (p < 0.4) {
       return lockData;
     }
 
