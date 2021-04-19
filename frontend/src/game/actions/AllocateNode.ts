@@ -38,9 +38,11 @@ export class AllocateNodeAction {
           location,
           lockData,
         ] of prevGameState.worldGen.lockMap.entries()) {
-          // compute lock status
-          const newStatus = LockStatus.TICKING;
-          prevMap.put(location, newStatus);
+          if (lockData) {
+            // TODO: compute lock status
+            const newStatus = LockStatus.TICKING;
+            prevMap.put(location, newStatus);
+          }
         }
 
         return prevMap.clone();
