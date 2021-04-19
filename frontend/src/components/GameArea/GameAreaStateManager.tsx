@@ -199,35 +199,6 @@ function Component(props: {
         nodeLocation,
         newStatus: NodeAllocatedStatus.TAKEN,
       });
-      // props.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
-      //   prevMap.put(nodeLocation, newStatus);
-      //   return prevMap.clone();
-      // });
-      // props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
-      //   (prevMap, prevGameState) => {
-      //     if (!prevMap) {
-      //       return prevMap;
-      //     }
-      //     prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
-      //     getWithinDistance(nodeLocation, 1).forEach((n) => {
-      //       if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
-      //         prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
-      //       }
-      //     });
-      //     getWithinDistance(nodeLocation, 3).forEach((n) => {
-      //       if (
-      //         (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-      //         NodeAllocatedStatus.HIDDEN
-      //       ) {
-      //         // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-      //         prevGameState.worldGen.lockMap.precompute(n);
-      //         prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
-      //       }
-      //     });
-
-      //     return prevMap.clone();
-      //   }
-      // );
     },
     [
       props.updaters,

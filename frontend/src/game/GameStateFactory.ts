@@ -78,24 +78,15 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
-        allocationStatusMap: (() => {
-          const map = new KeyedHashMap<Vector3, NodeAllocatedStatus>();
-          map.put(Vector3.Zero, NodeAllocatedStatus.TAKEN);
-          return map;
-        })(),
-
-        // lockMap: (() => {
-        //   const map = new LazyHashMap<Vector3, LockData | undefined>(
-        //     (k: Vector3) => lockFactory.create({ seed: mySeed, location: k })
-        //   );
-        //   return map;
-        // })(),
+        allocationStatusMap: new KeyedHashMap<Vector3, NodeAllocatedStatus>([
+          [Vector3.Zero, NodeAllocatedStatus.TAKEN],
+        ]),
       },
       playerUI: {
         selectedPointNode: undefined,
         activeTab: 0,
         isPixiHidden: true,
-        virtualGridLocation: new Vector3(0, 0, 0),
+        virtualGridLocation: Vector3.Zero,
       },
       computed: {},
       intent: {

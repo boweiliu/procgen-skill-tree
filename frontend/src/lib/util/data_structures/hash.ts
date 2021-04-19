@@ -90,6 +90,12 @@ export class HashSet<K extends { hash(): string }> {
 export class HashMap<K extends { hash(): string }, V> {
   protected _values: { [key: string]: V } = {};
 
+  constructor(initialValues: [K, V][] = []) {
+    for (const [key, value] of initialValues) {
+      this.put(key, value);
+    }
+  }
+
   put(key: K, value: V) {
     this._values[key.hash()] = value;
   }
@@ -156,6 +162,12 @@ export class HashableHashMap<
  */
 export class KeyedHashMap<K extends { hash(): string }, V> {
   private _kvalues: { [key: string]: [K, V] } = {};
+
+  constructor(initialValues: [K, V][] = []) {
+    for (const [key, value] of initialValues) {
+      this.put(key, value);
+    }
+  }
 
   put(key: K, value: V) {
     this._kvalues[key.hash()] = [key, value];
