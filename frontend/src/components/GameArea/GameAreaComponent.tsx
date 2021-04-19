@@ -306,13 +306,13 @@ function CellComponent({
 
   return (
     <div
-      onClick={onClick}
       id={`hex-block-${rowIdx}-${idx}`}
       className="hex-block"
       style={hexBlockStyle}
     >
       <div
         id={`hex-center-${rowIdx}-${idx}`}
+        onClick={onClick}
         className="hex-center"
         style={{
           ...hexCenterStyle,
