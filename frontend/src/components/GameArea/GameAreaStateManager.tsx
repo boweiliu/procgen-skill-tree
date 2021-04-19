@@ -7,7 +7,8 @@ import React, {
 } from 'react';
 import { updateRestTypeNode } from 'typescript';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
-import { getCoordNeighbors, getWithinDistance } from '../../game/HexGrid';
+import { AllocateNodeAction } from '../../game/actions/AllocateNode';
+import { getCoordNeighbors, getWithinDistance } from '../../game/lib/HexGrid';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -39,6 +40,7 @@ export const virtualAreaScaleMultiplier = 3.0;
 function Component(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
+  actions: { allocateNode: AllocateNodeAction };
   children?: React.ReactNode;
 }) {
   const { gameState, children } = props;
@@ -192,35 +194,40 @@ function Component(props: {
           return;
         }
       }
-      props.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
-        prevMap.put(nodeLocation, newStatus);
-        return prevMap.clone();
-      });
-      props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
-        (prevMap, prevGameState) => {
-          if (!prevMap) {
-            return prevMap;
-          }
-          prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
-          getWithinDistance(nodeLocation, 1).forEach((n) => {
-            if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
-              prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
-            }
-          });
-          getWithinDistance(nodeLocation, 3).forEach((n) => {
-            if (
-              (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-              NodeAllocatedStatus.HIDDEN
-            ) {
-              // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-              prevGameState.worldGen.lockMap.precompute(n);
-              prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
-            }
-          });
 
-          return prevMap.clone();
-        }
-      );
+      props.actions.allocateNode.enqueueAction({
+        nodeLocation,
+        newStatus: NodeAllocatedStatus.TAKEN,
+      });
+      // props.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
+      //   prevMap.put(nodeLocation, newStatus);
+      //   return prevMap.clone();
+      // });
+      // props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
+      //   (prevMap, prevGameState) => {
+      //     if (!prevMap) {
+      //       return prevMap;
+      //     }
+      //     prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+      //     getWithinDistance(nodeLocation, 1).forEach((n) => {
+      //       if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
+      //         prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+      //       }
+      //     });
+      //     getWithinDistance(nodeLocation, 3).forEach((n) => {
+      //       if (
+      //         (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
+      //         NodeAllocatedStatus.HIDDEN
+      //       ) {
+      //         // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+      //         prevGameState.worldGen.lockMap.precompute(n);
+      //         prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+      //       }
+      //     });
+
+      //     return prevMap.clone();
+      //   }
+      // );
     },
     [
       props.updaters,

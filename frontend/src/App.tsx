@@ -19,6 +19,7 @@ import {
   updaterGenerator2,
 } from './lib/util/updaterGenerator';
 import COLORS, { colorToCss } from './pixi/colors';
+import { AllocateNodeAction } from './game/actions/AllocateNode';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create()
@@ -67,7 +68,11 @@ function App() {
         <UseGameStateContext.Provider value={gameStateContextValue}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
-        <GameAreaStateManager gameState={gameState} updaters={updaters}>
+        <GameAreaStateManager
+          gameState={gameState}
+          updaters={updaters}
+          actions={{ allocateNode: new AllocateNodeAction(updaters) }}
+        >
           {/*<GameAreaComponent
             hidden={!gameState.playerUI.isPixiHidden}
             appSize={appSize}

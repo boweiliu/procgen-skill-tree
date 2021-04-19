@@ -1,5 +1,5 @@
-import { HashSet } from '../lib/util/data_structures/hash';
-import { IVector3, Vector3 } from '../lib/util/geometry/vector3';
+import { HashSet } from '../../lib/util/data_structures/hash';
+import { IVector3, Vector3 } from '../../lib/util/geometry/vector3';
 
 export enum Direction {
   NORTHWEST = 'NORTHWEST',

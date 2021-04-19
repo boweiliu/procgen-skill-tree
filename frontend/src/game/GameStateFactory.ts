@@ -16,7 +16,7 @@ import { Vector3 } from '../lib/util/geometry/vector3';
 import { assertOnlyCalledOnce } from '../lib/util/misc';
 import { Lazy, LazyHashMap } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
-import { getCoordNeighbors, getWithinDistance } from './HexGrid';
+import { getCoordNeighbors, getWithinDistance } from './lib/HexGrid';
 import { LockFactory, ZLevelGenFactory } from './WorldGenStateFactory';
 
 export type GameStateConfig = any;
