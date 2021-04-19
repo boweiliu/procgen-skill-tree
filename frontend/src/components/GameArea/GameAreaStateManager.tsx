@@ -162,14 +162,14 @@ function Component(props: {
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
-      console.log({ direction: args.direction });
+      // console.log({ direction: args.direction });
       let jumpAmounts = virtualGridDims.multiply(0.45).floor();
       jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
       const jumpOffset = jumpAmounts.multiply(args.direction);
-      console.log({ jumpOffset });
+      // console.log({ jumpOffset });
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
         return it
           .addX(jumpOffset.x)

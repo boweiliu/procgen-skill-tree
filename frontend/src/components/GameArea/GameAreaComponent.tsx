@@ -199,6 +199,8 @@ function GameArea(props: {
       } else {
         const elapsed = +new Date() - lastTime;
         if (elapsed > 40) {
+          // This REGULARLY fires with a reported delay of 150-200ms, even when scrolling with mouse
+          // for some reason (react optimization??) mouse scrolling is much smoother than keyboard
           console.log('WAS SLOW - ' + elapsed.toString());
         }
         direction = direction.multiply(elapsed);
