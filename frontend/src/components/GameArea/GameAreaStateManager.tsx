@@ -120,6 +120,7 @@ function Component(props: {
   );
 
   const virtualGridStatusMap: KeyedHashMap<Vector2, NodeData> = useMemo(() => {
+    const startTime = +new Date();
     const map = new KeyedHashMap<Vector2, NodeData>();
     for (let row = 0; row < virtualGridDims.x; row++) {
       for (let col = 0; col < virtualGridDims.y; col++) {
@@ -146,6 +147,10 @@ function Component(props: {
       }
     }
     // console.log({ map });
+    const elapsed = +new Date() - startTime;
+    if (elapsed > 100) {
+      window.alert('compute took ' + elapsed.toString());
+    }
     return map;
   }, [
     gameState.playerSave.allocationStatusMap,

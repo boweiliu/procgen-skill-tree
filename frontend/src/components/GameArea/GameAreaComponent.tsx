@@ -63,7 +63,7 @@ function GameArea(props: {
   useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
-    console.log({ receivedJumpOffset: jumpOffset });
+    console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
     const ref = container.current;
     if (!ref) return;
@@ -146,7 +146,7 @@ function GameArea(props: {
         target.scrollTop !== newScrollTop ||
         target.scrollLeft !== newScrollLeft
       ) {
-        console.log('jump!');
+        console.log('jump!', +new Date());
         // target.scrollTo(newScrollLeft, newScrollTop);
         props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
@@ -171,7 +171,7 @@ function GameArea(props: {
   // control scroll with keyboard
   useEffect(() => {
     let lastTime: number | null = null;
-    const SCROLL_INTERVAL_MS = 16;
+    const SCROLL_INTERVAL_MS = 10;
     const VELOCITY = 0.5;
     const action = () => {
       const ref = container.current;
@@ -198,6 +198,9 @@ function GameArea(props: {
         lastTime = +new Date();
       } else {
         const elapsed = +new Date() - lastTime;
+        if (elapsed > 40) {
+          console.log('WAS SLOW - ' + elapsed.toString());
+        }
         direction = direction.multiply(elapsed);
         lastTime = +new Date();
       }
