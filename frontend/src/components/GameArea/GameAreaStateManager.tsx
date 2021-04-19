@@ -192,12 +192,10 @@ function Component(props: {
           return;
         }
       }
-      props.updaters.playerSave.allocationStatusMap.enqueueUpdate(
-        (prevMap, prevGameState) => {
-          prevMap.put(nodeLocation, newStatus);
-          return prevMap.clone();
-        }
-      );
+      props.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
+        prevMap.put(nodeLocation, newStatus);
+        return prevMap.clone();
+      });
       props.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
         (prevMap, prevGameState) => {
           if (!prevMap) {
