@@ -14,6 +14,7 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
@@ -96,6 +97,15 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.actionStage.zIndex = 0;
     this.actionStage.sortableChildren = true;
     this.container.addChild(this.actionStage);
+
+    // test graphics
+    let g = new Pixi.Graphics();
+    g.beginFill(COLORS.white);
+    // g.drawCircle(0, 0, 32);
+    g.drawRect(-32, -40, 64, 80);
+    const center = props.appSize.divide(2);
+    g.position = PixiPointFrom(center);
+    this.actionStage.addChild(g);
 
     this.backdropStage = new Pixi.Sprite();
     this.backdropStage.zIndex = -1;
