@@ -39,6 +39,7 @@ export class PixiReactBridge {
 
   state!: State;
   props!: Props;
+  private staleProps?: Props;
 
   rootComponent: RootComponent | undefined;
   onTick!: (d: number) => void;
@@ -102,22 +103,41 @@ export class PixiReactBridge {
     curr.appendChild(this.app.view);
   }
 
-  updateSelf(props: Props) {
-    this.state.appSize = appSizeFromWindowSize(
-      new Vector2(
-        props.gameState.windowState.innerWidth,
-        props.gameState.windowState.innerHeight
+  updateSelf(props: Props, staleProps?: Props) {
+    // memoize: compute app state from window state dimensions only if they changed from last tick
+    if (
+      !(
+        props.gameState.windowState.innerWidth ===
+          staleProps?.gameState.windowState.innerWidth &&
+        props.gameState.windowState.innerHeight ===
+          staleProps?.gameState.windowState.innerHeight
       )
-    );
+    ) {
+      this.state.appSize = appSizeFromWindowSize(
+        new Vector2(
+          props.gameState.windowState.innerWidth,
+          props.gameState.windowState.innerHeight
+        )
+      );
+    }
+
     // console.log({ tick: props.gameState.tick });
     props.updaters.tick.enqueueUpdate((it) => it + 1);
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   // props should be a referentially distinct object from props the last time this was called
-  rerender(props: Props) {
+  rerender(futureProps: Props) {
     // console.log("base app rerender called", { playerUI: props.gameState.playerUI });
-    this.props = props;
+
+    // cache the stale props object
+    this.staleProps = this.props;
+    // take the props handed down from react (probably due to our own props.updaters.fireBatch() call, see game loop) and
+    // record them for future use. note that the future props do not take effect down the child hierarchy unless they are
+    // manually told to do so.
+    this.props = futureProps;
+
+    // If we're not done initializing yet (note that constructor does not set props!), finish it now
     if (!this.rootComponent) {
       // finish initialization
       this.rootComponent = new RootComponent({
@@ -146,13 +166,13 @@ export class PixiReactBridge {
 
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      this.updateSelf(this.props);
+      this.updateSelf(this.props, this.staleProps);
       // console.log('skipping update since pixi is not visible');
       this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
       return; // skip update loop if pixi is hidden
     }
     // assume props is up to date
-    this.updateSelf(this.props);
+    this.updateSelf(this.props, this.staleProps);
     // send props downwards
     this.rootComponent?.update({
       args: {
