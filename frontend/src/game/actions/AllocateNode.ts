@@ -1,8 +1,11 @@
-import { NodeAllocatedStatus } from '../../components/GameArea/GameAreaComponent';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+} from '../../components/GameArea/GameAreaComponent';
 import { GameState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { getWithinDistance } from '../lib/HexGrid';
+import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';
 
 export interface AllocateNodeInput {
   nodeLocation: Vector3;
@@ -18,28 +21,44 @@ export class AllocateNodeAction {
 
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation, newStatus } = input;
+
     this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
       prevMap.put(nodeLocation, newStatus);
       return prevMap.clone();
     });
+
     this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
       (prevMap, prevGameState) => {
         if (!prevMap) {
           return prevMap;
         }
         prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+
         getWithinDistance(nodeLocation, 1).forEach((n) => {
           if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
             prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
           }
         });
-        getWithinDistance(nodeLocation, 3).forEach((n) => {
+
+        // make sure we make use of lock state
+        // getWithinDistance(nodeLocation, 3).forEach((n) => {
+        // const validLocks = prevGameState.worldGen.lockMap
+        const validLocks: IReadonlySet<Vector3> = {
+          contains: (v: Vector3) => {
+            const maybeLock = prevGameState.worldGen.lockMap.get(v);
+            if (maybeLock && maybeLock.lockStatus !== LockStatus.OPEN) {
+              return true;
+            }
+            return false;
+          },
+        };
+        getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
           if (
             (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
             NodeAllocatedStatus.HIDDEN
           ) {
             // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            prevGameState.worldGen.lockMap.precompute(n);
+            // prevGameState.worldGen.lockMap.precompute(n);
             prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
           }
         });

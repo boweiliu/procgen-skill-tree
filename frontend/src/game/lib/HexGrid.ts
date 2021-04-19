@@ -52,6 +52,10 @@ export function getCoordNeighbors(
   return neighbors;
 }
 
+export type IReadonlySet<K> = {
+  contains: (k: K) => boolean;
+};
+
 /**
  *
  * @param base
@@ -62,9 +66,11 @@ export function getCoordNeighbors(
 export function getWithinDistance(
   base: Vector3,
   maxDistance: number,
-  minDistance?: number
+  minDistance?: number,
+  disallowedSet?: IReadonlySet<Vector3>
 ): Vector3[] {
   let touched: HashSet<Vector3> = new HashSet();
+  let disallowedButTouched: HashSet<Vector3> = new HashSet();
   touched.put(base);
   const byDist: Vector3[][] = [[base]];
 
@@ -76,8 +82,12 @@ export function getWithinDistance(
         if (!n) continue;
         if (touched.get(n)) continue;
 
-        touched.put(n);
-        byDist[d].push(n);
+        if (disallowedSet?.contains(n)) {
+          disallowedButTouched.put(n);
+        } else {
+          touched.put(n);
+          byDist[d].push(n);
+        }
       }
     }
   }
@@ -86,5 +96,6 @@ export function getWithinDistance(
   for (let dd = minDistance || 0; dd <= maxDistance; dd++) {
     result = result.concat(byDist[dd]);
   }
+  result = result.concat(disallowedButTouched.values());
   return result;
 }

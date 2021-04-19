@@ -164,3 +164,75 @@ export class LazyHashMap<K extends { hash(): string }, V> {
     return n;
   }
 }
+/*
+export class LazyHashSet<K extends { hash(): string }> {
+  private _values: LazyHashMap<K, boolean>;
+
+  constructor(factory: (k: K) => boolean, initialValues: K[] = []) {
+    this._values = new LazyHashMap<K, boolean>(factory);
+
+    for (const value of initialValues) {
+      this.put(value);
+    }
+  }
+
+  // remove(key: K): void {
+  //   this._values.remove(key);
+  // }
+
+  put(key: K): void {
+    this._values.put(key, true);
+  }
+
+  get(key: K): boolean {
+    return this._values.get(key) !== undefined;
+  }
+
+  contains(key: K): boolean {
+    return this._values.contains(key);
+  }
+
+  values(): K[] {
+    return this._values.values();
+  }
+
+  // hash(): string {
+  //   return this._values.hashKeyset();
+  // }
+
+  clone(): HashSet<K> {
+    let n = new HashSet<K>();
+    n._values = this._values.clone();
+    return n;
+  }
+
+  size(): number {
+    return this._values.size();
+  }
+
+  equals(other: HashSet<K> | undefined | null) {
+    if (other === undefined || other === null) {
+      return false;
+    }
+
+    if (this.size() !== other.size()) {
+      return false;
+    }
+
+    for (let k of this.values()) {
+      if (!other.contains(k)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // *[Symbol.iterator]() {
+  //   // construct a new iterator. note that as usual
+  //   for (let key of Object.keys(this._values)) {
+  //     yield key;
+  //   }
+  // }
+}
+*/
