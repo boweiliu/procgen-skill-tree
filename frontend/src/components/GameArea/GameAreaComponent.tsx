@@ -290,7 +290,7 @@ function CellComponent({
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
 
-  const isLocked = (idx === 12 && rowIdx === 4) || !!nodeData.lockData;
+  const isLocked = !!nodeData.lockData;
   const fillColor =
     status === NodeAllocatedStatus.TAKEN
       ? colorToCss(COLORS.grayBlack)
