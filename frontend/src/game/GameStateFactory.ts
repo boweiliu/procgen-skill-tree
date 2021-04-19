@@ -119,9 +119,7 @@ export class GameStateFactory {
     prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
 
     getWithinDistance(nodeLocation, 1).forEach((n) => {
-      if (prevMap.get(n) === NodeAllocatedStatus.UNREACHABLE) {
-        prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
-      }
+      prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
     });
 
     // make sure we make use of lock state
