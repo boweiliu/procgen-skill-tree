@@ -1,6 +1,6 @@
 * {
   box-sizing: border-box;
-  overflow-anchor: none;
+  overflow-anchor: none; /* https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-anchor helps with scroll anchoring */
 }
 .App {
   text-align: center;

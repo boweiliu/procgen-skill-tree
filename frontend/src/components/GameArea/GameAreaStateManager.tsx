@@ -55,8 +55,7 @@ function Component(props: {
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
   const virtualGridDims = useMemo(() => {
-    return new Vector2(100, 10);
-    new Vector2(
+    return new Vector2(
       // needs to be at least 3.8 x 4.8 so we have room for jumps
       Math.max(
         4,
