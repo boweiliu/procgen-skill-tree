@@ -114,7 +114,7 @@ function GameArea(props: {
       // handle scroll
       let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
-      let newScrollTop = target.scrollTop;
+      let newScrollTop = target.scrollTop; // only used as boolean to see if it changed
       let newScrollLeft = target.scrollLeft;
       if (target.scrollTop < gridHeight * 0.4) {
         // between 0.1 and 0.4 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
