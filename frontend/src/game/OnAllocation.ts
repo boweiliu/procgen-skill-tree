@@ -5,13 +5,14 @@ import {
   ResourceType,
 } from '../data/GameState';
 import { NodeType } from '../data/WorldGenState';
+import { Const } from '../lib/util/misc';
 import { canAllocate } from './Neighbors';
 
 export function doTryAllocate(
-  prev: PlayerSaveState,
+  prev: Const<PlayerSaveState>,
   prevGameState: GameState,
   selfPointNodeRef: PointNodeRef
-): [PlayerSaveState, boolean] {
+): [Const<PlayerSaveState>, boolean] {
   if (
     canAllocate(
       selfPointNodeRef,
@@ -40,9 +41,9 @@ export function doTryAllocate(
 }
 
 export function afterMaybeSpendingSp(
-  prev: PlayerSaveState,
+  prev: Const<PlayerSaveState>,
   prevGameState: GameState
-): PlayerSaveState {
+): Const<PlayerSaveState> {
   let next = { ...prev };
   if (next.spSpentThisQuest !== undefined) {
     next.spSpentThisQuest += 1;
@@ -53,7 +54,7 @@ export function afterMaybeSpendingSp(
     let resourceType = next.activeQuest.resourceType;
     let amount =
       prevGameState.computed.playerResourceAmounts?.[resourceType] || 0;
-    next.questProgressHistory.push(amount);
+    next.questProgressHistory = [...next.questProgressHistory, amount];
   }
   return next;
 }

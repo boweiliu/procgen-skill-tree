@@ -1,6 +1,9 @@
+import { Const } from './misc';
+
 type UpdaterFnParam2<T, W> =
-  | ((prev: T, prevWhole: W) => T)
+  | ((prev: Const<T>, prevWhole: W) => T | Const<T>)
   | (T extends Function ? never : T); // (T | ((prev: T, prevWhole: W) => T));
+
 type UpdaterFn2<T, W> = (arg: UpdaterFnParam2<T, W>) => void;
 
 /**

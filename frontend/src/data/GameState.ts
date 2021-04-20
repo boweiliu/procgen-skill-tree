@@ -135,13 +135,14 @@ export class ResourceTypeAndModifier {
 }
 
 export type PlayerUIState = {
-  // deprecated
+  // DEPRECATED
   selectedPointNode: PointNodeRef | undefined;
-
-  // deprecated
   activeTab: number;
 
+  // NOT DEPRECATED
   isPixiHidden: boolean;
-
   virtualGridLocation: Vector3;
+  // WIP?
+  virtualApproximateScroll?: Vector2;
+  strategicGridLocation?: Vector3;
 };
