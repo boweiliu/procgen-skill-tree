@@ -16,9 +16,14 @@ import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { StrategicHexGridComponent } from './StrategicHexGridComponent';
+import {
+  generateSimpleTextures,
+  SimpleTextureSet,
+} from '../textures/SimpleTextures';
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
+  simpleTexture: Lazy<SimpleTextureSet>;
   tick: number;
   playerCurrentZ: number;
   tooltip: TooltipInfo;
@@ -65,6 +70,9 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       pointNodeTexture: new Lazy(() =>
         generatePointNodeTexture(props.args.renderer)
       ),
+      simpleTexture: new Lazy(() =>
+        generateSimpleTextures(props.args.renderer)
+      ),
       tick: 0,
       playerCurrentZ: 0,
       tooltip: {
@@ -105,6 +113,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       return {
         args: {
           position: Vector2.Zero,
+          textures: state.simpleTexture.get(),
         },
         appSize: props.appSize,
       };
