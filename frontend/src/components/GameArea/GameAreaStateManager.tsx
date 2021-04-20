@@ -57,10 +57,17 @@ function Component(props: {
   const virtualGridDims = useMemo(
     () =>
       new Vector2(
-        Math.floor(
-          (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
+        // needs to be at least 3.8 x 4.8 so we have room for jumps
+        Math.max(
+          4,
+          Math.floor(
+            (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
+          )
         ),
-        Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
+        Math.max(
+          5,
+          Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
+        )
       ),
     [appSize, virtualAreaScaleMultiplier, hexGridPx]
   );
@@ -169,7 +176,7 @@ function Component(props: {
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
       const jumpOffset = jumpAmounts.multiply(args.direction);
-      // console.log({ jumpOffset });
+      console.log({ jumpOffset });
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
         return it
           .addX(jumpOffset.x)

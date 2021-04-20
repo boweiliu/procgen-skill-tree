@@ -116,24 +116,26 @@ function GameArea(props: {
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop;
       let newScrollLeft = target.scrollLeft;
-      if (target.scrollTop < gridHeight) {
+      if (target.scrollTop < gridHeight * 0.4) {
+        // between 0.1 and 0.4 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
         newScrollTop += gridHeight * 2;
         direction.y -= 1;
       }
       if (
         target.scrollTop >
-        (props.virtualGridDims.y - 1) * gridHeight - props.appSize.y
+        (props.virtualGridDims.y - 0.4) * gridHeight - props.appSize.y
       ) {
         newScrollTop -= gridHeight * 2;
         direction.y += 1;
       }
-      if (target.scrollLeft < gridWidth * 1.5) {
+      if (target.scrollLeft < gridWidth * 0.9) {
+        // between 0.6 and 0.9 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
         newScrollLeft += gridWidth * 2;
         direction.x -= 1;
       }
       if (
         target.scrollLeft >
-        (props.virtualGridDims.x - 2) * gridWidth - props.appSize.x
+        (props.virtualGridDims.x - 0.9) * gridWidth - props.appSize.x
       ) {
         newScrollLeft -= gridWidth * 2;
         direction.x += 1;
