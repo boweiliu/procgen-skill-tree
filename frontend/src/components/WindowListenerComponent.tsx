@@ -50,9 +50,10 @@ export class WindowListenerComponent extends React.Component<Props, State> {
   handleWindowResize = (e: any) => {
     this.props.updaters.enqueueUpdate((old) => {
       // console.log("executing window state update in window onresize in app");
-      old.innerWidth = window.innerWidth;
-      old.innerHeight = window.innerHeight;
-      return { ...old };
+      const result = { ...old };
+      result.innerWidth = window.innerWidth;
+      result.innerHeight = window.innerHeight;
+      return result;
     });
   };
 

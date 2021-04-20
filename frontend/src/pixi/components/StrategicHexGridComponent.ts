@@ -7,6 +7,11 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 type Props = {
   args: {
     position: Vector2;
+    textures: {
+      circle: Pixi.Texture;
+      rect: Pixi.Texture;
+      square: Pixi.Texture;
+    };
   };
   appSize: Vector2;
 };
@@ -16,7 +21,7 @@ type State = {};
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
-  private graphics: Pixi.Graphics;
+  private graphics: Pixi.Sprite;
 
   constructor(props: Props) {
     super(props);
@@ -28,11 +33,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.container = new Pixi.Container();
 
     // test graphics
-    this.graphics = new Pixi.Graphics();
-    this.graphics.beginFill(COLORS.white);
-    // g.drawCircle(0, 0, 4);
-    this.graphics.drawRect(-6, -10, 12, 20);
-    this.graphics.visible = false;
+    this.graphics = new Pixi.Sprite();
+    this.graphics.texture = props.args.textures.circle;
+    this.graphics.tint = COLORS.borderBlack;
+    // this.graphics.visible = false;
     this.container.addChild(this.graphics);
   }
 

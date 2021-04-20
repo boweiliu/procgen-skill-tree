@@ -7,6 +7,8 @@ import { RootComponent } from './components/RootComponent';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import COLORS from './colors';
 import createBunnyExample from './BunnyExample';
+import { myMemo } from '../lib/util/memo';
+import { isConstructorDeclaration } from 'typescript';
 
 type Props = {
   args: {
@@ -93,6 +95,13 @@ export class PixiReactBridge {
     this.onTick = (delta) => this.baseGameLoop(delta);
     this.onTick = this.onTick.bind(this);
     this.app.ticker.add(this.onTick);
+
+    this.state.appSize = appSizeFromWindowSize(
+      new Vector2(
+        this.props.gameState.windowState.innerWidth,
+        this.props.gameState.windowState.innerHeight
+      )
+    );
   }
 
   /**
@@ -104,7 +113,31 @@ export class PixiReactBridge {
   }
 
   updateSelf(props: Props, staleProps?: Props) {
+    if (props === staleProps) {
+      // console.log('updateSElf got the same props!!!');
+      return;
+    }
+    // console.log('update self', props.gameState.windowState, staleProps?.gameState.windowState);
     // memoize: compute app state from window state dimensions only if they changed from last tick
+    console.log('in updateSelf', {
+      pw: props.gameState.windowState.innerWidth,
+      sw: staleProps?.gameState.windowState.innerWidth,
+      ph: props.gameState.windowState.innerHeight,
+      sh: staleProps?.gameState.windowState.innerHeight,
+      props: props.gameState.windowState,
+      staleProps: staleProps?.gameState.windowState,
+    });
+    console.log('in updateSelf', {
+      props: props.gameState.windowState,
+      staleProps: staleProps?.gameState.windowState,
+    });
+    const pw = { ...props.gameState.windowState };
+    const h = pw.innerHeight;
+    console.log('in updateSelf', {
+      pw,
+      ph: pw.innerHeight,
+      h,
+    });
     if (
       !(
         props.gameState.windowState.innerWidth ===
@@ -113,29 +146,52 @@ export class PixiReactBridge {
           staleProps?.gameState.windowState.innerHeight
       )
     ) {
+      console.log(
+        'update self inner',
+        props.gameState.windowState,
+        staleProps?.gameState.windowState
+      );
       this.state.appSize = appSizeFromWindowSize(
         new Vector2(
           props.gameState.windowState.innerWidth,
           props.gameState.windowState.innerHeight
         )
       );
+    } else {
+      console.log('update self inner skipped due to no change');
     }
 
+    // this.state.appSize = myMemo(() => appSizeFromWindowSize(
+    //   new Vector2(
+    //     props.gameState.windowState.innerWidth,
+    //     props.gameState.windowState.innerHeight
+    //   )
+    // ), [props.gameState.windowState.innerWidth, props.gameState.windowState.innerHeight]);
+
     // console.log({ tick: props.gameState.tick });
-    props.updaters.tick.enqueueUpdate((it) => it + 1);
+    // props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   // props should be a referentially distinct object from props the last time this was called
   rerender(futureProps: Props) {
-    // console.log("base app rerender called", { playerUI: props.gameState.playerUI });
+    if (this.rootComponent && this.props === futureProps) {
+      // skip updating props if we're already initialized and there's no new props object
+      return;
+    }
+    console.log('base app rerender called', {
+      playerUI: futureProps.gameState.playerUI,
+      windowState: futureProps.gameState.windowState,
+      oldWindowState: this.props?.gameState.windowState,
+    });
 
     // cache the stale props object
-    this.staleProps = this.props;
+    // this.staleProps = this.props; // ????
     // take the props handed down from react (probably due to our own props.updaters.fireBatch() call, see game loop) and
     // record them for future use. note that the future props do not take effect down the child hierarchy unless they are
     // manually told to do so.
-    this.props = futureProps;
+    // this.props = futureProps; // not sure why this doesnt work
+    this.props = { ...futureProps };
 
     // If we're not done initializing yet (note that constructor does not set props!), finish it now
     if (!this.rootComponent) {
@@ -158,6 +214,11 @@ export class PixiReactBridge {
       // createBunnyExample({ parent: this.app.stage, ticker: this.app.ticker, x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
       this.didMount();
     }
+
+    console.log('now stuff is', {
+      windowState: this.props?.gameState.windowState,
+      staleWindowState: this.staleProps?.gameState.windowState,
+    });
   }
 
   renderSelf(props: Props) {
@@ -166,14 +227,25 @@ export class PixiReactBridge {
 
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      this.updateSelf(this.props, this.staleProps);
+      // this.updateSelf(this.props, this.staleProps);
       // console.log('skipping update since pixi is not visible');
       this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
       return; // skip update loop if pixi is hidden
     }
     // assume props is up to date
-    this.updateSelf(this.props, this.staleProps);
+    const props = { ...this.props };
+    const staleProps = this.staleProps ? { ...this.staleProps } : undefined;
+    console.log('before updateself: ', {
+      props: props.gameState.windowState,
+      staleProps: staleProps?.gameState.windowState,
+    });
+    this.updateSelf(props, staleProps);
+    console.log('after updateself: ', {
+      props: props.gameState.windowState,
+      staleProps: staleProps?.gameState.windowState,
+    });
     // send props downwards
+    // console.log('propagating props downwards');
     this.rootComponent?.update({
       args: {
         renderer: this.app.renderer,
@@ -186,6 +258,8 @@ export class PixiReactBridge {
     });
 
     this.renderSelf(this.props);
+    this.staleProps = this.props;
+    // this.staleProps = { ...this.props };
     this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }
