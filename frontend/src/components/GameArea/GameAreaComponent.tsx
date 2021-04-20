@@ -6,6 +6,7 @@ import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
+import { Vector3 } from '../../lib/util/geometry/vector3';
 
 /**
  *
@@ -55,6 +56,7 @@ function GameArea(props: {
   // this object reference is guaranteed to be stable unless jump cb is called
 
   jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
+  virtualDimsToLocation: (v: Vector2) => Vector3;
   virtualGridStatusMap: KeyedHashMap<Vector2, NodeData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
@@ -262,7 +264,11 @@ function GameArea(props: {
         {Array(props.virtualGridDims.y)
           .fill(0)
           .map((_, y) => (
-            <Row key={y} rowIdx={y} hexHalfBlockStyle={hexHalfBlockStyle}>
+            <Row
+              key={props.virtualDimsToLocation(new Vector2(0, y)).y.toString()}
+              rowIdx={y}
+              hexHalfBlockStyle={hexHalfBlockStyle}
+            >
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, x) => {

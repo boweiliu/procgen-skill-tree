@@ -170,7 +170,7 @@ function Component(props: {
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
       // console.log({ direction: args.direction });
-      let jumpAmounts = virtualGridDims.multiply(0.45).floor();
+      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
       jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
@@ -231,6 +231,7 @@ function Component(props: {
         virtualGridDims={virtualGridDims}
         jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}
+        virtualDimsToLocation={virtualDimsToLocation}
         updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
       />
