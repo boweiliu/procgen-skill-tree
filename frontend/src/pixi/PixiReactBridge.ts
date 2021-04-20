@@ -93,6 +93,14 @@ export class PixiReactBridge {
     this.onTick = (delta) => this.baseGameLoop(delta);
     this.onTick = this.onTick.bind(this);
     this.app.ticker.add(this.onTick);
+
+    // we forgot to set app size properly when pixi first loaded, so do it now
+    this.state.appSize = appSizeFromWindowSize(
+      new Vector2(
+        this.props.gameState.windowState.innerWidth,
+        this.props.gameState.windowState.innerHeight
+      )
+    );
   }
 
   /**
@@ -104,6 +112,11 @@ export class PixiReactBridge {
   }
 
   updateSelf(props: Props, staleProps?: Props) {
+    if (props === staleProps) {
+      props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
+      return;
+    }
+
     // memoize: compute app state from window state dimensions only if they changed from last tick
     if (
       !(
@@ -113,6 +126,11 @@ export class PixiReactBridge {
           staleProps?.gameState.windowState.innerHeight
       )
     ) {
+      console.log(
+        'update self inner',
+        props.gameState.windowState,
+        staleProps?.gameState.windowState
+      );
       this.state.appSize = appSizeFromWindowSize(
         new Vector2(
           props.gameState.windowState.innerWidth,
@@ -121,17 +139,19 @@ export class PixiReactBridge {
       );
     }
 
-    // console.log({ tick: props.gameState.tick });
-    props.updaters.tick.enqueueUpdate((it) => it + 1);
+    props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
   }
 
   // shim, called from react, possibly many times , possibly at any time, including during the baseGameLoop below
   // props should be a referentially distinct object from props the last time this was called
   rerender(futureProps: Props) {
-    // console.log("base app rerender called", { playerUI: props.gameState.playerUI });
+    if (this.rootComponent && this.props === futureProps) {
+      // skip updating props if we're already initialized and there's no new props object
+      return;
+    }
 
-    // cache the stale props object
-    this.staleProps = this.props;
+    console.log('base app rerender called');
+
     // take the props handed down from react (probably due to our own props.updaters.fireBatch() call, see game loop) and
     // record them for future use. note that the future props do not take effect down the child hierarchy unless they are
     // manually told to do so.
@@ -166,13 +186,14 @@ export class PixiReactBridge {
 
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      this.updateSelf(this.props, this.staleProps);
       // console.log('skipping update since pixi is not visible');
+      this.props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
       this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
       return; // skip update loop if pixi is hidden
     }
     // assume props is up to date
     this.updateSelf(this.props, this.staleProps);
+
     // send props downwards
     this.rootComponent?.update({
       args: {
@@ -186,6 +207,7 @@ export class PixiReactBridge {
     });
 
     this.renderSelf(this.props);
+    this.staleProps = this.props;
     this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
   }
 }
