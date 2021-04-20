@@ -161,16 +161,18 @@ function GameArea(props: {
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
   useEffect(() => {
+    // Set initial position in the center
     if (
       container.current != null &&
       container.current !== previousContainer.current
     ) {
-      container.current.scrollTop = (props.virtualGridDims.y * gridHeight) / 3;
+      container.current.scrollTop =
+        (props.virtualGridDims.y * gridHeight - props.appSize.y) / 2;
       container.current.scrollLeft =
-        ((props.virtualGridDims.x + 0.5) * gridWidth) / 3;
+        ((props.virtualGridDims.x + 0.5) * gridWidth - props.appSize.x) / 2;
     }
     previousContainer.current = container.current;
-  }, [container.current]);
+  }, [container.current, props.appSize]);
 
   // control scroll with keyboard
   useEffect(() => {

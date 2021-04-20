@@ -54,23 +54,20 @@ function Component(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
-  const virtualGridDims = useMemo(
-    () =>
-      new Vector2(
-        // needs to be at least 3.8 x 4.8 so we have room for jumps
-        Math.max(
-          4,
-          Math.floor(
-            (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
-          )
-        ),
-        Math.max(
-          5,
-          Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
-        )
+  const virtualGridDims = useMemo(() => {
+    return new Vector2(100, 10);
+    new Vector2(
+      // needs to be at least 3.8 x 4.8 so we have room for jumps
+      Math.max(
+        4,
+        Math.floor((appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5)
       ),
-    [appSize, virtualAreaScaleMultiplier, hexGridPx]
-  );
+      Math.max(
+        5,
+        Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
+      )
+    );
+  }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
   // useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
 
   const virtualDimsToLocation = useCallback(
