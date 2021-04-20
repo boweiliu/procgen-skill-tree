@@ -54,7 +54,7 @@ export function afterMaybeSpendingSp(
     let resourceType = next.activeQuest.resourceType;
     let amount =
       prevGameState.computed.playerResourceAmounts?.[resourceType] || 0;
-    next.questProgressHistory = [ ...next.questProgressHistory, amount];
+    next.questProgressHistory = [...next.questProgressHistory, amount];
   }
   return next;
 }

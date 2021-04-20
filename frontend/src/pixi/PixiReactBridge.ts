@@ -126,11 +126,11 @@ export class PixiReactBridge {
           staleProps?.gameState.windowState.innerHeight
       )
     ) {
-      console.log(
-        'update self inner',
-        props.gameState.windowState,
-        staleProps?.gameState.windowState
-      );
+      // console.log(
+      //   'update self inner',
+      //   props.gameState.windowState,
+      //   staleProps?.gameState.windowState
+      // );
       this.state.appSize = appSizeFromWindowSize(
         new Vector2(
           props.gameState.windowState.innerWidth,
@@ -150,7 +150,7 @@ export class PixiReactBridge {
       return;
     }
 
-    console.log('base app rerender called');
+    // console.log('base app rerender called');
 
     // take the props handed down from react (probably due to our own props.updaters.fireBatch() call, see game loop) and
     // record them for future use. note that the future props do not take effect down the child hierarchy unless they are

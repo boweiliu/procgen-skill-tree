@@ -1,5 +1,4 @@
-import { Const } from "./misc";
-
+import { Const } from './misc';
 
 type UpdaterFnParam2<T, W> =
   | ((prev: Const<T>, prevWhole: W) => T | Const<T>)
