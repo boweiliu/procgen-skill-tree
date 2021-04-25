@@ -103,14 +103,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const lockData = props.lockMap.get(virtualLocation);
       const lockStatus = props.lockStatusMap.get(virtualLocation);
 
-      if (nodeVisibleStatus == NodeAllocatedStatus.HIDDEN) {
+      if (nodeVisibleStatus === NodeAllocatedStatus.HIDDEN) {
         graphics.visible = false;
-      } else if (nodeAllocatedStatus == NodeAllocatedStatus.TAKEN) {
+      } else if (nodeAllocatedStatus === NodeAllocatedStatus.TAKEN) {
         graphics.visible = true;
         graphics.tint = COLORS.borderBlack;
       } else if (
-        nodeVisibleStatus == NodeAllocatedStatus.AVAILABLE ||
-        nodeVisibleStatus == NodeAllocatedStatus.UNREACHABLE
+        nodeVisibleStatus === NodeAllocatedStatus.AVAILABLE ||
+        nodeVisibleStatus === NodeAllocatedStatus.UNREACHABLE
       ) {
         graphics.visible = true;
         graphics.tint = COLORS.nodePink;
