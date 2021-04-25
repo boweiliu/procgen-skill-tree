@@ -39,15 +39,16 @@ export function getCoordNeighbors(
   neighbors.NORTHEAST = base.add(1, 1, 0);
   neighbors.SOUTHWEST = base.add(-1, -1, 0);
 
-  neighbors.DOWN = base
-    .multiply(new Vector3(PER_Z_SCALE_FACTOR, PER_Z_SCALE_FACTOR, 1))
-    .addZ(-1);
+  // TODO(bowei): reenable up/down neighbors later
+  // neighbors.DOWN = base
+  //   .multiply(new Vector3(PER_Z_SCALE_FACTOR, PER_Z_SCALE_FACTOR, 1))
+  //   .addZ(-1);
 
-  if (base.x % PER_Z_SCALE_FACTOR === 0 && base.y % PER_Z_SCALE_FACTOR === 0) {
-    neighbors.UP = base
-      .divide(new Vector3(PER_Z_SCALE_FACTOR, PER_Z_SCALE_FACTOR, 1))
-      .addZ(1);
-  }
+  // if (base.x % PER_Z_SCALE_FACTOR === 0 && base.y % PER_Z_SCALE_FACTOR === 0) {
+  //   neighbors.UP = base
+  //     .divide(new Vector3(PER_Z_SCALE_FACTOR, PER_Z_SCALE_FACTOR, 1))
+  //     .addZ(1);
+  // }
 
   return neighbors;
 }

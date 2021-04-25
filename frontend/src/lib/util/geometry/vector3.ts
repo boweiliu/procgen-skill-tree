@@ -53,7 +53,7 @@ export class Vector3 {
     return x instanceof Vector3;
   }
 
-  static FromVector2(p: IVector2, z: number) {
+  static FromVector2(p: IVector2, z: number = 0) {
     return new Vector3(p.x, p.y, z);
   }
 

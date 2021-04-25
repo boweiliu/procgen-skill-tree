@@ -141,6 +141,9 @@ export type PlayerUIState = {
 
   // NOT DEPRECATED
   isPixiHidden: boolean;
+  /**
+   * Determines where in the universe the user has scrolled to.
+   */
   virtualGridLocation: Vector3;
   // WIP?
   virtualApproximateScroll?: Vector2;

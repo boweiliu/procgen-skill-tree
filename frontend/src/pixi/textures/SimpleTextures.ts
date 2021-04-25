@@ -16,7 +16,8 @@ export function generateSimpleTextures(
 
   let rect = new Pixi.Graphics();
   rect.beginFill(COLORS.white);
-  rect.drawRect(-6, -10, 12, 20);
+  // rect.drawRect(-6, -10, 12, 20);
+  rect.drawRect(-2, -10, 4, 20);
 
   let square = new Pixi.Graphics();
   square.beginFill(COLORS.white);

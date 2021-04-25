@@ -10,6 +10,9 @@ export type WorldGenState = {
 
   // NOT DEPRECATED
   seed: number;
+  /**
+   * What sort of locks are generated. Does not store the live status of the locks.
+   */
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
 };
 

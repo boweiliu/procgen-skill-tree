@@ -1,5 +1,8 @@
 import * as Pixi from 'pixi.js';
-import { NodeAllocatedStatus } from '../../components/GameArea/GameAreaComponent';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+} from '../../components/GameArea/GameAreaComponent';
 import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
@@ -22,6 +25,8 @@ type Props = {
   appSize: Vector2;
   virtualGridLocation: Const<Vector3>;
   allocationStatusMap: Const<KeyedHashMap<Vector3, NodeAllocatedStatus>>;
+  fogOfWarStatusMap: Const<HashMap<Vector3, NodeAllocatedStatus>>;
+  lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
   lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
 };
 
@@ -57,10 +62,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.texture = props.args.textures.circle;
         graphics.tint = COLORS.nodePink;
         // graphics.visible = false;
-        if ((i == 0 && j == 0) || (i == 5 && j == 5)) {
-          // graphics.visible = true;
-          graphics.tint = COLORS.borderBlack;
-        }
+        // if ((i == 0 && j == 0) || (i == 5 && j == 5)) {
+        //   // graphics.visible = true;
+        //   graphics.tint = COLORS.borderBlack;
+        // }
         graphics.position = PixiPointFrom(
           props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
         );
@@ -80,6 +85,41 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       graphics.position = PixiPointFrom(
         props.appSize.divide(2).add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y))
       );
+      // if (v.x <= 1 && v.x >= -1 && v.y <= 1 && v.y >= -1) {
+
+      // } else {
+      //   continue;
+      // }
+      // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
+      const virtualLocation = props.virtualGridLocation.add(
+        Vector3.FromVector2(v)
+      );
+      const nodeVisibleStatus =
+        props.fogOfWarStatusMap.get(virtualLocation) ||
+        NodeAllocatedStatus.HIDDEN;
+      const nodeAllocatedStatus =
+        props.allocationStatusMap.get(virtualLocation) ||
+        NodeAllocatedStatus.HIDDEN;
+      const lockData = props.lockMap.get(virtualLocation);
+      const lockStatus = props.lockStatusMap.get(virtualLocation);
+
+      if (nodeVisibleStatus == NodeAllocatedStatus.HIDDEN) {
+        graphics.visible = false;
+      } else if (nodeAllocatedStatus == NodeAllocatedStatus.TAKEN) {
+        graphics.visible = true;
+        graphics.tint = COLORS.borderBlack;
+      } else if (
+        nodeVisibleStatus == NodeAllocatedStatus.AVAILABLE ||
+        nodeVisibleStatus == NodeAllocatedStatus.UNREACHABLE
+      ) {
+        graphics.visible = true;
+        graphics.tint = COLORS.nodePink;
+      }
+
+      if (lockData) {
+        graphics.texture = props.args.textures.rect;
+        // graphics.tint = COLORS.borderBlack;
+      }
     }
   }
 

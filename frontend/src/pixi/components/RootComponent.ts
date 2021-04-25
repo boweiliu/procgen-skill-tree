@@ -124,6 +124,8 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         appSize: props.appSize,
         virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
         allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
+        fogOfWarStatusMap: props.gameState.computed.fogOfWarStatusMap!,
+        lockStatusMap: props.gameState.computed.lockStatusMap!,
         lockMap: props.gameState.worldGen.lockMap,
       };
     };
