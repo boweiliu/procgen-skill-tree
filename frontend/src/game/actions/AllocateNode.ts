@@ -74,7 +74,7 @@ export class AllocateNodeAction {
             return false;
           },
         };
-        getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
+        getWithinDistance(nodeLocation, 4, 0, validLocks).forEach((n) => {
           if (
             (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
             NodeAllocatedStatus.HIDDEN

@@ -283,8 +283,8 @@ export class LockFactory {
       shortTextTimer: '2⌛',
       lockStatus: LockStatus.TICKING,
     };
-    // locks occur at frequency 0.4
-    if (p < 0.4) {
+    // locks occur at frequency 0.5
+    if (p < 0.5) {
       return lockData;
     }
 
