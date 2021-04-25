@@ -15,7 +15,10 @@ import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { StrategicHexGridComponent } from './StrategicHexGridComponent';
+import {
+  StrategicHexGridComponent,
+  StrategicHexGridComponentProps,
+} from './StrategicHexGridComponent';
 import {
   generateSimpleTextures,
   SimpleTextureSet,
@@ -109,13 +112,19 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.actionStage.sortableChildren = true;
     this.container.addChild(this.actionStage);
 
-    const strategicHexGridPropsFactory = (props: Props, state: State) => {
+    const strategicHexGridPropsFactory = (
+      props: Props,
+      state: State
+    ): StrategicHexGridComponentProps => {
       return {
         args: {
           position: Vector2.Zero,
           textures: state.simpleTexture.get(),
         },
         appSize: props.appSize,
+        virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
+        allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
+        lockMap: props.gameState.worldGen.lockMap,
       };
     };
     this.strategicHexGrid = new StrategicHexGridComponent(

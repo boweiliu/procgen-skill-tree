@@ -159,6 +159,7 @@ export class GameStateFactory {
           return false;
         },
       };
+      // TODO(bowei): unhardcode
       getWithinDistance(nodeLocation, 4, 0, validLocks).forEach((n) => {
         if (
           (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===

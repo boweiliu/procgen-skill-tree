@@ -1,6 +1,12 @@
 import * as Pixi from 'pixi.js';
+import { NodeAllocatedStatus } from '../../components/GameArea/GameAreaComponent';
+import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { LazyHashMap } from '../../lib/util/lazy';
+import { Const } from '../../lib/util/misc';
 import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
@@ -14,6 +20,9 @@ type Props = {
     };
   };
   appSize: Vector2;
+  virtualGridLocation: Const<Vector3>;
+  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeAllocatedStatus>>;
+  lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
 };
 
 type State = {};
@@ -22,6 +31,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
   private graphics: Pixi.Sprite;
+  private hexGrid: KeyedHashMap<Vector2, Pixi.Sprite> = new KeyedHashMap();
 
   constructor(props: Props) {
     super(props);
@@ -36,8 +46,28 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.graphics = new Pixi.Sprite();
     this.graphics.texture = props.args.textures.circle;
     this.graphics.tint = COLORS.borderBlack;
-    // this.graphics.visible = false;
+    this.graphics.visible = false;
     this.container.addChild(this.graphics);
+
+    // populate a grid
+    // TODO(bowei): unhardcode
+    for (let j = -20; j <= 20; j++) {
+      for (let i = -35 + Math.floor(j / 2); i <= 35 + Math.floor(j / 2); i++) {
+        const graphics = new Pixi.Sprite();
+        graphics.texture = props.args.textures.circle;
+        graphics.tint = COLORS.nodePink;
+        // graphics.visible = false;
+        if ((i == 0 && j == 0) || (i == 5 && j == 5)) {
+          // graphics.visible = true;
+          graphics.tint = COLORS.borderBlack;
+        }
+        graphics.position = PixiPointFrom(
+          props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
+        );
+        this.container.addChild(graphics);
+        this.hexGrid.put(new Vector2(i, j), graphics);
+      }
+    }
   }
 
   protected updateSelf(props: Props) {}
@@ -45,6 +75,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.args.position);
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
+
+    for (let [v, graphics] of this.hexGrid.entries()) {
+      graphics.position = PixiPointFrom(
+        props.appSize.divide(2).add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y))
+      );
+    }
   }
 
   protected shouldUpdate(
