@@ -1,7 +1,7 @@
 import './App.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
 import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
 import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
@@ -62,6 +62,13 @@ function App() {
   // const gameAreaStateManager: any | null = null;
   // gameAreaStateManager?.makeProps({ gameState, appSize });
 
+  useEffect(() => {
+    console.log('maybe toggling strategic view');
+    if (gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW) {
+      updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW]);
+
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
@@ -94,7 +101,7 @@ function App() {
             updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle pixi
+          Toggle strategic view (or click x)
         </button>
       </div>
 

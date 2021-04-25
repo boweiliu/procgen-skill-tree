@@ -81,6 +81,8 @@ export enum IntentName {
   PAN_EAST = 'PAN_EAST',
   TRAVEL_UPSTAIRS = 'TRAVEL_UPSTAIRS',
   TRAVEL_DOWNSTAIRS = 'TRAVEL_DOWNSTAIRS',
+
+  TOGGLE_STRATEGIC_VIEW = 'TOGGLE_STRATEGIC_VIEW',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {

@@ -119,6 +119,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (lockData) {
         graphics.texture = props.args.textures.rect;
         // graphics.tint = COLORS.borderBlack;
+      } else {
+        graphics.texture = props.args.textures.circle;
       }
     }
   }

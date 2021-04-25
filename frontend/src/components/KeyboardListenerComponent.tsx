@@ -31,6 +31,7 @@ const defaultKeyIntentConfig = {
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
   ArrowRight: IntentName.PAN_EAST,
+  x: IntentName.TOGGLE_STRATEGIC_VIEW,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };
