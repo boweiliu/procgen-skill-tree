@@ -288,7 +288,7 @@ export class LockFactory {
     }
     // TODO(bowei): unhardcode
     // locks occur at this frequency
-    if (p < 0.5) {
+    if (p < 0.47) {
       return lockData;
     }
 
