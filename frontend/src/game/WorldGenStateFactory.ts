@@ -283,6 +283,9 @@ export class LockFactory {
       shortTextTimer: '2⌛',
       lockStatus: LockStatus.TICKING,
     };
+    if (args.location.equals(Vector3.Zero)) {
+      return undefined;
+    }
     // TODO(bowei): unhardcode
     // locks occur at this frequency
     if (p < 0.5) {

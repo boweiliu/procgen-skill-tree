@@ -22,7 +22,7 @@ import COLORS, { colorToCss } from './pixi/colors';
 import { AllocateNodeAction } from './game/actions/AllocateNode';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
-  new GameStateFactory({}).create()
+  new GameStateFactory({}).create(0xaaaf)
 );
 
 /**
