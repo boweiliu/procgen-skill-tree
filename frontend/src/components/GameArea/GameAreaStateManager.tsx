@@ -16,9 +16,22 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import {
   GameAreaComponent,
+  LockStatus,
   NodeAllocatedStatus,
   NodeData,
 } from './GameAreaComponent';
+
+export type NodeReactData = {
+  shortText: React.ReactElement;
+  lockData?: {
+    shortTextTarget: string;
+    shortTextTimer: string;
+    lockStatus: LockStatus;
+  };
+  toolTipText: React.ReactElement;
+  status: NodeAllocatedStatus;
+  id: string;
+};
 
 export const GameAreaStateManager = React.memo(Component);
 
@@ -122,9 +135,12 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridStatusMap: KeyedHashMap<Vector2, NodeData> = useMemo(() => {
+  const virtualGridStatusMap: KeyedHashMap<
+    Vector2,
+    NodeReactData
+  > = useMemo(() => {
     const startTime = +new Date();
-    const map = new KeyedHashMap<Vector2, NodeData>();
+    const map = new KeyedHashMap<Vector2, NodeReactData>();
     for (let row = 0; row < virtualGridDims.x; row++) {
       for (let col = 0; col < virtualGridDims.y; col++) {
         const virtualVec = new Vector2(row, col);
@@ -139,9 +155,16 @@ function Component(props: {
             : maybeStatus || NodeAllocatedStatus.HIDDEN;
         const id = location.hash();
         const lockData = gameState.worldGen.lockMap.get(location);
-        const nodeData: NodeData = {
-          shortText: id,
-          toolTipText: nodeStatus.toString(),
+        const nodeData: NodeReactData = {
+          shortText: <>{id}</>,
+          toolTipText: (
+            <>
+              <div>{nodeStatus.toString()}</div>
+              <br />
+              <div>foo</div>
+            </>
+          ),
+          // toolTipText: `${nodeStatus.toString()}-x\n\n<br>\n\nfoo`,
           status: nodeStatus,
           lockData,
           id,

@@ -7,6 +7,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { NodeReactData } from './GameAreaStateManager';
 
 /**
  *
@@ -42,6 +43,7 @@ export type NodeData = {
   status: NodeAllocatedStatus;
   id: string;
 };
+
 type UpdateStatusCb = (args: {
   virtualDims: Vector2;
   newStatus: NodeAllocatedStatus;
@@ -57,7 +59,7 @@ function GameArea(props: {
 
   jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   virtualDimsToLocation: (v: Vector2) => Vector3;
-  virtualGridStatusMap: KeyedHashMap<Vector2, NodeData>;
+  virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
@@ -282,7 +284,6 @@ function GameArea(props: {
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
                       status={nodeData.status}
-                      text={nodeData.shortText}
                       hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
@@ -334,7 +335,6 @@ function CellComponent({
   hexCenterLockBlockStyle,
   onClick,
   status,
-  text,
   nodeData,
 }: {
   idx: number;
@@ -346,9 +346,8 @@ function CellComponent({
   hexCenterLockStyle: any;
   hexBlockStyle: any;
   onClick: React.MouseEventHandler;
-  text?: string;
   status: NodeAllocatedStatus;
-  nodeData: NodeData;
+  nodeData: NodeReactData;
 }) {
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
@@ -396,7 +395,7 @@ function CellComponent({
             marginLeft: '-2px',
           }}
         >
-          <div className="tiny-text">{text}</div>
+          <div className="tiny-text">{nodeData.shortText}</div>
         </div>
         <div
           className="hover-only"
@@ -451,7 +450,6 @@ function NodeComponent({
   hexCenterLockStyle,
   hexCenterLockBlockStyle,
   status,
-  text,
   onUpdateStatus,
   nodeData,
 }: {
@@ -465,8 +463,7 @@ function NodeComponent({
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
-  text?: string;
-  nodeData: NodeData;
+  nodeData: NodeReactData;
 }) {
   const handleClick = useCallback(
     (e) => {
@@ -489,11 +486,10 @@ function NodeComponent({
       hexCenterStyle={hexCenterStyle}
       hexCenterLockStyle={hexCenterLockStyle}
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-      text={text}
       status={status}
       nodeData={nodeData}
     >
-      {status}
+      {nodeData.toolTipText}
     </Cell>
   );
 }
