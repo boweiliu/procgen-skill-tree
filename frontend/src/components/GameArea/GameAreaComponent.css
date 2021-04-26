@@ -43,7 +43,7 @@
   display: none;
 }
 
-.hex-block:hover > .hover-only-2 {
+.hex-block:hover .hover-only-2 {
   display: block;
 }
 .hover-only-2 {

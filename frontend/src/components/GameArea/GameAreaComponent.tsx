@@ -373,25 +373,6 @@ function CellComponent({
       style={hexBlockStyle}
     >
       <div
-        className="hover-only-2"
-        style={{
-          marginRight: '-64px',
-          width: '64px',
-        }}
-      >
-        <div
-          style={{
-            marginLeft: '68px',
-            marginTop: '48px',
-            color: '#888888',
-            cursor: 'pointer',
-          }}
-          hidden={status === NodeAllocatedStatus.HIDDEN}
-        >
-          ?
-        </div>
-      </div>
-      <div
         id={`hex-center-${rowIdx}-${idx}`}
         onClick={onClick}
         className="hex-center"
@@ -464,7 +445,7 @@ function CellComponent({
         >
           <div
             style={{
-              marginTop: '20px',
+              marginTop: '-32px',
               color: '#888888',
               cursor: 'pointer',
             }}
