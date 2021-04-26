@@ -23,15 +23,16 @@ type keyToIntentMap = {
 };
 
 const defaultKeyIntentConfig = {
-  w: IntentName.PAN_NORTH,
-  a: IntentName.PAN_WEST,
-  s: IntentName.PAN_SOUTH,
-  d: IntentName.PAN_EAST,
+  // w: IntentName.PAN_NORTH,
+  // a: IntentName.PAN_WEST,
+  // s: IntentName.PAN_SOUTH,
+  // d: IntentName.PAN_EAST,
   ArrowUp: IntentName.PAN_NORTH,
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
   ArrowRight: IntentName.PAN_EAST,
-  x: IntentName.TOGGLE_STRATEGIC_VIEW,
+  m: IntentName.TOGGLE_STRATEGIC_VIEW,
+  i: IntentName.TOGGLE_SIDEBAR,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };

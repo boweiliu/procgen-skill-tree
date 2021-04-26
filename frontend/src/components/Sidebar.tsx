@@ -2,11 +2,17 @@ import React from 'react';
 
 import './Sidebar.css';
 
-export default function Sidebar({ children, hidden }: any) {
+export default function Sidebar({ children, hidden, setSidebarHidden }: any) {
   return (
     <div className="layout" hidden={hidden}>
-      ❎ Close
-      <br />
+      <div
+        className="close"
+        onClick={() => {
+          setSidebarHidden();
+        }}
+      >
+        ❎ Close
+      </div>
       <br />
       <>{children}</>
     </div>

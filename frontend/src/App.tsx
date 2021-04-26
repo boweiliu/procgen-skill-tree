@@ -71,6 +71,14 @@ function App() {
     }
   }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW]);
 
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  useEffect(() => {
+    console.log('maybe toggling sidebar');
+    if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
+      setSidebarOpen(!isSidebarOpen);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_SIDEBAR]);
+
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
@@ -103,11 +111,24 @@ function App() {
             updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle strategic view (or click x)
+          Toggle strategic view (hotkey: m)
+        </button>
+        <span> </span>
+        <button
+          onClick={() => {
+            setSidebarOpen(!isSidebarOpen);
+          }}
+        >
+          Toggle sidebar (hotkey: i)
         </button>
       </div>
 
-      <Sidebar hidden={true} setSidebarHidden={() => {}}>
+      <Sidebar
+        hidden={!isSidebarOpen}
+        setSidebarHidden={() => {
+          setSidebarOpen(false);
+        }}
+      >
         <Tabs
           onClick={() => {}}
           value={0}
