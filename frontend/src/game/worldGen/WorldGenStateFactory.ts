@@ -1,4 +1,4 @@
-import { LockStatus } from '../components/GameArea/GameAreaComponent';
+import { LockStatus } from '../../components/GameArea/GameAreaComponent';
 import {
   WorldGenState,
   ChunkGen,
@@ -8,13 +8,13 @@ import {
   ResourceType,
   ResourceModifier,
   ResourceNontrivialType,
-} from '../data/GameState';
-import { LockData } from '../data/PlayerSaveState';
-import { NodeType } from '../data/WorldGenState';
-import { HashSet, KeyedHashMap } from '../lib/util/data_structures/hash';
-import { Vector2 } from '../lib/util/geometry/vector2';
-import { Vector3 } from '../lib/util/geometry/vector3';
-import { INTMAX32, squirrel3 } from '../lib/util/random';
+} from '../../data/GameState';
+import { LockData } from '../../data/PlayerSaveState';
+import { NodeType } from '../../data/WorldGenState';
+import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { INTMAX32, squirrel3 } from '../../lib/util/random';
 
 export type WorldGenStateConfig = any;
 

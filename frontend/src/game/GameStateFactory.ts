@@ -24,7 +24,7 @@ import {
   getWithinDistance,
   IReadonlySet,
 } from './lib/HexGrid';
-import { LockFactory, ZLevelGenFactory } from './WorldGenStateFactory';
+import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
 
 export type GameStateConfig = any;
 
