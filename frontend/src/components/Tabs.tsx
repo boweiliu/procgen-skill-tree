@@ -13,7 +13,7 @@ export default function Tabs({ value, labels, onChange }: any) {
   );
 }
 
-function Tab({ onClick, value, active, children }: any) {
+export function Tab({ onClick, value, active, children }: any) {
   const handleClick = () => {
     onClick(value);
   };

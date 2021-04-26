@@ -2,6 +2,13 @@ import React from 'react';
 
 import './Sidebar.css';
 
-export default function Sidebar({ children }: any) {
-  return <div className="layout">{children}</div>;
+export default function Sidebar({ children, hidden }: any) {
+  return (
+    <div className="layout" hidden={hidden}>
+      ❎ Close
+      <br />
+      <br />
+      <>{children}</>
+    </div>
+  );
 }

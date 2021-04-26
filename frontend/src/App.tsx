@@ -20,6 +20,8 @@ import {
 } from './lib/util/updaterGenerator';
 import COLORS, { colorToCss } from './pixi/colors';
 import { AllocateNodeAction } from './game/actions/AllocateNode';
+import Sidebar from './components/Sidebar';
+import Tabs, { Tab } from './components/Tabs';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create(+new Date())
@@ -105,6 +107,17 @@ function App() {
         </button>
       </div>
 
+      <Sidebar hidden={true} setSidebarHidden={() => {}}>
+        <Tabs
+          onClick={() => {}}
+          value={0}
+          labels={['foo', 'bar']}
+          onChange={(value: number) => {}}
+          active
+        ></Tabs>
+        <br />
+        content
+      </Sidebar>
       <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
