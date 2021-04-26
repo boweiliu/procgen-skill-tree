@@ -373,16 +373,9 @@ function CellComponent({
       style={hexBlockStyle}
     >
       <div
-        className="spacer"
-        style={{
-          width: '64px',
-          height: '64px',
-        }}
-      ></div>
-      <div
         className="hover-only-2"
         style={{
-          marginLeft: '-64px',
+          marginRight: '-64px',
           width: '64px',
         }}
       >
@@ -404,7 +397,6 @@ function CellComponent({
         className="hex-center"
         style={{
           ...hexCenterStyle,
-          marginLeft: '-64px',
           backgroundColor: fillColor,
           borderColor: borderColor,
         }}
