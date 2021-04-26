@@ -43,6 +43,13 @@
   display: none;
 }
 
+.hex-block:hover > .hover-only-2 {
+  display: block;
+}
+.hover-only-2 {
+  display: none;
+}
+
 .hex-center-lock-left {
   border-style: solid;
   border-width: 2px;

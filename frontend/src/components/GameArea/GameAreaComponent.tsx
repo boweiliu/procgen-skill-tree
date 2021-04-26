@@ -436,6 +436,24 @@ function CellComponent({
           </div>
         </div>
       ) : null}
+      <div
+        className="hover-only-2"
+        style={{
+          marginLeft: '-64px',
+          width: '64px',
+        }}
+      >
+        <div
+          style={{
+            marginLeft: '68px',
+            marginTop: '48px',
+            color: '#888888',
+            cursor: 'pointer',
+          }}
+        >
+          ?
+        </div>
+      </div>
     </div>
   );
 }
