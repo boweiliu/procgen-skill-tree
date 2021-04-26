@@ -1,34 +1,28 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { updateRestTypeNode } from 'typescript';
+import React, { useCallback, useMemo, useState } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
-import { getCoordNeighbors, getWithinDistance } from '../../game/lib/HexGrid';
-import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import COLORS, { colorToCss } from '../../pixi/colors';
 import {
   GameAreaComponent,
   LockStatus,
   NodeAllocatedStatus,
-  NodeData,
 } from './GameAreaComponent';
 
 export type NodeReactData = {
+  // 3-4 character description that goes on the main board
   shortText: React.ReactElement;
+  // 3-4 line description that gets displayed on hover
+  toolTipText: React.ReactElement;
+  // Extended description that shows up in sidebar
+  fullText: React.ReactElement;
   lockData?: {
     shortTextTarget: string;
     shortTextTimer: string;
     lockStatus: LockStatus;
   };
-  toolTipText: React.ReactElement;
   status: NodeAllocatedStatus;
   id: string;
 };
@@ -164,7 +158,7 @@ function Component(props: {
               <div>foo</div>
             </>
           ),
-          // toolTipText: `${nodeStatus.toString()}-x\n\n<br>\n\nfoo`,
+          fullText: <> </>,
           status: nodeStatus,
           lockData,
           id,

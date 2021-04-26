@@ -32,18 +32,6 @@ export enum LockStatus {
   OPEN = 'OPEN',
 }
 
-export type NodeData = {
-  shortText: string;
-  lockData?: {
-    shortTextTarget: string;
-    shortTextTimer: string;
-    lockStatus: LockStatus;
-  };
-  toolTipText: string;
-  status: NodeAllocatedStatus;
-  id: string;
-};
-
 type UpdateStatusCb = (args: {
   virtualDims: Vector2;
   newStatus: NodeAllocatedStatus;
