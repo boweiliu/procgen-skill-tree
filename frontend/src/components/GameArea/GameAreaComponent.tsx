@@ -393,6 +393,7 @@ function CellComponent({
             color: '#888888',
             cursor: 'pointer',
           }}
+          hidden={status === NodeAllocatedStatus.HIDDEN}
         >
           ?
         </div>
