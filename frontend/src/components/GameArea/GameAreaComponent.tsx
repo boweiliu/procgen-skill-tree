@@ -455,6 +455,24 @@ function CellComponent({
           </div>
         </div>
       ) : null}
+      <div style={{ height: 0, width: 0, position: 'relative' }}>
+        <div
+          className="hover-only-2"
+          style={{
+            position: 'absolute',
+          }}
+        >
+          <div
+            style={{
+              marginTop: '20px',
+              color: '#888888',
+              cursor: 'pointer',
+            }}
+          >
+            ?
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
