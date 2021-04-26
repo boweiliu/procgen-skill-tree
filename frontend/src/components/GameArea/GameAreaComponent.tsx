@@ -373,11 +373,37 @@ function CellComponent({
       style={hexBlockStyle}
     >
       <div
+        className="spacer"
+        style={{
+          width: '64px',
+          height: '64px',
+        }}
+      ></div>
+      <div
+        className="hover-only-2"
+        style={{
+          marginLeft: '-64px',
+          width: '64px',
+        }}
+      >
+        <div
+          style={{
+            marginLeft: '68px',
+            marginTop: '48px',
+            color: '#888888',
+            cursor: 'pointer',
+          }}
+        >
+          ?
+        </div>
+      </div>
+      <div
         id={`hex-center-${rowIdx}-${idx}`}
         onClick={onClick}
         className="hex-center"
         style={{
           ...hexCenterStyle,
+          marginLeft: '-64px',
           backgroundColor: fillColor,
           borderColor: borderColor,
         }}
@@ -436,24 +462,6 @@ function CellComponent({
           </div>
         </div>
       ) : null}
-      <div
-        className="hover-only-2"
-        style={{
-          marginLeft: '-64px',
-          width: '64px',
-        }}
-      >
-        <div
-          style={{
-            marginLeft: '68px',
-            marginTop: '48px',
-            color: '#888888',
-            cursor: 'pointer',
-          }}
-        >
-          ?
-        </div>
-      </div>
     </div>
   );
 }
