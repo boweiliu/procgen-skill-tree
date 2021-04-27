@@ -107,15 +107,6 @@
         "parameters": [],
         "random_rolls": [
           {
-            "variable_name": "value",
-            "distribution": "uniform",
-            "parameters": {
-              "min_inclusive": "10",
-              "max_inclusive": "20",
-              "increment": "2"
-            }
-          },
-          {
             "variable_name": "attribute",
             "distribution": "weighted",
             "parameters": {
@@ -142,9 +133,60 @@
                       "value": "base_*"
                     }
                   },
-                  "weight": 100
+                  "weight": 400
                 }
               ]
+            }
+          },
+          {
+            "variable_name": "value",
+            "distribution": "uniform",
+            "parameters": {
+              "min_inclusive": {
+                "array_access_op": {
+                  "index": 0,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "max_inclusive": {
+                "array_access_op": {
+                  "index": 1,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "increment": {
+                "array_access_op": {
+                  "index": 2,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         ],
