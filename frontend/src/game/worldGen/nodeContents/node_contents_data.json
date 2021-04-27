@@ -114,6 +114,38 @@
               "max_inclusive": "20",
               "increment": "2"
             }
+          },
+          {
+            "variable_name": "attribute",
+            "distribution": "weighted",
+            "parameters": {
+              "weights": [
+                {
+                  "metamapped": ["value"],
+                  "value": {
+                    "match": {
+                      "over": "attribute",
+                      "key": "name",
+                      "verb": "like",
+                      "value": "desirable_*"
+                    }
+                  },
+                  "weight": 100
+                },
+                {
+                  "metamapped": ["value"],
+                  "value": {
+                    "match": {
+                      "over": "attribute",
+                      "key": "name",
+                      "verb": "like",
+                      "value": "base_*"
+                    }
+                  },
+                  "weight": 100
+                }
+              ]
+            }
           }
         ],
         "generation": [
@@ -130,60 +162,44 @@
         ]
       }
     ],
-    "_generation": {
-      "primary_attribute": [
-        {
-          "attribute_name": "empty",
-          "weight_ratio_override": 0.5
-        },
-        {
-          "match": {
-            "verb": "like",
+    "lookup_tables": [
+      {
+        "name": "flat",
+        "comment": "",
+        "schema": [
+          {
             "key": "attribute_name",
-            "value": "base_*"
+            "value": "number[]"
+          }
+        ],
+        "data": [
+          {
+            "key": "desirable_0",
+            "value": [10, 20, 2]
           },
-          "weight": 100
-        },
-        {
-          "match": {
-            "verb": "is",
-            "key": "base_attribute",
-            "value": true
+          {
+            "key": "desirable_1",
+            "value": [10, 20, 2]
           },
-          "weight": 100
-        }
-      ],
-      "secondary_attribute": [
-        {
-          "attribute_name": "empty",
-          "weight_ratio_override": 0.1
-        },
-        {
-          "attribute_name": "desirable_0",
-          "weight": 100
-        },
-        {
-          "attribute_name": "desirable_1",
-          "weight": 100
-        },
-        {
-          "attribute_name": "desirable_2",
-          "weight": 100
-        },
-        {
-          "attribute_name": "base_0",
-          "weight": 100
-        },
-        {
-          "attribute_name": "base_1",
-          "weight": 100
-        },
-        {
-          "attribute_name": "base_2",
-          "weight": 100
-        }
-      ]
-    }
+          {
+            "key": "desirable_2",
+            "value": [10, 20, 2]
+          },
+          {
+            "metamapped": ["key"],
+            "key": {
+              "match": {
+                "over": "attribute",
+                "key": "name",
+                "verb": "like",
+                "value": "base_*"
+              }
+            },
+            "value": [10, 30, 2]
+          }
+        ]
+      }
+    ]
   },
   "meta": {
     "attributes": {
