@@ -1,40 +1,196 @@
 {
-  "attributes": [
-    {
-      "name": "desirable_0",
-      "display_name": "Attack",
-      "display_character": "A",
-      "end_goal_attribute": true
-    },
-    {
-      "name": "desirable_1",
-      "display_name": "Defense",
-      "display_character": "D",
-      "end_goal_attribute": true
-    },
-    {
-      "name": "desirable_2",
-      "display_name": "Magic",
-      "display_character": "M",
-      "end_goal_attribute": true
-    },
-    {
-      "name": "base_0",
-      "display_name": "Red",
-      "display_character": "R",
-      "base_attribute": true
-    },
-    {
-      "name": "base_1",
-      "display_name": "Green",
-      "display_character": "G",
-      "base_attribute": true
-    },
-    {
-      "name": "base_2",
-      "display_name": "Blue",
-      "display_character": "B",
-      "base_attribute": true
+  "data": {
+    "attributes": [
+      {
+        "name": "desirable_0",
+        "comment": "Calling these desirables for now - they're what the player will be trying to achieve",
+        "display_name": "Attack",
+        "display_character": "A",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "desirable_1",
+        "display_name": "Defense",
+        "display_character": "D",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "desirable_2",
+        "display_name": "Magic",
+        "display_character": "M",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "base_0",
+        "comment": "Base stats - player will use these to fuel more efficient desirable allocations",
+        "display_name": "Red",
+        "display_character": "R",
+        "base_attribute": true
+      },
+      {
+        "name": "base_1",
+        "display_name": "Green",
+        "display_character": "G",
+        "base_attribute": true
+      },
+      {
+        "name": "base_2",
+        "display_name": "Blue",
+        "display_character": "B",
+        "base_attribute": true
+      },
+      {
+        "name": "empty",
+        "display_name": "",
+        "display_character": "",
+        "empty": true
+      }
+    ],
+    "modifiers": [
+      {
+        "name": "flat_0",
+        "display_name": "flat"
+      },
+      {
+        "name": "increased_0",
+        "display_name": "% increased"
+      },
+      {
+        "name": "cost_0",
+        "display_name": "SPEND"
+      }
+    ],
+    "generation_groups": [
+      {
+        "name": "root",
+        "root": true,
+        "parameters": [],
+        "generation": [
+          {
+            "proportion": 0.5,
+            "recursive": true,
+            "generation_group_name": "empty",
+            "parameters": []
+          },
+          {
+            "weight": 100,
+            "recursive": true,
+            "generation_group_name": "single",
+            "parameters": []
+          },
+          {
+            "weight": 400,
+            "recursive": true,
+            "generation_group_name": "double",
+            "parameters": []
+          },
+          {
+            "weight": 400,
+            "recursive": true,
+            "generation_group_name": "costed",
+            "parameters": []
+          }
+        ]
+      },
+      {
+        "name": "empty",
+        "parameters": [],
+        "generation": [
+          {
+            "proportion": 1.0,
+            "node_contents": {}
+          }
+        ]
+      },
+      {
+        "name": "single",
+        "parameters": [],
+        "random_rolls": [
+          {
+            "variable_name": "value",
+            "distribution": "uniform",
+            "parameters": {
+              "min_inclusive": "10",
+              "max_inclusive": "20",
+              "increment": "2"
+            }
+          }
+        ],
+        "generation": [
+          {
+            "proportion": 1.0,
+            "node_contents": {
+              "attribute_name": "desirable_0",
+              "value": {
+                "variable_name": "value"
+              },
+              "modifier_name": "flat_0"
+            }
+          }
+        ]
+      }
+    ],
+    "_generation": {
+      "primary_attribute": [
+        {
+          "attribute_name": "empty",
+          "weight_ratio_override": 0.5
+        },
+        {
+          "match": {
+            "verb": "like",
+            "key": "attribute_name",
+            "value": "base_*"
+          },
+          "weight": 100
+        },
+        {
+          "match": {
+            "verb": "is",
+            "key": "base_attribute",
+            "value": true
+          },
+          "weight": 100
+        }
+      ],
+      "secondary_attribute": [
+        {
+          "attribute_name": "empty",
+          "weight_ratio_override": 0.1
+        },
+        {
+          "attribute_name": "desirable_0",
+          "weight": 100
+        },
+        {
+          "attribute_name": "desirable_1",
+          "weight": 100
+        },
+        {
+          "attribute_name": "desirable_2",
+          "weight": 100
+        },
+        {
+          "attribute_name": "base_0",
+          "weight": 100
+        },
+        {
+          "attribute_name": "base_1",
+          "weight": 100
+        },
+        {
+          "attribute_name": "base_2",
+          "weight": 100
+        }
+      ]
     }
-  ]
+  },
+  "meta": {
+    "attributes": {
+      "comment": "Types of stats that can be allocated"
+    },
+    "quantities": {
+      "comment": "Ways in which attributes can be modified"
+    }
+  }
 }
