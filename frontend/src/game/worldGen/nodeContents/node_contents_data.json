@@ -1,0 +1,40 @@
+{
+  "attributes": [
+    {
+      "name": "desirable_0",
+      "display_name": "Attack",
+      "display_character": "A",
+      "end_goal_attribute": true
+    },
+    {
+      "name": "desirable_1",
+      "display_name": "Defense",
+      "display_character": "D",
+      "end_goal_attribute": true
+    },
+    {
+      "name": "desirable_2",
+      "display_name": "Magic",
+      "display_character": "M",
+      "end_goal_attribute": true
+    },
+    {
+      "name": "base_0",
+      "display_name": "Red",
+      "display_character": "R",
+      "base_attribute": true
+    },
+    {
+      "name": "base_1",
+      "display_name": "Green",
+      "display_character": "G",
+      "base_attribute": true
+    },
+    {
+      "name": "base_2",
+      "display_name": "Blue",
+      "display_character": "B",
+      "base_attribute": true
+    }
+  ]
+}
