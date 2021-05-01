@@ -1,4 +1,6 @@
 import * as Pixi from 'pixi.js';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS from '../colors';
 
 export interface SimpleTextureSet {
@@ -13,15 +15,18 @@ export function generateSimpleTextures(
   let circle = new Pixi.Graphics();
   circle.beginFill(COLORS.white);
   circle.drawCircle(0, 0, 8);
+  // circle.pivot = PixiPointFrom(Vector2.Zero);
 
   let rect = new Pixi.Graphics();
   rect.beginFill(COLORS.white);
   // rect.drawRect(-6, -10, 12, 20);
-  rect.drawRect(-2, -10, 4, 20);
+  rect.drawRect(0, 0, 4, 20);
+  // rect.pivot = PixiPointFrom(Vector2.Zero);
 
   let square = new Pixi.Graphics();
   square.beginFill(COLORS.white);
-  square.drawRect(-8, -8, 16, 16);
+  square.drawRect(0, 0, 16, 16);
+  // square.pivot = PixiPointFrom(Vector2.Zero);
 
   return {
     circle: renderer.generateTexture(circle, Pixi.SCALE_MODES.LINEAR, 1),

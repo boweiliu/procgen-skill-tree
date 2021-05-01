@@ -116,11 +116,17 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.tint = COLORS.nodePink;
       }
 
+      // graphics.anchor = PixiPointFrom(Vector2.Zero);
+      // graphics.pivot = PixiPointFrom(Vector2.Zero);
       if (lockData) {
         graphics.texture = props.args.textures.rect;
+        graphics.position.x -= props.args.textures.rect.width / 2;
+        graphics.position.y -= props.args.textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
       } else {
         graphics.texture = props.args.textures.circle;
+        graphics.position.x -= props.args.textures.circle.width / 2;
+        graphics.position.y -= props.args.textures.circle.height / 2;
       }
     }
   }
