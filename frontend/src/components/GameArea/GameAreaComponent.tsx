@@ -385,19 +385,6 @@ function CellComponent({
         >
           <div className="tiny-text">{nodeData.shortText}</div>
         </div>
-        <div
-          className="hover-only"
-          style={{
-            borderStyle: 'solid',
-            marginTop: '-16px',
-            marginLeft: '48px',
-            minWidth: 'max-content',
-            padding: '3px',
-            background: 'rgba(255,255,255,0.3)',
-          }}
-        >
-          {children}
-        </div>
       </div>
       {isLocked ? (
         <div
@@ -440,6 +427,23 @@ function CellComponent({
           >
             ?
           </div>
+        </div>
+      </div>
+      <div style={{ height: 0, width: 0, position: 'relative' }}>
+        <div
+          className="hover-only"
+          style={{
+            borderStyle: 'solid',
+            width:  'max-content',
+            maxWidth: '224px',
+            padding: '3px',
+            background: 'rgba(255,255,255,0.3)',
+            position: 'absolute',
+            top: '16px',
+            left: '-13px',
+          }}
+        >
+          {children}
         </div>
       </div>
     </div>

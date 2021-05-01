@@ -3,7 +3,6 @@
   overflow-y: scroll;
   /* scrollbar-width: none;
   -ms-overflow-style: none; */
-  white-space: nowrap;
 }
 
 .game-area::-webkit-scrollbar {
@@ -36,7 +35,7 @@
   border-radius: 50%;
 }
 
-.hex-center:hover > .hover-only {
+.hex-center:hover ~ div .hover-only {
   display: block;
 }
 .hover-only {
