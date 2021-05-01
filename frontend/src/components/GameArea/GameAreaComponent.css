@@ -69,10 +69,14 @@
 }
 
 .tiny-text {
+  color: grey;
+  font-size: small; /* this invalidates the below comment, potentially */
+
   /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
   this fills it in symmetrically on the left and bottom.*/
+  /*
   padding-left: 2px;
-  padding-bottom: 2px;
+  padding-bottom: 2px; */
   max-width: 48px;
   overflow: hidden;
   cursor: default;

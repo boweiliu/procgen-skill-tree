@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
+import { AttributeSymbolMap } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -149,13 +150,46 @@ function Component(props: {
             : maybeStatus || NodeAllocatedStatus.HIDDEN;
         const id = location.hash();
         const lockData = gameState.worldGen.lockMap.get(location);
+        const nodeContents = gameState.worldGen.nodeContentsMap.get(location);
+        let shortText1 = '+';
+        if (nodeContents.lines[0]) {
+          // the origin node is empty
+          shortText1 += AttributeSymbolMap[nodeContents.lines[0].attribute];
+        } else {
+          shortText1 = '';
+        }
+        if (
+          nodeContents.lines[1] &&
+          nodeContents.lines[0].attribute !== nodeContents.lines[1].attribute
+        ) {
+          // add another symbol if it's a mixed node
+          shortText1 += AttributeSymbolMap[nodeContents.lines[1].attribute];
+        }
+        let shortText2 = '';
+        if (nodeContents.condition) {
+          shortText2 =
+            '-' + AttributeSymbolMap[nodeContents.condition.attribute];
+        }
+
         const nodeData: NodeReactData = {
-          shortText: <>{id}</>,
+          shortText: shortText2 ? (
+            <>
+              {shortText1}
+              <br />
+              {shortText2}
+            </>
+          ) : (
+            <>{shortText1}</>
+          ),
           toolTipText: (
             <>
               <div>{nodeStatus.toString()}</div>
               <br />
-              <div>foo</div>
+              {JSON.stringify(nodeContents.lines[0], undefined, 2)}
+              <br />
+              {JSON.stringify(nodeContents.lines[1], undefined, 2)}
+              <br />
+              {JSON.stringify(nodeContents.condition, undefined, 2)}
             </>
           ),
           fullText: <> </>,
@@ -174,6 +208,7 @@ function Component(props: {
     return map;
   }, [
     gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
     gameState.worldGen.lockMap,
     virtualGridDims,
     virtualDimsToLocation,

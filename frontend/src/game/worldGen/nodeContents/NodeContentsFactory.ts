@@ -27,6 +27,12 @@ export enum Attribute {
   BLUE = 'BLUE',
 }
 
+export const AttributeSymbolMap = {
+  [Attribute.RED]: '🔴',
+  [Attribute.GREEN]: '🟢',
+  [Attribute.BLUE]: '🔵',
+};
+
 export enum Modifier {
   FLAT = 'FLAT',
   INCREASED = 'INCREASED',
@@ -45,7 +51,7 @@ export class NodeContentsFactory {
         lines: [],
       };
     }
-    return {
+    const nodeContents: NodeContents = {
       lines: [
         {
           amount: 10,
@@ -54,15 +60,17 @@ export class NodeContentsFactory {
         },
         {
           amount: 2,
-          attribute: Attribute.RED,
+          attribute: Attribute.GREEN,
           modifier: Modifier.INCREASED,
         },
       ],
       condition: {
         type: 'SPEND',
         amount: 12,
-        attribute: Attribute.GREEN,
+        attribute: Attribute.BLUE,
       },
     };
+    // nodeContents.condition = undefined;
+    return nodeContents;
   }
 }
