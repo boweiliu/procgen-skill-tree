@@ -184,12 +184,9 @@ function Component(props: {
           toolTipText: (
             <>
               <div>{nodeStatus.toString()}</div>
-              <br />
-              {JSON.stringify(nodeContents.lines[0], undefined, 2)}
-              <br />
-              {JSON.stringify(nodeContents.lines[1], undefined, 2)}
-              <br />
-              {JSON.stringify(nodeContents.condition, undefined, 2)}
+              <div>{JSON.stringify(nodeContents.lines[0], undefined, 2)}</div>
+              <div>{JSON.stringify(nodeContents.lines[1], undefined, 2)}</div>
+              <div>{JSON.stringify(nodeContents.condition, undefined, 2)}</div>
             </>
           ),
           fullText: <> </>,
