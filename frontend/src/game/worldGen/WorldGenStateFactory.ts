@@ -279,8 +279,8 @@ export class LockFactory {
     const p = id / INTMAX32;
 
     let lockData: LockData = {
-      shortTextTarget: '1🟢',
-      shortTextTimer: '2⌛',
+      shortTextTarget: '🔒',
+      shortTextTimer: '',
       lockStatus: LockStatus.TICKING,
     };
     if (args.location.equals(Vector3.Zero)) {

@@ -66,12 +66,12 @@ export class NodeContentsFactory {
         squirrel3(args.seed + args.location.x + args.location.z)
     );
     let p = id / INTMAX32;
-    if (p < 0.6) {
+    if (p < 0.8) {
       // probability of empty node
       return {
         lines: [],
       };
-    } else if (p < 0.8) {
+    } else if (p < 0.9) {
       // no COST
       id = squirrel3(id);
       p = id / INTMAX32;

@@ -29,6 +29,7 @@ import {
   NodeContents,
   NodeContentsFactory,
 } from './worldGen/nodeContents/NodeContentsFactory';
+import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 
 export type GameStateConfig = any;
 
@@ -121,7 +122,7 @@ export class GameStateFactory {
      */
     // let prevMap = gameState.playerSave.allocationStatusMap;
     // first precompute the nearby lock states
-    getWithinDistance(Vector3.Zero, 3).forEach((n) => {
+    getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
       gameState.worldGen.lockMap.precompute(n);
     });
     // fill in lock statuses with computed statuses
@@ -168,14 +169,18 @@ export class GameStateFactory {
           return false;
         },
       };
-      // TODO(bowei): unhardcode
-      getWithinDistance(nodeLocation, 4, 0, validLocks).forEach((n) => {
+      getWithinDistance(
+        nodeLocation,
+        FOG_OF_WAR_DISTANCE,
+        0,
+        validLocks
+      ).forEach((n) => {
         if (
           (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
           NodeAllocatedStatus.HIDDEN
         ) {
           // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-          // prevGameState.worldGen.lockMap.precompute(n);
+          prevGameState.worldGen.lockMap.precompute(n);
           prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
         }
       });
