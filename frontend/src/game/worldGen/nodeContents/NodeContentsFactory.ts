@@ -40,6 +40,11 @@ export class NodeContentsFactory {
   }
 
   public create(args: { seed: number; location: Vector3 }): NodeContents {
+    if (args.location.equals(Vector3.Zero)) {
+      return {
+        lines: [],
+      };
+    }
     return {
       lines: [
         {
@@ -47,7 +52,17 @@ export class NodeContentsFactory {
           attribute: Attribute.RED,
           modifier: Modifier.FLAT,
         },
+        {
+          amount: 2,
+          attribute: Attribute.RED,
+          modifier: Modifier.INCREASED,
+        },
       ],
+      condition: {
+        type: 'SPEND',
+        amount: 12,
+        attribute: Attribute.GREEN,
+      },
     };
   }
 }

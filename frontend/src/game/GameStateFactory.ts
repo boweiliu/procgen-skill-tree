@@ -25,6 +25,10 @@ import {
   IReadonlySet,
 } from './lib/HexGrid';
 import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
+import {
+  NodeContents,
+  NodeContentsFactory,
+} from './worldGen/nodeContents/NodeContentsFactory';
 
 export type GameStateConfig = any;
 
@@ -65,6 +69,10 @@ export class GameStateFactory {
     const lockDataMap = new LazyHashMap<Vector3, LockData | undefined>((k) =>
       lockFactory.create({ seed: mySeed, location: k })
     );
+    const nodeContentsFactory = new NodeContentsFactory({});
+    const nodeContentsMap = new LazyHashMap<Vector3, NodeContents>((k) =>
+      nodeContentsFactory.create({ seed: mySeed, location: k })
+    );
 
     const gameState: GameState = {
       tick: 0,
@@ -73,6 +81,7 @@ export class GameStateFactory {
         // deprecated
         zLevels: { 0: zLevel },
         lockMap: lockDataMap,
+        nodeContentsMap,
       },
       playerSave: {
         // justAllocated: undefined,

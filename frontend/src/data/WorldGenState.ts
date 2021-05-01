@@ -1,3 +1,4 @@
+import { NodeContents } from '../game/worldGen/nodeContents/NodeContentsFactory';
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
@@ -14,6 +15,11 @@ export type WorldGenState = {
    * What sort of locks are generated. Does not store the live status of the locks.
    */
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
+
+  /**
+   * Data about each node.
+   */
+  nodeContentsMap: LazyHashMap<Vector3, NodeContents>;
 };
 
 export type ZLevelGen = {
