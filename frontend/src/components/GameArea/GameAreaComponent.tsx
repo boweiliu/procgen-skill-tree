@@ -411,40 +411,18 @@ function CellComponent({
           </div>
         </div>
       ) : null}
-      <div style={{ height: 0, width: 0, position: 'relative' }}>
+      <div className="empty-positioned">
         <div
           className="hover-only-2"
           style={{
             position: 'absolute',
           }}
         >
-          <div
-            style={{
-              marginTop: '-32px',
-              color: '#888888',
-              cursor: 'pointer',
-            }}
-          >
-            ?
-          </div>
+          <div className="question">?</div>
         </div>
       </div>
-      <div style={{ height: 0, width: 0, position: 'relative' }}>
-        <div
-          className="hover-only"
-          style={{
-            borderStyle: 'solid',
-            width:  'max-content',
-            maxWidth: '224px',
-            padding: '3px',
-            background: 'rgba(255,255,255,0.3)',
-            position: 'absolute',
-            top: '16px',
-            left: '-13px',
-          }}
-        >
-          {children}
-        </div>
+      <div className="empty-positioned">
+        <div className="hover-only node-tooltip">{children}</div>
       </div>
     </div>
   );
