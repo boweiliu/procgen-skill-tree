@@ -49,11 +49,11 @@ const WEIGHTS = {
   DECISION_0: {
     EMPTY: 800,
     NO_SPEND: 100,
-    SPEND: 100,
+    SPEND: 10,
   },
   DECISION_1: {
     SINGLE: 500,
-    DOUBLE: 500,
+    DOUBLE: 100,
   },
 };
 
@@ -78,11 +78,52 @@ function randomSwitch<T>(args: {
   throw Error();
 }
 
+function randomValue<T>(args: {
+  randInt: number;
+  weights: { [k in keyof T]: number };
+}): keyof T {
+  const { randInt, weights } = args;
+  const p = randInt / INTMAX32;
+  const weightTotal = (Object.values(weights) as number[]).reduce(
+    (pv, cv) => pv + cv
+  );
+  let unusedWeight = p * weightTotal;
+  for (const [key, weight] of Object.entries(weights) as [keyof T, number][]) {
+    if (unusedWeight <= weight) {
+      // use key
+      return key;
+    } else {
+      unusedWeight -= weight;
+    }
+  }
+  throw Error();
+}
+
 export class NodeContentsFactory {
   public config: NodeContentsFactoryConfig;
 
   constructor(config: NodeContentsFactoryConfig) {
     this.config = config;
+  }
+
+  private createSingle(args: { randInt: number }): NodeContentsLine {
+    const attribute = randomValue<typeof Attribute>({
+      randInt: args.randInt,
+      weights: {
+        [Attribute.RED]: 100,
+        [Attribute.GREEN]: 100,
+        [Attribute.BLUE]: 100,
+        [Attribute.DEL0]: 10,
+        [Attribute.DEL1]: 10,
+        [Attribute.DEL2]: 10,
+      },
+    });
+
+    return {
+      attribute: Attribute[attribute],
+      amount: 10,
+      modifier: Modifier.FLAT,
+    };
   }
 
   private createNoSpend(args: { randInt: number }): NodeContents {
@@ -92,28 +133,14 @@ export class NodeContentsFactory {
       behaviors: {
         SINGLE: (randInt) => {
           return {
-            lines: [
-              {
-                amount: 10,
-                attribute: Attribute.RED,
-                modifier: Modifier.FLAT,
-              },
-            ],
+            lines: [this.createSingle({ randInt })],
           };
         },
         DOUBLE: (randInt) => {
           return {
             lines: [
-              {
-                amount: 10,
-                attribute: Attribute.RED,
-                modifier: Modifier.FLAT,
-              },
-              {
-                amount: 2,
-                attribute: Attribute.BLUE,
-                modifier: Modifier.INCREASED,
-              },
+              this.createSingle({ randInt }),
+              this.createSingle({ randInt: squirrel3(randInt) }),
             ],
           };
         },
@@ -148,12 +175,25 @@ export class NodeContentsFactory {
         },
         SPEND: (randInt: number) => {
           const base = this.createNoSpend({ randInt });
+
+          const attribute = randomValue<typeof Attribute>({
+            randInt,
+            weights: {
+              [Attribute.RED]: 100,
+              [Attribute.GREEN]: 100,
+              [Attribute.BLUE]: 100,
+              [Attribute.DEL0]: 0,
+              [Attribute.DEL1]: 0,
+              [Attribute.DEL2]: 0,
+            },
+          });
+
           return {
             ...base,
             condition: {
               type: 'SPEND',
               amount: 12,
-              attribute: Attribute.GREEN,
+              attribute: Attribute[attribute],
             },
           };
         },
