@@ -45,6 +45,39 @@ export enum Modifier {
   INCREASED = 'INCREASED',
 }
 
+const WEIGHTS = {
+  DECISION_0: {
+    EMPTY: 800,
+    NO_SPEND: 100,
+    SPEND: 100,
+  },
+  DECISION_1: {
+    SINGLE: 500,
+    DOUBLE: 500,
+  },
+};
+
+function randomSwitch<T>(args: {
+  randInt: number;
+  weights: { [k: string]: number };
+  behaviors: { [k: string]: (randInt: number) => T };
+}): T {
+  const { randInt, weights, behaviors } = args;
+  const p = randInt / INTMAX32;
+  const newRandInt = squirrel3(randInt);
+  const weightTotal = Object.values(weights).reduce((pv, cv) => pv + cv);
+  let unusedWeight = p * weightTotal;
+  for (const [key, weight] of Object.entries(weights)) {
+    if (unusedWeight <= weight) {
+      // use key
+      return behaviors[key](newRandInt);
+    } else {
+      unusedWeight -= weight;
+    }
+  }
+  throw Error();
+}
+
 export class NodeContentsFactory {
   public config: NodeContentsFactoryConfig;
 
@@ -52,78 +85,79 @@ export class NodeContentsFactory {
     this.config = config;
   }
 
+  private createNoSpend(args: { randInt: number }): NodeContents {
+    return randomSwitch<NodeContents>({
+      randInt: args.randInt,
+      weights: WEIGHTS.DECISION_1,
+      behaviors: {
+        SINGLE: (randInt) => {
+          return {
+            lines: [
+              {
+                amount: 10,
+                attribute: Attribute.RED,
+                modifier: Modifier.FLAT,
+              },
+            ],
+          };
+        },
+        DOUBLE: (randInt) => {
+          return {
+            lines: [
+              {
+                amount: 10,
+                attribute: Attribute.RED,
+                modifier: Modifier.FLAT,
+              },
+              {
+                amount: 2,
+                attribute: Attribute.BLUE,
+                modifier: Modifier.INCREASED,
+              },
+            ],
+          };
+        },
+      },
+    });
+  }
+
   public create(args: { seed: number; location: Vector3 }): NodeContents {
-    if (args.location.equals(Vector3.Zero)) {
+    const { seed, location } = args;
+    if (location.equals(Vector3.Zero)) {
       return {
         lines: [],
       };
     }
 
-    let id = squirrel3(
-      args.seed +
-        args.location.x +
-        args.location.y +
-        squirrel3(args.seed + args.location.x + args.location.z)
-    );
-    let p = id / INTMAX32;
-    if (p < 0.8) {
-      // probability of empty node
-      return {
-        lines: [],
-      };
-    } else if (p < 0.9) {
-      // no COST
-      id = squirrel3(id);
-      p = id / INTMAX32;
-      if (p < 0.75) {
-        // probability of single
-        return {
-          lines: [
-            {
-              amount: 10,
-              attribute: Attribute.RED,
-              modifier: Modifier.FLAT,
-            },
-          ],
-        };
-      } else {
-        // probability of double
-        return {
-          lines: [
-            {
-              amount: 10,
-              attribute: Attribute.DEL0,
-              modifier: Modifier.FLAT,
-            },
-            {
-              amount: 2,
-              attribute: Attribute.GREEN,
-              modifier: Modifier.INCREASED,
-            },
-          ],
-        };
-      }
-    } else {
-      // COST{
-      return {
-        lines: [
-          {
-            amount: 10,
-            attribute: Attribute.BLUE,
-            modifier: Modifier.FLAT,
-          },
-          {
-            amount: 2,
-            attribute: Attribute.DEL2,
-            modifier: Modifier.INCREASED,
-          },
-        ],
-        condition: {
-          type: 'SPEND',
-          amount: 12,
-          attribute: Attribute.DEL1,
+    return randomSwitch<NodeContents>({
+      randInt: squirrel3(
+        seed +
+          location.x +
+          location.y +
+          squirrel3(seed + location.x + location.z)
+      ),
+      weights: WEIGHTS.DECISION_0,
+      behaviors: {
+        EMPTY: (randInt: number) => {
+          return {
+            lines: [],
+          };
         },
-      };
-    }
+        NO_SPEND: (randInt: number) => {
+          return this.createNoSpend({ randInt });
+        },
+        SPEND: (randInt: number) => {
+          const base = this.createNoSpend({ randInt });
+          return {
+            ...base,
+            condition: {
+              type: 'SPEND',
+              amount: 12,
+              attribute: Attribute.GREEN,
+            },
+          };
+        },
+      },
+    });
   }
 }
