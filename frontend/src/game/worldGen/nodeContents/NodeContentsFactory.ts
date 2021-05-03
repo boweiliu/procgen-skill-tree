@@ -29,18 +29,18 @@ export interface NodeContentsLine {
 }
 
 export enum Attribute {
-  RED = 'RED',
-  GREEN = 'GREEN',
-  BLUE = 'BLUE',
+  RED0 = 'RED0',
+  RED1 = 'RED1',
+  RED2 = 'RED2',
   DEL0 = 'DEL0',
   DEL1 = 'DEL1',
   DEL2 = 'DEL2',
 }
 
 export const AttributeSymbolMap = {
-  [Attribute.RED]: '🔴',
-  [Attribute.GREEN]: '🟢',
-  [Attribute.BLUE]: '🔵',
+  [Attribute.RED0]: '🔴',
+  [Attribute.RED1]: '🟢',
+  [Attribute.RED2]: '🔵',
   [Attribute.DEL0]: '⚔️',
   [Attribute.DEL1]: '🛡️',
   [Attribute.DEL2]: '✨',
@@ -74,9 +74,9 @@ export class NodeContentsFactory {
     const attribute = randomValue<typeof Attribute>({
       randInt: args.randInt,
       weights: {
-        [Attribute.RED]: 100,
-        [Attribute.GREEN]: 100,
-        [Attribute.BLUE]: 100,
+        [Attribute.RED0]: 100,
+        [Attribute.RED1]: 100,
+        [Attribute.RED2]: 100,
         [Attribute.DEL0]: 10,
         [Attribute.DEL1]: 10,
         [Attribute.DEL2]: 10,
@@ -168,9 +168,9 @@ export class NodeContentsFactory {
           const attribute = randomValue<typeof Attribute>({
             randInt,
             weights: {
-              [Attribute.RED]: 100,
-              [Attribute.GREEN]: 100,
-              [Attribute.BLUE]: 100,
+              [Attribute.RED0]: 100,
+              [Attribute.RED1]: 100,
+              [Attribute.RED2]: 100,
               [Attribute.DEL0]: 0,
               [Attribute.DEL1]: 0,
               [Attribute.DEL2]: 0,
