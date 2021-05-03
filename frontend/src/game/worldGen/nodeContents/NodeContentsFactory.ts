@@ -37,15 +37,6 @@ export enum Attribute {
   DEL2 = 'DEL2',
 }
 
-export const AttributeSymbolMap = {
-  [Attribute.RED0]: '🔴',
-  [Attribute.RED1]: '🟢',
-  [Attribute.RED2]: '🔵',
-  [Attribute.DEL0]: '⚔️',
-  [Attribute.DEL1]: '🛡️',
-  [Attribute.DEL2]: '✨',
-};
-
 export enum Modifier {
   FLAT = 'FLAT',
   INCREASED = 'INCREASED',

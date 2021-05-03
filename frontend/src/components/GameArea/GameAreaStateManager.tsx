@@ -1,7 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
-import { AttributeSymbolMap } from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import {
+  AttributeSymbolMap,
+  nodeContentsLineToString,
+  nodeContentsConditionToString,
+} from '../../game/worldGen/nodeContents/NodeContentsRendering';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -184,9 +188,19 @@ function Component(props: {
           toolTipText: (
             <>
               <div>{nodeStatus.toString()}</div>
-              <div>{JSON.stringify(nodeContents.lines[0], undefined, 2)}</div>
-              <div>{JSON.stringify(nodeContents.lines[1], undefined, 2)}</div>
-              <div>{JSON.stringify(nodeContents.condition, undefined, 2)}</div>
+              <br />
+              <div>
+                {nodeContents.lines[0] &&
+                  nodeContentsLineToString(nodeContents.lines[0])}
+              </div>
+              <div>
+                {nodeContents.lines[1] &&
+                  nodeContentsLineToString(nodeContents.lines[1])}
+              </div>
+              <div>
+                {nodeContents.condition &&
+                  nodeContentsConditionToString(nodeContents.condition)}
+              </div>
             </>
           ),
           fullText: <> </>,
