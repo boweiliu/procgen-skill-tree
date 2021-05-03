@@ -47,7 +47,7 @@ export enum Modifier {
 
 const WEIGHTS = {
   DECISION_0: {
-    EMPTY: 800,
+    EMPTY: 100,
     NO_SPEND: 100,
     SPEND: 10,
   },
@@ -57,7 +57,7 @@ const WEIGHTS = {
   },
 };
 
-function randomSwitch<T>(args: {
+export function randomSwitch<T>(args: {
   randInt: number;
   weights: { [k: string]: number };
   behaviors: { [k: string]: (randInt: number) => T };
@@ -78,7 +78,7 @@ function randomSwitch<T>(args: {
   throw Error();
 }
 
-function randomValue<T>(args: {
+export function randomValue<T>(args: {
   randInt: number;
   weights: { [k in keyof T]: number };
 }): keyof T {
@@ -97,6 +97,43 @@ function randomValue<T>(args: {
     }
   }
   throw Error();
+}
+
+export function randomUniform(args: {
+  randInt: number;
+  min: number;
+  max: number;
+  increment?: number;
+  inclusive?: boolean;
+}): number {
+  const { randInt, min, max, increment = 1, inclusive = true } = args;
+  const p = randInt / INTMAX32;
+  let numBuckets = Math.ceil((max - min) / increment);
+  if (min + increment * numBuckets === max && inclusive === true) {
+    numBuckets += 1;
+  }
+  const g = Math.floor(p * numBuckets);
+  return min + g * increment;
+}
+
+export function randomDice(args: {
+  randInt: number;
+  formula: string;
+  plus?: number;
+}): number {
+  const { randInt, formula, plus = 0 } = args;
+  const numDice = parseInt(formula.split('d')[0]);
+  const numPips = parseInt(formula.split('d')[1]);
+  let val = 0;
+  for (let i = 0; i < numDice; i++) {
+    val += randomUniform({
+      randInt: squirrel3(randInt + i),
+      min: 1,
+      max: numPips,
+      inclusive: true,
+    });
+  }
+  return val + plus;
 }
 
 export class NodeContentsFactory {
@@ -119,10 +156,35 @@ export class NodeContentsFactory {
       },
     });
 
+    const modifier = randomValue<typeof Modifier>({
+      randInt: squirrel3(args.randInt),
+      weights: {
+        [Modifier.FLAT]: 100,
+        [Modifier.INCREASED]: 75,
+      },
+    });
+
+    let amount = 0;
+    if (modifier === Modifier.FLAT) {
+      amount = randomDice({
+        randInt: squirrel3(args.randInt + 1),
+        formula: '2d6',
+        plus: 8,
+      });
+    } else {
+      amount = randomUniform({
+        randInt: squirrel3(args.randInt + 2),
+        min: 4,
+        max: 7,
+        increment: 0.5,
+        inclusive: true,
+      });
+    }
+
     return {
       attribute: Attribute[attribute],
-      amount: 10,
-      modifier: Modifier.FLAT,
+      amount,
+      modifier: Modifier[modifier],
     };
   }
 
