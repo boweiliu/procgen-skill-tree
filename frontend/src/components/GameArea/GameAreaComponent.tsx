@@ -8,7 +8,7 @@ import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaStateManager';
+// import { hexGridPx } from './GameAreaStateManager';
 
 export const GameAreaComponent = React.memo(GameArea);
 
@@ -35,6 +35,10 @@ type UpdateStatusCb = (args: {
 }) => void;
 
 const hexCenterRadius = 32;
+
+const hexGridPx = new Vector2(268, 232);
+const gridWidth = hexGridPx.x;
+const gridHeight = hexGridPx.y;
 
 function GameArea(props: {
   hidden: boolean;
@@ -64,9 +68,6 @@ function GameArea(props: {
     );
   }, [props.jumpOffset]);
 
-  const gridWidth = hexGridPx.x;
-  const gridHeight = hexGridPx.y;
-
   const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
   const hexHalfBlockStyle = {
     width: gridWidth / 2 + 'px',
@@ -90,7 +91,7 @@ function GameArea(props: {
     width: hexCenterRadius * 2 + 'px',
     height: hexCenterRadius + 'px',
     marginTop: hexCenterRadius + 'px',
-    backgroundColor: colorToCss(COLORS.nodePink),
+    // backgroundColor: colorToCss(COLORS.nodePink),
     // borderColor: colorToCss(COLORS.nodeBorder),
   };
 
@@ -308,6 +309,11 @@ function RowComponent({
   );
 }
 
+/**
+ * Renderes a single rectangular component of a hex grid.
+ * Contains a central node, hover-over tooltips attached to the node, and optionally 2 rectangular text boxes
+ * that represent the locked state.
+ */
 const Cell = React.memo(CellComponent);
 function CellComponent({
   idx,
@@ -320,6 +326,7 @@ function CellComponent({
   onClick,
   status,
   nodeData,
+  toolTipText,
 }: {
   idx: number;
   hexCenterLockBlockStyle: any;
@@ -332,6 +339,7 @@ function CellComponent({
   onClick: React.MouseEventHandler;
   status: NodeAllocatedStatus;
   nodeData: NodeReactData;
+  toolTipText: React.ReactNode;
 }) {
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
@@ -393,7 +401,11 @@ function CellComponent({
         >
           <div
             className="hex-center-lock-left"
-            style={{ ...leftLock, borderColor: lockBorderColor }}
+            style={{
+              ...leftLock,
+              backgroundColor: colorToCss(COLORS.nodePink),
+              borderColor: lockBorderColor,
+            }}
           >
             <div className="tiny-text">
               {nodeData.lockData?.shortTextTarget}
@@ -401,7 +413,11 @@ function CellComponent({
           </div>
           <div
             className="hex-center-lock-right"
-            style={{ ...rightLock, borderColor: lockBorderColor }}
+            style={{
+              ...rightLock,
+              backgroundColor: colorToCss(COLORS.nodePink),
+              borderColor: lockBorderColor,
+            }}
           >
             <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
           </div>
@@ -418,7 +434,7 @@ function CellComponent({
         </div>
       </div>
       <div className="empty-positioned">
-        <div className="hover-only node-tooltip">{children}</div>
+        <div className="hover-only node-tooltip">{toolTipText}</div>
       </div>
     </div>
   );
@@ -472,8 +488,7 @@ function NodeComponent({
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
       status={status}
       nodeData={nodeData}
-    >
-      {nodeData.toolTipText}
-    </Cell>
+      toolTipText={nodeData.toolTipText}
+    ></Cell>
   );
 }
