@@ -10,28 +10,15 @@ import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
+import {
+  computeVirtualNodeDataMap,
+  NodeReactData,
+} from './computeVirtualNodeDataMap';
 import {
   GameAreaComponent,
   LockStatus,
   NodeAllocatedStatus,
 } from './GameAreaComponent';
-
-export type NodeReactData = {
-  // 3-4 character description that goes on the main board
-  shortText: React.ReactElement;
-  // 3-4 line description that gets displayed on hover
-  toolTipText: React.ReactElement;
-  // Extended description that shows up in sidebar
-  fullText: React.ReactElement;
-  lockData?: {
-    shortTextTarget: string;
-    shortTextTimer: string;
-    lockStatus: LockStatus;
-  };
-  status: NodeAllocatedStatus;
-  id: string;
-};
 
 export const GameAreaStateManager = React.memo(Component);
 
@@ -124,18 +111,8 @@ function Component(props: {
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
-  // ,
-  //   [gameState.playerUI.virtualGridLocation, virtualGridDims]
-  // );
 
-  const locationToVirtualDims = useCallback(
-    (location: Vector3): Vector2 | undefined => {
-      return undefined;
-    },
-    [gameState.playerUI.virtualGridLocation, virtualGridDims]
-  );
-
-  const virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData> = useMemo(
+  const virtualGridStatusMap = useMemo(
     () =>
       computeVirtualNodeDataMap({
         allocationStatusMap: gameState.playerSave.allocationStatusMap,

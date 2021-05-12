@@ -7,7 +7,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { NodeReactData } from './GameAreaStateManager';
+import { NodeReactData } from './computeVirtualNodeDataMap';
 
 /**
  *

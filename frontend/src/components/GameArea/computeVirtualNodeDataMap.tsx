@@ -10,9 +10,28 @@ import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { LazyHashMap } from '../../lib/util/lazy';
-import { NodeAllocatedStatus } from './GameAreaComponent';
-import { NodeReactData } from './GameAreaStateManager';
+import { LockStatus, NodeAllocatedStatus } from './GameAreaComponent';
 
+export type NodeReactData = {
+  // 3-4 character description that goes on the main board
+  shortText: React.ReactElement;
+  // 3-4 line description that gets displayed on hover
+  toolTipText: React.ReactElement;
+  // Extended description that shows up in sidebar
+  fullText: React.ReactElement;
+  lockData?: {
+    shortTextTarget: string;
+    shortTextTimer: string;
+    lockStatus: LockStatus;
+  };
+  status: NodeAllocatedStatus;
+  id: string;
+};
+
+/**
+ * Computes a hash map of vector2 virtual hex grid coordinates to
+ * text & tooltip info about the node at those coordinates.
+ */
 export function computeVirtualNodeDataMap(args: {
   allocationStatusMap: KeyedHashMap<Vector3, NodeAllocatedStatus>;
   nodeContentsMap: LazyHashMap<Vector3, NodeContents>;
