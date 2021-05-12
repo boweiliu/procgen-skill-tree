@@ -188,7 +188,7 @@ function Component(props: {
           toolTipText: (
             <>
               <div>{nodeStatus.toString()}</div>
-              <br />
+              {nodeContents.lines[0] ? <br /> : <></>}
               <div>
                 {nodeContents.lines[0] &&
                   nodeContentsLineToString(nodeContents.lines[0])}
