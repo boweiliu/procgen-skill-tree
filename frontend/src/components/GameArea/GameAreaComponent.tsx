@@ -8,11 +8,8 @@ import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
+import { hexGridPx } from './GameAreaStateManager';
 
-/**
- *
- *
- */
 export const GameAreaComponent = React.memo(GameArea);
 
 export enum NodeAllocatedStatus {
@@ -36,6 +33,8 @@ type UpdateStatusCb = (args: {
   virtualDims: Vector2;
   newStatus: NodeAllocatedStatus;
 }) => void;
+
+const hexCenterRadius = 32;
 
 function GameArea(props: {
   hidden: boolean;
@@ -64,13 +63,10 @@ function GameArea(props: {
       ref.scrollTop - jumpOffset.y * gridHeight
     );
   }, [props.jumpOffset]);
-  // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
-  // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
-  // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
-  const gridWidth = 268;
-  const gridHeight = 232;
 
-  const hexCenterRadius = 32;
+  const gridWidth = hexGridPx.x;
+  const gridHeight = hexGridPx.y;
+
   const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
   const hexHalfBlockStyle = {
     width: gridWidth / 2 + 'px',
