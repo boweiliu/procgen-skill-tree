@@ -326,7 +326,6 @@ function CellComponent({
   onClick,
   status,
   nodeData,
-  toolTipText,
 }: {
   idx: number;
   hexCenterLockBlockStyle: any;
@@ -339,7 +338,6 @@ function CellComponent({
   onClick: React.MouseEventHandler;
   status: NodeAllocatedStatus;
   nodeData: NodeReactData;
-  toolTipText: React.ReactNode;
 }) {
   const leftLock = { ...hexCenterLockBlockStyle };
   const rightLock = { ...hexCenterLockBlockStyle };
@@ -376,6 +374,7 @@ function CellComponent({
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div
+          className="hex-center-text-wrapper"
           style={{
             display: 'flex',
             width: hexCenterStyle.width,
@@ -395,7 +394,6 @@ function CellComponent({
           id={`hex-lock-${rowIdx}-${idx}`}
           hidden={status === NodeAllocatedStatus.HIDDEN}
           style={{
-            // zIndex: 3,
             ...hexCenterLockStyle,
           }}
         >
@@ -434,7 +432,7 @@ function CellComponent({
         </div>
       </div>
       <div className="empty-positioned">
-        <div className="hover-only node-tooltip">{toolTipText}</div>
+        <div className="hover-only node-tooltip">{nodeData.toolTipText}</div>
       </div>
     </div>
   );
@@ -444,7 +442,6 @@ const Node = React.memo(NodeComponent);
 function NodeComponent({
   idx,
   rowIdx,
-  children,
   hexBlockStyle,
   hexCenterStyle,
   hexCenterLockStyle,
@@ -488,7 +485,6 @@ function NodeComponent({
       hexCenterLockBlockStyle={hexCenterLockBlockStyle}
       status={status}
       nodeData={nodeData}
-      toolTipText={nodeData.toolTipText}
     ></Cell>
   );
 }
