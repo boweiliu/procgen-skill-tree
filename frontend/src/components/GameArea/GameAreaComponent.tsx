@@ -416,12 +416,7 @@ function CellComponent({
         </div>
       ) : null}
       <div className="empty-positioned">
-        <div
-          className="hover-only-2"
-          style={{
-            position: 'absolute',
-          }}
-        >
+        <div className="hover-only absolute-positioned">
           <div className="question">?</div>
         </div>
       </div>
