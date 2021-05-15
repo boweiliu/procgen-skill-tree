@@ -98,8 +98,6 @@ function GameArea(props: {
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
-      // const scrollRoom = virtualAreaSize.subtract(props.appSize);
-      // const scrollMod = scrollRoom.divide(virtualGrids);
       // handle scroll
       let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
@@ -237,12 +235,6 @@ function GameArea(props: {
     >
       <div
         className="virtual-game-area"
-        style={
-          {
-            // width: virtualAreaSize.x,
-            // height: virtualAreaSize.y,
-          }
-        }
         onPointerOver={(e: React.PointerEvent) => {
           // console.log(e);
         }}
@@ -318,7 +310,6 @@ const Cell = React.memo(CellComponent);
 function CellComponent({
   idx,
   rowIdx,
-  children,
   hexBlockStyle,
   hexCenterStyle,
   hexCenterLockStyle,
@@ -331,7 +322,6 @@ function CellComponent({
   hexCenterLockBlockStyle: any;
 
   rowIdx: number;
-  children?: React.ReactNode;
   hexCenterStyle: any;
   hexCenterLockStyle: any;
   hexBlockStyle: any;
