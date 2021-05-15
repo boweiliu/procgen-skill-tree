@@ -376,14 +376,8 @@ function CellComponent({
         <div
           className="hex-center-text-wrapper"
           style={{
-            display: 'flex',
             width: hexCenterStyle.width,
             height: hexCenterStyle.height,
-            alignItems: 'center',
-            justifyContent: 'center',
-            // otherwise the border width screws up centering here
-            marginTop: '-2px',
-            marginLeft: '-2px',
           }}
         >
           <div className="tiny-text">{nodeData.shortText}</div>

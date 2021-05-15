@@ -34,6 +34,14 @@
   border-color: #444444;
   border-radius: 50%;
 }
+.hex-center-text-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* otherwise the border width screws up centering here */
+  margin-top: -2px;
+  margin-left: -2px;
+}
 .empty-positioned {
   height: 0;
   width: 0;
