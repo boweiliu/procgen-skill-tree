@@ -224,7 +224,7 @@ function GameArea(props: {
   return (
     <div
       ref={container}
-      className="game-area"
+      className="game-area hidden-scrollbars"
       hidden={props.hidden}
       style={{
         width: props.appSize.x,

@@ -1,3 +1,5 @@
+/* https://css-tricks.com/updating-a-css-variable-with-javascript/
+   https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
 :root {
   --border: 2px;
 }
@@ -5,12 +7,15 @@
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
-  /* scrollbar-width: none;
-  -ms-overflow-style: none; */
 }
 
-.game-area::-webkit-scrollbar {
-  /* display: none; */
+.hidden-scrollbars {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hidden-scrollbars::-webkit-scrollbar {
+  display: none;
 }
 /**
       // see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
