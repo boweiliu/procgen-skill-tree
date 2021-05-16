@@ -52,6 +52,7 @@
   margin-top: calc(-1 * var(--border));
   margin-left: calc(-1 * var(--border));
 }
+
 .empty-positioned {
   height: 0;
   width: 0;
@@ -110,7 +111,7 @@
 }
 
 .tiny-text {
-  color: grey;
+  color: #888888;
   font-size: small; /* this invalidates the below comment, potentially */
 
   /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
