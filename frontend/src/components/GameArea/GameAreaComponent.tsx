@@ -8,7 +8,7 @@ import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-// import { hexGridPx } from './GameAreaStateManager';
+import { hexGridPx } from './GameAreaStateManager';
 
 export const GameAreaComponent = React.memo(GameArea);
 
@@ -36,10 +36,7 @@ type UpdateStatusCb = (args: {
 
 const hexCenterRadius = 32;
 
-const hexGridPx = new Vector2(268, 232);
-const gridWidth = hexGridPx.x;
-const gridHeight = hexGridPx.y;
-
+// const hexGridPx = new Vector2(268, 232);
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
@@ -55,6 +52,9 @@ function GameArea(props: {
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
 }) {
+  const gridWidth = hexGridPx.x;
+  const gridHeight = hexGridPx.y;
+
   useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
