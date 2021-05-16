@@ -63,11 +63,11 @@
   border-style: solid;
   width: max-content;
   max-width: 224px;
-  padding: 3px;
+  padding: 4px;
   background: rgba(255, 255, 255, 0.3);
   position: absolute;
-  top: 16px;
-  left: -13px;
+  top: 20px;
+  left: -8px;
 }
 
 .hex-block:hover .hover-only-2 {
