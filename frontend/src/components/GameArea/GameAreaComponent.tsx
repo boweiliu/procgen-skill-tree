@@ -76,23 +76,16 @@ function GameArea(props: {
   const hexCenterStyle = {
     width: hexCenterRadius * 2 + 'px',
     height: hexCenterRadius * 2 + 'px',
-    // backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
   };
   const hexCenterLockStyle = {
     marginLeft: `-${hexCenterRadius * 2}px`,
     width: hexCenterRadius * 2 + 'px',
     height: hexCenterRadius * 5 + 'px',
-    // backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
   };
   const hexCenterLockBlockStyle = {
-    // width: hexCenterRadius - 12 + 'px',
     width: hexCenterRadius * 2 + 'px',
     height: hexCenterRadius + 'px',
     marginTop: hexCenterRadius + 'px',
-    // backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
   };
 
   const handleScroll = useCallback(

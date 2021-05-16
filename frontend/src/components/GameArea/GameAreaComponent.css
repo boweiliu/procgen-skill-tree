@@ -3,6 +3,13 @@
 :root {
   --border: 2px;
   --readable-white: #888888;
+  --app-size-width: none;
+  --app-size-height: none;
+  --background-black: none;
+  --deemphasized-black: none;
+  --active-purple: none;
+  --border-important-white: none;
+  --border-unimportant-black: none;
 }
 
 .game-area {
