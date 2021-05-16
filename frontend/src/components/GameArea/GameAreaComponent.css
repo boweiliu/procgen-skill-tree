@@ -2,6 +2,7 @@
    https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
 :root {
   --border: 2px;
+  --readable-white: #888888;
 }
 
 .game-area {
@@ -17,6 +18,7 @@
 .hidden-scrollbars::-webkit-scrollbar {
   display: none;
 }
+
 /**
       // see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
       // https://stackoverflow.com/questions/4192847/set-scroll-position
@@ -40,7 +42,6 @@
 .hex-center {
   border-style: solid;
   border-width: var(--border);
-  border-color: #444444;
   /* circle */
   border-radius: 50%;
 }
@@ -70,7 +71,8 @@
   width: max-content;
   max-width: 224px;
   padding: 4px;
-  background: rgba(255, 255, 255, 0.3);
+  /* background: rgba(255, 255, 255, 0.3); */
+  background: #666666;
   position: absolute;
   top: 20px;
   left: -8px;
@@ -88,14 +90,13 @@
 }
 .question {
   margin-top: -32px;
-  color: #888888;
+  color: var(--readable-white);
   cursor: pointer;
 }
 
 .hex-center-lock-left {
   border-style: solid;
   border-width: var(--border);
-  border-color: #444444;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,14 +105,13 @@
 .hex-center-lock-right {
   border-style: solid;
   border-width: var(--border);
-  border-color: #444444;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .tiny-text {
-  color: #888888;
+  color: var(--readable-white);
   font-size: small; /* this invalidates the below comment, potentially */
 
   /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
