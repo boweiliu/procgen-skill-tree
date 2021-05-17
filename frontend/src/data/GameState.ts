@@ -148,6 +148,11 @@ export type PlayerUIState = {
    * Determines where in the universe the user has scrolled to.
    */
   virtualGridLocation: Vector3;
+  /**
+   * Which, if any, node is highlighted with a selection cursor
+   */
+  cursoredNode: Vector3 | undefined;
+
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;

@@ -2,14 +2,9 @@ import './GameAreaCell.css';
 import './GameArea.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
+import React, { useCallback, useState } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import COLORS, { colorToCss } from '../../pixi/colors';
-import { IntentName, PlayerIntentState } from '../../data/GameState';
-import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaStateManager';
 import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaComponent';
 
 /**
@@ -43,20 +38,33 @@ function GameAreaCellComponent({
     },
     [onUpdateStatus, nodeData.status, idx, rowIdx]
   );
-  return <Cell onClick={handleClick} nodeData={nodeData}></Cell>;
+  return (
+    <Cell
+      onClickCenter={handleClick}
+      nodeData={nodeData}
+      onClickQuestionMark={() => {
+        console.log('question mark clicked');
+      }}
+    ></Cell>
+  );
 }
 
 /**
  * Renderes a single rectangular component of a hex grid.
  * Contains a central node, hover-over tooltips attached to the node, and optionally 2 rectangular text boxes
  * that represent the locked state.
+ *
+ * @param onClickCenter callback to fire when the node itself (as opposed to the region around it) is clicked.
+ * @param onClickQuestionMark callback to fire when the question mark tooltip icon is clicked.
  */
 const Cell = React.memo(CellComponent);
 function CellComponent({
-  onClick,
+  onClickCenter,
+  onClickQuestionMark,
   nodeData,
 }: {
-  onClick: React.MouseEventHandler;
+  onClickCenter: React.MouseEventHandler;
+  onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
 }) {
   let [selected, setSelected] = useState(false);
@@ -82,7 +90,7 @@ function CellComponent({
             ? 'border-unimportant'
             : 'border-important'
         )}
-        onClick={onClick}
+        onClick={onClickCenter}
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div className="hex-center-text-wrapper">
@@ -109,6 +117,7 @@ function CellComponent({
           <div
             className="question"
             hidden={status === NodeAllocatedStatus.HIDDEN}
+            onClick={onClickQuestionMark}
           >
             ?
           </div>
