@@ -27,6 +27,8 @@ import {
  */
 export const hexGridPx = new Vector2(268, 232);
 
+export const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
+
 /**
  * How much bigger the "virtual" (i.e. scrollable) game area is than the visible window.
  * Bigger == more elements rendered which are outside the viewport == worse performance,

@@ -8,7 +8,7 @@ import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaStateManager';
+import { hexGridPx, hexCenterRadius } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
 
 /**
@@ -30,8 +30,6 @@ export enum LockStatus {
   TICKING = 'TICKING',
   OPEN = 'OPEN',
 }
-
-const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
 
 export type UpdateStatusCb = (args: {
   virtualDims: Vector2;
