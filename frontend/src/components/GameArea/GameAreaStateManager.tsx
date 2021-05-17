@@ -96,6 +96,7 @@ function Component(props: {
       gameState.playerSave.allocationStatusMap,
       gameState.worldGen.nodeContentsMap,
       gameState.worldGen.lockMap,
+      gameState.computed.fogOfWarStatusMap,
       virtualGridDims,
       virtualDimsToLocation,
     ]
