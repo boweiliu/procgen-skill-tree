@@ -316,14 +316,10 @@ function RowComponent({
  */
 const Cell = React.memo(CellComponent);
 function CellComponent({
-  idx,
-  rowIdx,
   onClick,
   status,
   nodeData,
 }: {
-  idx: number;
-  rowIdx: number;
   onClick: React.MouseEventHandler;
   status: NodeAllocatedStatus;
   nodeData: NodeReactData;
@@ -343,9 +339,8 @@ function CellComponent({
     : borderColor;
 
   return (
-    <div id={`hex-block-${rowIdx}-${idx}`} className="hex-block">
+    <div className="hex-block">
       <div
-        id={`hex-center-${rowIdx}-${idx}`}
         onClick={onClick}
         className="hex-center"
         style={{
@@ -361,7 +356,6 @@ function CellComponent({
       {isLocked ? (
         <div
           className="hex-center-lock"
-          id={`hex-lock-${rowIdx}-${idx}`}
           hidden={status === NodeAllocatedStatus.HIDDEN}
         >
           <div
@@ -424,12 +418,6 @@ function NodeComponent({
     [onUpdateStatus, status, idx, rowIdx]
   );
   return (
-    <Cell
-      onClick={handleClick}
-      idx={idx}
-      rowIdx={rowIdx}
-      status={status}
-      nodeData={nodeData}
-    ></Cell>
+    <Cell onClick={handleClick} status={status} nodeData={nodeData}></Cell>
   );
 }
