@@ -56,6 +56,25 @@ function GameArea(props: {
   const gridHeight = hexGridPx.y;
 
   useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--grid-width',
+      ` ${hexGridPx.x}px`
+    );
+  }, [hexGridPx.x]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--grid-height',
+      ` ${hexGridPx.y}px`
+    );
+  }, [hexGridPx.y]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--hex-center-radius',
+      ` ${hexCenterRadius}px`
+    );
+  }, [hexCenterRadius]);
+
+  useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
     console.log({ receivedJumpOffset: jumpOffset }, +new Date());
@@ -287,9 +306,9 @@ function RowComponent({
 
   return (
     <div className="hex-block-row">
-      {odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {odd && <div className="hex-block hex-half-block" />}
       {children}
-      {!odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {!odd && <div className="hex-block hex-half-block" />}
     </div>
   );
 }
@@ -340,44 +359,30 @@ function CellComponent({
     : borderColor;
 
   return (
-    <div
-      id={`hex-block-${rowIdx}-${idx}`}
-      className="hex-block"
-      style={hexBlockStyle}
-    >
+    <div id={`hex-block-${rowIdx}-${idx}`} className="hex-block">
       <div
         id={`hex-center-${rowIdx}-${idx}`}
         onClick={onClick}
         className="hex-center"
         style={{
-          ...hexCenterStyle,
           backgroundColor: fillColor,
           borderColor: borderColor,
         }}
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
-        <div
-          className="hex-center-text-wrapper"
-          style={{
-            width: hexCenterStyle.width,
-            height: hexCenterStyle.height,
-          }}
-        >
+        <div className="hex-center-text-wrapper">
           <div className="tiny-text">{nodeData.shortText}</div>
         </div>
       </div>
       {isLocked ? (
         <div
+          className="hex-center-lock"
           id={`hex-lock-${rowIdx}-${idx}`}
           hidden={status === NodeAllocatedStatus.HIDDEN}
-          style={{
-            ...hexCenterLockStyle,
-          }}
         >
           <div
             className="hex-center-lock-left"
             style={{
-              ...leftLock,
               backgroundColor: colorToCss(COLORS.nodePink),
               borderColor: lockBorderColor,
             }}
@@ -389,7 +394,6 @@ function CellComponent({
           <div
             className="hex-center-lock-right"
             style={{
-              ...rightLock,
               backgroundColor: colorToCss(COLORS.nodePink),
               borderColor: lockBorderColor,
             }}
