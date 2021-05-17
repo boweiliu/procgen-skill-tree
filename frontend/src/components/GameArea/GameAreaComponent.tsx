@@ -93,6 +93,16 @@ function GameArea(props: {
       colorToCss(COLORS.borderWhite)
     );
   }, [COLORS]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--app-size-width',
+      ` ${props.appSize.x}px`
+    );
+    document.documentElement.style.setProperty(
+      '--app-size-height',
+      ` ${props.appSize.y}px`
+    );
+  }, [props.appSize]);
 
   useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
@@ -238,10 +248,6 @@ function GameArea(props: {
       ref={container}
       className="game-area hidden-scrollbars"
       hidden={props.hidden}
-      style={{
-        width: props.appSize.x,
-        height: props.appSize.y,
-      }}
       onScroll={handleScroll}
     >
       <div
@@ -338,11 +344,22 @@ function CellComponent({
     <div className="hex-block">
       <div
         onClick={onClick}
-        className="hex-center"
-        style={{
-          backgroundColor: fillColor,
-          borderColor: borderColor,
-        }}
+        className={classnames(
+          'hex-center',
+          status === NodeAllocatedStatus.TAKEN
+            ? 'node-allocated'
+            : 'node-unallocated',
+          status === NodeAllocatedStatus.TAKEN ||
+            status === NodeAllocatedStatus.UNREACHABLE
+            ? 'border-unimportant'
+            : 'border-important'
+        )}
+        style={
+          {
+            // backgroundColor: fillColor,
+            // borderColor: borderColor,
+          }
+        }
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div className="hex-center-text-wrapper">
