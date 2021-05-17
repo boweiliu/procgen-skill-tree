@@ -367,7 +367,6 @@ function CellComponent({
           <div
             className="hex-center-lock-left"
             style={{
-              backgroundColor: colorToCss(COLORS.nodePink),
               borderColor: lockBorderColor,
             }}
           >
@@ -378,7 +377,6 @@ function CellComponent({
           <div
             className="hex-center-lock-right"
             style={{
-              backgroundColor: colorToCss(COLORS.nodePink),
               borderColor: lockBorderColor,
             }}
           >

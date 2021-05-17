@@ -131,6 +131,7 @@
   margin-top: var(--hex-center-radius);
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
 }
 
 .hex-center-lock-right {
@@ -142,6 +143,7 @@
   margin-top: var(--hex-center-radius);
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
 }
 
 .tiny-text {
