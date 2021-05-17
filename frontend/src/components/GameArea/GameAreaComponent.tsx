@@ -87,26 +87,10 @@ function GameArea(props: {
     );
   }, [props.jumpOffset]);
 
-  const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
   const hexHalfBlockStyle = {
     width: gridWidth / 2 + 'px',
     height: gridHeight + 'px',
   };
-  const hexCenterStyle = {
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 2 + 'px',
-  };
-  const hexCenterLockStyle = {
-    marginLeft: `-${hexCenterRadius * 2}px`,
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 5 + 'px',
-  };
-  const hexCenterLockBlockStyle = {
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius + 'px',
-    marginTop: hexCenterRadius + 'px',
-  };
-
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
@@ -260,7 +244,6 @@ function GameArea(props: {
             <Row
               key={props.virtualDimsToLocation(new Vector2(0, y)).y.toString()}
               rowIdx={y}
-              hexHalfBlockStyle={hexHalfBlockStyle}
             >
               {Array(props.virtualGridDims.x)
                 .fill(0)
@@ -273,12 +256,8 @@ function GameArea(props: {
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
                       status={nodeData.status}
-                      hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
-                      hexCenterStyle={hexCenterStyle}
-                      hexCenterLockStyle={hexCenterLockStyle}
-                      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
                       onUpdateStatus={props.updateNodeStatusCb}
                     />
                   );
@@ -294,11 +273,9 @@ const Row = React.memo(RowComponent);
 
 function RowComponent({
   rowIdx,
-  hexHalfBlockStyle,
   children,
 }: {
   rowIdx: number;
-  hexHalfBlockStyle: any;
   children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
@@ -322,28 +299,16 @@ const Cell = React.memo(CellComponent);
 function CellComponent({
   idx,
   rowIdx,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
   onClick,
   status,
   nodeData,
 }: {
   idx: number;
-  hexCenterLockBlockStyle: any;
-
   rowIdx: number;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
   onClick: React.MouseEventHandler;
   status: NodeAllocatedStatus;
   nodeData: NodeReactData;
 }) {
-  const leftLock = { ...hexCenterLockBlockStyle };
-  const rightLock = { ...hexCenterLockBlockStyle };
-
   const isLocked = !!nodeData.lockData;
   const fillColor =
     status === NodeAllocatedStatus.TAKEN
@@ -418,24 +383,15 @@ const Node = React.memo(NodeComponent);
 function NodeComponent({
   idx,
   rowIdx,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
   status,
   onUpdateStatus,
   nodeData,
 }: {
   status: NodeAllocatedStatus;
   idx: number;
-  hexCenterLockBlockStyle: any;
   onUpdateStatus: UpdateStatusCb;
-
   rowIdx: number;
   children?: React.ReactNode;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
   nodeData: NodeReactData;
 }) {
   const handleClick = useCallback(
@@ -453,12 +409,8 @@ function NodeComponent({
   return (
     <Cell
       onClick={handleClick}
-      hexBlockStyle={hexBlockStyle}
       idx={idx}
       rowIdx={rowIdx}
-      hexCenterStyle={hexCenterStyle}
-      hexCenterLockStyle={hexCenterLockStyle}
-      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
       status={status}
       nodeData={nodeData}
     ></Cell>
