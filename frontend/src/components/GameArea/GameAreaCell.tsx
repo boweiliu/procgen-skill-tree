@@ -2,7 +2,7 @@ import './GameAreaCell.css';
 import './GameArea.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
@@ -31,7 +31,8 @@ function GameAreaCellComponent({
   nodeData: NodeReactData;
 }) {
   const handleClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
       e.preventDefault();
       console.log(`clicked`);
       console.log({ idx, rowIdx, status: nodeData.status });
@@ -58,11 +59,18 @@ function CellComponent({
   onClick: React.MouseEventHandler;
   nodeData: NodeReactData;
 }) {
+  let [selected, setSelected] = useState(false);
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
 
   return (
-    <div className="hex-block hex-full-block">
+    <div
+      className="hex-block hex-full-block"
+      onClick={() => {
+        console.log('hex block was clicked!');
+        setSelected(!selected);
+      }}
+    >
       <div
         className={classnames(
           'hex-center',
@@ -107,7 +115,15 @@ function CellComponent({
         </div>
       </div>
       <div className="empty-positioned">
-        <div className="hover-only node-tooltip">{nodeData.toolTipText}</div>
+        <div className="hover-only absolute-positioned node-tooltip">
+          {nodeData.toolTipText}
+        </div>
+      </div>
+      <div className="empty-positioned selection-cursor-wrapper">
+        <div
+          className="absolute-positioned selection-cursor"
+          hidden={!selected}
+        ></div>
       </div>
     </div>
   );
