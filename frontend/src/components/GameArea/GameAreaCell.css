@@ -76,6 +76,7 @@
 
 .question {
   margin-top: calc(-1 * var(--hex-center-radius));
+  margin-left: calc(0.125 * var(--hex-center-radius));
   color: var(--readable-white);
   cursor: pointer;
 }
