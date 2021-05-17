@@ -1,6 +1,6 @@
 import './GameAreaComponent.css';
+import './GameArea.css';
 
-import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';

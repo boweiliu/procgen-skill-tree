@@ -1,4 +1,5 @@
 import './GameAreaCell.css';
+import './GameArea.css';
 
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef } from 'react';
