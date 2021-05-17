@@ -21,11 +21,9 @@ export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
   idx,
   rowIdx,
-  status,
   onUpdateStatus,
   nodeData,
 }: {
-  status: NodeAllocatedStatus;
   idx: number;
   onUpdateStatus: UpdateStatusCb;
   rowIdx: number;
@@ -36,17 +34,15 @@ function GameAreaCellComponent({
     (e) => {
       e.preventDefault();
       console.log(`clicked`);
-      console.log({ idx, rowIdx, status });
+      console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
         virtualDims: new Vector2(idx, rowIdx),
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
-    [onUpdateStatus, status, idx, rowIdx]
+    [onUpdateStatus, nodeData.status, idx, rowIdx]
   );
-  return (
-    <Cell onClick={handleClick} status={status} nodeData={nodeData}></Cell>
-  );
+  return <Cell onClick={handleClick} nodeData={nodeData}></Cell>;
 }
 
 /**
@@ -57,13 +53,12 @@ function GameAreaCellComponent({
 const Cell = React.memo(CellComponent);
 function CellComponent({
   onClick,
-  status,
   nodeData,
 }: {
   onClick: React.MouseEventHandler;
-  status: NodeAllocatedStatus;
   nodeData: NodeReactData;
 }) {
+  const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
 
   return (

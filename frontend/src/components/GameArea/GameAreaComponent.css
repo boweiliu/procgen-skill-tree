@@ -38,14 +38,6 @@
       // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
 */
 
-.hex-block {
-  float: left;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* height: 100%; */
-}
-
 .hex-half-block {
   width: calc(0.5 * var(--grid-width));
   height: var(--grid-height);

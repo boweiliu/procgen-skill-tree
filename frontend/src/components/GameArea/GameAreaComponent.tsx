@@ -257,15 +257,7 @@ function GameArea(props: {
       hidden={props.hidden}
       onScroll={handleScroll}
     >
-      <div
-        className="virtual-game-area"
-        onPointerOver={(e: React.PointerEvent) => {
-          // console.log(e);
-        }}
-        onClick={(e: React.MouseEvent) => {
-          // console.log(e);
-        }}
-      >
+      <div className="virtual-game-area">
         {Array(props.virtualGridDims.y)
           .fill(0)
           .map((_, y) => (
@@ -283,7 +275,6 @@ function GameArea(props: {
                     <GameAreaCell
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
-                      status={nodeData.status}
                       idx={x}
                       rowIdx={y}
                       onUpdateStatus={props.updateNodeStatusCb}
