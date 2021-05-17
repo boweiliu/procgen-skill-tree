@@ -10,11 +10,17 @@
   --active-purple: none;
   --border-important-white: none;
   --border-unimportant-black: none;
+  --hex-center-radius: none;
+  --grid-width: none;
+  --grid-height: none;
 }
 
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
+  background-color: var(--background-black);
+  width: var(--app-size-width);
+  height: var(--app-size-height);
 }
 
 .hidden-scrollbars {
@@ -38,6 +44,13 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: var(--grid-width);
+  height: var(--grid-height);
+}
+
+.hex-half-block {
+  width: calc(0.5 * var(--grid-width));
+  height: var(--grid-height);
 }
 
 .hex-block-row {
@@ -51,7 +64,24 @@
   border-width: var(--border);
   /* circle */
   border-radius: 50%;
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
 }
+
+.node-allocated {
+  background-color: var(--deemphasized-black);
+}
+.node-unallocated {
+  background-color: var(--active-purple);
+}
+
+.border-unimportant {
+  border-color: var(--border-unimportant-black);
+}
+.border-important {
+  border-color: var(--border-important-white);
+}
+
 .hex-center-text-wrapper {
   display: flex;
   align-items: center;
@@ -59,6 +89,8 @@
   /* otherwise the border width screws up centering here */
   margin-top: calc(-1 * var(--border));
   margin-left: calc(-1 * var(--border));
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
 }
 
 .empty-positioned {
@@ -101,12 +133,23 @@
   cursor: pointer;
 }
 
+.hex-center-lock {
+  margin-left: calc(-2 * var(--hex-center-radius));
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(5 * var(--hex-center-radius));
+}
+
 .hex-center-lock-left {
   border-style: solid;
   border-width: var(--border);
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: var(--hex-center-radius);
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
 }
 
 .hex-center-lock-right {
@@ -115,6 +158,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: var(--hex-center-radius);
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
 }
 
 .tiny-text {

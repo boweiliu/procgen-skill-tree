@@ -56,6 +56,55 @@ function GameArea(props: {
   const gridHeight = hexGridPx.y;
 
   useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--grid-width',
+      ` ${hexGridPx.x}px`
+    );
+    document.documentElement.style.setProperty(
+      '--grid-height',
+      ` ${hexGridPx.y}px`
+    );
+  }, [hexGridPx]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--hex-center-radius',
+      ` ${hexCenterRadius}px`
+    );
+  }, [hexCenterRadius]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--background-black',
+      colorToCss(COLORS.backgroundBlue)
+    );
+    document.documentElement.style.setProperty(
+      '--deemphasized-black',
+      colorToCss(COLORS.grayBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--active-purple',
+      colorToCss(COLORS.nodePink)
+    );
+    document.documentElement.style.setProperty(
+      '--border-unimportant-black',
+      colorToCss(COLORS.borderBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--border-important-white',
+      colorToCss(COLORS.borderWhite)
+    );
+  }, [COLORS]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--app-size-width',
+      ` ${props.appSize.x}px`
+    );
+    document.documentElement.style.setProperty(
+      '--app-size-height',
+      ` ${props.appSize.y}px`
+    );
+  }, [props.appSize]);
+
+  useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
     console.log({ receivedJumpOffset: jumpOffset }, +new Date());
@@ -67,26 +116,6 @@ function GameArea(props: {
       ref.scrollTop - jumpOffset.y * gridHeight
     );
   }, [props.jumpOffset]);
-
-  const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
-  const hexHalfBlockStyle = {
-    width: gridWidth / 2 + 'px',
-    height: gridHeight + 'px',
-  };
-  const hexCenterStyle = {
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 2 + 'px',
-  };
-  const hexCenterLockStyle = {
-    marginLeft: `-${hexCenterRadius * 2}px`,
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 5 + 'px',
-  };
-  const hexCenterLockBlockStyle = {
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius + 'px',
-    marginTop: hexCenterRadius + 'px',
-  };
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
@@ -219,11 +248,6 @@ function GameArea(props: {
       ref={container}
       className="game-area hidden-scrollbars"
       hidden={props.hidden}
-      style={{
-        width: props.appSize.x,
-        height: props.appSize.y,
-        backgroundColor: colorToCss(COLORS.backgroundBlue),
-      }}
       onScroll={handleScroll}
     >
       <div
@@ -241,7 +265,6 @@ function GameArea(props: {
             <Row
               key={props.virtualDimsToLocation(new Vector2(0, y)).y.toString()}
               rowIdx={y}
-              hexHalfBlockStyle={hexHalfBlockStyle}
             >
               {Array(props.virtualGridDims.x)
                 .fill(0)
@@ -254,12 +277,8 @@ function GameArea(props: {
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
                       status={nodeData.status}
-                      hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
-                      hexCenterStyle={hexCenterStyle}
-                      hexCenterLockStyle={hexCenterLockStyle}
-                      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
                       onUpdateStatus={props.updateNodeStatusCb}
                     />
                   );
@@ -275,11 +294,9 @@ const Row = React.memo(RowComponent);
 
 function RowComponent({
   rowIdx,
-  hexHalfBlockStyle,
   children,
 }: {
   rowIdx: number;
-  hexHalfBlockStyle: any;
   children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
@@ -287,9 +304,9 @@ function RowComponent({
 
   return (
     <div className="hex-block-row">
-      {odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {odd && <div className="hex-block hex-half-block" />}
       {children}
-      {!odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {!odd && <div className="hex-block hex-half-block" />}
     </div>
   );
 }
@@ -301,30 +318,14 @@ function RowComponent({
  */
 const Cell = React.memo(CellComponent);
 function CellComponent({
-  idx,
-  rowIdx,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
   onClick,
   status,
   nodeData,
 }: {
-  idx: number;
-  hexCenterLockBlockStyle: any;
-
-  rowIdx: number;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
   onClick: React.MouseEventHandler;
   status: NodeAllocatedStatus;
   nodeData: NodeReactData;
 }) {
-  const leftLock = { ...hexCenterLockBlockStyle };
-  const rightLock = { ...hexCenterLockBlockStyle };
-
   const isLocked = !!nodeData.lockData;
   const fillColor =
     status === NodeAllocatedStatus.TAKEN
@@ -340,60 +341,36 @@ function CellComponent({
     : borderColor;
 
   return (
-    <div
-      id={`hex-block-${rowIdx}-${idx}`}
-      className="hex-block"
-      style={hexBlockStyle}
-    >
+    <div className="hex-block">
       <div
-        id={`hex-center-${rowIdx}-${idx}`}
         onClick={onClick}
-        className="hex-center"
-        style={{
-          ...hexCenterStyle,
-          backgroundColor: fillColor,
-          borderColor: borderColor,
-        }}
+        className={classnames(
+          'hex-center',
+          status === NodeAllocatedStatus.TAKEN
+            ? 'node-allocated'
+            : 'node-unallocated',
+          status === NodeAllocatedStatus.TAKEN ||
+            status === NodeAllocatedStatus.UNREACHABLE
+            ? 'border-unimportant'
+            : 'border-important'
+        )}
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
-        <div
-          className="hex-center-text-wrapper"
-          style={{
-            width: hexCenterStyle.width,
-            height: hexCenterStyle.height,
-          }}
-        >
+        <div className="hex-center-text-wrapper">
           <div className="tiny-text">{nodeData.shortText}</div>
         </div>
       </div>
       {isLocked ? (
         <div
-          id={`hex-lock-${rowIdx}-${idx}`}
+          className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
-          style={{
-            ...hexCenterLockStyle,
-          }}
         >
-          <div
-            className="hex-center-lock-left"
-            style={{
-              ...leftLock,
-              backgroundColor: colorToCss(COLORS.nodePink),
-              borderColor: lockBorderColor,
-            }}
-          >
+          <div className="hex-center-lock-left">
             <div className="tiny-text">
               {nodeData.lockData?.shortTextTarget}
             </div>
           </div>
-          <div
-            className="hex-center-lock-right"
-            style={{
-              ...rightLock,
-              backgroundColor: colorToCss(COLORS.nodePink),
-              borderColor: lockBorderColor,
-            }}
-          >
+          <div className="hex-center-lock-right">
             <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
           </div>
         </div>
@@ -414,24 +391,15 @@ const Node = React.memo(NodeComponent);
 function NodeComponent({
   idx,
   rowIdx,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
   status,
   onUpdateStatus,
   nodeData,
 }: {
   status: NodeAllocatedStatus;
   idx: number;
-  hexCenterLockBlockStyle: any;
   onUpdateStatus: UpdateStatusCb;
-
   rowIdx: number;
   children?: React.ReactNode;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
   nodeData: NodeReactData;
 }) {
   const handleClick = useCallback(
@@ -447,16 +415,6 @@ function NodeComponent({
     [onUpdateStatus, status, idx, rowIdx]
   );
   return (
-    <Cell
-      onClick={handleClick}
-      hexBlockStyle={hexBlockStyle}
-      idx={idx}
-      rowIdx={rowIdx}
-      hexCenterStyle={hexCenterStyle}
-      hexCenterLockStyle={hexCenterLockStyle}
-      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-      status={status}
-      nodeData={nodeData}
-    ></Cell>
+    <Cell onClick={handleClick} status={status} nodeData={nodeData}></Cell>
   );
 }
