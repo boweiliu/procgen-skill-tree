@@ -54,6 +54,9 @@
 .hex-center:hover ~ div .hover-only {
   display: block;
 }
+.hex-center-lock:hover ~ div .hover-only {
+  display: block;
+}
 
 /* used for clickable question mark tooltip */
 .hover-only-2 {
@@ -63,6 +66,9 @@
   display: block;
 }
 
+.node-tooltip-wrapper {
+  z-index: 15;
+}
 .node-tooltip {
   border-style: solid;
   width: max-content;
@@ -70,8 +76,8 @@
   padding: calc(2 * var(--border));
   background: var(--border-important-white);
   position: absolute;
-  top: calc(0.625 * var(--hex-center-radius));
-  left: calc(-0.25 * var(--hex-center-radius));
+  margin-left: calc(0 * var(--hex-center-radius));
+  margin-top: calc(0.5 * var(--hex-center-radius));
 }
 
 .question {

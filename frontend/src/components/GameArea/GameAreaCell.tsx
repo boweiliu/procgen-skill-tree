@@ -123,7 +123,7 @@ function CellComponent({
           </div>
         </div>
       </div>
-      <div className="empty-positioned">
+      <div className="empty-positioned node-tooltip-wrapper">
         <div className="hover-only absolute-positioned node-tooltip">
           {nodeData.toolTipText}
         </div>
