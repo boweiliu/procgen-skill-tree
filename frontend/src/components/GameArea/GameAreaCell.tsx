@@ -64,7 +64,6 @@ function CellComponent({
   return (
     <div className="hex-block hex-full-block">
       <div
-        onClick={onClick}
         className={classnames(
           'hex-center',
           status === NodeAllocatedStatus.TAKEN
@@ -75,6 +74,7 @@ function CellComponent({
             ? 'border-unimportant'
             : 'border-important'
         )}
+        onClick={onClick}
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div className="hex-center-text-wrapper">
@@ -97,8 +97,13 @@ function CellComponent({
         </div>
       ) : null}
       <div className="empty-positioned">
-        <div className="hover-only absolute-positioned">
-          <div className="question">?</div>
+        <div className="hover-only-2 absolute-positioned">
+          <div
+            className="question"
+            hidden={status === NodeAllocatedStatus.HIDDEN}
+          >
+            ?
+          </div>
         </div>
       </div>
       <div className="empty-positioned">

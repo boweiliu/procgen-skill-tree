@@ -42,13 +42,26 @@
   width: 0;
   position: relative;
 }
-
-.hex-center:hover ~ div .hover-only {
-  display: block;
+.absolute-positioned {
+  position: absolute;
 }
+
+/* used for node center tooltip */
 .hover-only {
   display: none;
 }
+.hex-center:hover ~ div .hover-only {
+  display: block;
+}
+
+/* used for clickable question mark tooltip */
+.hover-only-2 {
+  display: none;
+}
+.hex-block:hover .hover-only-2 {
+  display: block;
+}
+
 .node-tooltip {
   border-style: solid;
   width: max-content;
@@ -60,16 +73,6 @@
   left: calc(-0.25 * var(--hex-center-radius));
 }
 
-.hex-block:hover .hover-only-2 {
-  display: block;
-}
-.hover-only-2 {
-  display: none;
-  position: absolute;
-}
-.absolute-positioned {
-  position: absolute;
-}
 .question {
   margin-top: calc(-1 * var(--hex-center-radius));
   color: var(--readable-white);
