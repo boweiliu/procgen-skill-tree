@@ -136,14 +136,14 @@
 }
 
 .selection-cursor {
-  margin-left: -120px;
-  margin-top: -48px;
-  width: 16px;
-  height: 96px;
+  margin-left: calc(-2.375 * var(--hex-center-radius));
+  margin-top: calc(-1 * var(--hex-center-radius));
+  width: calc(0.25 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
   border-color: var(--border-important-white);
   border-style: solid;
   border-right-style: none;
-  border-width: 4px;
+  border-width: calc(2 * var(--border));
   animation: blinker 1.5s ease-in infinite;
 }
 
