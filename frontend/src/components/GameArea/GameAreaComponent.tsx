@@ -10,8 +10,9 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { hexGridPx } from './GameAreaStateManager';
 
-export const GameAreaComponent = React.memo(GameArea);
-
+/**
+ * TODO(bowei): move these enums out of here into game state
+ */
 export enum NodeAllocatedStatus {
   // DEPRECATED
   TAKEN = 'TAKEN',
@@ -29,14 +30,14 @@ export enum LockStatus {
   OPEN = 'OPEN',
 }
 
+const hexCenterRadius = 32;
+
 type UpdateStatusCb = (args: {
   virtualDims: Vector2;
   newStatus: NodeAllocatedStatus;
 }) => void;
 
-const hexCenterRadius = 32;
-
-// const hexGridPx = new Vector2(268, 232);
+export const GameAreaComponent = React.memo(GameArea);
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
@@ -52,9 +53,12 @@ function GameArea(props: {
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
 }) {
+  const container = useRef<HTMLDivElement>(null);
+  const previousContainer = useRef<HTMLDivElement>(null) as any;
   const gridWidth = hexGridPx.x;
   const gridHeight = hexGridPx.y;
 
+  // Set css variables from react
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--grid-width',
@@ -104,8 +108,9 @@ function GameArea(props: {
     );
   }, [props.appSize]);
 
+  // Receives a Vector2 instance jumpOffset,
+  // and uses offset to jump to a new scroll position
   useEffect(() => {
-    // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
     const jumpOffset = props.jumpOffset;
     console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
@@ -117,6 +122,9 @@ function GameArea(props: {
     );
   }, [props.jumpOffset]);
 
+  /**
+   * Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
+   */
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
@@ -165,10 +173,8 @@ function GameArea(props: {
     [props.appSize.x, props.appSize.y]
   );
 
-  const container = useRef<HTMLDivElement>(null);
-  const previousContainer = useRef<HTMLDivElement>(null) as any;
+  // Set initial position in the center, exactly once!
   useEffect(() => {
-    // Set initial position in the center
     if (
       container.current != null &&
       container.current !== previousContainer.current
@@ -327,18 +333,6 @@ function CellComponent({
   nodeData: NodeReactData;
 }) {
   const isLocked = !!nodeData.lockData;
-  const fillColor =
-    status === NodeAllocatedStatus.TAKEN
-      ? colorToCss(COLORS.grayBlack)
-      : colorToCss(COLORS.nodePink);
-  const borderColor =
-    status === NodeAllocatedStatus.TAKEN ||
-    status === NodeAllocatedStatus.UNREACHABLE
-      ? colorToCss(COLORS.borderBlack)
-      : colorToCss(COLORS.borderWhite);
-  const lockBorderColor = isLocked
-    ? colorToCss(COLORS.borderBlack)
-    : borderColor;
 
   return (
     <div className="hex-block">
@@ -387,6 +381,11 @@ function CellComponent({
   );
 }
 
+/**
+ * Smart wrapper for the Cell (rectangular component of a hex grid).
+ *
+ * Handles sending the click event upstream to cause a status update.
+ */
 const Node = React.memo(NodeComponent);
 function NodeComponent({
   idx,
