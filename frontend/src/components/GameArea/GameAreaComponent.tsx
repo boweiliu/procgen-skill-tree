@@ -60,19 +60,39 @@ function GameArea(props: {
       '--grid-width',
       ` ${hexGridPx.x}px`
     );
-  }, [hexGridPx.x]);
-  useEffect(() => {
     document.documentElement.style.setProperty(
       '--grid-height',
       ` ${hexGridPx.y}px`
     );
-  }, [hexGridPx.y]);
+  }, [hexGridPx]);
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--hex-center-radius',
       ` ${hexCenterRadius}px`
     );
   }, [hexCenterRadius]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--background-black',
+      colorToCss(COLORS.backgroundBlue)
+    );
+    document.documentElement.style.setProperty(
+      '--deemphasized-black',
+      colorToCss(COLORS.grayBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--active-purple',
+      colorToCss(COLORS.nodePink)
+    );
+    document.documentElement.style.setProperty(
+      '--border-unimportant-black',
+      colorToCss(COLORS.borderBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--border-important-white',
+      colorToCss(COLORS.borderWhite)
+    );
+  }, [COLORS]);
 
   useEffect(() => {
     // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
@@ -225,7 +245,6 @@ function GameArea(props: {
       style={{
         width: props.appSize.x,
         height: props.appSize.y,
-        backgroundColor: colorToCss(COLORS.backgroundBlue),
       }}
       onScroll={handleScroll}
     >

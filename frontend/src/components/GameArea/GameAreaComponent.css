@@ -18,6 +18,7 @@
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
+  background-color: var(--background-black);
 }
 
 .hidden-scrollbars {
