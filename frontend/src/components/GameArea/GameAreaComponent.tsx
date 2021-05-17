@@ -107,10 +107,6 @@ function GameArea(props: {
     );
   }, [props.jumpOffset]);
 
-  const hexHalfBlockStyle = {
-    width: gridWidth / 2 + 'px',
-    height: gridHeight + 'px',
-  };
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
