@@ -11,6 +11,10 @@ import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaComponent';
  * Smart wrapper for the Cell (rectangular component of a hex grid).
  *
  * Handles sending the click event upstream to cause a status update.
+ * @param idx x-coord of this cell in its row of hex cells
+ * @param rowIdx y-coord of this row of hex cells
+ * @param onUpdateStatus callback for updating the status of this cell
+ * @param nodeData react fragments to help render this cell
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
@@ -22,15 +26,14 @@ function GameAreaCellComponent({
   idx: number;
   onUpdateStatus: UpdateStatusCb;
   rowIdx: number;
-  children?: React.ReactNode;
   nodeData: NodeReactData;
 }) {
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
-      console.log(`clicked`);
-      console.log({ idx, rowIdx, status: nodeData.status });
+      // console.log(`clicked`);
+      // console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
         virtualDims: new Vector2(idx, rowIdx),
         newStatus: NodeAllocatedStatus.TAKEN,
@@ -38,13 +41,17 @@ function GameAreaCellComponent({
     },
     [onUpdateStatus, nodeData.status, idx, rowIdx]
   );
+
+  const handleClickQuestionMark = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  }, []);
+
   return (
     <Cell
       onClickCenter={handleClick}
       nodeData={nodeData}
-      onClickQuestionMark={() => {
-        console.log('question mark clicked');
-      }}
+      onClickQuestionMark={handleClickQuestionMark}
     ></Cell>
   );
 }
