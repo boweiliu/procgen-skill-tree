@@ -61,9 +61,6 @@ function App() {
     ];
   }, [gameState, updaters, fireBatch]);
 
-  // const gameAreaStateManager: any | null = null;
-  // gameAreaStateManager?.makeProps({ gameState, appSize });
-
   useEffect(() => {
     console.log('maybe toggling strategic view');
     if (gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW) {
