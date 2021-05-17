@@ -15,6 +15,10 @@ export interface AllocateNodeInput {
 // TODO(bowei): unhardcode
 export const FOG_OF_WAR_DISTANCE = 6;
 
+/**
+ * Stateless action wrapper over updaters.
+ * Represents the action of allocating a node.
+ */
 export class AllocateNodeAction {
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 

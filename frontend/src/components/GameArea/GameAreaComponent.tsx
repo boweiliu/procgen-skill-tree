@@ -31,7 +31,7 @@ export enum LockStatus {
   OPEN = 'OPEN',
 }
 
-const hexCenterRadius = 32;
+const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
 
 export type UpdateStatusCb = (args: {
   virtualDims: Vector2;

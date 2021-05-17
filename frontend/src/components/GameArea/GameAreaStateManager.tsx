@@ -20,8 +20,6 @@ import {
   NodeAllocatedStatus,
 } from './GameAreaComponent';
 
-export const GameAreaStateManager = React.memo(Component);
-
 /**
  * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
  * 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
@@ -37,6 +35,7 @@ export const hexGridPx = new Vector2(268, 232);
  */
 export const virtualAreaScaleMultiplier = 3.0;
 
+export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
@@ -53,7 +52,9 @@ function Component(props: {
       )
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
+
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
+
   const virtualGridDims = useMemo(() => {
     return new Vector2(
       // needs to be at least 3.8 x 4.8 so we have room for jumps
@@ -67,14 +68,13 @@ function Component(props: {
       )
     );
   }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
-  // useEffect(() => console.log({ virtualGridDims }), [virtualGridDims]);
 
   const virtualDimsToLocation = useCallback(
     (virtualDims: Vector2): Vector3 => {
       const virtualCenter = virtualGridDims.divide(2).floor();
       const offsetFromVirtualCenter = virtualDims.subtract(virtualCenter);
       let relativeLocation = new Vector2(0, 0);
-      // TODO(bowei):
+
       if (offsetFromVirtualCenter.y % 2 === 0) {
         // calculate the effect of y
         relativeLocation = new Vector2(-1, -2).multiply(

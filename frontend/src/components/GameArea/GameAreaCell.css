@@ -52,13 +52,12 @@
 .node-tooltip {
   border-style: solid;
   width: max-content;
-  max-width: 224px;
-  padding: 4px;
-  /* background: rgba(255, 255, 255, 0.3); */
-  background: #666666;
+  max-width: calc(var(--grid-width) - 2 * var(--hex-center-radius));
+  padding: calc(2 * var(--border));
+  background: var(--border-important-white);
   position: absolute;
-  top: 20px;
-  left: -8px;
+  top: calc(0.625 * var(--hex-center-radius));
+  left: calc(-0.25 * var(--hex-center-radius));
 }
 
 .hex-block:hover .hover-only-2 {
@@ -72,7 +71,7 @@
   position: absolute;
 }
 .question {
-  margin-top: -32px;
+  margin-top: calc(-1 * var(--hex-center-radius));
   color: var(--readable-white);
   cursor: pointer;
 }
@@ -118,7 +117,9 @@
   /*
   padding-left: 2px;
   padding-bottom: 2px; */
-  max-width: 48px;
+  max-width: calc(
+    1.5 * var(--hex-center-radius)
+  ); /* circle is diameter 2R, so leave 25% margins */
   overflow: hidden;
   cursor: default;
 }

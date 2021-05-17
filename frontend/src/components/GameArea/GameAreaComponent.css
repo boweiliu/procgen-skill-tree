@@ -23,6 +23,12 @@
   height: var(--app-size-height);
 }
 
+/**
+ * see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
+ * https://stackoverflow.com/questions/4192847/set-scroll-position
+ * https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
+*/
+
 .hidden-scrollbars {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -31,12 +37,6 @@
 .hidden-scrollbars::-webkit-scrollbar {
   display: none;
 }
-
-/**
-      // see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
-      // https://stackoverflow.com/questions/4192847/set-scroll-position
-      // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
-*/
 
 .hex-half-block {
   width: calc(0.5 * var(--grid-width));

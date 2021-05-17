@@ -89,12 +89,7 @@ function App() {
           gameState={gameState}
           updaters={updaters}
           actions={{ allocateNode: new AllocateNodeAction(updaters) }}
-        >
-          {/*<GameAreaComponent
-            hidden={!gameState.playerUI.isPixiHidden}
-            appSize={appSize}
-          />*/}
-        </GameAreaStateManager>
+        ></GameAreaStateManager>
       </div>
 
       <div className="debug-overlay">
