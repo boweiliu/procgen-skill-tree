@@ -15,6 +15,7 @@ import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaComponent';
  * @param rowIdx y-coord of this row of hex cells
  * @param onUpdateStatus callback for updating the status of this cell
  * @param nodeData react fragments to help render this cell
+ * @param isCursored whether or not to display a flashing cursor for this cell
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
@@ -22,11 +23,15 @@ function GameAreaCellComponent({
   rowIdx,
   onUpdateStatus,
   nodeData,
+  isCursored,
+  setCursored,
 }: {
   idx: number;
   onUpdateStatus: UpdateStatusCb;
   rowIdx: number;
   nodeData: NodeReactData;
+  isCursored: boolean;
+  setCursored: (b: boolean) => void;
 }) {
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -45,6 +50,7 @@ function GameAreaCellComponent({
   const handleClickQuestionMark = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    setCursored(!isCursored);
   }, []);
 
   return (
@@ -52,6 +58,7 @@ function GameAreaCellComponent({
       onClickCenter={handleClick}
       nodeData={nodeData}
       onClickQuestionMark={handleClickQuestionMark}
+      isCursored={isCursored}
     ></Cell>
   );
 }
@@ -69,23 +76,18 @@ function CellComponent({
   onClickCenter,
   onClickQuestionMark,
   nodeData,
+  isCursored,
 }: {
   onClickCenter: React.MouseEventHandler;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
+  isCursored: boolean;
 }) {
-  let [selected, setSelected] = useState(false);
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
 
   return (
-    <div
-      className="hex-block hex-full-block"
-      onClick={() => {
-        console.log('hex block was clicked!');
-        setSelected(!selected);
-      }}
-    >
+    <div className="hex-block hex-full-block">
       <div
         className={classnames(
           'hex-center',
@@ -138,7 +140,7 @@ function CellComponent({
       <div className="empty-positioned selection-cursor-wrapper">
         <div
           className="absolute-positioned selection-cursor"
-          hidden={!selected}
+          hidden={!isCursored}
         ></div>
       </div>
     </div>

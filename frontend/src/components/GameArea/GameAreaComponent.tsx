@@ -50,8 +50,8 @@ export const GameAreaComponent = React.memo(GameArea);
  * @param virtualGridStatusMap table of ui grid location to object containing react fragments for contents of that node
  * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change.
  * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
- * @param cursoredNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
- * @param setCursoredNode callback which takes virtual 2d coords and causes that node to now be cursored.
+ * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
+ * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
  */
 function GameArea(props: {
   hidden: boolean;
@@ -67,6 +67,8 @@ function GameArea(props: {
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
+  cursoredVirtualNode: Vector2 | undefined;
+  setCursoredVirtualNode: (v: Vector2 | undefined) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
@@ -282,8 +284,9 @@ function GameArea(props: {
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, x) => {
+                  const virtualCoords = new Vector2(x, y);
                   const nodeData = props.virtualGridStatusMap.get(
-                    new Vector2(x, y)
+                    virtualCoords
                   )!;
                   return (
                     <GameAreaCell
@@ -292,6 +295,15 @@ function GameArea(props: {
                       idx={x}
                       rowIdx={y}
                       onUpdateStatus={props.updateNodeStatusCb}
+                      isCursored={
+                        !!props.cursoredVirtualNode &&
+                        props.cursoredVirtualNode.equals(virtualCoords)
+                      }
+                      setCursored={(nowIsCursored: boolean) => {
+                        props.setCursoredVirtualNode(
+                          nowIsCursored ? virtualCoords : undefined
+                        );
+                      }}
                     />
                   );
                 })}
