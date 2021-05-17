@@ -354,12 +354,6 @@ function CellComponent({
             ? 'border-unimportant'
             : 'border-important'
         )}
-        style={
-          {
-            // backgroundColor: fillColor,
-            // borderColor: borderColor,
-          }
-        }
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div className="hex-center-text-wrapper">
@@ -371,22 +365,12 @@ function CellComponent({
           className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
         >
-          <div
-            className="hex-center-lock-left"
-            style={{
-              borderColor: lockBorderColor,
-            }}
-          >
+          <div className="hex-center-lock-left">
             <div className="tiny-text">
               {nodeData.lockData?.shortTextTarget}
             </div>
           </div>
-          <div
-            className="hex-center-lock-right"
-            style={{
-              borderColor: lockBorderColor,
-            }}
-          >
+          <div className="hex-center-lock-right">
             <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
           </div>
         </div>

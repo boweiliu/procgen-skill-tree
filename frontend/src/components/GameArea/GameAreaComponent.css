@@ -149,6 +149,7 @@
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
   background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
 }
 
 .hex-center-lock-right {
@@ -161,6 +162,7 @@
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
   background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
 }
 
 .tiny-text {
