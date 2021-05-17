@@ -151,7 +151,7 @@ export type PlayerUIState = {
   /**
    * Which, if any, node is highlighted with a selection cursor
    */
-  cursoredNode: Vector3 | undefined;
+  cursoredNodeLocation: Vector3 | undefined;
 
   // WIP?
   virtualApproximateScroll?: Vector2;

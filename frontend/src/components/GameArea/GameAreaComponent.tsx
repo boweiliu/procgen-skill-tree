@@ -46,10 +46,12 @@ export const GameAreaComponent = React.memo(GameArea);
  * @param intent keyboard controls mapped to "intents" i.e. game functions
  * @param virtualGridDims the integer dimensions of the virtual scrollable space, measured in grid units.
  * @param jumpOffset integers. if non-null, jump callbackwas recently requested. otherwise it is guaranteed to be identical object reference as the last time this component was rendered.
- * @param virtualDimsToLocation utility stateless function to convert from ui grid dims (ints) to 3d node location
+ * @param virtualDimsToLocation utility stateless function to convert from ui virtual grid dims (ints) to 3d node location in game state (ints)
  * @param virtualGridStatusMap table of ui grid location to object containing react fragments for contents of that node
  * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change.
  * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
+ * @param cursoredNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
+ * @param setCursoredNode callback which takes virtual 2d coords and causes that node to now be cursored.
  */
 function GameArea(props: {
   hidden: boolean;
