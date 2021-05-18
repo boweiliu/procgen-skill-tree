@@ -24,14 +24,14 @@ function GameAreaCellComponent({
   onUpdateStatus,
   nodeData,
   isCursored,
-  setCursored,
+  onUpdateCursored,
 }: {
   idx: number;
   onUpdateStatus: UpdateStatusCb;
   rowIdx: number;
   nodeData: NodeReactData;
   isCursored: boolean;
-  setCursored: (b: boolean) => void;
+  onUpdateCursored: (v: Vector2 | undefined) => void;
 }) {
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -51,9 +51,9 @@ function GameAreaCellComponent({
     (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
-      setCursored(!isCursored);
+      onUpdateCursored(isCursored ? undefined : new Vector2(idx, rowIdx));
     },
-    [isCursored, setCursored]
+    [isCursored, onUpdateCursored]
   );
 
   return (

@@ -301,11 +301,7 @@ function GameArea(props: {
                         !!props.cursoredVirtualNode &&
                         props.cursoredVirtualNode.equals(virtualCoords)
                       }
-                      setCursored={(nowIsCursored: boolean) => {
-                        props.setCursoredVirtualNode(
-                          nowIsCursored ? virtualCoords : undefined
-                        );
-                      }}
+                      onUpdateCursored={props.setCursoredVirtualNode}
                     />
                   );
                 })}
