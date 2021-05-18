@@ -19,7 +19,10 @@ import {
   LockStatus,
   NodeAllocatedStatus,
 } from './GameAreaComponent';
-import { virtualCoordsToLocation } from './locationUtils';
+import {
+  locationToVirtualCoords,
+  virtualCoordsToLocation,
+} from './locationUtils';
 
 /**
  * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
@@ -75,6 +78,16 @@ function Component(props: {
     (virtualCoords: Vector2): Vector3 => {
       return virtualCoordsToLocation({
         virtualCoords,
+        virtualGridDims,
+        virtualGridLocation: gameState.playerUI.virtualGridLocation,
+      });
+    },
+    [gameState.playerUI.virtualGridLocation, virtualGridDims]
+  );
+  const locationToVirtualDims = useCallback(
+    (location: Vector3): Vector2 | undefined => {
+      return locationToVirtualCoords({
+        location,
         virtualGridDims,
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
       });
@@ -158,6 +171,18 @@ function Component(props: {
     ]
   );
 
+  const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
+    if (gameState.playerUI.cursoredNodeLocation) {
+      console.log({
+        3: gameState.playerUI.cursoredNodeLocation,
+        2: locationToVirtualDims(gameState.playerUI.cursoredNodeLocation),
+      });
+      return locationToVirtualDims(gameState.playerUI.cursoredNodeLocation);
+    } else {
+      return undefined;
+    }
+  }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualDims]);
+
   return (
     <>
       <GameAreaComponent
@@ -170,8 +195,14 @@ function Component(props: {
         virtualDimsToLocation={virtualDimsToLocation}
         updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
-        cursoredVirtualNode={new Vector2(5, 5)}
-        setCursoredVirtualNode={() => {}}
+        cursoredVirtualNode={cursoredVirtualNodeCoords}
+        setCursoredVirtualNode={(v: Vector2 | undefined) => {
+          props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+            let updated = v ? virtualDimsToLocation(v) : undefined;
+            console.log({ updated });
+            return updated;
+          });
+        }}
       />
     </>
   );
