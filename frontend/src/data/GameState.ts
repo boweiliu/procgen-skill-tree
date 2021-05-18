@@ -161,6 +161,10 @@ export type PlayerUIState = {
    * Which, if any, node is highlighted with a selection cursor
    */
   cursoredNodeLocation: Vector3 | undefined;
+  /**
+   * state of the sidebar component
+   */
+  isSidebarOpen: boolean;
 
   // WIP?
   virtualApproximateScroll?: Vector2;

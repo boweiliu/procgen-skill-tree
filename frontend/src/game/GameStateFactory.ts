@@ -105,6 +105,7 @@ export class GameStateFactory {
         isPixiHidden: true,
         virtualGridLocation: Vector3.Zero,
         cursoredNodeLocation: undefined,
+        isSidebarOpen: false,
       },
       computed: {},
       intent: {

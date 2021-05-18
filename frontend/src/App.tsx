@@ -68,11 +68,10 @@ function App() {
     }
   }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW]);
 
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
     console.log('maybe toggling sidebar');
     if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
-      setSidebarOpen(!isSidebarOpen);
+      updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
     }
   }, [gameState.intent.newIntent.TOGGLE_SIDEBAR]);
 
@@ -108,7 +107,7 @@ function App() {
         <span> </span>
         <button
           onClick={() => {
-            setSidebarOpen(!isSidebarOpen);
+            updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
           }}
         >
           Toggle sidebar (hotkey: i)
@@ -116,9 +115,9 @@ function App() {
       </div>
 
       <Sidebar
-        hidden={!isSidebarOpen}
+        hidden={!gameState.playerUI.isSidebarOpen}
         setSidebarHidden={() => {
-          setSidebarOpen(false);
+          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
         }}
       >
         <Tabs

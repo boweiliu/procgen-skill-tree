@@ -194,6 +194,10 @@ function Component(props: {
         console.log({ updated });
         return updated;
       });
+      if (v) {
+        // also open the sidebar
+        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+      }
     },
     [props.updaters, virtualDimsToLocation]
   );
