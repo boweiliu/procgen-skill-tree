@@ -12,6 +12,13 @@ export interface AllocateNodeInput {
   newStatus: NodeAllocatedStatus.TAKEN;
 }
 
+// TODO(bowei): unhardcode
+export const FOG_OF_WAR_DISTANCE = 6;
+
+/**
+ * Stateless action wrapper over updaters.
+ * Represents the action of allocating a node.
+ */
 export class AllocateNodeAction {
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 
@@ -74,13 +81,18 @@ export class AllocateNodeAction {
             return false;
           },
         };
-        getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
+        getWithinDistance(
+          nodeLocation,
+          FOG_OF_WAR_DISTANCE,
+          0,
+          validLocks
+        ).forEach((n) => {
           if (
             (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
             NodeAllocatedStatus.HIDDEN
           ) {
             // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            // prevGameState.worldGen.lockMap.precompute(n);
+            prevGameState.worldGen.lockMap.precompute(n);
             prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
           }
         });

@@ -6,7 +6,7 @@ import {
   PointNodeRef,
   ZLevelGen,
 } from '../../data/GameState';
-import { ZLevelGenFactory } from '../../game/WorldGenStateFactory';
+import { ZLevelGenFactory } from '../../game/worldGen/WorldGenStateFactory';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';

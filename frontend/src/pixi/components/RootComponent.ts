@@ -5,7 +5,7 @@ import {
   generatePointNodeTexture,
   PointNodeTextureSet,
 } from '../textures/PointNodeTexture';
-import { ZLevelGenFactory } from '../../game/WorldGenStateFactory';
+import { ZLevelGenFactory } from '../../game/worldGen/WorldGenStateFactory';
 import { Const } from '../../lib/util/misc';
 import { Lazy } from '../../lib/util/lazy';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -14,9 +14,19 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import {
+  StrategicHexGridComponent,
+  StrategicHexGridComponentProps,
+} from './StrategicHexGridComponent';
+import {
+  generateSimpleTextures,
+  SimpleTextureSet,
+} from '../textures/SimpleTextures';
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
+  simpleTexture: Lazy<SimpleTextureSet>;
   tick: number;
   playerCurrentZ: number;
   tooltip: TooltipInfo;
@@ -47,6 +57,8 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   // Contains a few entities that doesn't move when game camera moves, but located behind action stage entities, e.g. static backgrounds
   private backdropStage: Pixi.Container;
   // public keyboard: KeyboardState;
+  private strategicHexGrid: StrategicHexGridComponent;
+
   private backdrop: Pixi.Graphics;
 
   constructor(props: Props) {
@@ -60,6 +72,9 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     } = this.useState<State, RootComponent2>(this, {
       pointNodeTexture: new Lazy(() =>
         generatePointNodeTexture(props.args.renderer)
+      ),
+      simpleTexture: new Lazy(() =>
+        generateSimpleTextures(props.args.renderer)
       ),
       tick: 0,
       playerCurrentZ: 0,
@@ -96,6 +111,32 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.actionStage.zIndex = 0;
     this.actionStage.sortableChildren = true;
     this.container.addChild(this.actionStage);
+
+    const strategicHexGridPropsFactory = (
+      props: Props,
+      state: State
+    ): StrategicHexGridComponentProps => {
+      return {
+        args: {
+          position: Vector2.Zero,
+          textures: state.simpleTexture.get(),
+        },
+        appSize: props.appSize,
+        virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
+        allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
+        fogOfWarStatusMap: props.gameState.computed.fogOfWarStatusMap!,
+        lockStatusMap: props.gameState.computed.lockStatusMap!,
+        lockMap: props.gameState.worldGen.lockMap,
+      };
+    };
+    this.strategicHexGrid = new StrategicHexGridComponent(
+      strategicHexGridPropsFactory(props, this.state)
+    );
+    this.addChild({
+      childClass: StrategicHexGridComponent,
+      instance: this.strategicHexGrid,
+      propsFactory: strategicHexGridPropsFactory,
+    });
 
     this.backdropStage = new Pixi.Sprite();
     this.backdropStage.zIndex = -1;

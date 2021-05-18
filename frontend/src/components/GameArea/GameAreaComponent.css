@@ -1,72 +1,50 @@
+/* https://css-tricks.com/updating-a-css-variable-with-javascript/
+   https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
+:root {
+  --border: 2px;
+  --readable-white: #888888;
+  --app-size-width: none;
+  --app-size-height: none;
+  --background-black: none;
+  --deemphasized-black: none;
+  --active-purple: none;
+  --border-important-white: none;
+  --border-unimportant-black: none;
+  --hex-center-radius: none;
+  --grid-width: none;
+  --grid-height: none;
+}
+
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  white-space: nowrap;
+  background-color: var(--background-black);
+  width: var(--app-size-width);
+  height: var(--app-size-height);
 }
 
-.game-area::-webkit-scrollbar {
-  display: none;
-}
 /**
-      // see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
-      // https://stackoverflow.com/questions/4192847/set-scroll-position
-      // https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
+ * see https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
+ * https://stackoverflow.com/questions/4192847/set-scroll-position
+ * https://stackoverflow.com/questions/53158796/get-scroll-position-with-reactjs
 */
 
-.hex-block {
-  float: left;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+.hidden-scrollbars {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hidden-scrollbars::-webkit-scrollbar {
+  display: none;
+}
+
+.hex-half-block {
+  width: calc(0.5 * var(--grid-width));
+  height: var(--grid-height);
 }
 
 .hex-block-row {
   display: block;
   float: left;
   min-width: max-content;
-}
-
-.hex-center {
-  border-style: solid;
-  border-width: 2px;
-  border-color: #444444;
-  border-radius: 50%;
-}
-
-.hex-center:hover > .hover-only {
-  display: block;
-}
-.hover-only {
-  display: none;
-}
-
-.hex-center-lock-left {
-  border-style: solid;
-  border-width: 2px;
-  border-color: #444444;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hex-center-lock-right {
-  border-style: solid;
-  border-width: 2px;
-  border-color: #444444;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.tiny-text {
-  /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
-  this fills it in symmetrically on the left and bottom.*/
-  padding-left: 2px;
-  padding-bottom: 2px;
-  max-width: 48px;
-  overflow: hidden;
-  cursor: default;
 }

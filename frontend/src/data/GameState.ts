@@ -81,6 +81,20 @@ export enum IntentName {
   PAN_EAST = 'PAN_EAST',
   TRAVEL_UPSTAIRS = 'TRAVEL_UPSTAIRS',
   TRAVEL_DOWNSTAIRS = 'TRAVEL_DOWNSTAIRS',
+
+  TOGGLE_STRATEGIC_VIEW = 'TOGGLE_STRATEGIC_VIEW',
+  TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR',
+
+  MOVE_CURSOR_WEST = 'MOVE_CURSOR_WEST',
+  MOVE_CURSOR_EAST = 'MOVE_CURSOR_EAST',
+  MOVE_CURSOR_NORTH = 'MOVE_CURSOR_NORTH',
+  MOVE_CURSOR_SOUTH = 'MOVE_CURSOR_SOUTH',
+  MOVE_CURSOR_NORTHWEST = 'MOVE_CURSOR_NORTHWEST',
+  MOVE_CURSOR_NORTHEAST = 'MOVE_CURSOR_NORTHEAST',
+  MOVE_CURSOR_SOUTHWEST = 'MOVE_CURSOR_SOUTHWEST',
+  MOVE_CURSOR_SOUTHEAST = 'MOVE_CURSOR_SOUTHEAST',
+
+  INTERACT_WITH_NODE = 'INTERACT_WITH_NODE',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
@@ -135,13 +149,26 @@ export class ResourceTypeAndModifier {
 }
 
 export type PlayerUIState = {
-  // deprecated
+  // DEPRECATED
   selectedPointNode: PointNodeRef | undefined;
-
-  // deprecated
   activeTab: number;
 
+  // NOT DEPRECATED
   isPixiHidden: boolean;
-
+  /**
+   * Determines where in the universe the user has scrolled to.
+   */
   virtualGridLocation: Vector3;
+  /**
+   * Which, if any, node is highlighted with a selection cursor
+   */
+  cursoredNodeLocation: Vector3 | undefined;
+  /**
+   * state of the sidebar component
+   */
+  isSidebarOpen: boolean;
+
+  // WIP?
+  virtualApproximateScroll?: Vector2;
+  strategicGridLocation?: Vector3;
 };

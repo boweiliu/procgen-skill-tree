@@ -1,18 +1,19 @@
 import './GameAreaComponent.css';
+import './GameArea.css';
 
-import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
 import { IntentName, PlayerIntentState } from '../../data/GameState';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { NodeReactData } from './computeVirtualNodeDataMap';
+import { hexGridPx, hexCenterRadius } from './GameAreaStateManager';
+import { GameAreaCell } from './GameAreaCell';
 
 /**
- *
- *
+ * TODO(bowei): move these enums out of here into game state
  */
-export const GameAreaComponent = React.memo(GameArea);
-
 export enum NodeAllocatedStatus {
   // DEPRECATED
   TAKEN = 'TAKEN',
@@ -30,38 +31,103 @@ export enum LockStatus {
   OPEN = 'OPEN',
 }
 
-export type NodeData = {
-  shortText: string;
-  lockData?: {
-    shortTextTarget: string;
-    shortTextTimer: string;
-    lockStatus: LockStatus;
-  };
-  toolTipText: string;
-  status: NodeAllocatedStatus;
-  id: string;
-};
-type UpdateStatusCb = (args: {
+export type UpdateStatusCb = (args: {
   virtualDims: Vector2;
   newStatus: NodeAllocatedStatus;
 }) => void;
 
+export const GameAreaComponent = React.memo(GameArea);
+/**
+ * Dumb-ish component that manages the game board where the skill tree is located, as well as the "virtual"
+ * game space which is larger than the currently visible scrollable area the player can see.
+ *
+ * @param hidden whether this component is visible or not.
+ * @param appSize the size of the area used to play the game
+ * @param intent keyboard controls mapped to "intents" i.e. game functions
+ * @param virtualGridDims the integer dimensions of the virtual scrollable space, measured in grid units.
+ * @param jumpOffset integers. if non-null, jump callbackwas recently requested. otherwise it is guaranteed to be identical object reference as the last time this component was rendered.
+ * @param virtualDimsToLocation utility stateless function to convert from ui virtual grid dims (ints) to 3d node location in game state (ints)
+ * @param virtualGridStatusMap table of ui grid location to object containing react fragments for contents of that node
+ * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change.
+ * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
+ * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
+ * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
+ */
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
-  intent: PlayerIntentState;
+  // intent: PlayerIntentState;
   // virtualSize: Vector2; // in pixels
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
 
   jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
-  virtualGridStatusMap: KeyedHashMap<Vector2, NodeData>;
+  virtualDimsToLocation: (v: Vector2) => Vector3;
+  virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   onJump: (args: { direction: Vector2 }) => void;
+  cursoredVirtualNode: Vector2 | undefined;
+  setCursoredVirtualNode: (v: Vector2 | undefined) => void;
 }) {
+  const container = useRef<HTMLDivElement>(null);
+  const previousContainer = useRef<HTMLDivElement>(null) as any;
+  const gridWidth = hexGridPx.x;
+  const gridHeight = hexGridPx.y;
+
+  // Set css variables from react
   useEffect(() => {
-    // jumps to a new scroll position based on the newly received Vector2 instance jumpOffset
+    document.documentElement.style.setProperty(
+      '--grid-width',
+      ` ${hexGridPx.x}px`
+    );
+    document.documentElement.style.setProperty(
+      '--grid-height',
+      ` ${hexGridPx.y}px`
+    );
+  }, [hexGridPx]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--hex-center-radius',
+      ` ${hexCenterRadius}px`
+    );
+  }, [hexCenterRadius]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--background-black',
+      colorToCss(COLORS.backgroundBlue)
+    );
+    document.documentElement.style.setProperty(
+      '--deemphasized-black',
+      colorToCss(COLORS.grayBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--active-purple',
+      colorToCss(COLORS.nodePink)
+    );
+    document.documentElement.style.setProperty(
+      '--border-unimportant-black',
+      colorToCss(COLORS.borderBlack)
+    );
+    document.documentElement.style.setProperty(
+      '--border-important-white',
+      colorToCss(COLORS.borderWhite)
+    );
+  }, [COLORS]);
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--app-size-width',
+      ` ${props.appSize.x}px`
+    );
+    document.documentElement.style.setProperty(
+      '--app-size-height',
+      ` ${props.appSize.y}px`
+    );
+  }, [props.appSize]);
+
+  // Receives a Vector2 instance jumpOffset,
+  // and uses offset to jump to a new scroll position
+  useEffect(() => {
     const jumpOffset = props.jumpOffset;
     console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
@@ -72,68 +138,38 @@ function GameArea(props: {
       ref.scrollTop - jumpOffset.y * gridHeight
     );
   }, [props.jumpOffset]);
-  // Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
-  // 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
-  // for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
-  const gridWidth = 268;
-  const gridHeight = 232;
 
-  const hexCenterRadius = 32;
-  const hexBlockStyle = { width: gridWidth + 'px', height: gridHeight + 'px' };
-  const hexHalfBlockStyle = {
-    width: gridWidth / 2 + 'px',
-    height: gridHeight + 'px',
-  };
-  const hexCenterStyle = {
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 2 + 'px',
-    // backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
-  };
-  const hexCenterLockStyle = {
-    marginLeft: `-${hexCenterRadius * 2}px`,
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius * 5 + 'px',
-    // backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
-  };
-  const hexCenterLockBlockStyle = {
-    // width: hexCenterRadius - 12 + 'px',
-    width: hexCenterRadius * 2 + 'px',
-    height: hexCenterRadius + 'px',
-    marginTop: hexCenterRadius + 'px',
-    backgroundColor: colorToCss(COLORS.nodePink),
-    // borderColor: colorToCss(COLORS.nodeBorder),
-  };
-
+  /**
+   * Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
+   */
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
-      // const scrollRoom = virtualAreaSize.subtract(props.appSize);
-      // const scrollMod = scrollRoom.divide(virtualGrids);
       // handle scroll
       let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
-      let newScrollTop = target.scrollTop;
+      let newScrollTop = target.scrollTop; // only used as boolean to see if it changed
       let newScrollLeft = target.scrollLeft;
-      if (target.scrollTop < gridHeight) {
+      if (target.scrollTop < gridHeight * 0.4) {
+        // between 0.1 and 0.4 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
         newScrollTop += gridHeight * 2;
         direction.y -= 1;
       }
       if (
         target.scrollTop >
-        (props.virtualGridDims.y - 1) * gridHeight - props.appSize.y
+        (props.virtualGridDims.y - 0.4) * gridHeight - props.appSize.y
       ) {
         newScrollTop -= gridHeight * 2;
         direction.y += 1;
       }
-      if (target.scrollLeft < gridWidth * 1.5) {
+      if (target.scrollLeft < gridWidth * 0.9) {
+        // between 0.6 and 0.9 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
         newScrollLeft += gridWidth * 2;
         direction.x -= 1;
       }
       if (
         target.scrollLeft >
-        (props.virtualGridDims.x - 2) * gridWidth - props.appSize.x
+        (props.virtualGridDims.x - 0.9) * gridWidth - props.appSize.x
       ) {
         newScrollLeft -= gridWidth * 2;
         direction.x += 1;
@@ -154,21 +190,22 @@ function GameArea(props: {
     [props.appSize.x, props.appSize.y]
   );
 
-  const container = useRef<HTMLDivElement>(null);
-  const previousContainer = useRef<HTMLDivElement>(null) as any;
+  // Set initial position in the center, exactly once!
   useEffect(() => {
     if (
       container.current != null &&
       container.current !== previousContainer.current
     ) {
-      container.current.scrollTop = (props.virtualGridDims.y * gridHeight) / 3;
+      container.current.scrollTop =
+        (props.virtualGridDims.y * gridHeight - props.appSize.y) / 2;
       container.current.scrollLeft =
-        ((props.virtualGridDims.x + 0.5) * gridWidth) / 3;
+        ((props.virtualGridDims.x + 0.5) * gridWidth - props.appSize.x) / 2;
     }
     previousContainer.current = container.current;
-  }, [container.current]);
+  }, [container.current, props.appSize]);
 
   // control scroll with keyboard
+  /*
   useEffect(() => {
     let lastTime: number | null = null;
     const SCROLL_INTERVAL_MS = 10;
@@ -216,7 +253,8 @@ function GameArea(props: {
     const interval = setInterval(action, SCROLL_INTERVAL_MS);
     action();
     return () => clearInterval(interval);
-  }, [props.intent.activeIntent, props.intent.newIntent, container.current]);
+  }, [props.intent.activeIntent, props.intent.newIntent, container.current]); 
+  */
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -233,53 +271,37 @@ function GameArea(props: {
   return (
     <div
       ref={container}
-      className="game-area"
+      className="game-area hidden-scrollbars"
       hidden={props.hidden}
-      style={{
-        width: props.appSize.x,
-        height: props.appSize.y,
-        backgroundColor: colorToCss(COLORS.backgroundBlue),
-      }}
       onScroll={handleScroll}
     >
-      <div
-        className="virtual-game-area"
-        style={
-          {
-            // width: virtualAreaSize.x,
-            // height: virtualAreaSize.y,
-          }
-        }
-        onPointerOver={(e: React.PointerEvent) => {
-          // console.log(e);
-        }}
-        onClick={(e: React.MouseEvent) => {
-          // console.log(e);
-        }}
-      >
+      <div className="virtual-game-area">
         {Array(props.virtualGridDims.y)
           .fill(0)
           .map((_, y) => (
-            <Row key={y} rowIdx={y} hexHalfBlockStyle={hexHalfBlockStyle}>
+            <Row
+              key={props.virtualDimsToLocation(new Vector2(0, y)).y.toString()}
+              rowIdx={y}
+            >
               {Array(props.virtualGridDims.x)
                 .fill(0)
                 .map((_, x) => {
+                  const virtualCoords = new Vector2(x, y);
                   const nodeData = props.virtualGridStatusMap.get(
-                    new Vector2(x, y)
+                    virtualCoords
                   )!;
                   return (
-                    <Node
+                    <GameAreaCell
                       nodeData={nodeData}
                       key={nodeData?.id ?? `loading${x}`}
-                      status={nodeData.status}
-                      text={nodeData.shortText}
-                      hexBlockStyle={hexBlockStyle}
                       idx={x}
                       rowIdx={y}
-                      hexCenterStyle={hexCenterStyle}
-                      hexCenterLockStyle={hexCenterLockStyle}
-                      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
                       onUpdateStatus={props.updateNodeStatusCb}
+                      isCursored={
+                        !!props.cursoredVirtualNode &&
+                        props.cursoredVirtualNode.equals(virtualCoords)
+                      }
+                      onUpdateCursored={props.setCursoredVirtualNode}
                     />
                   );
                 })}
@@ -294,11 +316,9 @@ const Row = React.memo(RowComponent);
 
 function RowComponent({
   rowIdx,
-  hexHalfBlockStyle,
   children,
 }: {
   rowIdx: number;
-  hexHalfBlockStyle: any;
   children?: React.ReactNode;
 }) {
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
@@ -306,184 +326,9 @@ function RowComponent({
 
   return (
     <div className="hex-block-row">
-      {odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {odd && <div className="hex-block hex-half-block" />}
       {children}
-      {!odd && <div className="hex-block" style={hexHalfBlockStyle} />}
+      {!odd && <div className="hex-block hex-half-block" />}
     </div>
-  );
-}
-
-const Cell = React.memo(CellComponent);
-function CellComponent({
-  idx,
-  rowIdx,
-  children,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
-  onClick,
-  status,
-  text,
-  nodeData,
-}: {
-  idx: number;
-  hexCenterLockBlockStyle: any;
-
-  rowIdx: number;
-  children?: React.ReactNode;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
-  onClick: React.MouseEventHandler;
-  text?: string;
-  status: NodeAllocatedStatus;
-  nodeData: NodeData;
-}) {
-  const leftLock = { ...hexCenterLockBlockStyle };
-  const rightLock = { ...hexCenterLockBlockStyle };
-
-  const isLocked = !!nodeData.lockData;
-  const fillColor =
-    status === NodeAllocatedStatus.TAKEN
-      ? colorToCss(COLORS.grayBlack)
-      : colorToCss(COLORS.nodePink);
-  const borderColor =
-    status === NodeAllocatedStatus.TAKEN ||
-    status === NodeAllocatedStatus.UNREACHABLE
-      ? colorToCss(COLORS.borderBlack)
-      : colorToCss(COLORS.borderWhite);
-  const lockBorderColor = isLocked
-    ? colorToCss(COLORS.borderBlack)
-    : borderColor;
-
-  return (
-    <div
-      id={`hex-block-${rowIdx}-${idx}`}
-      className="hex-block"
-      style={hexBlockStyle}
-    >
-      <div
-        id={`hex-center-${rowIdx}-${idx}`}
-        onClick={onClick}
-        className="hex-center"
-        style={{
-          ...hexCenterStyle,
-          backgroundColor: fillColor,
-          borderColor: borderColor,
-        }}
-        hidden={status === NodeAllocatedStatus.HIDDEN}
-      >
-        <div
-          style={{
-            display: 'flex',
-            width: hexCenterStyle.width,
-            height: hexCenterStyle.height,
-            alignItems: 'center',
-            justifyContent: 'center',
-            // otherwise the border width screws up centering here
-            marginTop: '-2px',
-            marginLeft: '-2px',
-          }}
-        >
-          <div className="tiny-text">{text}</div>
-        </div>
-        <div
-          className="hover-only"
-          style={{
-            borderStyle: 'solid',
-            marginTop: '-16px',
-            marginLeft: '48px',
-            minWidth: 'max-content',
-            padding: '3px',
-            background: 'rgba(255,255,255,0.3)',
-          }}
-        >
-          {children}
-        </div>
-      </div>
-      {isLocked ? (
-        <div
-          id={`hex-lock-${rowIdx}-${idx}`}
-          hidden={status === NodeAllocatedStatus.HIDDEN}
-          style={{
-            // zIndex: 3,
-            ...hexCenterLockStyle,
-          }}
-        >
-          <div
-            className="hex-center-lock-left"
-            style={{ ...leftLock, borderColor: lockBorderColor }}
-          >
-            <div className="tiny-text">
-              {nodeData.lockData?.shortTextTarget}
-            </div>
-          </div>
-          <div
-            className="hex-center-lock-right"
-            style={{ ...rightLock, borderColor: lockBorderColor }}
-          >
-            <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-const Node = React.memo(NodeComponent);
-function NodeComponent({
-  idx,
-  rowIdx,
-  children,
-  hexBlockStyle,
-  hexCenterStyle,
-  hexCenterLockStyle,
-  hexCenterLockBlockStyle,
-  status,
-  text,
-  onUpdateStatus,
-  nodeData,
-}: {
-  status: NodeAllocatedStatus;
-  idx: number;
-  hexCenterLockBlockStyle: any;
-  onUpdateStatus: UpdateStatusCb;
-
-  rowIdx: number;
-  children?: React.ReactNode;
-  hexCenterStyle: any;
-  hexCenterLockStyle: any;
-  hexBlockStyle: any;
-  text?: string;
-  nodeData: NodeData;
-}) {
-  const handleClick = useCallback(
-    (e) => {
-      e.preventDefault();
-      console.log(`clicked`);
-      console.log({ idx, rowIdx, status });
-      onUpdateStatus({
-        virtualDims: new Vector2(idx, rowIdx),
-        newStatus: NodeAllocatedStatus.TAKEN,
-      });
-    },
-    [onUpdateStatus, status, idx, rowIdx]
-  );
-  return (
-    <Cell
-      onClick={handleClick}
-      hexBlockStyle={hexBlockStyle}
-      idx={idx}
-      rowIdx={rowIdx}
-      hexCenterStyle={hexCenterStyle}
-      hexCenterLockStyle={hexCenterLockStyle}
-      hexCenterLockBlockStyle={hexCenterLockBlockStyle}
-      text={text}
-      status={status}
-      nodeData={nodeData}
-    >
-      {status}
-    </Cell>
   );
 }

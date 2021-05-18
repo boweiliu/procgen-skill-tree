@@ -1,0 +1,161 @@
+.hex-full-block {
+  width: var(--grid-width);
+  height: var(--grid-height);
+}
+
+.hex-center {
+  border-style: solid;
+  border-width: var(--border);
+  /* circle */
+  border-radius: 50%;
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
+  z-index: 5;
+}
+
+.node-allocated {
+  background-color: var(--deemphasized-black);
+}
+.node-unallocated {
+  background-color: var(--active-purple);
+}
+
+.border-unimportant {
+  border-color: var(--border-unimportant-black);
+}
+.border-important {
+  border-color: var(--border-important-white);
+}
+
+.hex-center-text-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* otherwise the border width screws up centering here */
+  margin-top: calc(-1 * var(--border));
+  margin-left: calc(-1 * var(--border));
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
+}
+
+.empty-positioned {
+  height: 0;
+  width: 0;
+  position: relative;
+}
+.absolute-positioned {
+  position: absolute;
+}
+
+/* used for node center tooltip */
+.hover-only {
+  display: none;
+}
+.hex-center:hover ~ div .hover-only {
+  display: block;
+}
+.hex-center-lock:hover ~ div .hover-only {
+  display: block;
+}
+
+/* used for clickable question mark tooltip */
+.hover-only-2 {
+  display: none;
+}
+.hex-block:hover .hover-only-2 {
+  display: block;
+}
+
+.node-tooltip-wrapper {
+  z-index: 15;
+}
+.node-tooltip {
+  border-style: solid;
+  width: max-content;
+  max-width: calc(var(--grid-width) - 2 * var(--hex-center-radius));
+  padding: calc(2 * var(--border));
+  background: var(--border-important-white);
+  position: absolute;
+  margin-left: calc(0 * var(--hex-center-radius));
+  margin-top: calc(0.5 * var(--hex-center-radius));
+}
+
+.question {
+  margin-top: calc(-1 * var(--hex-center-radius));
+  margin-left: calc(0.125 * var(--hex-center-radius));
+  color: var(--readable-white);
+  cursor: pointer;
+}
+
+.hex-center-lock {
+  z-index: 10;
+  margin-left: calc(-2 * var(--hex-center-radius));
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(5 * var(--hex-center-radius));
+}
+
+.hex-center-lock-left {
+  z-index: 10;
+  border-style: solid;
+  border-width: var(--border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: var(--hex-center-radius);
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
+}
+
+.hex-center-lock-right {
+  z-index: 10;
+  border-style: solid;
+  border-width: var(--border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: var(--hex-center-radius);
+  width: calc(2 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+  background-color: var(--active-purple);
+  border-color: var(--border-unimportant-black);
+}
+
+.tiny-text {
+  color: var(--readable-white);
+  font-size: small; /* this invalidates the below comment, potentially */
+
+  /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.
+  this fills it in symmetrically on the left and bottom.*/
+  /*
+  padding-left: 2px;
+  padding-bottom: 2px; */
+  max-width: calc(
+    1.5 * var(--hex-center-radius)
+  ); /* circle is diameter 2R, so leave 25% margins */
+  overflow: hidden;
+  cursor: default;
+}
+
+.selection-cursor-wrapper {
+  z-index: 1;
+}
+
+.selection-cursor {
+  margin-left: calc(-2.375 * var(--hex-center-radius));
+  margin-top: calc(-1 * var(--hex-center-radius));
+  width: calc(0.25 * var(--hex-center-radius));
+  height: calc(2 * var(--hex-center-radius));
+  border-color: var(--border-important-white);
+  border-style: solid;
+  border-right-style: none;
+  border-width: calc(2 * var(--border));
+  animation: blinker 1.5s ease-in infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.25;
+  }
+}

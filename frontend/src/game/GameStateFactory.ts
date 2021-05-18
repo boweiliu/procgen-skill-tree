@@ -24,7 +24,12 @@ import {
   getWithinDistance,
   IReadonlySet,
 } from './lib/HexGrid';
-import { LockFactory, ZLevelGenFactory } from './WorldGenStateFactory';
+import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
+import {
+  NodeContents,
+  NodeContentsFactory,
+} from './worldGen/nodeContents/NodeContentsFactory';
+import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 
 export type GameStateConfig = any;
 
@@ -65,6 +70,10 @@ export class GameStateFactory {
     const lockDataMap = new LazyHashMap<Vector3, LockData | undefined>((k) =>
       lockFactory.create({ seed: mySeed, location: k })
     );
+    const nodeContentsFactory = new NodeContentsFactory({});
+    const nodeContentsMap = new LazyHashMap<Vector3, NodeContents>((k) =>
+      nodeContentsFactory.create({ seed: mySeed, location: k })
+    );
 
     const gameState: GameState = {
       tick: 0,
@@ -73,6 +82,7 @@ export class GameStateFactory {
         // deprecated
         zLevels: { 0: zLevel },
         lockMap: lockDataMap,
+        nodeContentsMap,
       },
       playerSave: {
         // justAllocated: undefined,
@@ -94,6 +104,8 @@ export class GameStateFactory {
         activeTab: 0,
         isPixiHidden: true,
         virtualGridLocation: Vector3.Zero,
+        cursoredNodeLocation: undefined,
+        isSidebarOpen: false,
       },
       computed: {},
       intent: {
@@ -112,7 +124,7 @@ export class GameStateFactory {
      */
     // let prevMap = gameState.playerSave.allocationStatusMap;
     // first precompute the nearby lock states
-    getWithinDistance(Vector3.Zero, 3).forEach((n) => {
+    getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
       gameState.worldGen.lockMap.precompute(n);
     });
     // fill in lock statuses with computed statuses
@@ -159,13 +171,18 @@ export class GameStateFactory {
           return false;
         },
       };
-      getWithinDistance(nodeLocation, 3, 0, validLocks).forEach((n) => {
+      getWithinDistance(
+        nodeLocation,
+        FOG_OF_WAR_DISTANCE,
+        0,
+        validLocks
+      ).forEach((n) => {
         if (
           (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
           NodeAllocatedStatus.HIDDEN
         ) {
           // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-          // prevGameState.worldGen.lockMap.precompute(n);
+          prevGameState.worldGen.lockMap.precompute(n);
           prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
         }
       });

@@ -1,0 +1,9 @@
+/* Shared between GameAreaComponent and GameAreaCell */
+
+.hex-block {
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* height: 100%; */
+}

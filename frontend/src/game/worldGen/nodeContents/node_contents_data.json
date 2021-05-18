@@ -1,0 +1,254 @@
+{
+  "data": {
+    "attributes": [
+      {
+        "name": "desirable_0",
+        "comment": "Calling these desirables for now - they're what the player will be trying to achieve",
+        "display_name": "Attack",
+        "display_character": "A",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "desirable_1",
+        "display_name": "Defense",
+        "display_character": "D",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "desirable_2",
+        "display_name": "Magic",
+        "display_character": "M",
+        "end_goal_attribute": true
+      },
+      {
+        "name": "base_0",
+        "comment": "Base stats - player will use these to fuel more efficient desirable allocations",
+        "display_name": "Red",
+        "display_character": "R",
+        "base_attribute": true
+      },
+      {
+        "name": "base_1",
+        "display_name": "Green",
+        "display_character": "G",
+        "base_attribute": true
+      },
+      {
+        "name": "base_2",
+        "display_name": "Blue",
+        "display_character": "B",
+        "base_attribute": true
+      },
+      {
+        "name": "empty",
+        "display_name": "",
+        "display_character": "",
+        "empty": true
+      }
+    ],
+    "modifiers": [
+      {
+        "name": "flat_0",
+        "display_name": "flat"
+      },
+      {
+        "name": "increased_0",
+        "display_name": "% increased"
+      },
+      {
+        "name": "cost_0",
+        "display_name": "SPEND"
+      }
+    ],
+    "generation_groups": [
+      {
+        "name": "root",
+        "root": true,
+        "parameters": [],
+        "generation": [
+          {
+            "proportion": 0.5,
+            "recursive": true,
+            "generation_group_name": "empty",
+            "parameters": []
+          },
+          {
+            "weight": 100,
+            "recursive": true,
+            "generation_group_name": "single",
+            "parameters": []
+          },
+          {
+            "weight": 400,
+            "recursive": true,
+            "generation_group_name": "double",
+            "parameters": []
+          },
+          {
+            "weight": 400,
+            "recursive": true,
+            "generation_group_name": "costed",
+            "parameters": []
+          }
+        ]
+      },
+      {
+        "name": "empty",
+        "parameters": [],
+        "generation": [
+          {
+            "proportion": 1.0,
+            "node_contents": {}
+          }
+        ]
+      },
+      {
+        "name": "single",
+        "parameters": [],
+        "random_rolls": [
+          {
+            "variable_name": "attribute",
+            "distribution": "weighted",
+            "parameters": {
+              "weights": [
+                {
+                  "metamapped": ["value"],
+                  "value": {
+                    "match": {
+                      "over": "attribute",
+                      "key": "name",
+                      "verb": "like",
+                      "value": "desirable_*"
+                    }
+                  },
+                  "weight": 100
+                },
+                {
+                  "metamapped": ["value"],
+                  "value": {
+                    "match": {
+                      "over": "attribute",
+                      "key": "name",
+                      "verb": "like",
+                      "value": "base_*"
+                    }
+                  },
+                  "weight": 400
+                }
+              ]
+            }
+          },
+          {
+            "variable_name": "value",
+            "distribution": "uniform",
+            "parameters": {
+              "min_inclusive": {
+                "array_access_op": {
+                  "index": 0,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "max_inclusive": {
+                "array_access_op": {
+                  "index": 1,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "increment": {
+                "array_access_op": {
+                  "index": 2,
+                  "array": {
+                    "table_lookup_op": {
+                      "table_name": "flat",
+                      "key": {
+                        "variable_op": {
+                          "name": "attribute"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "generation": [
+          {
+            "proportion": 1.0,
+            "node_contents": {
+              "attribute_name": "desirable_0",
+              "value": {
+                "variable_name": "value"
+              },
+              "modifier_name": "flat_0"
+            }
+          }
+        ]
+      }
+    ],
+    "lookup_tables": [
+      {
+        "name": "flat",
+        "comment": "",
+        "schema": [
+          {
+            "key": "attribute_name",
+            "value": "number[]"
+          }
+        ],
+        "data": [
+          {
+            "key": "desirable_0",
+            "value": [10, 20, 2]
+          },
+          {
+            "key": "desirable_1",
+            "value": [10, 20, 2]
+          },
+          {
+            "key": "desirable_2",
+            "value": [10, 20, 2]
+          },
+          {
+            "metamapped": ["key"],
+            "key": {
+              "match": {
+                "over": "attribute",
+                "key": "name",
+                "verb": "like",
+                "value": "base_*"
+              }
+            },
+            "value": [10, 30, 2]
+          }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "attributes": {
+      "comment": "Types of stats that can be allocated"
+    },
+    "quantities": {
+      "comment": "Ways in which attributes can be modified"
+    }
+  }
+}

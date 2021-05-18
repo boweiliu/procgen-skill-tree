@@ -8,6 +8,7 @@
 }
 .tab-label:hover {
   font-weight: 700;
+  cursor: pointer;
   color: inherit;
 }
 .inactive {

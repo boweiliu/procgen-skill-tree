@@ -27,14 +27,17 @@ export function PixiWrapperComponent(props: { hidden: boolean }) {
   }, [application]);
 
   // Trigger component render on first load and also when game state is updated
-  application.rerender({
-    args: {
-      fireBatch: fireBatchedSetGameState,
-      isSecondConstructorCall: false,
-    },
-    updaters: gameStateUpdaters,
-    gameState,
-  });
+  // wrap in useeffect to avoid triggering every react render (130+ UPS) and only check every pixi render (60fps)
+  useEffect(() => {
+    application.rerender({
+      args: {
+        fireBatch: fireBatchedSetGameState,
+        isSecondConstructorCall: false,
+      },
+      updaters: gameStateUpdaters,
+      gameState,
+    });
+  }, [application, fireBatchedSetGameState, gameStateUpdaters, gameState]);
 
   return (
     <>

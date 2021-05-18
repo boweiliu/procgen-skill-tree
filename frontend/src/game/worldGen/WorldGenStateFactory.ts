@@ -1,4 +1,4 @@
-import { LockStatus } from '../components/GameArea/GameAreaComponent';
+import { LockStatus } from '../../components/GameArea/GameAreaComponent';
 import {
   WorldGenState,
   ChunkGen,
@@ -8,13 +8,13 @@ import {
   ResourceType,
   ResourceModifier,
   ResourceNontrivialType,
-} from '../data/GameState';
-import { LockData } from '../data/PlayerSaveState';
-import { NodeType } from '../data/WorldGenState';
-import { HashSet, KeyedHashMap } from '../lib/util/data_structures/hash';
-import { Vector2 } from '../lib/util/geometry/vector2';
-import { Vector3 } from '../lib/util/geometry/vector3';
-import { INTMAX32, squirrel3 } from '../lib/util/random';
+} from '../../data/GameState';
+import { LockData } from '../../data/PlayerSaveState';
+import { NodeType } from '../../data/WorldGenState';
+import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { INTMAX32, squirrel3 } from '../../lib/util/random';
 
 export type WorldGenStateConfig = any;
 
@@ -279,12 +279,16 @@ export class LockFactory {
     const p = id / INTMAX32;
 
     let lockData: LockData = {
-      shortTextTarget: '1🟢',
-      shortTextTimer: '2⌛',
+      shortTextTarget: '🔒',
+      shortTextTimer: '',
       lockStatus: LockStatus.TICKING,
     };
-    // locks occur at frequency 0.4
-    if (p < 0.4) {
+    if (args.location.equals(Vector3.Zero)) {
+      return undefined;
+    }
+    // TODO(bowei): unhardcode
+    // locks occur at this frequency
+    if (p < 0.47) {
       return lockData;
     }
 

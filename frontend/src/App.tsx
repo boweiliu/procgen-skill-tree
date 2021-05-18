@@ -1,7 +1,7 @@
 import './App.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
 import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
 import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
@@ -20,9 +20,11 @@ import {
 } from './lib/util/updaterGenerator';
 import COLORS, { colorToCss } from './pixi/colors';
 import { AllocateNodeAction } from './game/actions/AllocateNode';
+import Sidebar from './components/Sidebar';
+import Tabs, { Tab } from './components/Tabs';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
-  new GameStateFactory({}).create()
+  new GameStateFactory({}).create(+new Date())
 );
 
 /**
@@ -59,8 +61,19 @@ function App() {
     ];
   }, [gameState, updaters, fireBatch]);
 
-  // const gameAreaStateManager: any | null = null;
-  // gameAreaStateManager?.makeProps({ gameState, appSize });
+  useEffect(() => {
+    console.log('maybe toggling strategic view');
+    if (gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW) {
+      updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW]);
+
+  useEffect(() => {
+    console.log('maybe toggling sidebar');
+    if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
+      updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_SIDEBAR]);
 
   return (
     <div className={classnames({ App: true })}>
@@ -72,12 +85,7 @@ function App() {
           gameState={gameState}
           updaters={updaters}
           actions={{ allocateNode: new AllocateNodeAction(updaters) }}
-        >
-          {/*<GameAreaComponent
-            hidden={!gameState.playerUI.isPixiHidden}
-            appSize={appSize}
-          />*/}
-        </GameAreaStateManager>
+        ></GameAreaStateManager>
       </div>
 
       <div className="debug-overlay">
@@ -94,10 +102,34 @@ function App() {
             updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle pixi
+          Toggle strategic view (hotkey: m)
+        </button>
+        <span> </span>
+        <button
+          onClick={() => {
+            updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
+          }}
+        >
+          Toggle sidebar (hotkey: i)
         </button>
       </div>
 
+      <Sidebar
+        hidden={!gameState.playerUI.isSidebarOpen}
+        setSidebarHidden={() => {
+          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
+        }}
+      >
+        <Tabs
+          onClick={() => {}}
+          value={0}
+          labels={['foo', 'bar']}
+          onChange={(value: number) => {}}
+          active
+        ></Tabs>
+        <br />
+        content
+      </Sidebar>
       <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
