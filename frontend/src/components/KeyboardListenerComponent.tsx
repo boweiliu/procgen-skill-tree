@@ -34,9 +34,9 @@ const defaultKeyIntentConfig = {
   m: IntentName.TOGGLE_STRATEGIC_VIEW,
   i: IntentName.TOGGLE_SIDEBAR,
   q: IntentName.MOVE_CURSOR_NORTHWEST,
-  w: IntentName.MOVE_CURSOR_NORTHWEST,
+  w: IntentName.MOVE_CURSOR_NORTH,
   a: IntentName.MOVE_CURSOR_WEST,
-  s: IntentName.MOVE_CURSOR_SOUTHEAST, // for compatibility with wasd
+  s: IntentName.MOVE_CURSOR_SOUTH,
   d: IntentName.MOVE_CURSOR_EAST,
   e: IntentName.MOVE_CURSOR_NORTHEAST,
   z: IntentName.MOVE_CURSOR_SOUTHWEST,

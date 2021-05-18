@@ -201,35 +201,60 @@ function Component(props: {
   // manage keyboard wasdezx navigation
   useEffect(() => {
     const newIntent = props.gameState.intent.newIntent;
+    const newLocation = virtualDimsToLocation(
+      virtualGridDims.divide(2).floor()
+    );
     if (newIntent[IntentName.MOVE_CURSOR_EAST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.addX(1)
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.addX(1) || newLocation
       );
     }
     if (newIntent[IntentName.MOVE_CURSOR_WEST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.addX(-1)
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.addX(-1) || newLocation
       );
     }
     if (newIntent[IntentName.MOVE_CURSOR_NORTHEAST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.add({ x: 1, y: 1, z: 0 })
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: 1, y: 1, z: 0 }) || newLocation
       );
     }
     if (newIntent[IntentName.MOVE_CURSOR_NORTHWEST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.addY(1)
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.addY(1) || newLocation
       );
     }
     if (newIntent[IntentName.MOVE_CURSOR_SOUTHEAST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.addY(-1)
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.addY(-1) || newLocation
       );
     }
     if (newIntent[IntentName.MOVE_CURSOR_SOUTHWEST]) {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
-        prev?.add({ x: -1, y: -1, z: 0 })
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: -1, y: -1, z: 0 }) || newLocation
       );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_SOUTH]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        if (prev && prev.y % 2 === 0) {
+          return prev?.add({ x: 0, y: -1, z: 0 });
+        } else if (prev && prev.y % 2 !== 0) {
+          return prev?.add({ x: -1, y: -1, z: 0 });
+        } else {
+          return newLocation;
+        }
+      });
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_NORTH]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        if (prev && prev.y % 2 === 0) {
+          return prev?.add({ x: 1, y: 1, z: 0 });
+        } else if (prev && prev.y % 2 !== 0) {
+          return prev?.add({ x: 0, y: 1, z: 0 });
+        } else {
+          return newLocation;
+        }
+      });
     }
   }, [props.gameState.intent.newIntent, props.updaters]);
 
