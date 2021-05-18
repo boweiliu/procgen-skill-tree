@@ -183,6 +183,17 @@ function Component(props: {
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualDims]);
 
+  const setCursoredVirtualNode = useCallback(
+    (v: Vector2 | undefined) => {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        let updated = v ? virtualDimsToLocation(v) : undefined;
+        console.log({ updated });
+        return updated;
+      });
+    },
+    [props.updaters, virtualDimsToLocation]
+  );
+
   return (
     <>
       <GameAreaComponent
@@ -196,13 +207,7 @@ function Component(props: {
         updateNodeStatusCb={handleUpdateNodeStatus}
         onJump={handleJump}
         cursoredVirtualNode={cursoredVirtualNodeCoords}
-        setCursoredVirtualNode={(v: Vector2 | undefined) => {
-          props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-            let updated = v ? virtualDimsToLocation(v) : undefined;
-            console.log({ updated });
-            return updated;
-          });
-        }}
+        setCursoredVirtualNode={setCursoredVirtualNode}
       />
     </>
   );

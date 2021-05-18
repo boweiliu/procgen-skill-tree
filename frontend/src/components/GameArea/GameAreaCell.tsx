@@ -47,11 +47,14 @@ function GameAreaCellComponent({
     [onUpdateStatus, nodeData.status, idx, rowIdx]
   );
 
-  const handleClickQuestionMark = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setCursored(!isCursored);
-  }, []);
+  const handleClickQuestionMark = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setCursored(!isCursored);
+    },
+    [isCursored, setCursored]
+  );
 
   return (
     <Cell
