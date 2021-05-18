@@ -23,10 +23,6 @@ type keyToIntentMap = {
 };
 
 const defaultKeyIntentConfig = {
-  // w: IntentName.PAN_NORTH,
-  // a: IntentName.PAN_WEST,
-  // s: IntentName.PAN_SOUTH,
-  // d: IntentName.PAN_EAST,
   ArrowUp: IntentName.PAN_NORTH,
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
@@ -42,6 +38,7 @@ const defaultKeyIntentConfig = {
   z: IntentName.MOVE_CURSOR_SOUTHWEST,
   x: IntentName.MOVE_CURSOR_SOUTHEAST,
   c: IntentName.MOVE_CURSOR_SOUTHEAST,
+  ' ': IntentName.INTERACT_WITH_NODE,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };
@@ -70,6 +67,8 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
       configuredIntent !== undefined &&
       configuredIntent !== IntentName.NOOP
     ) {
+      e.preventDefault();
+
       this.props.updaters.newIntent[configuredIntent].enqueueUpdate(() => {
         this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
           () => false

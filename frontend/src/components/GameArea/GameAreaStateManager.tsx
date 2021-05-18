@@ -260,7 +260,20 @@ function Component(props: {
         }
       });
     }
-  }, [props.gameState.intent.newIntent, props.updaters]);
+    if (newIntent[IntentName.INTERACT_WITH_NODE]) {
+      if (cursoredVirtualNodeCoords) {
+        handleUpdateNodeStatus({
+          virtualDims: cursoredVirtualNodeCoords,
+          newStatus: NodeAllocatedStatus.TAKEN,
+        });
+      }
+    }
+  }, [
+    props.gameState.intent.newIntent,
+    props.updaters,
+    cursoredVirtualNodeCoords,
+    handleUpdateNodeStatus,
+  ]);
 
   return (
     <>

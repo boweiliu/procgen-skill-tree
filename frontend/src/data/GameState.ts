@@ -93,6 +93,8 @@ export enum IntentName {
   MOVE_CURSOR_NORTHEAST = 'MOVE_CURSOR_NORTHEAST',
   MOVE_CURSOR_SOUTHWEST = 'MOVE_CURSOR_SOUTHWEST',
   MOVE_CURSOR_SOUTHEAST = 'MOVE_CURSOR_SOUTHEAST',
+
+  INTERACT_WITH_NODE = 'INTERACT_WITH_NODE',
 }
 
 export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
