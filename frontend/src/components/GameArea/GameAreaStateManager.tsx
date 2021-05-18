@@ -1,5 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { GameState, appSizeFromWindowSize } from '../../data/GameState';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  GameState,
+  appSizeFromWindowSize,
+  IntentName,
+} from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import {
   AttributeSymbolMap,
@@ -194,12 +198,47 @@ function Component(props: {
     [props.updaters, virtualDimsToLocation]
   );
 
+  // manage keyboard wasdezx navigation
+  useEffect(() => {
+    const newIntent = props.gameState.intent.newIntent;
+    if (newIntent[IntentName.MOVE_CURSOR_EAST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.addX(1)
+      );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_WEST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.addX(-1)
+      );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_NORTHEAST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.add({ x: 1, y: 1, z: 0 })
+      );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_NORTHWEST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.addY(1)
+      );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_SOUTHEAST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.addY(-1)
+      );
+    }
+    if (newIntent[IntentName.MOVE_CURSOR_SOUTHWEST]) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) =>
+        prev?.add({ x: -1, y: -1, z: 0 })
+      );
+    }
+  }, [props.gameState.intent.newIntent, props.updaters]);
+
   return (
     <>
       <GameAreaComponent
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
-        intent={gameState.intent}
+        // intent={gameState.intent}
         virtualGridDims={virtualGridDims}
         jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}

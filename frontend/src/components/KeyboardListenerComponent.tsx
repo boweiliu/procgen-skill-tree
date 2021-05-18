@@ -33,6 +33,7 @@ const defaultKeyIntentConfig = {
   ArrowRight: IntentName.PAN_EAST,
   m: IntentName.TOGGLE_STRATEGIC_VIEW,
   i: IntentName.TOGGLE_SIDEBAR,
+  q: IntentName.MOVE_CURSOR_NORTHWEST,
   w: IntentName.MOVE_CURSOR_NORTHWEST,
   a: IntentName.MOVE_CURSOR_WEST,
   s: IntentName.MOVE_CURSOR_SOUTHEAST, // for compatibility with wasd
@@ -40,6 +41,7 @@ const defaultKeyIntentConfig = {
   e: IntentName.MOVE_CURSOR_NORTHEAST,
   z: IntentName.MOVE_CURSOR_SOUTHWEST,
   x: IntentName.MOVE_CURSOR_SOUTHEAST,
+  c: IntentName.MOVE_CURSOR_SOUTHEAST,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };

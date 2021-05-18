@@ -56,7 +56,7 @@ export const GameAreaComponent = React.memo(GameArea);
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
-  intent: PlayerIntentState;
+  // intent: PlayerIntentState;
   // virtualSize: Vector2; // in pixels
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
@@ -205,6 +205,7 @@ function GameArea(props: {
   }, [container.current, props.appSize]);
 
   // control scroll with keyboard
+  /*
   useEffect(() => {
     let lastTime: number | null = null;
     const SCROLL_INTERVAL_MS = 10;
@@ -252,7 +253,8 @@ function GameArea(props: {
     const interval = setInterval(action, SCROLL_INTERVAL_MS);
     action();
     return () => clearInterval(interval);
-  }, [props.intent.activeIntent, props.intent.newIntent, container.current]);
+  }, [props.intent.activeIntent, props.intent.newIntent, container.current]); 
+  */
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
