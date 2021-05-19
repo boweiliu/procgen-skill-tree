@@ -168,7 +168,7 @@ function Component(props: {
     [
       props.updaters,
       virtualDimsToLocation,
-      gameState.playerSave.allocationStatusMap,
+      // gameState.playerSave.allocationStatusMap,
       gameState.computed.fogOfWarStatusMap,
       gameState.computed.lockStatusMap,
       gameState.worldGen.lockMap,

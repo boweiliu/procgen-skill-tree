@@ -206,60 +206,44 @@ function GameArea(props: {
     previousContainer.current = container.current;
   }, [container.current, props.appSize]);
 
+  console.log('Game area component rerender');
+
   // control scroll with keyboard
   useEffect(() => {
-    console.log('keyboard scroll direction update received');
-  }, [props.keyboardScrollDirection]);
-  /*
-  useEffect(() => {
-    let lastTime: number | null = null;
-    const SCROLL_INTERVAL_MS = 10;
-    const VELOCITY = 0.5;
-    const action = () => {
-      const ref = container.current;
-      if (!ref) return;
-      let direction = Vector2.Zero;
-      if (props.intent.activeIntent[IntentName.PAN_EAST]) {
-        direction = direction.addX(1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_WEST]) {
-        direction = direction.addX(-1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_NORTH]) {
-        direction = direction.addY(1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_SOUTH]) {
-        direction = direction.addY(-1);
-      }
-      // if (!direction.equals(Vector2.Zero)) {
-      //   // window.alert(" got direction " +  direction.toString() + props.intent.toString());
-      //   console.log(" got direction ", new Date(), direction, props.intent);
-      // }
-      if (lastTime === null) {
-        direction = direction.multiply(SCROLL_INTERVAL_MS); // assume 1 tick
-        lastTime = +new Date();
-      } else {
-        const elapsed = +new Date() - lastTime;
-        if (elapsed > 40) {
-          // This REGULARLY fires with a reported delay of 150-200ms, even when scrolling with mouse
-          // for some reason (react optimization??) mouse scrolling is much smoother than keyboard
-          console.log('WAS SLOW - ' + elapsed.toString());
+    if (!props.keyboardScrollDirection.equals(Vector2.Zero)) {
+      console.log('nonzero keyboard scroll direction update received');
+
+      let lastTime: number | null = null;
+      const SCROLL_INTERVAL_MS = 10;
+      const VELOCITY = 0.5;
+      const action = () => {
+        const ref = container.current;
+        if (!ref) return;
+        let direction = Vector2.Zero;
+        if (lastTime === null) {
+          direction = props.keyboardScrollDirection.multiply(
+            SCROLL_INTERVAL_MS
+          ); // assume 1 tick
+          lastTime = +new Date();
+        } else {
+          const elapsed = +new Date() - lastTime;
+          if (elapsed > 40) {
+            console.log('WAS SLOW - ' + elapsed.toString());
+          }
+          direction = props.keyboardScrollDirection.multiply(elapsed);
+          lastTime = +new Date();
         }
-        direction = direction.multiply(elapsed);
-        lastTime = +new Date();
-      }
-      direction = direction.multiply(VELOCITY);
-      // direction = direction.multiply(10);
-      ref.scrollTo(
-        ref.scrollLeft + direction.x,
-        ref.scrollTop - direction.y // scroll is measured from the top left
-      );
-    };
-    const interval = setInterval(action, SCROLL_INTERVAL_MS);
-    action();
-    return () => clearInterval(interval);
-  }, [props.intent.activeIntent, props.intent.newIntent, container.current]); 
-  */
+        direction = direction.multiply(VELOCITY);
+        ref.scrollTo(
+          ref.scrollLeft + direction.x,
+          ref.scrollTop - direction.y // scroll is measured from the top left
+        );
+      };
+      const interval = setInterval(action, SCROLL_INTERVAL_MS);
+      action();
+      return () => clearInterval(interval);
+    }
+  }, [props.keyboardScrollDirection, container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
