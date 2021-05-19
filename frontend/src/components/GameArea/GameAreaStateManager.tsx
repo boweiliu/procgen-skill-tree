@@ -142,7 +142,7 @@ function Component(props: {
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
-      // console.log({ got: 'here' });
+      console.log({ got: 'here handleUpdateNodeStatus' });
       const { virtualDims, newStatus } = args;
       const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
       const prevStatus =

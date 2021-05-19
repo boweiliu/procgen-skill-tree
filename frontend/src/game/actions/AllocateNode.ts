@@ -29,7 +29,12 @@ export class AllocateNodeAction {
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation, newStatus } = input;
 
+    let isNoop = false;
     this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
+      if (prevMap.get(nodeLocation) === newStatus) {
+        isNoop = true;
+        return prevMap;
+      }
       prevMap.put(nodeLocation, newStatus);
       return prevMap.clone();
     });
@@ -37,6 +42,9 @@ export class AllocateNodeAction {
     // before updating Fog of war, first unlock any locks
     this.updaters.computed.lockStatusMap?.enqueueUpdate(
       (prevMap, prevGameState) => {
+        if (isNoop) {
+          return prevMap;
+        }
         if (!prevMap) {
           return prevMap;
         }
@@ -58,6 +66,9 @@ export class AllocateNodeAction {
 
     this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
       (prevMap, prevGameState) => {
+        if (isNoop) {
+          return prevMap;
+        }
         if (!prevMap) {
           return prevMap;
         }
