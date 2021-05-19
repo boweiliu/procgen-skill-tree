@@ -207,6 +207,9 @@ function GameArea(props: {
   }, [container.current, props.appSize]);
 
   // control scroll with keyboard
+  useEffect(() => {
+    console.log('keyboard scroll direction update received');
+  }, [props.keyboardScrollDirection]);
   /*
   useEffect(() => {
     let lastTime: number | null = null;

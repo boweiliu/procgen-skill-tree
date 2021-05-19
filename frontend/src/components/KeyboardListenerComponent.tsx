@@ -62,13 +62,15 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
     const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
+    if (configuredIntent) {
+      e.preventDefault();
+    }
+
     if (
       e.repeat === false &&
       configuredIntent !== undefined &&
       configuredIntent !== IntentName.NOOP
     ) {
-      e.preventDefault();
-
       this.props.updaters.newIntent[configuredIntent].enqueueUpdate(() => {
         this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
           () => false
