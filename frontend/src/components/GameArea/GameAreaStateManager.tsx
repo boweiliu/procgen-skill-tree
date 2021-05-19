@@ -99,25 +99,24 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridStatusMap = useMemo(
-    () =>
-      computeVirtualNodeDataMap({
-        allocationStatusMap: gameState.playerSave.allocationStatusMap,
-        nodeContentsMap: gameState.worldGen.nodeContentsMap,
-        lockMap: gameState.worldGen.lockMap,
-        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-        virtualGridDims,
-        virtualDimsToLocation,
-      }),
-    [
-      gameState.playerSave.allocationStatusMap,
-      gameState.worldGen.nodeContentsMap,
-      gameState.worldGen.lockMap,
-      gameState.computed.fogOfWarStatusMap,
+  const virtualGridStatusMap = useMemo(() => {
+    console.log('recomputed virtualGridStatusMap');
+    return computeVirtualNodeDataMap({
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       virtualGridDims,
       virtualDimsToLocation,
-    ]
-  );
+    });
+  }, [
+    gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
+    gameState.worldGen.lockMap,
+    gameState.computed.fogOfWarStatusMap,
+    virtualGridDims,
+    virtualDimsToLocation,
+  ]);
 
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
@@ -160,15 +159,20 @@ function Component(props: {
         }
       }
 
-      props.actions.allocateNode.enqueueAction({
-        nodeLocation,
-        newStatus: NodeAllocatedStatus.TAKEN,
-      });
+      if (
+        gameState.playerSave.allocationStatusMap.get(nodeLocation) !==
+        NodeAllocatedStatus.TAKEN
+      ) {
+        props.actions.allocateNode.enqueueAction({
+          nodeLocation,
+          newStatus: NodeAllocatedStatus.TAKEN,
+        });
+      }
     },
     [
       props.updaters,
       virtualDimsToLocation,
-      // gameState.playerSave.allocationStatusMap,
+      gameState.playerSave.allocationStatusMap,
       gameState.computed.fogOfWarStatusMap,
       gameState.computed.lockStatusMap,
       gameState.worldGen.lockMap,
