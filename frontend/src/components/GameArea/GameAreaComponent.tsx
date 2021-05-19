@@ -214,8 +214,8 @@ function GameArea(props: {
       console.log('nonzero keyboard scroll direction update received');
 
       let lastTime: number | null = null;
-      const SCROLL_INTERVAL_MS = 10;
-      const VELOCITY = 0.5;
+      const SCROLL_INTERVAL_MS = 8;
+      const VELOCITY = 0.75;
       const action = () => {
         const ref = container.current;
         if (!ref) return;
