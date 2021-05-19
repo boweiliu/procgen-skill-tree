@@ -52,6 +52,7 @@ export const GameAreaComponent = React.memo(GameArea);
  * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
  * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
  * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
+ * @param keyboardScrollDirection if nonzero, player is trying to scroll using keyboard controls
  */
 function GameArea(props: {
   hidden: boolean;
@@ -69,6 +70,7 @@ function GameArea(props: {
   onJump: (args: { direction: Vector2 }) => void;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  keyboardScrollDirection: Vector2;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;

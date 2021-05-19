@@ -275,6 +275,29 @@ function Component(props: {
     handleUpdateNodeStatus,
   ]);
 
+  // Manage keyboard controls here so that the dumb component doesnt have to rerender all the time
+  const keyboardScrollDirection: Vector2 = useMemo(() => {
+    let direction = Vector2.Zero;
+    if (props.gameState.intent.activeIntent.PAN_EAST) {
+      direction = direction.addX(1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_WEST) {
+      direction = direction.addX(-1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_NORTH) {
+      direction = direction.addY(1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_SOUTH) {
+      direction = direction.addY(-1);
+    }
+    return direction;
+  }, [
+    props.gameState.intent.activeIntent.PAN_EAST,
+    props.gameState.intent.activeIntent.PAN_WEST,
+    props.gameState.intent.activeIntent.PAN_NORTH,
+    props.gameState.intent.activeIntent.PAN_SOUTH,
+  ]);
+
   return (
     <>
       <GameAreaComponent
@@ -289,6 +312,7 @@ function Component(props: {
         onJump={handleJump}
         cursoredVirtualNode={cursoredVirtualNodeCoords}
         setCursoredVirtualNode={setCursoredVirtualNode}
+        keyboardScrollDirection={keyboardScrollDirection}
       />
     </>
   );
