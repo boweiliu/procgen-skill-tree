@@ -72,6 +72,8 @@ function GameArea(props: {
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   keyboardScrollDirection: Vector2;
 }) {
+  console.log('Game area component rerender');
+
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
   const gridWidth = hexGridPx.x;
@@ -205,8 +207,6 @@ function GameArea(props: {
     }
     previousContainer.current = container.current;
   }, [container.current, props.appSize]);
-
-  console.log('Game area component rerender');
 
   // control scroll with keyboard
   useEffect(() => {
