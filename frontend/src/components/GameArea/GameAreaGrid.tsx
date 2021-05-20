@@ -96,7 +96,10 @@ function GameArea(props: {
       '--hex-center-radius',
       ` ${hexCenterRadius}px`
     );
-    document.documentElement.style.setProperty('--border', ` ${borderWidth}px`);
+    document.documentElement.style.setProperty(
+      '--border-width',
+      ` ${borderWidth}px`
+    );
   }, [hexGridPx, hexCenterRadius, borderWidth]);
   useEffect(() => {}, [hexCenterRadius]);
   useEffect(() => {

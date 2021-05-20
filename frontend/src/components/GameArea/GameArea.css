@@ -11,7 +11,7 @@
 /* https://css-tricks.com/updating-a-css-variable-with-javascript/
    https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
 :root {
-  --border: 0px;
+  --border-width: 0px;
   --text-readable-white: #000000;
   --app-size-width: 0px;
   --app-size-height: 0px;
