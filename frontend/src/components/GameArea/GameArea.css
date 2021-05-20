@@ -7,3 +7,20 @@
   align-items: center;
   /* height: 100%; */
 }
+
+/* https://css-tricks.com/updating-a-css-variable-with-javascript/
+   https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
+:root {
+  --border: 0px;
+  --text-readable-white: #000000;
+  --app-size-width: 0px;
+  --app-size-height: 0px;
+  --background-black: #000000;
+  --deemphasized-black: #000000;
+  --active-purple: #000000;
+  --border-important-white: #000000;
+  --border-unimportant-black: #000000;
+  --hex-center-radius: 0px;
+  --grid-width: 0px;
+  --grid-height: 0px;
+}
