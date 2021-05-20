@@ -100,7 +100,6 @@ function Component(props: {
   );
 
   const virtualGridStatusMap = useMemo(() => {
-    console.log('recomputed virtualGridStatusMap');
     return computeVirtualNodeDataMap({
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       nodeContentsMap: gameState.worldGen.nodeContentsMap,

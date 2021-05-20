@@ -72,7 +72,7 @@ function GameArea(props: {
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   keyboardScrollDirection: Vector2;
 }) {
-  console.log('Game area component rerender');
+  // console.log('Game area component rerender');
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
@@ -133,7 +133,7 @@ function GameArea(props: {
   // and uses offset to jump to a new scroll position
   useEffect(() => {
     const jumpOffset = props.jumpOffset;
-    console.log({ receivedJumpOffset: jumpOffset }, +new Date());
+    // console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
     const ref = container.current;
     if (!ref) return;
@@ -186,7 +186,7 @@ function GameArea(props: {
         target.scrollTop !== newScrollTop ||
         target.scrollLeft !== newScrollLeft
       ) {
-        console.log('jump!', +new Date());
+        // console.log('jump!', +new Date());
         // target.scrollTo(newScrollLeft, newScrollTop);
         props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
@@ -211,7 +211,7 @@ function GameArea(props: {
   // control scroll with keyboard
   useEffect(() => {
     if (!props.keyboardScrollDirection.equals(Vector2.Zero)) {
-      console.log('nonzero keyboard scroll direction update received');
+      // console.log('nonzero keyboard scroll direction update received');
 
       let lastTime: number | null = null;
       const SCROLL_INTERVAL_MS = 8;

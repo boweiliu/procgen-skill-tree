@@ -33,7 +33,7 @@ function GameAreaCellComponent({
   isCursored: boolean;
   onUpdateCursored: (v: Vector2 | undefined) => void;
 }) {
-  console.log('GameAreaCell rerendered');
+  // console.log('GameAreaCell rerendered');
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
