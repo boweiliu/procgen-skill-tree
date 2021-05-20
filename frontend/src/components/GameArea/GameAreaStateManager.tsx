@@ -140,8 +140,9 @@ function Component(props: {
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
-      console.log({ got: 'here handleUpdateNodeStatus' });
       const { virtualDims, newStatus } = args;
+
+      // console.log({ got: 'here handleUpdateNodeStatus' });
       const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
       const prevStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||

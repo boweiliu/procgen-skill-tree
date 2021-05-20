@@ -31,9 +31,9 @@ export class AllocateNodeAction {
 
     this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
       // console.log('prev was', prevMap.get(nodeLocation), 'now', newStatus);
-      if (prevMap.get(nodeLocation) === newStatus) {
-        return prevMap;
-      }
+      // if (prevMap.get(nodeLocation) === newStatus) {
+      //   return prevMap;
+      // }
       prevMap.put(nodeLocation, newStatus);
       return prevMap.clone();
     });
