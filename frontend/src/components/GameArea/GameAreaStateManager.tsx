@@ -99,25 +99,23 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridStatusMap = useMemo(
-    () =>
-      computeVirtualNodeDataMap({
-        allocationStatusMap: gameState.playerSave.allocationStatusMap,
-        nodeContentsMap: gameState.worldGen.nodeContentsMap,
-        lockMap: gameState.worldGen.lockMap,
-        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-        virtualGridDims,
-        virtualDimsToLocation,
-      }),
-    [
-      gameState.playerSave.allocationStatusMap,
-      gameState.worldGen.nodeContentsMap,
-      gameState.worldGen.lockMap,
-      gameState.computed.fogOfWarStatusMap,
+  const virtualGridStatusMap = useMemo(() => {
+    return computeVirtualNodeDataMap({
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       virtualGridDims,
       virtualDimsToLocation,
-    ]
-  );
+    });
+  }, [
+    gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
+    gameState.worldGen.lockMap,
+    gameState.computed.fogOfWarStatusMap,
+    virtualGridDims,
+    virtualDimsToLocation,
+  ]);
 
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
@@ -142,8 +140,9 @@ function Component(props: {
 
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
-      // console.log({ got: 'here' });
       const { virtualDims, newStatus } = args;
+
+      // console.log({ got: 'here handleUpdateNodeStatus' });
       const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
       const prevStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
@@ -160,10 +159,15 @@ function Component(props: {
         }
       }
 
-      props.actions.allocateNode.enqueueAction({
-        nodeLocation,
-        newStatus: NodeAllocatedStatus.TAKEN,
-      });
+      if (
+        gameState.playerSave.allocationStatusMap.get(nodeLocation) !==
+        NodeAllocatedStatus.TAKEN
+      ) {
+        props.actions.allocateNode.enqueueAction({
+          nodeLocation,
+          newStatus: NodeAllocatedStatus.TAKEN,
+        });
+      }
     },
     [
       props.updaters,
@@ -275,6 +279,29 @@ function Component(props: {
     handleUpdateNodeStatus,
   ]);
 
+  // Manage keyboard controls here so that the dumb component doesnt have to rerender all the time
+  const keyboardScrollDirection: Vector2 = useMemo(() => {
+    let direction = Vector2.Zero;
+    if (props.gameState.intent.activeIntent.PAN_EAST) {
+      direction = direction.addX(1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_WEST) {
+      direction = direction.addX(-1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_NORTH) {
+      direction = direction.addY(1);
+    }
+    if (props.gameState.intent.activeIntent.PAN_SOUTH) {
+      direction = direction.addY(-1);
+    }
+    return direction;
+  }, [
+    props.gameState.intent.activeIntent.PAN_EAST,
+    props.gameState.intent.activeIntent.PAN_WEST,
+    props.gameState.intent.activeIntent.PAN_NORTH,
+    props.gameState.intent.activeIntent.PAN_SOUTH,
+  ]);
+
   return (
     <>
       <GameAreaComponent
@@ -289,6 +316,7 @@ function Component(props: {
         onJump={handleJump}
         cursoredVirtualNode={cursoredVirtualNodeCoords}
         setCursoredVirtualNode={setCursoredVirtualNode}
+        keyboardScrollDirection={keyboardScrollDirection}
       />
     </>
   );

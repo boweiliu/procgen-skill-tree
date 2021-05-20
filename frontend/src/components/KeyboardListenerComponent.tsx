@@ -27,6 +27,10 @@ const defaultKeyIntentConfig = {
   ArrowLeft: IntentName.PAN_WEST,
   ArrowDown: IntentName.PAN_SOUTH,
   ArrowRight: IntentName.PAN_EAST,
+  k: IntentName.PAN_NORTH,
+  h: IntentName.PAN_WEST,
+  j: IntentName.PAN_SOUTH,
+  l: IntentName.PAN_EAST,
   m: IntentName.TOGGLE_STRATEGIC_VIEW,
   i: IntentName.TOGGLE_SIDEBAR,
   q: IntentName.MOVE_CURSOR_NORTHWEST,
@@ -62,13 +66,15 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
     const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
+    if (configuredIntent) {
+      e.preventDefault();
+    }
+
     if (
       e.repeat === false &&
       configuredIntent !== undefined &&
       configuredIntent !== IntentName.NOOP
     ) {
-      e.preventDefault();
-
       this.props.updaters.newIntent[configuredIntent].enqueueUpdate(() => {
         this.props.updaters.newIntent[configuredIntent].enqueueUpdate(
           () => false

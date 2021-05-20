@@ -52,6 +52,7 @@ export const GameAreaComponent = React.memo(GameArea);
  * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
  * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
  * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
+ * @param keyboardScrollDirection if nonzero, player is trying to scroll using keyboard controls
  */
 function GameArea(props: {
   hidden: boolean;
@@ -69,7 +70,10 @@ function GameArea(props: {
   onJump: (args: { direction: Vector2 }) => void;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  keyboardScrollDirection: Vector2;
 }) {
+  // console.log('Game area component rerender');
+
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
   const gridWidth = hexGridPx.x;
@@ -129,7 +133,7 @@ function GameArea(props: {
   // and uses offset to jump to a new scroll position
   useEffect(() => {
     const jumpOffset = props.jumpOffset;
-    console.log({ receivedJumpOffset: jumpOffset }, +new Date());
+    // console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
     const ref = container.current;
     if (!ref) return;
@@ -182,7 +186,7 @@ function GameArea(props: {
         target.scrollTop !== newScrollTop ||
         target.scrollLeft !== newScrollLeft
       ) {
-        console.log('jump!', +new Date());
+        // console.log('jump!', +new Date());
         // target.scrollTo(newScrollLeft, newScrollTop);
         props.onJump({ direction: new Vector2(direction.x, direction.y) });
       }
@@ -205,56 +209,41 @@ function GameArea(props: {
   }, [container.current, props.appSize]);
 
   // control scroll with keyboard
-  /*
   useEffect(() => {
-    let lastTime: number | null = null;
-    const SCROLL_INTERVAL_MS = 10;
-    const VELOCITY = 0.5;
-    const action = () => {
-      const ref = container.current;
-      if (!ref) return;
-      let direction = Vector2.Zero;
-      if (props.intent.activeIntent[IntentName.PAN_EAST]) {
-        direction = direction.addX(1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_WEST]) {
-        direction = direction.addX(-1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_NORTH]) {
-        direction = direction.addY(1);
-      }
-      if (props.intent.activeIntent[IntentName.PAN_SOUTH]) {
-        direction = direction.addY(-1);
-      }
-      // if (!direction.equals(Vector2.Zero)) {
-      //   // window.alert(" got direction " +  direction.toString() + props.intent.toString());
-      //   console.log(" got direction ", new Date(), direction, props.intent);
-      // }
-      if (lastTime === null) {
-        direction = direction.multiply(SCROLL_INTERVAL_MS); // assume 1 tick
-        lastTime = +new Date();
-      } else {
-        const elapsed = +new Date() - lastTime;
-        if (elapsed > 40) {
-          // This REGULARLY fires with a reported delay of 150-200ms, even when scrolling with mouse
-          // for some reason (react optimization??) mouse scrolling is much smoother than keyboard
-          console.log('WAS SLOW - ' + elapsed.toString());
+    if (!props.keyboardScrollDirection.equals(Vector2.Zero)) {
+      // console.log('nonzero keyboard scroll direction update received');
+
+      let lastTime: number | null = null;
+      const SCROLL_INTERVAL_MS = 8;
+      const VELOCITY = 0.75;
+      const action = () => {
+        const ref = container.current;
+        if (!ref) return;
+        let direction = Vector2.Zero;
+        if (lastTime === null) {
+          direction = props.keyboardScrollDirection.multiply(
+            SCROLL_INTERVAL_MS
+          ); // assume 1 tick
+          lastTime = +new Date();
+        } else {
+          const elapsed = +new Date() - lastTime;
+          if (elapsed > 40) {
+            console.log('WAS SLOW - ' + elapsed.toString());
+          }
+          direction = props.keyboardScrollDirection.multiply(elapsed);
+          lastTime = +new Date();
         }
-        direction = direction.multiply(elapsed);
-        lastTime = +new Date();
-      }
-      direction = direction.multiply(VELOCITY);
-      // direction = direction.multiply(10);
-      ref.scrollTo(
-        ref.scrollLeft + direction.x,
-        ref.scrollTop - direction.y // scroll is measured from the top left
-      );
-    };
-    const interval = setInterval(action, SCROLL_INTERVAL_MS);
-    action();
-    return () => clearInterval(interval);
-  }, [props.intent.activeIntent, props.intent.newIntent, container.current]); 
-  */
+        direction = direction.multiply(VELOCITY);
+        ref.scrollTo(
+          ref.scrollLeft + direction.x,
+          ref.scrollTop - direction.y // scroll is measured from the top left
+        );
+      };
+      const interval = setInterval(action, SCROLL_INTERVAL_MS);
+      action();
+      return () => clearInterval(interval);
+    }
+  }, [props.keyboardScrollDirection, container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
