@@ -5,24 +5,11 @@ import {
   IntentName,
 } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
-import {
-  AttributeSymbolMap,
-  nodeContentsLineToString,
-  nodeContentsConditionToString,
-} from '../../game/worldGen/nodeContents/NodeContentsRendering';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import {
-  computeVirtualNodeDataMap,
-  NodeReactData,
-} from './computeVirtualNodeDataMap';
-import {
-  GameAreaComponent,
-  LockStatus,
-  NodeAllocatedStatus,
-} from './GameAreaGrid';
+import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
+import { GameAreaComponent, NodeAllocatedStatus } from './GameAreaGrid';
 import {
   locationToVirtualCoords,
   virtualCoordsToLocation,
@@ -140,6 +127,9 @@ function Component(props: {
     [virtualGridDims]
   );
 
+  /**
+   * If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
+   */
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
       const { virtualDims, newStatus } = args;
@@ -181,6 +171,7 @@ function Component(props: {
     ]
   );
 
+  // manage cursor "node selected" state
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       console.log({
@@ -200,7 +191,7 @@ function Component(props: {
         console.log({ updated });
         return updated;
       });
-      if (v) {
+      if (!!v) {
         // also open the sidebar
         props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
       }

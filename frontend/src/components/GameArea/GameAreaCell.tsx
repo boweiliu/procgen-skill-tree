@@ -2,7 +2,7 @@ import './GameAreaCell.css';
 import './GameArea.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaGrid';
