@@ -101,7 +101,6 @@ function GameArea(props: {
       ` ${borderWidth}px`
     );
   }, [hexGridPx, hexCenterRadius, borderWidth]);
-  useEffect(() => {}, [hexCenterRadius]);
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--background-black',
