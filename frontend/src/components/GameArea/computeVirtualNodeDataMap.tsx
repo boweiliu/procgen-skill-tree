@@ -10,7 +10,7 @@ import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { LazyHashMap } from '../../lib/util/lazy';
-import { LockStatus, NodeAllocatedStatus } from './GameAreaComponent';
+import { LockStatus, NodeAllocatedStatus } from './GameAreaGrid';
 
 export type NodeReactData = {
   // 3-4 character description that goes on the main board

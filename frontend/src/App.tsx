@@ -3,7 +3,7 @@ import './App.css';
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
-import { GameAreaComponent } from './components/GameArea/GameAreaComponent';
+import { GameAreaComponent } from './components/GameArea/GameAreaGrid';
 import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';

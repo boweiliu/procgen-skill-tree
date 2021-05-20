@@ -1,7 +1,7 @@
 import {
   LockStatus,
   NodeAllocatedStatus,
-} from '../components/GameArea/GameAreaComponent';
+} from '../components/GameArea/GameAreaGrid';
 import {
   HashMap,
   HashSet,

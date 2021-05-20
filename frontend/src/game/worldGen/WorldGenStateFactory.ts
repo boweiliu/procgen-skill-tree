@@ -1,4 +1,4 @@
-import { LockStatus } from '../../components/GameArea/GameAreaComponent';
+import { LockStatus } from '../../components/GameArea/GameAreaGrid';
 import {
   WorldGenState,
   ChunkGen,

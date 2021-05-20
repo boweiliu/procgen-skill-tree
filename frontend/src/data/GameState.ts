@@ -1,7 +1,7 @@
 import {
   LockStatus,
   NodeAllocatedStatus,
-} from '../components/GameArea/GameAreaComponent';
+} from '../components/GameArea/GameAreaGrid';
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';

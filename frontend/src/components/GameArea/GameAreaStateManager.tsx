@@ -22,7 +22,7 @@ import {
   GameAreaComponent,
   LockStatus,
   NodeAllocatedStatus,
-} from './GameAreaComponent';
+} from './GameAreaGrid';
 import {
   locationToVirtualCoords,
   virtualCoordsToLocation,

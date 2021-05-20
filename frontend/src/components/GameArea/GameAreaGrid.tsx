@@ -1,4 +1,4 @@
-import './GameAreaComponent.css';
+import './GameAreaGrid.css';
 import './GameArea.css';
 
 import React, { useCallback, useEffect, useRef } from 'react';

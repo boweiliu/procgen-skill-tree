@@ -1,7 +1,7 @@
 import {
   LockStatus,
   NodeAllocatedStatus,
-} from '../../components/GameArea/GameAreaComponent';
+} from '../../components/GameArea/GameAreaGrid';
 import { GameState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';

@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaComponent';
+import { UpdateStatusCb, NodeAllocatedStatus } from './GameAreaGrid';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
