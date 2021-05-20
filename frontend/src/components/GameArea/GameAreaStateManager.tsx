@@ -3,13 +3,14 @@ import {
   GameState,
   appSizeFromWindowSize,
   IntentName,
+  NodeAllocatedStatus,
 } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaComponent, NodeAllocatedStatus } from './GameAreaGrid';
+import { GameAreaComponent } from './GameAreaGrid';
 import {
   locationToVirtualCoords,
   virtualCoordsToLocation,

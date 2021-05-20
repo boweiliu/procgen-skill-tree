@@ -1,8 +1,8 @@
 import {
+  GameState,
   LockStatus,
   NodeAllocatedStatus,
-} from '../../components/GameArea/GameAreaGrid';
-import { GameState } from '../../data/GameState';
+} from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';

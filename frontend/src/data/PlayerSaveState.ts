@@ -1,14 +1,10 @@
-import {
-  LockStatus,
-  NodeAllocatedStatus,
-} from '../components/GameArea/GameAreaGrid';
+import { LockStatus, NodeAllocatedStatus } from './GameState';
 import {
   HashMap,
   HashSet,
   KeyedHashMap,
 } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { Lazy, LazyHashMap } from '../lib/util/lazy';
 import { PointNodeRef } from './PointNodeRef';
 import { ResourceType } from './WorldGenState';
 

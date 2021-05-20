@@ -9,26 +9,7 @@ import { NodeReactData } from './computeVirtualNodeDataMap';
 import { hexGridPx } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
 import { CssVariablesComponent } from './CssVariables';
-
-/**
- * TODO(bowei): move these enums out of here into game state
- */
-export enum NodeAllocatedStatus {
-  // DEPRECATED
-  TAKEN = 'TAKEN',
-
-  // NOT DEPRECATED
-  VISIBLE = 'VISIBLE',
-  HIDDEN = 'HIDDEN',
-  AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
-  UNREACHABLE = 'UNREACHABLE',
-}
-
-export enum LockStatus {
-  CLOSED = 'CLOSED',
-  TICKING = 'TICKING',
-  OPEN = 'OPEN',
-}
+import { NodeAllocatedStatus } from '../../data/GameState';
 
 export type UpdateStatusCb = (args: {
   virtualDims: Vector2;

@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
@@ -10,7 +11,6 @@ import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { LazyHashMap } from '../../lib/util/lazy';
-import { LockStatus, NodeAllocatedStatus } from './GameAreaGrid';
 
 export type NodeReactData = {
   // 3-4 character description that goes on the main board
