@@ -3,16 +3,17 @@
 :root {
   --border: 2px;
   --readable-white: #888888;
-  --app-size-width: none;
-  --app-size-height: none;
-  --background-black: none;
-  --deemphasized-black: none;
-  --active-purple: none;
-  --border-important-white: none;
-  --border-unimportant-black: none;
-  --hex-center-radius: none;
-  --grid-width: none;
-  --grid-height: none;
+
+  --app-size-width: 0px;
+  --app-size-height: 0px;
+  --background-black: #000000;
+  --deemphasized-black: #000000;
+  --active-purple: #000000;
+  --border-important-white: #000000;
+  --border-unimportant-black: #000000;
+  --hex-center-radius: 0px;
+  --grid-width: 0px;
+  --grid-height: 0px;
 }
 
 .game-area {
