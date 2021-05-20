@@ -83,7 +83,7 @@
 .question {
   margin-top: calc(-1 * var(--hex-center-radius));
   margin-left: calc(0.125 * var(--hex-center-radius));
-  color: var(--readable-white);
+  color: var(--text-readable-white);
   cursor: pointer;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .tiny-text {
-  color: var(--readable-white);
+  color: var(--text-readable-white);
   font-size: small; /* this invalidates the below comment, potentially */
 
   /* font is 12px x 16px but there's like 2px of "typography space/kern" at the right and top.

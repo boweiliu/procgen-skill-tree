@@ -5,10 +5,13 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS, { colorToCss } from '../../pixi/colors';
-import { IntentName, PlayerIntentState } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx, hexCenterRadius } from './GameAreaStateManager';
+import {
+  hexGridPx,
+  hexCenterRadius,
+  borderWidth,
+} from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
 
 /**
@@ -89,13 +92,13 @@ function GameArea(props: {
       '--grid-height',
       ` ${hexGridPx.y}px`
     );
-  }, [hexGridPx]);
-  useEffect(() => {
     document.documentElement.style.setProperty(
       '--hex-center-radius',
       ` ${hexCenterRadius}px`
     );
-  }, [hexCenterRadius]);
+    document.documentElement.style.setProperty('--border', ` ${borderWidth}px`);
+  }, [hexGridPx, hexCenterRadius, borderWidth]);
+  useEffect(() => {}, [hexCenterRadius]);
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--background-black',
@@ -116,6 +119,10 @@ function GameArea(props: {
     document.documentElement.style.setProperty(
       '--border-important-white',
       colorToCss(COLORS.borderWhite)
+    );
+    document.documentElement.style.setProperty(
+      '--text-readable-white',
+      colorToCss(COLORS.textWhite)
     );
   }, [COLORS]);
   useEffect(() => {
