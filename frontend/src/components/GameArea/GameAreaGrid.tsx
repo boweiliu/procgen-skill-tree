@@ -4,15 +4,11 @@ import './GameArea.css';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import COLORS, { colorToCss } from '../../pixi/colors';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import {
-  hexGridPx,
-  hexCenterRadius,
-  borderWidth,
-} from './GameAreaStateManager';
+import { hexGridPx } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
+import { CssVariablesComponent } from './CssVariables';
 
 /**
  * TODO(bowei): move these enums out of here into game state
@@ -81,62 +77,6 @@ function GameArea(props: {
   const previousContainer = useRef<HTMLDivElement>(null) as any;
   const gridWidth = hexGridPx.x;
   const gridHeight = hexGridPx.y;
-
-  // Set css variables from react
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--grid-width',
-      ` ${hexGridPx.x}px`
-    );
-    document.documentElement.style.setProperty(
-      '--grid-height',
-      ` ${hexGridPx.y}px`
-    );
-    document.documentElement.style.setProperty(
-      '--hex-center-radius',
-      ` ${hexCenterRadius}px`
-    );
-    document.documentElement.style.setProperty(
-      '--border-width',
-      ` ${borderWidth}px`
-    );
-  }, [hexGridPx, hexCenterRadius, borderWidth]);
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--background-black',
-      colorToCss(COLORS.backgroundBlue)
-    );
-    document.documentElement.style.setProperty(
-      '--deemphasized-black',
-      colorToCss(COLORS.grayBlack)
-    );
-    document.documentElement.style.setProperty(
-      '--active-purple',
-      colorToCss(COLORS.nodePink)
-    );
-    document.documentElement.style.setProperty(
-      '--border-unimportant-black',
-      colorToCss(COLORS.borderBlack)
-    );
-    document.documentElement.style.setProperty(
-      '--border-important-white',
-      colorToCss(COLORS.borderWhite)
-    );
-    document.documentElement.style.setProperty(
-      '--text-readable-white',
-      colorToCss(COLORS.textWhite)
-    );
-  }, [COLORS]);
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--app-size-width',
-      ` ${props.appSize.x}px`
-    );
-    document.documentElement.style.setProperty(
-      '--app-size-height',
-      ` ${props.appSize.y}px`
-    );
-  }, [props.appSize]);
 
   // Receives a Vector2 instance jumpOffset,
   // and uses offset to jump to a new scroll position
@@ -269,10 +209,13 @@ function GameArea(props: {
   return (
     <div
       ref={container}
-      className="game-area hidden-scrollbars"
+      // className="game-area hidden-scrollbars"
+      className="game-area"
       hidden={props.hidden}
       onScroll={handleScroll}
     >
+      <CssVariablesComponent appSize={props.appSize} />
+
       <div className="virtual-game-area">
         {Array(props.virtualGridDims.y)
           .fill(0)

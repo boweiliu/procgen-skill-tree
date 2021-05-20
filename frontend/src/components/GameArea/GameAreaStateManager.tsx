@@ -34,6 +34,9 @@ export const borderWidth = 2; // border of circles, etc. in px
  */
 export const virtualAreaScaleMultiplier = 3.0;
 
+/**
+ * Wrapper for GameAreaGrid which handles most of the state management - so that rerendering doesnt have to happen so often.
+ */
 export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
   gameState: GameState;
@@ -54,17 +57,18 @@ function Component(props: {
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
   const virtualGridDims = useMemo(() => {
-    return new Vector2(
-      // needs to be at least 3.8 x 4.8 so we have room for jumps
-      Math.max(
-        4,
-        Math.floor((appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5)
-      ),
-      Math.max(
-        5,
-        Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y)
-      )
+    let x = Math.floor(
+      (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
     );
+    let y = Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y);
+
+    // y = (Math.floor((y - 1) / 2) * 2) + 1; // force y to be odd
+
+    // needs to be at least 3.8 x 4.8 so we have room for jumps
+    // x = Math.max(4, x);
+    // y = Math.max(5, y);
+
+    return new Vector2(x, y);
   }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
 
   const virtualDimsToLocation = useCallback(
