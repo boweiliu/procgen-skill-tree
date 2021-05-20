@@ -198,44 +198,47 @@ function GameArea(props: {
       <CssVariablesComponent appSize={props.appSize} />
 
       <div className="virtual-game-area">
-        {Array(props.virtualGridDims.y)
-          .fill(0)
-          .map((_, y) => (
-            <Row
-              key={props.virtualDimsToLocation(new Vector2(0, y)).y.toString()}
-              rowIdx={y}
-            >
-              {Array(props.virtualGridDims.x)
-                .fill(0)
-                .map((_, x) => {
-                  const virtualCoords = new Vector2(x, y);
-                  const nodeData = props.virtualGridStatusMap.get(
-                    virtualCoords
-                  )!;
-                  return (
-                    <GameAreaCell
-                      nodeData={nodeData}
-                      key={nodeData?.id ?? `loading${x}`}
-                      idx={x}
-                      rowIdx={y}
-                      onUpdateStatus={props.updateNodeStatusCb}
-                      isCursored={
-                        !!props.cursoredVirtualNode &&
-                        props.cursoredVirtualNode.equals(virtualCoords)
-                      }
-                      onUpdateCursored={props.setCursoredVirtualNode}
-                    />
-                  );
-                })}
-            </Row>
-          ))}
+        <>
+          {Array(props.virtualGridDims.y)
+            .fill(0)
+            .map((_, y) => (
+              <Row
+                key={props
+                  .virtualDimsToLocation(new Vector2(0, y))
+                  .y.toString()}
+                rowIdx={y}
+              >
+                {Array(props.virtualGridDims.x)
+                  .fill(0)
+                  .map((_, x) => {
+                    const virtualCoords = new Vector2(x, y);
+                    const nodeData = props.virtualGridStatusMap.get(
+                      virtualCoords
+                    )!;
+                    return (
+                      <GameAreaCell
+                        nodeData={nodeData}
+                        key={nodeData?.id ?? `loading${x}`}
+                        idx={x}
+                        rowIdx={y}
+                        onUpdateStatus={props.updateNodeStatusCb}
+                        isCursored={
+                          !!props.cursoredVirtualNode &&
+                          props.cursoredVirtualNode.equals(virtualCoords)
+                        }
+                        onUpdateCursored={props.setCursoredVirtualNode}
+                      />
+                    );
+                  })}
+              </Row>
+            ))}
+        </>
       </div>
     </div>
   );
 }
 
 const Row = React.memo(RowComponent);
-
 function RowComponent({
   rowIdx,
   children,
@@ -246,6 +249,8 @@ function RowComponent({
   /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   const odd = !!(rowIdx % 2);
 
+  // If the row number is odd, prepend a half-block to the row contents of hex blocks
+  // Else, if the row number is even, append a half-block
   return (
     <div className="hex-block-row">
       {odd && <div className="hex-block hex-half-block" />}
