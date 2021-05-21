@@ -48,7 +48,7 @@ function Component(props: {
 }) {
   const { gameState, appSize } = props;
 
-  const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
+  // const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
   const virtualGridDims = useMemo(() => {
     let x = Math.floor(
@@ -104,26 +104,26 @@ function Component(props: {
     virtualDimsToLocation,
   ]);
 
-  const handleJump = useCallback(
-    (args: { direction: Vector2 }) => {
-      // direction: if we hit bottom right of screen, direction == (1,1)
-      // console.log({ direction: args.direction });
-      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
-      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
-      jumpAmounts = jumpAmounts
-        .clampX(1, virtualGridDims.x - 1)
-        .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
-      const jumpOffset = jumpAmounts.multiply(args.direction);
-      console.log({ jumpOffset });
-      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-        return it
-          .addX(jumpOffset.x)
-          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
-      });
-      setJumpOffset(jumpOffset.multiply(1));
-    },
-    [virtualGridDims]
-  );
+  // const handleJump = useCallback(
+  //   (args: { direction: Vector2 }) => {
+  //     // direction: if we hit bottom right of screen, direction == (1,1)
+  //     // console.log({ direction: args.direction });
+  //     let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+  //     jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
+  //     jumpAmounts = jumpAmounts
+  //       .clampX(1, virtualGridDims.x - 1)
+  //       .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
+  //     const jumpOffset = jumpAmounts.multiply(args.direction);
+  //     console.log({ jumpOffset });
+  //     props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+  //       return it
+  //         .addX(jumpOffset.x)
+  //         .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
+  //     });
+  //     setJumpOffset(jumpOffset.multiply(1));
+  //   },
+  //   [virtualGridDims]
+  // );
 
   /**
    * If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
@@ -306,13 +306,14 @@ function Component(props: {
       <GameAreaComponent
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
+        updaters={props.updaters}
         // intent={gameState.intent}
         virtualGridDims={virtualGridDims}
-        jumpOffset={jumpOffset}
+        // jumpOffset={jumpOffset}
         virtualGridStatusMap={virtualGridStatusMap}
         virtualDimsToLocation={virtualDimsToLocation}
         updateNodeStatusCb={handleUpdateNodeStatus}
-        onJump={handleJump}
+        // onJump={handleJump}
         cursoredVirtualNode={cursoredVirtualNodeCoords}
         setCursoredVirtualNode={setCursoredVirtualNode}
         keyboardScrollDirection={keyboardScrollDirection}

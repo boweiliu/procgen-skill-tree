@@ -1,7 +1,7 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -9,7 +9,8 @@ import { NodeReactData } from './computeVirtualNodeDataMap';
 import { hexGridPx } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
 import { CssVariablesComponent } from './CssVariables';
-import { NodeAllocatedStatus } from '../../data/GameState';
+import { GameState, NodeAllocatedStatus } from '../../data/GameState';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 
 export type UpdateStatusCb = (args: {
   virtualDims: Vector2;
@@ -37,17 +38,18 @@ export const GameAreaComponent = React.memo(GameArea);
 function GameArea(props: {
   hidden: boolean;
   appSize: Vector2;
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
   // intent: PlayerIntentState;
   // virtualSize: Vector2; // in pixels
   virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
   // this object reference is guaranteed to be stable unless jump cb is called
 
-  jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
+  // jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
   virtualDimsToLocation: (v: Vector2) => Vector3;
   virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
-  onJump: (args: { direction: Vector2 }) => void;
+  // onJump: (args: { direction: Vector2 }) => void;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   keyboardScrollDirection: Vector2;
@@ -58,11 +60,13 @@ function GameArea(props: {
   const previousContainer = useRef<HTMLDivElement>(null) as any;
   const gridWidth = hexGridPx.x;
   const gridHeight = hexGridPx.y;
+  const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
+  const { virtualGridDims } = props;
 
   // Receives a Vector2 instance jumpOffset,
   // and uses offset to jump to a new scroll position
   useEffect(() => {
-    const jumpOffset = props.jumpOffset;
+    // const jumpOffset = props.jumpOffset;
     // console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
     const ref = container.current;
@@ -71,7 +75,28 @@ function GameArea(props: {
       ref.scrollLeft - jumpOffset.x * gridWidth,
       ref.scrollTop - jumpOffset.y * gridHeight
     );
-  }, [props.jumpOffset]);
+  }, [jumpOffset]);
+
+  const handleJump = useCallback(
+    (args: { direction: Vector2 }) => {
+      // direction: if we hit bottom right of screen, direction == (1,1)
+      // console.log({ direction: args.direction });
+      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
+      jumpAmounts = jumpAmounts
+        .clampX(1, virtualGridDims.x - 1)
+        .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
+      const jumpOffset = jumpAmounts.multiply(args.direction);
+      console.log({ jumpOffset });
+      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+        return it
+          .addX(jumpOffset.x)
+          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
+      });
+      setJumpOffset(jumpOffset.multiply(1));
+    },
+    [virtualGridDims]
+  );
 
   /**
    * Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
@@ -118,7 +143,7 @@ function GameArea(props: {
       ) {
         // console.log('jump!', +new Date());
         // target.scrollTo(newScrollLeft, newScrollTop);
-        props.onJump({ direction: new Vector2(direction.x, direction.y) });
+        handleJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
     [props.appSize.x, props.appSize.y]
