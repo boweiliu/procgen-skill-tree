@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import {
-  GameState,
-  IntentName,
-  NodeAllocatedStatus,
-} from '../../data/GameState';
+import { GameState, NodeAllocatedStatus } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';

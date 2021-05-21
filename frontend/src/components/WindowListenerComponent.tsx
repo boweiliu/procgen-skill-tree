@@ -1,5 +1,5 @@
 import React from 'react';
-import UAParser from 'ua-parser-js';
+// import UAParser from 'ua-parser-js';
 import { GameState, WindowState } from '../data/GameState';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
