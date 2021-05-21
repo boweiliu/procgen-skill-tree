@@ -26,6 +26,7 @@
   height: var(--grid-height);
 }
 
+/* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
 .hex-block-row {
   display: block;
   float: left;

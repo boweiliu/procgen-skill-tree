@@ -44,7 +44,7 @@ function GameAreaCellComponent({
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
-        virtualCoords: new Vector2(idx, rowIdx),
+        virtualCoords: new Vector2(idx, rowIdx), // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
@@ -55,6 +55,7 @@ function GameAreaCellComponent({
     (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
+      // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
       onUpdateCursored(isCursored ? undefined : new Vector2(idx, rowIdx));
     },
     [isCursored, onUpdateCursored]

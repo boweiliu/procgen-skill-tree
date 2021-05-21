@@ -1,15 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  GameState,
-  appSizeFromWindowSize,
-  IntentName,
-  NodeAllocatedStatus,
-} from '../../data/GameState';
+import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
-import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
 import { CssVariablesComponent } from './CssVariables';
 import { GameAreaStateManager } from './GameAreaStateManager';
 
@@ -32,7 +26,10 @@ export const borderWidth = 2; // border of circles, etc. in px
  */
 export const virtualAreaScaleMultiplier = 3.0;
 
-const gameState: GameState = {} as any;
+/**
+ * The subset of the game state that is relevant to game area components.
+ */
+const gameState: GameState = {} as any; // easily extract types without type-ing them out
 export type GameAreaSubState = {
   playerUI: {
     virtualGridLocation: typeof gameState.playerUI.virtualGridLocation;
@@ -53,7 +50,10 @@ export type GameAreaSubState = {
   intent: typeof gameState.intent;
 };
 
-// export const GameAreaInterface = React.memo(Component);
+/**
+ * Handles managing constants (settings) as well as pruning down game state and updaters to what is actually relevant.
+ * Helps with memoization as well.
+ */
 export function GameAreaInterface(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
@@ -114,9 +114,10 @@ export function GameAreaInterface(props: {
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
     gameState.computed.lockStatusMap,
-    gameState.intent,
+    gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
   ]);
 
+  // TODO(bowei): improve this abstraction??
   const actions = useMemo(() => {
     return { allocateNode: new AllocateNodeAction(props.updaters) };
   }, [props.updaters]);

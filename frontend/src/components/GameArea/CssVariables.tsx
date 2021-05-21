@@ -1,9 +1,13 @@
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { colorToCss } from '../../pixi/colors';
 
 export const CssVariablesComponent = React.memo(Component);
 
+/**
+ * Handles loading display settings from props into css variables.
+ * component is empty in the DOM - can be embedded anywhere in react hierarchy
+ */
 function Component(props: {
   appSize: Vector2;
   hexGridPx: Vector2;

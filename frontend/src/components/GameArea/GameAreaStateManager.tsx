@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   GameState,
-  appSizeFromWindowSize,
   IntentName,
   NodeAllocatedStatus,
 } from '../../data/GameState';
@@ -19,7 +18,9 @@ import {
 } from './locationUtils';
 
 /**
- * Wrapper for GameAreaGrid which handles most of the state management - so that rerendering doesnt have to happen so often.
+ * Wrapper for GameAreaGrid that manages game state location <> virtual coord conversions, as well as populating the onClick/onSelect callbacks when interacting with nodes.
+ * @param virtualGridDims integer vector for # of grid cells in each dimension
+ * @param appSize the playable area
  */
 export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
@@ -32,6 +33,7 @@ function Component(props: {
   const { gameState, appSize, virtualGridDims } = props;
   // console.log("GameArea state manager rerender");
 
+  // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
   const virtualCoordsToLocation = useCallback(
     (virtualCoords: Vector2): Vector3 => {
       return convertVirtualCoordsToLocation({
@@ -53,6 +55,7 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
+  // Hydrate the contents of all the nodes
   const virtualNodeDataMap = useMemo(() => {
     return computeVirtualNodeDataMap({
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -71,30 +74,7 @@ function Component(props: {
     virtualCoordsToLocation,
   ]);
 
-  // const handleJump = useCallback(
-  //   (args: { direction: Vector2 }) => {
-  //     // direction: if we hit bottom right of screen, direction == (1,1)
-  //     // console.log({ direction: args.direction });
-  //     let jumpAmounts = virtualGridDims.multiply(0.35).floor();
-  //     jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
-  //     jumpAmounts = jumpAmounts
-  //       .clampX(1, virtualGridDims.x - 1)
-  //       .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
-  //     const jumpOffset = jumpAmounts.multiply(args.direction);
-  //     console.log({ jumpOffset });
-  //     props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-  //       return it
-  //         .addX(jumpOffset.x)
-  //         .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
-  //     });
-  //     setJumpOffset(jumpOffset.multiply(1));
-  //   },
-  //   [virtualGridDims]
-  // );
-
-  /**
-   * If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
-   */
+  // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
       const { virtualCoords, newStatus } = args;
@@ -136,13 +116,13 @@ function Component(props: {
     ]
   );
 
-  // manage cursor "node selected" state
+  // Manage cursor "node selected" state
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
-      console.log({
-        3: gameState.playerUI.cursoredNodeLocation,
-        2: locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation),
-      });
+      // console.log({
+      //   3: gameState.playerUI.cursoredNodeLocation,
+      //   2: locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation),
+      // });
       return locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation);
     } else {
       return undefined;
@@ -245,7 +225,8 @@ function Component(props: {
     handleUpdateNodeStatus,
   ]);
 
-  // Manage keyboard controls here so that the dumb component doesnt have to rerender all the time
+  // Manage keyboard scrolling here
+  // TODO(bowei): move this into infinite scroll manager. the only reason this is here is because we have access to intent object conveniently here
   const keyboardScrollDirection: Vector2 = useMemo(() => {
     let direction = Vector2.Zero;
     if (props.gameState.intent.activeIntent.PAN_EAST) {

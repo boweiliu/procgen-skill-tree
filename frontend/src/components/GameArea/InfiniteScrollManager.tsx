@@ -22,7 +22,7 @@ type Props = {
   hexGridPx: Vector2; // the size of a single grid unit, in px
   virtualGridDims: Vector2; // in grid units. width x height, guaranteed to be integers
   children?: any;
-  debug?: any; // TODO(bowei): contains triggers (extracted out of gameState.playerUI) for debugging the scroll jump and the virtual position rerender, SEPARATELY
+  debug?: any;
 
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
@@ -31,7 +31,13 @@ type Props = {
 export const InfiniteScrollManager = React.memo(Component);
 /**
  * Manages the scroll state.
- * @param hidden
+ * @param hidden true to disappear this entire component and all its children.
+ * @param appSize size of the scrollable viewport
+ * @param hexGridPx size of a single grid unit, in px. needs to be a good ratio if we want an actual hex grid
+ * @param virtualGridDims integer vector for # of grid cells in each dimension
+ * @param children any react subcomponents. Note that updating children causes this component to update as well - react memo is sensitive to it
+ * @param debug TODO(bowei): contains triggers (extracted out of gameState.playerUI) for debugging the scroll jump and the virtual position rerender, SEPARATELY
+ * @param keyboardScrollDirection unit-ish vector indicating player using keyboard controls to scroll (we disabled native browser keyboard scrolling)
  */
 function Component(props: Props) {
   const {
@@ -42,23 +48,6 @@ function Component(props: Props) {
     keyboardScrollDirection,
   } = props;
   console.log('infinite scroll manager rerender');
-
-  useMemo(() => {
-    console.log('hexGridPx changed');
-    return null;
-  }, [hexGridPx]);
-  useMemo(() => {
-    console.log('children changed');
-    return null;
-  }, [props.children]);
-  useMemo(() => {
-    console.log('updaters changed');
-    return null;
-  }, [props.updaters]);
-  useMemo(() => {
-    console.log('keyboardScrollDirection changed');
-    return null;
-  }, [props.keyboardScrollDirection]);
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
@@ -91,6 +80,7 @@ function Component(props: Props) {
     );
   }, [jumpOffset]);
 
+  // when we trigger a scroll jump, compute where we jump to, and don't forget to update the virtual grid location
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
@@ -116,9 +106,7 @@ function Component(props: Props) {
     [virtualGridDims, updaters]
   );
 
-  /**
-   * Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
-   */
+  // Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
@@ -200,18 +188,6 @@ function Component(props: Props) {
     }
   }, [keyboardScrollDirection, container.current]);
 
-  /**
-   * See pointer/mouse, over/enter/out/leave, event propagation documentation
-   * https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_event_mouseenter_mouseover#:~:text=mouseenter%20and%20mouseover.-,The%20mouseover%20event%20triggers%20when%20the%20mouse%20pointer%20enters%20the,moved%20over%20the%20div%20element.
-   * https://stackoverflow.com/questions/4697758/prevent-onmouseout-when-hovering-child-element-of-the-parent-absolute-div-withou
-   * https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
-   * https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Examples#example_5_event_propagation
-   * https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation
-   * https://developer.mozilla.org/en-US/docs/Web/API/Event/target
-   * https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-   * https://stackoverflow.com/questions/55546973/react-onmouseenter-event-triggering-on-child-element
-   * https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
-   */
   return (
     <div
       ref={container}

@@ -18,21 +18,21 @@ export type UpdateStatusCb = (args: {
 
 export const GameAreaGrid = React.memo(Component);
 /**
- * Dumb-ish component that manages the game board where the skill tree is located, as well as the "virtual"
+ * Dumb-ish component that manages the game board where the skill tree is located
+ * , as well as the "virtual"
  * game space which is larger than the currently visible scrollable area the player can see.
  *
- * @param virtualGridDims the integer dimensions of the virtual scrollable space, measured in grid units.
- * @param virtualCoordsToLocation utility stateless function to convert from ui virtual grid dims (ints) to 3d node location in game state (ints)
- * @param virtualNodeDataMap table of ui grid location to object containing react fragments for contents of that node
- * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change.
+ * @param virtualGridDims the integer dimensions of the virtual scrollable space, measured in grid units. integer vector.
+ * @param virtualCoordsToLocation utility stateless function to convert from ui virtual grid coords (ints) to 3d node location in game state (ints)
+ * @param virtualNodeDataMap table of ui grid corods to object containing react fragments for contents of that node
+ * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change. need to provide the virtual grid coords of the node to be allocated, and the new status.
  * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
- * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
+ * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored, or undefined to clear cursor
  */
 function Component(props: {
-  virtualGridDims: Vector2; // in grid units. width x height. integer
+  virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
   virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
-  // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
@@ -65,7 +65,7 @@ function Component(props: {
         .fill(0)
         .map((_, y) => (
           <Row
-            key={virtualCoordsToLocation(new Vector2(0, y)).y.toString()}
+            key={virtualCoordsToLocation(new Vector2(0, y)).y.toString()} // important to force react to hang on to the old row
             rowIdx={y}
           >
             {Array(virtualGridDims.x)
@@ -102,7 +102,6 @@ function RowComponent({
   rowIdx: number;
   children?: React.ReactNode;
 }) {
-  /* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
   const odd = !!(rowIdx % 2);
 
   // If the row number is odd, prepend a half-block to the row contents of hex blocks
