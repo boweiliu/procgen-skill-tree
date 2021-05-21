@@ -1,10 +1,8 @@
 import {
-  LockStatus,
-  NodeAllocatedStatus,
-} from '../components/GameArea/GameAreaComponent';
-import {
   GameState,
   PointNodeRef,
+  LockStatus,
+  NodeAllocatedStatus,
   noIntent,
   WindowState,
 } from '../data/GameState';

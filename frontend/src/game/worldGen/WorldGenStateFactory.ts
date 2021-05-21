@@ -1,4 +1,3 @@
-import { LockStatus } from '../../components/GameArea/GameAreaComponent';
 import {
   WorldGenState,
   ChunkGen,
@@ -8,6 +7,7 @@ import {
   ResourceType,
   ResourceModifier,
   ResourceNontrivialType,
+  LockStatus,
 } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeType } from '../../data/WorldGenState';

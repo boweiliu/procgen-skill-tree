@@ -1,8 +1,5 @@
 import * as Pixi from 'pixi.js';
-import {
-  LockStatus,
-  NodeAllocatedStatus,
-} from '../../components/GameArea/GameAreaComponent';
+import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';

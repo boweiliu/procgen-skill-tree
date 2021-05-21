@@ -1,7 +1,7 @@
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 
-export function virtualCoordsToLocation(args: {
+export function convertVirtualCoordsToLocation(args: {
   virtualCoords: Vector2;
   virtualGridLocation: Vector3;
   virtualGridDims: Vector2;
@@ -45,7 +45,7 @@ export function virtualCoordsToLocation(args: {
   return virtualGridLocation.add(Vector3.FromVector2(relativeLocation, 0));
 }
 
-export function locationToVirtualCoords(args: {
+export function convertLocationToVirtualCoords(args: {
   location: Vector3;
   virtualGridLocation: Vector3;
   virtualGridDims: Vector2;

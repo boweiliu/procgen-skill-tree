@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React from 'react';
+import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
@@ -10,7 +11,6 @@ import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { LazyHashMap } from '../../lib/util/lazy';
-import { LockStatus, NodeAllocatedStatus } from './GameAreaComponent';
 
 export type NodeReactData = {
   // 3-4 character description that goes on the main board
@@ -38,7 +38,7 @@ export function computeVirtualNodeDataMap(args: {
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
   fogOfWarStatusMap: HashMap<Vector3, NodeAllocatedStatus> | undefined;
   virtualGridDims: Vector2;
-  virtualDimsToLocation: (v: Vector2) => Vector3;
+  virtualCoordsToLocation: (v: Vector2) => Vector3;
 }): KeyedHashMap<Vector2, NodeReactData> {
   const {
     allocationStatusMap,
@@ -46,14 +46,14 @@ export function computeVirtualNodeDataMap(args: {
     lockMap,
     fogOfWarStatusMap,
     virtualGridDims,
-    virtualDimsToLocation,
+    virtualCoordsToLocation,
   } = args;
   const startTime = +new Date();
   const map = new KeyedHashMap<Vector2, NodeReactData>();
   for (let row = 0; row < virtualGridDims.x; row++) {
     for (let col = 0; col < virtualGridDims.y; col++) {
       const virtualVec = new Vector2(row, col);
-      const location = virtualDimsToLocation(virtualVec);
+      const location = virtualCoordsToLocation(virtualVec);
       const maybeStatus = fogOfWarStatusMap?.get(location);
       const takenStatus = allocationStatusMap.get(location);
       const nodeStatus =

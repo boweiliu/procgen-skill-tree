@@ -1,21 +1,3 @@
-/* https://css-tricks.com/updating-a-css-variable-with-javascript/
-   https://stackoverflow.com/questions/41725725/access-css-variable-from-javascript */
-:root {
-  --border: 2px;
-  --readable-white: #888888;
-
-  --app-size-width: 0px;
-  --app-size-height: 0px;
-  --background-black: #000000;
-  --deemphasized-black: #000000;
-  --active-purple: #000000;
-  --border-important-white: #000000;
-  --border-unimportant-black: #000000;
-  --hex-center-radius: 0px;
-  --grid-width: 0px;
-  --grid-height: 0px;
-}
-
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
@@ -44,6 +26,7 @@
   height: var(--grid-height);
 }
 
+/* https://stackoverflow.com/questions/1015809/how-to-get-floating-divs-inside-fixed-width-div-to-continue-horizontally */
 .hex-block-row {
   display: block;
   float: left;

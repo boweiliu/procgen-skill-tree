@@ -1,7 +1,3 @@
-import {
-  LockStatus,
-  NodeAllocatedStatus,
-} from '../components/GameArea/GameAreaComponent';
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
@@ -119,6 +115,23 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
     x: Math.min(1920, (window?.x || Infinity) - 24),
     y: Math.min(1080, (window?.y || Infinity) - 24),
   });
+}
+
+export enum NodeAllocatedStatus {
+  // DEPRECATED
+  TAKEN = 'TAKEN',
+
+  // NOT DEPRECATED
+  VISIBLE = 'VISIBLE',
+  HIDDEN = 'HIDDEN',
+  AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
+  UNREACHABLE = 'UNREACHABLE',
+}
+
+export enum LockStatus {
+  CLOSED = 'CLOSED',
+  TICKING = 'TICKING',
+  OPEN = 'OPEN',
 }
 
 export type ComputedState = {

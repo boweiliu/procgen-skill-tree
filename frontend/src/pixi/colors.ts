@@ -31,6 +31,7 @@ let COLORS = {
   borderBlack: 0x111111,
   borderWhite: 0x666666,
   black: 0x000000,
+  textWhite: 0x888888,
 };
 
 // baseColor = 0xccee88; // bright yellow green
