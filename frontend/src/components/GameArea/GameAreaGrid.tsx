@@ -95,7 +95,7 @@ function GameArea(props: {
       });
       setJumpOffset(jumpOffset.multiply(1));
     },
-    [virtualGridDims]
+    [virtualGridDims, props.updaters]
   );
 
   /**
