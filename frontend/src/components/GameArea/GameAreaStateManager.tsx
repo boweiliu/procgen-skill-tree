@@ -278,19 +278,12 @@ function Component(props: {
         keyboardScrollDirection={keyboardScrollDirection}
       >
         <GameAreaGrid
-          hidden={!gameState.playerUI.isPixiHidden}
-          appSize={appSize}
-          updaters={props.updaters}
-          // intent={gameState.intent}
           virtualGridDims={virtualGridDims}
-          // jumpOffset={jumpOffset}
           virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
           updateNodeStatusCb={handleUpdateNodeStatus}
-          // onJump={handleJump}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
           setCursoredVirtualNode={setCursoredVirtualNode}
-          keyboardScrollDirection={keyboardScrollDirection}
         />
       </InfiniteScrollManager>
     </>

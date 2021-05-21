@@ -26,7 +26,14 @@ function Component(props: {
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
 }) {
-  const { hexGridPx, virtualGridDims } = props;
+  const {
+    hexGridPx,
+    virtualGridDims,
+    appSize,
+    updaters,
+    keyboardScrollDirection,
+  } = props;
+  console.log('infinite scroll manager rerender');
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
@@ -41,12 +48,12 @@ function Component(props: {
     ) {
       // TODO(bowei): figure out where the actual center is, so we can center the screen on the starting node perfectly
       container.current.scrollTop =
-        (props.virtualGridDims.y * hexGridPx.y - props.appSize.y) / 2;
+        (virtualGridDims.y * hexGridPx.y - appSize.y) / 2;
       container.current.scrollLeft =
-        ((props.virtualGridDims.x + 0.5) * hexGridPx.x - props.appSize.x) / 2;
+        ((virtualGridDims.x + 0.5) * hexGridPx.x - appSize.x) / 2;
     }
     previousContainer.current = container.current;
-  }, [container.current, props.appSize]);
+  }, [container.current, appSize]);
 
   // Uses offset to jump to a new scroll position, exactly once
   useEffect(() => {
@@ -73,7 +80,7 @@ function Component(props: {
 
       // console.log({ newJumpOffset });
 
-      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+      updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
         return it
           .addX(newJumpOffset.x)
           .add(new Vector3(-1, -2, 0).multiply(newJumpOffset.y / 2));
@@ -81,7 +88,7 @@ function Component(props: {
       // force a rerender
       setJumpOffset(newJumpOffset);
     },
-    [virtualGridDims, props.updaters]
+    [virtualGridDims, updaters]
   );
 
   /**
@@ -102,7 +109,7 @@ function Component(props: {
       }
       if (
         target.scrollTop >
-        (props.virtualGridDims.y - 0.4) * hexGridPx.y - props.appSize.y
+        (virtualGridDims.y - 0.4) * hexGridPx.y - appSize.y
       ) {
         newScrollTop -= hexGridPx.y * 2;
         direction.y += 1;
@@ -114,7 +121,7 @@ function Component(props: {
       }
       if (
         target.scrollLeft >
-        (props.virtualGridDims.x - 0.9) * hexGridPx.x - props.appSize.x
+        (virtualGridDims.x - 0.9) * hexGridPx.x - appSize.x
       ) {
         newScrollLeft -= hexGridPx.x * 2;
         direction.x += 1;
@@ -132,12 +139,12 @@ function Component(props: {
         handleJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
-    [props.appSize.x, props.appSize.y]
+    [appSize.x, appSize.y]
   );
 
   // control scroll with keyboard
   useEffect(() => {
-    if (!props.keyboardScrollDirection.equals(Vector2.Zero)) {
+    if (!keyboardScrollDirection.equals(Vector2.Zero)) {
       // console.log('nonzero keyboard scroll direction update received');
 
       let lastTime: number | null = null;
@@ -146,16 +153,14 @@ function Component(props: {
         if (!ref) return;
         let direction = Vector2.Zero;
         if (lastTime === null) {
-          direction = props.keyboardScrollDirection.multiply(
-            SCROLL_INTERVAL_MS
-          ); // assume 1 tick
+          direction = keyboardScrollDirection.multiply(SCROLL_INTERVAL_MS); // assume 1 tick
           lastTime = +new Date();
         } else {
           const elapsed = +new Date() - lastTime;
           if (elapsed > 40) {
             console.log('WAS SLOW - ' + elapsed.toString());
           }
-          direction = props.keyboardScrollDirection.multiply(elapsed);
+          direction = keyboardScrollDirection.multiply(elapsed);
           lastTime = +new Date();
         }
         direction = direction.multiply(SCROLL_VELOCITY);
@@ -168,7 +173,7 @@ function Component(props: {
       action();
       return () => clearInterval(interval);
     }
-  }, [props.keyboardScrollDirection, container.current]);
+  }, [keyboardScrollDirection, container.current]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
