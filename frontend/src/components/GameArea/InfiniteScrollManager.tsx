@@ -1,7 +1,13 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -10,12 +16,7 @@ import { GameState } from '../../data/GameState';
 const SCROLL_INTERVAL_MS = 8; // polling interval - how often to check keyboard scroll state. recommended 60 FPS == 16ms or faster.
 const SCROLL_VELOCITY = 0.75; // pixels per ms. independent of interval_ms tick rate
 
-export const InfiniteScrollManager = React.memo(Component);
-/**
- * Manages the scroll state.
- * @param hidden
- */
-function Component(props: {
+type Props = {
   hidden: boolean;
   appSize: Vector2;
   hexGridPx: Vector2; // the size of a single grid unit, in px
@@ -25,7 +26,14 @@ function Component(props: {
 
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
-}) {
+};
+
+export const InfiniteScrollManager = React.memo(Component);
+/**
+ * Manages the scroll state.
+ * @param hidden
+ */
+function Component(props: Props) {
   const {
     hexGridPx,
     virtualGridDims,
@@ -34,6 +42,23 @@ function Component(props: {
     keyboardScrollDirection,
   } = props;
   console.log('infinite scroll manager rerender');
+
+  useMemo(() => {
+    console.log('hexGridPx changed');
+    return null;
+  }, [hexGridPx]);
+  useMemo(() => {
+    console.log('children changed');
+    return null;
+  }, [props.children]);
+  useMemo(() => {
+    console.log('updaters changed');
+    return null;
+  }, [props.updaters]);
+  useMemo(() => {
+    console.log('keyboardScrollDirection changed');
+    return null;
+  }, [props.keyboardScrollDirection]);
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;

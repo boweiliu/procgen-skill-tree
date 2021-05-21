@@ -57,7 +57,6 @@ export type GameAreaSubState = {
 export function GameAreaInterface(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
 }) {
   const { gameState } = props;
 
@@ -86,6 +85,7 @@ export function GameAreaInterface(props: {
   }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
+    console.log('sub game state recalculated!');
     return {
       playerUI: {
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -117,6 +117,10 @@ export function GameAreaInterface(props: {
     gameState.intent,
   ]);
 
+  const actions = useMemo(() => {
+    return { allocateNode: new AllocateNodeAction(props.updaters) };
+  }, [props.updaters]);
+
   return (
     <>
       <CssVariablesComponent
@@ -131,7 +135,7 @@ export function GameAreaInterface(props: {
         virtualGridDims={virtualGridDims}
         gameState={subGameState}
         updaters={props.updaters}
-        actions={props.actions}
+        actions={actions}
       />
     </>
   );

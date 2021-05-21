@@ -30,6 +30,7 @@ function Component(props: {
   actions: { allocateNode: AllocateNodeAction };
 }) {
   const { gameState, appSize, virtualGridDims } = props;
+  // console.log("GameArea state manager rerender");
 
   const virtualCoordsToLocation = useCallback(
     (virtualCoords: Vector2): Vector3 => {

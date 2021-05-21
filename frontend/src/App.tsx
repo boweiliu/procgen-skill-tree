@@ -82,7 +82,6 @@ function App() {
         <GameAreaInterface
           gameState={gameState}
           updaters={updaters}
-          actions={{ allocateNode: new AllocateNodeAction(updaters) }}
         ></GameAreaInterface>
       </div>
 
