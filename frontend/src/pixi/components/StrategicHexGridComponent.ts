@@ -115,7 +115,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
-      if (lockData) {
+      if (lockData && lockStatus !== LockStatus.OPEN) {
         graphics.texture = props.args.textures.rect;
         graphics.position.x -= props.args.textures.rect.width / 2;
         graphics.position.y -= props.args.textures.rect.height / 2;

@@ -1,20 +1,17 @@
 import * as Pixi from 'pixi.js';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { ChunkGenConstants, GameState, IntentName } from '../../data/GameState';
+import { GameState } from '../../data/GameState';
 import {
   generatePointNodeTexture,
   PointNodeTextureSet,
 } from '../textures/PointNodeTexture';
-import { ZLevelGenFactory } from '../../game/worldGen/WorldGenStateFactory';
 import { Const } from '../../lib/util/misc';
 import { Lazy } from '../../lib/util/lazy';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { ZLevelComponent, ZLevelComponentProps } from './ZLevelComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
-import { PixiPointFrom } from '../../lib/pixi/pixify';
 import {
   StrategicHexGridComponent,
   StrategicHexGridComponentProps,
@@ -162,11 +159,11 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   }
 
   protected didMount() {
-    const { updaters } = this._staleProps;
+    // const { updaters } = this._staleProps;
   }
 
   protected didUpdate() {
-    const { updaters } = this._staleProps;
+    // const { updaters } = this._staleProps;
   }
 }
 

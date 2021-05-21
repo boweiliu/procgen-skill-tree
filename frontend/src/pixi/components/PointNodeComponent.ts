@@ -6,7 +6,6 @@ import {
   PointNodeGen,
   PointNodeRef,
   ResourceModifier,
-  ResourceType,
 } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
