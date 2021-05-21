@@ -11,6 +11,7 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
 import { GameAreaComponent } from './GameAreaGrid';
+import { GameAreaSubState } from './GameAreaInterface';
 import {
   locationToVirtualCoords,
   virtualCoordsToLocation,
@@ -40,20 +41,12 @@ export const virtualAreaScaleMultiplier = 3.0;
  */
 export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
-  gameState: GameState;
+  gameState: GameAreaSubState;
+  appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
-  const { gameState } = props;
-
-  const appSize = useMemo(() => {
-    return appSizeFromWindowSize(
-      new Vector2(
-        gameState.windowState.innerWidth,
-        gameState.windowState.innerHeight
-      )
-    );
-  }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
+  const { gameState, appSize } = props;
 
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
@@ -271,7 +264,15 @@ function Component(props: {
       }
     }
   }, [
-    props.gameState.intent.newIntent,
+    props.gameState.intent.newIntent.INTERACT_WITH_NODE,
+    props.gameState.intent.newIntent.MOVE_CURSOR_EAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_WEST,
     props.updaters,
     cursoredVirtualNodeCoords,
     handleUpdateNodeStatus,

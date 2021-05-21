@@ -22,6 +22,7 @@ import COLORS, { colorToCss } from './pixi/colors';
 import { AllocateNodeAction } from './game/actions/AllocateNode';
 import Sidebar from './components/Sidebar';
 import Tabs, { Tab } from './components/Tabs';
+import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create(+new Date())
@@ -81,11 +82,11 @@ function App() {
         <UseGameStateContext.Provider value={gameStateContextValue}>
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
-        <GameAreaStateManager
+        <GameAreaInterface
           gameState={gameState}
           updaters={updaters}
           actions={{ allocateNode: new AllocateNodeAction(updaters) }}
-        ></GameAreaStateManager>
+        ></GameAreaInterface>
       </div>
 
       <div className="debug-overlay">

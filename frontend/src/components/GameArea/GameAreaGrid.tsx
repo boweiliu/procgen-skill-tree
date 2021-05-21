@@ -195,8 +195,6 @@ function GameArea(props: {
       hidden={props.hidden}
       onScroll={handleScroll}
     >
-      <CssVariablesComponent appSize={props.appSize} />
-
       <div className="virtual-game-area">
         <>
           {Array(props.virtualGridDims.y)

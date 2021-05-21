@@ -11,7 +11,7 @@ import { GameAreaCell } from './GameAreaCell';
 import { CssVariablesComponent } from './CssVariables';
 import { GameState, NodeAllocatedStatus } from '../../data/GameState';
 
-export const GameAreaComponent = React.memo(Component);
+export const InfiniteScrollManager = React.memo(Component);
 function Component(props: {
   hidden: boolean;
   appSize: Vector2;
@@ -175,8 +175,6 @@ function Component(props: {
       hidden={props.hidden}
       onScroll={handleScroll}
     >
-      <CssVariablesComponent appSize={props.appSize} />
-
       <div className="virtual-game-area">{props.children}</div>
     </div>
   );
