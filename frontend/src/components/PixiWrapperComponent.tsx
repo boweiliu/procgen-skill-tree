@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { UseGameStateContext } from '../contexts';
 import { PixiReactBridge } from '../pixi/PixiReactBridge';
-import { WindowState } from '../data/GameState';
 import { Lazy } from '../lib/util/lazy';
 
 const initialApplication = new Lazy(() => new PixiReactBridge());
@@ -11,7 +10,7 @@ const initialApplication = new Lazy(() => new PixiReactBridge());
  * and send rerender props updates to pixi application when react causes state to be updated.
  */
 export function PixiWrapperComponent(props: { hidden: boolean }) {
-  const [application, setApplication] = useState(initialApplication.get());
+  const [application] = useState(initialApplication.get());
   const container = useRef<HTMLDivElement>(null);
   const [gameState, gameStateUpdaters, fireBatchedSetGameState] = useContext(
     UseGameStateContext

@@ -4,7 +4,6 @@ import {
   PointNodeGen,
   ChunkGenConstants,
   ZLevelGen,
-  ResourceType,
   ResourceModifier,
   ResourceNontrivialType,
   LockStatus,

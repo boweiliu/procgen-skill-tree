@@ -14,14 +14,9 @@ import {
 } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { assertOnlyCalledOnce } from '../lib/util/misc';
-import { Lazy, LazyHashMap } from '../lib/util/lazy';
+import { LazyHashMap } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
-import {
-  getCoordNeighbors,
-  getWithinDistance,
-  IReadonlySet,
-} from './lib/HexGrid';
+import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
 import {
   NodeContents,
@@ -128,7 +123,7 @@ export class GameStateFactory {
     // fill in lock statuses with computed statuses
     {
       let prevMap = gameState.computed.lockStatusMap;
-      let nodeLocation = Vector3.Zero;
+      // let nodeLocation = Vector3.Zero;
       const prevGameState = gameState;
 
       for (let [
@@ -146,7 +141,7 @@ export class GameStateFactory {
     {
       let prevMap = gameState.computed.fogOfWarStatusMap;
       let nodeLocation = Vector3.Zero;
-      let newStatus = NodeAllocatedStatus.TAKEN;
+      // let newStatus = NodeAllocatedStatus.TAKEN;
       const prevGameState = gameState;
 
       prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);

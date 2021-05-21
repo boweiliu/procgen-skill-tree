@@ -1,5 +1,4 @@
 import { EPSILON } from '../epsilon_math';
-import { Util } from '../misc';
 import { IVector2, Vector2 } from './vector2';
 
 export interface IVector3 {

@@ -1,4 +1,4 @@
-import { HashMap, KeyedHashMap } from './data_structures/hash';
+import { KeyedHashMap } from './data_structures/hash';
 import { Const } from './misc';
 
 /**

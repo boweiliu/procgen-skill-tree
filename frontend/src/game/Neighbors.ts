@@ -3,7 +3,6 @@ import { enumKeys } from '../lib/util/misc';
 import {
   ChunkGenConstants,
   PointNodeRef,
-  ResourceType,
   WorldGenState,
 } from '../data/GameState';
 import { Vector2 } from '../lib/util/geometry/vector2';

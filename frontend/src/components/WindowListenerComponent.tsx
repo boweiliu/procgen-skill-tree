@@ -1,11 +1,6 @@
 import React from 'react';
 import UAParser from 'ua-parser-js';
-import {
-  GameState,
-  IntentName,
-  PlayerIntentState,
-  WindowState,
-} from '../data/GameState';
+import { GameState, WindowState } from '../data/GameState';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
 type Props = {
@@ -21,14 +16,15 @@ type State = {};
 // FOR NOW - ignore this
 // https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model/Managing_screen_orientation
 // https://stackoverflow.com/questions/14360581/force-landscape-orientation-mode
-const browser = new UAParser().getBrowser();
-let forceRotate = false;
-if (
-  browser.name === 'Mobile Safari' &&
-  window.innerWidth < window.innerHeight
-) {
-  forceRotate = true;
-}
+
+// const browser = new UAParser().getBrowser();
+// let forceRotate = false;
+// if (
+//   browser.name === 'Mobile Safari' &&
+//   window.innerWidth < window.innerHeight
+// ) {
+//   forceRotate = true;
+// }
 //     <div className={classnames({ App: true, "force-landscape": forceRotate })}>
 /*
 .force-landscape {

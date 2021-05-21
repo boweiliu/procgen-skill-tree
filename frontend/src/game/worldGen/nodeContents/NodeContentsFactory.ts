@@ -1,6 +1,5 @@
-import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
-import { INTMAX32, squirrel3 } from '../../../lib/util/random';
+import { squirrel3 } from '../../../lib/util/random';
 import {
   randomDice,
   randomSwitch,

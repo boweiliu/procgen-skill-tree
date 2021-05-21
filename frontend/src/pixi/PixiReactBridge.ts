@@ -1,11 +1,12 @@
 import * as Pixi from 'pixi.js';
 import { Vector2 } from '../lib/util/geometry/vector2';
-import { GameState, WindowState } from '../data/GameState';
+import { GameState } from '../data/GameState';
 // eslint-disable-next-line
 import { assertOnlyCalledOnce, Const } from '../lib/util/misc';
 import { RootComponent } from './components/RootComponent';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import COLORS from './colors';
+// eslint-disable-next-line
 import createBunnyExample from './BunnyExample';
 
 type Props = {

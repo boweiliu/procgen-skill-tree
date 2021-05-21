@@ -146,7 +146,7 @@ function Component(props: Props) {
         handleJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
-    [appSize.x, appSize.y]
+    [appSize, handleJump, hexGridPx, virtualGridDims]
   );
 
   // control scroll with keyboard
@@ -180,7 +180,7 @@ function Component(props: Props) {
       action();
       return () => clearInterval(interval);
     }
-  }, [keyboardScrollDirection, container.current]);
+  }, [keyboardScrollDirection]);
 
   return (
     <div
