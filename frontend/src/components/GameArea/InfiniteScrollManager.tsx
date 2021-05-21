@@ -6,10 +6,7 @@ import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaStateManager';
-import { GameAreaCell } from './GameAreaCell';
-import { CssVariablesComponent } from './CssVariables';
-import { GameState, NodeAllocatedStatus } from '../../data/GameState';
+import { hexGridPx } from './GameAreaInterface';
 
 export const InfiniteScrollManager = React.memo(Component);
 function Component(props: {

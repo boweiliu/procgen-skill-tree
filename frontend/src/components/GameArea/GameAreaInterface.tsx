@@ -128,6 +128,7 @@ export function GameAreaInterface(props: {
       />
       <GameAreaStateManager
         appSize={appSize}
+        virtualGridDims={virtualGridDims}
         gameState={subGameState}
         updaters={props.updaters}
         actions={props.actions}

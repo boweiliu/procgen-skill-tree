@@ -18,52 +18,17 @@ import {
 } from './locationUtils';
 
 /**
- * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
- * 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
- * for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
- */
-export const hexGridPx = new Vector2(268, 232);
-
-export const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
-
-export const borderWidth = 2; // border of circles, etc. in px
-
-/**
- * How much bigger the "virtual" (i.e. scrollable) game area is than the visible window.
- * Bigger == more elements rendered which are outside the viewport == worse performance,
- * but need to 'jump' the scroll viewport less often.
- * Recommended default is 3.0
- */
-export const virtualAreaScaleMultiplier = 3.0;
-
-/**
  * Wrapper for GameAreaGrid which handles most of the state management - so that rerendering doesnt have to happen so often.
  */
 export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
   gameState: GameAreaSubState;
+  virtualGridDims: Vector2;
   appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
-  const { gameState, appSize } = props;
-
-  // const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
-
-  const virtualGridDims = useMemo(() => {
-    let x = Math.floor(
-      (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
-    );
-    let y = Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y);
-
-    // y = (Math.floor((y - 1) / 2) * 2) + 1; // force y to be odd
-
-    // needs to be at least 3.8 x 4.8 so we have room for jumps
-    // x = Math.max(4, x);
-    // y = Math.max(5, y);
-
-    return new Vector2(x, y);
-  }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
+  const { gameState, appSize, virtualGridDims } = props;
 
   const virtualCoordsToLocation = useCallback(
     (virtualCoords: Vector2): Vector3 => {

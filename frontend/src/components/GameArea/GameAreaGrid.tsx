@@ -6,10 +6,10 @@ import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
 import { GameState, NodeAllocatedStatus } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import { hexGridPx } from './GameAreaInterface';
 
 export type UpdateStatusCb = (args: {
   virtualCoords: Vector2;
