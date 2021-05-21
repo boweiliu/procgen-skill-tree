@@ -17,6 +17,7 @@ import { NodeAllocatedStatus } from '../../data/GameState';
  * @param onUpdateStatus callback for updating the status of this cell
  * @param nodeData react fragments to help render this cell
  * @param isCursored whether or not to display a flashing cursor for this cell
+ * @param onUpdateCursored callback, should be called with the cell virtual position to select that cell, or undefined to unselect the currently selected cell
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({

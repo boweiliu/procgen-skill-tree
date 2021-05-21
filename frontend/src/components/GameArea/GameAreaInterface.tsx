@@ -59,8 +59,8 @@ export type GameAreaSubState = {
   intent: typeof gameState.intent;
 };
 
-export const GameAreaInterface = React.memo(Component);
-function Component(props: {
+// export const GameAreaInterface = React.memo(Component);
+export function GameAreaInterface(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
