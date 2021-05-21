@@ -7,6 +7,9 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
 
+const SCROLL_INTERVAL_MS = 8; // polling interval - how often to check keyboard scroll state. recommended 60 FPS == 16ms or faster.
+const SCROLL_VELOCITY = 0.75; // pixels per ms. independent of interval_ms tick rate
+
 export const InfiniteScrollManager = React.memo(Component);
 function Component(props: {
   hidden: boolean;
@@ -22,10 +25,24 @@ function Component(props: {
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
+
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
-  // Receives a Vector2 instance jumpOffset,
-  // and uses offset to jump to a new scroll position
+  // Set initial position in the center, exactly once!
+  useEffect(() => {
+    if (
+      container.current != null &&
+      container.current !== previousContainer.current
+    ) {
+      container.current.scrollTop =
+        (props.virtualGridDims.y * hexGridPx.y - props.appSize.y) / 2;
+      container.current.scrollLeft =
+        ((props.virtualGridDims.x + 0.5) * hexGridPx.x - props.appSize.x) / 2;
+    }
+    previousContainer.current = container.current;
+  }, [container.current, props.appSize]);
+
+  // Uses offset to jump to a new scroll position, exactly once
   useEffect(() => {
     if (!jumpOffset) return;
     const ref = container.current;
@@ -45,14 +62,18 @@ function Component(props: {
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
-      const jumpOffset = jumpAmounts.multiply(args.direction);
-      console.log({ jumpOffset });
+
+      const newJumpOffset = jumpAmounts.multiply(args.direction);
+
+      // console.log({ newJumpOffset });
+
       props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
         return it
-          .addX(jumpOffset.x)
-          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
+          .addX(newJumpOffset.x)
+          .add(new Vector3(-1, -2, 0).multiply(newJumpOffset.y / 2));
       });
-      setJumpOffset(jumpOffset.multiply(1));
+      // force a rerender
+      setJumpOffset(newJumpOffset);
     },
     [virtualGridDims, props.updaters]
   );
@@ -108,28 +129,12 @@ function Component(props: {
     [props.appSize.x, props.appSize.y]
   );
 
-  // Set initial position in the center, exactly once!
-  useEffect(() => {
-    if (
-      container.current != null &&
-      container.current !== previousContainer.current
-    ) {
-      container.current.scrollTop =
-        (props.virtualGridDims.y * hexGridPx.y - props.appSize.y) / 2;
-      container.current.scrollLeft =
-        ((props.virtualGridDims.x + 0.5) * hexGridPx.x - props.appSize.x) / 2;
-    }
-    previousContainer.current = container.current;
-  }, [container.current, props.appSize]);
-
   // control scroll with keyboard
   useEffect(() => {
     if (!props.keyboardScrollDirection.equals(Vector2.Zero)) {
       // console.log('nonzero keyboard scroll direction update received');
 
       let lastTime: number | null = null;
-      const SCROLL_INTERVAL_MS = 8;
-      const VELOCITY = 0.75;
       const action = () => {
         const ref = container.current;
         if (!ref) return;
@@ -147,7 +152,7 @@ function Component(props: {
           direction = props.keyboardScrollDirection.multiply(elapsed);
           lastTime = +new Date();
         }
-        direction = direction.multiply(VELOCITY);
+        direction = direction.multiply(SCROLL_VELOCITY);
         ref.scrollTo(
           ref.scrollLeft + direction.x,
           ref.scrollTop - direction.y // scroll is measured from the top left
