@@ -11,12 +11,17 @@ const SCROLL_INTERVAL_MS = 8; // polling interval - how often to check keyboard 
 const SCROLL_VELOCITY = 0.75; // pixels per ms. independent of interval_ms tick rate
 
 export const InfiniteScrollManager = React.memo(Component);
+/**
+ * Manages the scroll state.
+ * @param hidden
+ */
 function Component(props: {
   hidden: boolean;
   appSize: Vector2;
   hexGridPx: Vector2; // the size of a single grid unit, in px
   virtualGridDims: Vector2; // in grid units. width x height, guaranteed to be integers
   children: any;
+  debug: any; // TODO(bowei): contains triggers (extracted out of gameState.playerUI) for debugging the scroll jump and the virtual position rerender, SEPARATELY
 
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
@@ -34,6 +39,7 @@ function Component(props: {
       container.current != null &&
       container.current !== previousContainer.current
     ) {
+      // TODO(bowei): figure out where the actual center is, so we can center the screen on the starting node perfectly
       container.current.scrollTop =
         (props.virtualGridDims.y * hexGridPx.y - props.appSize.y) / 2;
       container.current.scrollLeft =
