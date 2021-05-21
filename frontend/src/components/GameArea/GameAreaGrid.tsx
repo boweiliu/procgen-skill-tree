@@ -1,7 +1,7 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';

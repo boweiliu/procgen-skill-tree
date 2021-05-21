@@ -108,6 +108,7 @@ function Component(props: {
     },
     [
       props.updaters,
+      props.actions,
       virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
       gameState.computed.fogOfWarStatusMap,
@@ -221,6 +222,8 @@ function Component(props: {
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_WEST,
     props.updaters,
+    virtualCoordsToLocation,
+    virtualGridDims,
     cursoredVirtualNodeCoords,
     handleUpdateNodeStatus,
   ]);

@@ -82,7 +82,7 @@ export function GameAreaInterface(props: {
     // y = Math.max(5, y);
 
     return new Vector2(x, y);
-  }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
+  }, [appSize]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
     // console.log('sub game state recalculated!');

@@ -48,7 +48,7 @@ function GameAreaCellComponent({
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
-    [onUpdateStatus, nodeData.status, idx, rowIdx]
+    [onUpdateStatus, idx, rowIdx]
   );
 
   const handleClickQuestionMark = useCallback(
@@ -58,7 +58,7 @@ function GameAreaCellComponent({
       // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
       onUpdateCursored(isCursored ? undefined : new Vector2(idx, rowIdx));
     },
-    [isCursored, onUpdateCursored]
+    [isCursored, onUpdateCursored, idx, rowIdx]
   );
 
   return (

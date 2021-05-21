@@ -1,15 +1,6 @@
 import './DebugOverlayComponent.css';
 
-import classnames from 'classnames';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import COLORS, { colorToCss } from '../pixi/colors';
-import { Vector2 } from '../lib/util/geometry/vector2';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FpsTracker } from '../lib/util/fpsTracker';
 import { WindowState } from '../data/GameState';
 
@@ -48,9 +39,12 @@ function ReactFps() {
     return () => clearTimeout(timer);
   }, [counter]);
 
-  const fpsString = useMemo(() => reactFpsTracker.current.getFpsString(), [
-    counter,
-  ]);
+  const fpsString = useMemo(() => {
+    if (counter >= 0) {
+      return reactFpsTracker.current.getFpsString();
+    }
+    return '';
+  }, [counter]);
 
   return <div>RPS: {fpsString}</div>;
 }

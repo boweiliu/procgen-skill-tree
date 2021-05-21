@@ -61,7 +61,7 @@ function Component(props: Props) {
         ((virtualGridDims.x + 0.5) * hexGridPx.x - appSize.x) / 2;
     }
     previousContainer.current = container.current;
-  }, [container.current, appSize]);
+  }, [appSize, virtualGridDims, hexGridPx]);
 
   // Uses offset to jump to a new scroll position, exactly once
   useEffect(() => {
@@ -72,7 +72,7 @@ function Component(props: Props) {
       ref.scrollLeft - jumpOffset.x * hexGridPx.x,
       ref.scrollTop - jumpOffset.y * hexGridPx.y
     );
-  }, [jumpOffset]);
+  }, [jumpOffset, hexGridPx]);
 
   // when we trigger a scroll jump, compute where we jump to, and don't forget to update the virtual grid location
   const handleJump = useCallback(
