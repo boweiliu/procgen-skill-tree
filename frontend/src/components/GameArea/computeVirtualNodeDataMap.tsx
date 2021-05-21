@@ -95,6 +95,14 @@ export function computeVirtualNodeDataMap(args: {
         toolTipText: (
           <>
             <div>{nodeStatus.toString()}</div>
+            {location.equals(Vector3.Zero) ? (
+              <>
+                {' '}
+                <br /> <div>Your starting node</div>
+              </>
+            ) : (
+              <> </>
+            )}
             {nodeContents.lines[0] ? <br /> : <></>}
             <div>
               {nodeContents.lines[0] &&
