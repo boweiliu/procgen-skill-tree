@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   GameState,
-  appSizeFromWindowSize,
   IntentName,
   NodeAllocatedStatus,
 } from '../../data/GameState';
@@ -10,71 +9,34 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaComponent } from './GameAreaGrid';
+import { GameAreaGrid } from './GameAreaGrid';
+import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
+import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
-  locationToVirtualCoords,
-  virtualCoordsToLocation,
+  convertLocationToVirtualCoords,
+  convertVirtualCoordsToLocation,
 } from './locationUtils';
 
 /**
- * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
- * 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
- * for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
- */
-export const hexGridPx = new Vector2(268, 232);
-
-export const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
-
-export const borderWidth = 2; // border of circles, etc. in px
-
-/**
- * How much bigger the "virtual" (i.e. scrollable) game area is than the visible window.
- * Bigger == more elements rendered which are outside the viewport == worse performance,
- * but need to 'jump' the scroll viewport less often.
- * Recommended default is 3.0
- */
-export const virtualAreaScaleMultiplier = 3.0;
-
-/**
- * Wrapper for GameAreaGrid which handles most of the state management - so that rerendering doesnt have to happen so often.
+ * Wrapper for GameAreaGrid that manages game state location <> virtual coord conversions, as well as populating the onClick/onSelect callbacks when interacting with nodes.
+ * @param virtualGridDims integer vector for # of grid cells in each dimension
+ * @param appSize the playable area
  */
 export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
-  gameState: GameState;
+  gameState: GameAreaSubState;
+  virtualGridDims: Vector2;
+  appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
-  const { gameState } = props;
+  const { gameState, appSize, virtualGridDims } = props;
+  // console.log("GameArea state manager rerender");
 
-  const appSize = useMemo(() => {
-    return appSizeFromWindowSize(
-      new Vector2(
-        gameState.windowState.innerWidth,
-        gameState.windowState.innerHeight
-      )
-    );
-  }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
-
-  const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
-
-  const virtualGridDims = useMemo(() => {
-    let x = Math.floor(
-      (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
-    );
-    let y = Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y);
-
-    // y = (Math.floor((y - 1) / 2) * 2) + 1; // force y to be odd
-
-    // needs to be at least 3.8 x 4.8 so we have room for jumps
-    // x = Math.max(4, x);
-    // y = Math.max(5, y);
-
-    return new Vector2(x, y);
-  }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
-
-  const virtualDimsToLocation = useCallback(
+  // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
+  const virtualCoordsToLocation = useCallback(
     (virtualCoords: Vector2): Vector3 => {
-      return virtualCoordsToLocation({
+      return convertVirtualCoordsToLocation({
         virtualCoords,
         virtualGridDims,
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -82,9 +44,9 @@ function Component(props: {
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
-  const locationToVirtualDims = useCallback(
+  const locationToVirtualCoords = useCallback(
     (location: Vector3): Vector2 | undefined => {
-      return locationToVirtualCoords({
+      return convertLocationToVirtualCoords({
         location,
         virtualGridDims,
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -93,14 +55,15 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridStatusMap = useMemo(() => {
+  // Hydrate the contents of all the nodes
+  const virtualNodeDataMap = useMemo(() => {
     return computeVirtualNodeDataMap({
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       virtualGridDims,
-      virtualDimsToLocation,
+      virtualCoordsToLocation,
     });
   }, [
     gameState.playerSave.allocationStatusMap,
@@ -108,39 +71,16 @@ function Component(props: {
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
     virtualGridDims,
-    virtualDimsToLocation,
+    virtualCoordsToLocation,
   ]);
 
-  const handleJump = useCallback(
-    (args: { direction: Vector2 }) => {
-      // direction: if we hit bottom right of screen, direction == (1,1)
-      // console.log({ direction: args.direction });
-      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
-      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
-      jumpAmounts = jumpAmounts
-        .clampX(1, virtualGridDims.x - 1)
-        .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
-      const jumpOffset = jumpAmounts.multiply(args.direction);
-      console.log({ jumpOffset });
-      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-        return it
-          .addX(jumpOffset.x)
-          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
-      });
-      setJumpOffset(jumpOffset.multiply(1));
-    },
-    [virtualGridDims]
-  );
-
-  /**
-   * If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
-   */
+  // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatus = useCallback(
-    (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
-      const { virtualDims, newStatus } = args;
+    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+      const { virtualCoords, newStatus } = args;
 
       // console.log({ got: 'here handleUpdateNodeStatus' });
-      const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
+      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
       const prevStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeAllocatedStatus.HIDDEN;
@@ -168,7 +108,7 @@ function Component(props: {
     },
     [
       props.updaters,
-      virtualDimsToLocation,
+      virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
       gameState.computed.fogOfWarStatusMap,
       gameState.computed.lockStatusMap,
@@ -176,23 +116,23 @@ function Component(props: {
     ]
   );
 
-  // manage cursor "node selected" state
+  // Manage cursor "node selected" state
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
-      console.log({
-        3: gameState.playerUI.cursoredNodeLocation,
-        2: locationToVirtualDims(gameState.playerUI.cursoredNodeLocation),
-      });
-      return locationToVirtualDims(gameState.playerUI.cursoredNodeLocation);
+      // console.log({
+      //   3: gameState.playerUI.cursoredNodeLocation,
+      //   2: locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation),
+      // });
+      return locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation);
     } else {
       return undefined;
     }
-  }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualDims]);
+  }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 
   const setCursoredVirtualNode = useCallback(
     (v: Vector2 | undefined) => {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-        let updated = v ? virtualDimsToLocation(v) : undefined;
+        let updated = v ? virtualCoordsToLocation(v) : undefined;
         console.log({ updated });
         return updated;
       });
@@ -201,13 +141,13 @@ function Component(props: {
         props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
       }
     },
-    [props.updaters, virtualDimsToLocation]
+    [props.updaters, virtualCoordsToLocation]
   );
 
-  // manage keyboard wasdezx navigation
+  // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
     const newIntent = props.gameState.intent.newIntent;
-    const newLocation = virtualDimsToLocation(
+    const newLocation = virtualCoordsToLocation(
       virtualGridDims.divide(2).floor()
     );
     if (newIntent[IntentName.MOVE_CURSOR_EAST]) {
@@ -265,19 +205,28 @@ function Component(props: {
     if (newIntent[IntentName.INTERACT_WITH_NODE]) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
-          virtualDims: cursoredVirtualNodeCoords,
+          virtualCoords: cursoredVirtualNodeCoords,
           newStatus: NodeAllocatedStatus.TAKEN,
         });
       }
     }
   }, [
-    props.gameState.intent.newIntent,
+    props.gameState.intent.newIntent.INTERACT_WITH_NODE,
+    props.gameState.intent.newIntent.MOVE_CURSOR_EAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
+    props.gameState.intent.newIntent.MOVE_CURSOR_WEST,
     props.updaters,
     cursoredVirtualNodeCoords,
     handleUpdateNodeStatus,
   ]);
 
-  // Manage keyboard controls here so that the dumb component doesnt have to rerender all the time
+  // Manage keyboard scrolling here
+  // TODO(bowei): move this into infinite scroll manager. the only reason this is here is because we have access to intent object conveniently here
   const keyboardScrollDirection: Vector2 = useMemo(() => {
     let direction = Vector2.Zero;
     if (props.gameState.intent.activeIntent.PAN_EAST) {
@@ -302,20 +251,23 @@ function Component(props: {
 
   return (
     <>
-      <GameAreaComponent
+      <InfiniteScrollManager
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
-        // intent={gameState.intent}
+        updaters={props.updaters}
+        hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}
-        jumpOffset={jumpOffset}
-        virtualGridStatusMap={virtualGridStatusMap}
-        virtualDimsToLocation={virtualDimsToLocation}
-        updateNodeStatusCb={handleUpdateNodeStatus}
-        onJump={handleJump}
-        cursoredVirtualNode={cursoredVirtualNodeCoords}
-        setCursoredVirtualNode={setCursoredVirtualNode}
         keyboardScrollDirection={keyboardScrollDirection}
-      />
+      >
+        <GameAreaGrid
+          virtualGridDims={virtualGridDims}
+          virtualNodeDataMap={virtualNodeDataMap}
+          virtualCoordsToLocation={virtualCoordsToLocation}
+          updateNodeStatusCb={handleUpdateNodeStatus}
+          cursoredVirtualNode={cursoredVirtualNodeCoords}
+          setCursoredVirtualNode={setCursoredVirtualNode}
+        />
+      </InfiniteScrollManager>
     </>
   );
 }

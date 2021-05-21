@@ -17,6 +17,7 @@ import { NodeAllocatedStatus } from '../../data/GameState';
  * @param onUpdateStatus callback for updating the status of this cell
  * @param nodeData react fragments to help render this cell
  * @param isCursored whether or not to display a flashing cursor for this cell
+ * @param onUpdateCursored callback, should be called with the cell virtual position to select that cell, or undefined to unselect the currently selected cell
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
@@ -43,7 +44,7 @@ function GameAreaCellComponent({
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
-        virtualDims: new Vector2(idx, rowIdx),
+        virtualCoords: new Vector2(idx, rowIdx), // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
@@ -54,6 +55,7 @@ function GameAreaCellComponent({
     (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
+      // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
       onUpdateCursored(isCursored ? undefined : new Vector2(idx, rowIdx));
     },
     [isCursored, onUpdateCursored]

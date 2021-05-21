@@ -1,16 +1,22 @@
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import React, { useCallback, useEffect, useRef } from 'react';
-import COLORS, { colorToCss } from '../../pixi/colors';
-
-import {
-  hexGridPx,
-  hexCenterRadius,
-  borderWidth,
-} from './GameAreaStateManager';
+import React, { useEffect } from 'react';
+import { colorToCss } from '../../pixi/colors';
 
 export const CssVariablesComponent = React.memo(Component);
 
-function Component(props: { appSize: Vector2; children?: any }) {
+/**
+ * Handles loading display settings from props into css variables.
+ * component is empty in the DOM - can be embedded anywhere in react hierarchy
+ */
+function Component(props: {
+  appSize: Vector2;
+  hexGridPx: Vector2;
+  borderWidth: number;
+  hexCenterRadius: number;
+  COLORS: any;
+  children?: any;
+}) {
+  const { hexGridPx, borderWidth, hexCenterRadius, appSize, COLORS } = props;
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--grid-width',
