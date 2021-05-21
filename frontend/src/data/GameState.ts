@@ -59,11 +59,15 @@ export type GameState = {
 export type PlayerIntentState = {
   activeIntent: Intent;
   newIntent: Intent;
+  cumulativeIntent: CumulativeIntent;
   endedIntent: Intent;
 };
 
 export type Intent = {
   [name in IntentName]: boolean;
+};
+export type CumulativeIntent = {
+  [name in IntentName]: number;
 };
 
 export enum IntentName {
@@ -96,6 +100,13 @@ export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
   object[key] = false;
   return object;
 }, {} as Intent);
+export const noCumulativeIntent = enumKeys(IntentName).reduce(
+  (object: CumulativeIntent, key) => {
+    object[key] = 0;
+    return object;
+  },
+  {} as CumulativeIntent
+);
 
 /**
  * current window settings -- allows for dynamic resizing and also rotation on mobile web

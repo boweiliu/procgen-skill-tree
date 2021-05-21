@@ -5,6 +5,7 @@ import {
   NodeAllocatedStatus,
   noIntent,
   WindowState,
+  noCumulativeIntent,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
 import {
@@ -105,6 +106,7 @@ export class GameStateFactory {
         activeIntent: noIntent,
         newIntent: noIntent,
         endedIntent: noIntent,
+        cumulativeIntent: noCumulativeIntent,
       },
       windowState,
     };
