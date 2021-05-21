@@ -20,8 +20,8 @@ function Component(props: {
   appSize: Vector2;
   hexGridPx: Vector2; // the size of a single grid unit, in px
   virtualGridDims: Vector2; // in grid units. width x height, guaranteed to be integers
-  children: any;
-  debug: any; // TODO(bowei): contains triggers (extracted out of gameState.playerUI) for debugging the scroll jump and the virtual position rerender, SEPARATELY
+  children?: any;
+  debug?: any; // TODO(bowei): contains triggers (extracted out of gameState.playerUI) for debugging the scroll jump and the virtual position rerender, SEPARATELY
 
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;

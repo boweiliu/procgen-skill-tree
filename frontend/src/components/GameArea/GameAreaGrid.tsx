@@ -212,51 +212,37 @@ function Component(props: {
    * https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
    */
   return (
-    <div
-      ref={container}
-      // className="game-area hidden-scrollbars"
-      className="game-area"
-      hidden={props.hidden}
-      onScroll={handleScroll}
-    >
-      <div className="virtual-game-area">
-        <>
-          {Array(props.virtualGridDims.y)
-            .fill(0)
-            .map((_, y) => (
-              <Row
-                key={props
-                  .virtualCoordsToLocation(new Vector2(0, y))
-                  .y.toString()}
-                rowIdx={y}
-              >
-                {Array(props.virtualGridDims.x)
-                  .fill(0)
-                  .map((_, x) => {
-                    const virtualCoords = new Vector2(x, y);
-                    const nodeData = props.virtualNodeDataMap.get(
-                      virtualCoords
-                    )!;
-                    return (
-                      <GameAreaCell
-                        nodeData={nodeData}
-                        key={nodeData?.id ?? `loading${x}`}
-                        idx={x}
-                        rowIdx={y}
-                        onUpdateStatus={props.updateNodeStatusCb}
-                        isCursored={
-                          !!props.cursoredVirtualNode &&
-                          props.cursoredVirtualNode.equals(virtualCoords)
-                        }
-                        onUpdateCursored={props.setCursoredVirtualNode}
-                      />
-                    );
-                  })}
-              </Row>
-            ))}
-        </>
-      </div>
-    </div>
+    <>
+      {Array(props.virtualGridDims.y)
+        .fill(0)
+        .map((_, y) => (
+          <Row
+            key={props.virtualCoordsToLocation(new Vector2(0, y)).y.toString()}
+            rowIdx={y}
+          >
+            {Array(props.virtualGridDims.x)
+              .fill(0)
+              .map((_, x) => {
+                const virtualCoords = new Vector2(x, y);
+                const nodeData = props.virtualNodeDataMap.get(virtualCoords)!;
+                return (
+                  <GameAreaCell
+                    nodeData={nodeData}
+                    key={nodeData?.id ?? `loading${x}`}
+                    idx={x}
+                    rowIdx={y}
+                    onUpdateStatus={props.updateNodeStatusCb}
+                    isCursored={
+                      !!props.cursoredVirtualNode &&
+                      props.cursoredVirtualNode.equals(virtualCoords)
+                    }
+                    onUpdateCursored={props.setCursoredVirtualNode}
+                  />
+                );
+              })}
+          </Row>
+        ))}
+    </>
   );
 }
 

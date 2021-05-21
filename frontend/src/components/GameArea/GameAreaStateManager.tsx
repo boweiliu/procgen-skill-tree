@@ -11,7 +11,8 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
 import { GameAreaGrid } from './GameAreaGrid';
-import { GameAreaSubState } from './GameAreaInterface';
+import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
+import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
   convertLocationToVirtualCoords,
   convertVirtualCoordsToLocation,
@@ -268,21 +269,30 @@ function Component(props: {
 
   return (
     <>
-      <GameAreaGrid
+      <InfiniteScrollManager
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
         updaters={props.updaters}
-        // intent={gameState.intent}
+        hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}
-        // jumpOffset={jumpOffset}
-        virtualNodeDataMap={virtualNodeDataMap}
-        virtualCoordsToLocation={virtualCoordsToLocation}
-        updateNodeStatusCb={handleUpdateNodeStatus}
-        // onJump={handleJump}
-        cursoredVirtualNode={cursoredVirtualNodeCoords}
-        setCursoredVirtualNode={setCursoredVirtualNode}
         keyboardScrollDirection={keyboardScrollDirection}
-      />
+      >
+        <GameAreaGrid
+          hidden={!gameState.playerUI.isPixiHidden}
+          appSize={appSize}
+          updaters={props.updaters}
+          // intent={gameState.intent}
+          virtualGridDims={virtualGridDims}
+          // jumpOffset={jumpOffset}
+          virtualNodeDataMap={virtualNodeDataMap}
+          virtualCoordsToLocation={virtualCoordsToLocation}
+          updateNodeStatusCb={handleUpdateNodeStatus}
+          // onJump={handleJump}
+          cursoredVirtualNode={cursoredVirtualNodeCoords}
+          setCursoredVirtualNode={setCursoredVirtualNode}
+          keyboardScrollDirection={keyboardScrollDirection}
+        />
+      </InfiniteScrollManager>
     </>
   );
 }
