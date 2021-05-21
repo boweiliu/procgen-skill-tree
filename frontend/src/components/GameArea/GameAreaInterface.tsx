@@ -7,17 +7,11 @@ import {
 } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
 import { CssVariablesComponent } from './CssVariables';
 import { GameAreaStateManager } from './GameAreaStateManager';
-import { InfiniteScrollManager } from './InfiniteScrollManager';
-import {
-  locationToVirtualCoords,
-  virtualCoordsToLocation,
-} from './locationUtils';
 
 /**
  * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:

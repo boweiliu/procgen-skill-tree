@@ -44,7 +44,7 @@ function GameAreaCellComponent({
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
-        virtualDims: new Vector2(idx, rowIdx),
+        virtualCoords: new Vector2(idx, rowIdx),
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },

@@ -10,11 +10,11 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaComponent } from './GameAreaGrid';
+import { GameAreaGrid } from './GameAreaGrid';
 import { GameAreaSubState } from './GameAreaInterface';
 import {
-  locationToVirtualCoords,
-  virtualCoordsToLocation,
+  convertLocationToVirtualCoords,
+  convertVirtualCoordsToLocation,
 } from './locationUtils';
 
 /**
@@ -65,9 +65,9 @@ function Component(props: {
     return new Vector2(x, y);
   }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
 
-  const virtualDimsToLocation = useCallback(
+  const virtualCoordsToLocation = useCallback(
     (virtualCoords: Vector2): Vector3 => {
-      return virtualCoordsToLocation({
+      return convertVirtualCoordsToLocation({
         virtualCoords,
         virtualGridDims,
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -75,9 +75,9 @@ function Component(props: {
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
-  const locationToVirtualDims = useCallback(
+  const locationToVirtualCoords = useCallback(
     (location: Vector3): Vector2 | undefined => {
-      return locationToVirtualCoords({
+      return convertLocationToVirtualCoords({
         location,
         virtualGridDims,
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -86,14 +86,14 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  const virtualGridStatusMap = useMemo(() => {
+  const virtualNodeDataMap = useMemo(() => {
     return computeVirtualNodeDataMap({
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       virtualGridDims,
-      virtualDimsToLocation,
+      virtualCoordsToLocation,
     });
   }, [
     gameState.playerSave.allocationStatusMap,
@@ -101,7 +101,7 @@ function Component(props: {
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
     virtualGridDims,
-    virtualDimsToLocation,
+    virtualCoordsToLocation,
   ]);
 
   // const handleJump = useCallback(
@@ -129,11 +129,11 @@ function Component(props: {
    * If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
    */
   const handleUpdateNodeStatus = useCallback(
-    (args: { virtualDims: Vector2; newStatus: NodeAllocatedStatus }) => {
-      const { virtualDims, newStatus } = args;
+    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+      const { virtualCoords, newStatus } = args;
 
       // console.log({ got: 'here handleUpdateNodeStatus' });
-      const nodeLocation: Vector3 = virtualDimsToLocation(virtualDims);
+      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
       const prevStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeAllocatedStatus.HIDDEN;
@@ -161,7 +161,7 @@ function Component(props: {
     },
     [
       props.updaters,
-      virtualDimsToLocation,
+      virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
       gameState.computed.fogOfWarStatusMap,
       gameState.computed.lockStatusMap,
@@ -174,18 +174,18 @@ function Component(props: {
     if (gameState.playerUI.cursoredNodeLocation) {
       console.log({
         3: gameState.playerUI.cursoredNodeLocation,
-        2: locationToVirtualDims(gameState.playerUI.cursoredNodeLocation),
+        2: locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation),
       });
-      return locationToVirtualDims(gameState.playerUI.cursoredNodeLocation);
+      return locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation);
     } else {
       return undefined;
     }
-  }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualDims]);
+  }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 
   const setCursoredVirtualNode = useCallback(
     (v: Vector2 | undefined) => {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-        let updated = v ? virtualDimsToLocation(v) : undefined;
+        let updated = v ? virtualCoordsToLocation(v) : undefined;
         console.log({ updated });
         return updated;
       });
@@ -194,13 +194,13 @@ function Component(props: {
         props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
       }
     },
-    [props.updaters, virtualDimsToLocation]
+    [props.updaters, virtualCoordsToLocation]
   );
 
   // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
     const newIntent = props.gameState.intent.newIntent;
-    const newLocation = virtualDimsToLocation(
+    const newLocation = virtualCoordsToLocation(
       virtualGridDims.divide(2).floor()
     );
     if (newIntent[IntentName.MOVE_CURSOR_EAST]) {
@@ -258,7 +258,7 @@ function Component(props: {
     if (newIntent[IntentName.INTERACT_WITH_NODE]) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
-          virtualDims: cursoredVirtualNodeCoords,
+          virtualCoords: cursoredVirtualNodeCoords,
           newStatus: NodeAllocatedStatus.TAKEN,
         });
       }
@@ -303,15 +303,15 @@ function Component(props: {
 
   return (
     <>
-      <GameAreaComponent
+      <GameAreaGrid
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
         updaters={props.updaters}
         // intent={gameState.intent}
         virtualGridDims={virtualGridDims}
         // jumpOffset={jumpOffset}
-        virtualGridStatusMap={virtualGridStatusMap}
-        virtualDimsToLocation={virtualDimsToLocation}
+        virtualNodeDataMap={virtualNodeDataMap}
+        virtualCoordsToLocation={virtualCoordsToLocation}
         updateNodeStatusCb={handleUpdateNodeStatus}
         // onJump={handleJump}
         cursoredVirtualNode={cursoredVirtualNodeCoords}

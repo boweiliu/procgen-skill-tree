@@ -3,8 +3,6 @@ import './App.css';
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
-import { GameAreaComponent } from './components/GameArea/GameAreaGrid';
-import { GameAreaStateManager } from './components/GameArea/GameAreaStateManager';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
 import { WindowListenerComponent } from './components/WindowListenerComponent';
@@ -18,7 +16,6 @@ import {
   UpdaterGeneratorType2,
   updaterGenerator2,
 } from './lib/util/updaterGenerator';
-import COLORS, { colorToCss } from './pixi/colors';
 import { AllocateNodeAction } from './game/actions/AllocateNode';
 import Sidebar from './components/Sidebar';
 import Tabs, { Tab } from './components/Tabs';

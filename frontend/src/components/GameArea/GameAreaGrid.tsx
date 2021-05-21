@@ -8,16 +8,15 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { hexGridPx } from './GameAreaStateManager';
 import { GameAreaCell } from './GameAreaCell';
-import { CssVariablesComponent } from './CssVariables';
 import { GameState, NodeAllocatedStatus } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 
 export type UpdateStatusCb = (args: {
-  virtualDims: Vector2;
+  virtualCoords: Vector2;
   newStatus: NodeAllocatedStatus;
 }) => void;
 
-export const GameAreaComponent = React.memo(GameArea);
+export const GameAreaGrid = React.memo(Component);
 /**
  * Dumb-ish component that manages the game board where the skill tree is located, as well as the "virtual"
  * game space which is larger than the currently visible scrollable area the player can see.
@@ -27,15 +26,15 @@ export const GameAreaComponent = React.memo(GameArea);
  * @param intent keyboard controls mapped to "intents" i.e. game functions
  * @param virtualGridDims the integer dimensions of the virtual scrollable space, measured in grid units.
  * @param jumpOffset integers. if non-null, jump callbackwas recently requested. otherwise it is guaranteed to be identical object reference as the last time this component was rendered.
- * @param virtualDimsToLocation utility stateless function to convert from ui virtual grid dims (ints) to 3d node location in game state (ints)
- * @param virtualGridStatusMap table of ui grid location to object containing react fragments for contents of that node
+ * @param virtualCoordsToLocation utility stateless function to convert from ui virtual grid dims (ints) to 3d node location in game state (ints)
+ * @param virtualNodeDataMap table of ui grid location to object containing react fragments for contents of that node
  * @param updateNodeStatusCb callback for when a node is allocated and the node status needs to change.
  * @param onJump callback for when this component wants to communicate that a jump should be triggered. the jump offset is then supposed to come down as props in the next render cycle.
  * @param cursoredVirtualNode 2d virtual dims of the node which is currently cursored (flashing and may show up in sidebar), or undefined if there is none
  * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored.
  * @param keyboardScrollDirection if nonzero, player is trying to scroll using keyboard controls
  */
-function GameArea(props: {
+function Component(props: {
   hidden: boolean;
   appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
@@ -45,8 +44,8 @@ function GameArea(props: {
   // this object reference is guaranteed to be stable unless jump cb is called
 
   // jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
-  virtualDimsToLocation: (v: Vector2) => Vector3;
-  virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData>;
+  virtualCoordsToLocation: (v: Vector2) => Vector3;
+  virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   updateNodeStatusCb: UpdateStatusCb;
   // onJump: (args: { direction: Vector2 }) => void;
@@ -227,7 +226,7 @@ function GameArea(props: {
             .map((_, y) => (
               <Row
                 key={props
-                  .virtualDimsToLocation(new Vector2(0, y))
+                  .virtualCoordsToLocation(new Vector2(0, y))
                   .y.toString()}
                 rowIdx={y}
               >
@@ -235,7 +234,7 @@ function GameArea(props: {
                   .fill(0)
                   .map((_, x) => {
                     const virtualCoords = new Vector2(x, y);
-                    const nodeData = props.virtualGridStatusMap.get(
+                    const nodeData = props.virtualNodeDataMap.get(
                       virtualCoords
                     )!;
                     return (

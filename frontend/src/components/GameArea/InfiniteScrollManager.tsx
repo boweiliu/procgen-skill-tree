@@ -24,8 +24,8 @@ function Component(props: {
   // this object reference is guaranteed to be stable unless jump cb is called
 
   jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
-  virtualDimsToLocation: (v: Vector2) => Vector3;
-  virtualGridStatusMap: KeyedHashMap<Vector2, NodeReactData>;
+  virtualCoordsToLocation: (v: Vector2) => Vector3;
+  virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
   // specify virtual coordinates of the node and the new status to cause an update.
   onJump: (args: { direction: Vector2 }) => void;
   cursoredVirtualNode: Vector2 | undefined;
