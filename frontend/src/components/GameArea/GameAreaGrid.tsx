@@ -53,7 +53,7 @@ function Component(props: {
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   keyboardScrollDirection: Vector2;
 }) {
-  // console.log('Game area component rerender');
+  console.log('Game area grid rerender');
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;

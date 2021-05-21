@@ -1,54 +1,61 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useCallback, useEffect, useRef } from 'react';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { NodeReactData } from './computeVirtualNodeDataMap';
-import { hexGridPx } from './GameAreaInterface';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import { GameState } from '../../data/GameState';
 
 export const InfiniteScrollManager = React.memo(Component);
 function Component(props: {
   hidden: boolean;
   appSize: Vector2;
-  hideScrollbars: boolean;
-  children?: any;
+  hexGridPx: Vector2; // the size of a single grid unit, in px
+  virtualGridDims: Vector2; // in grid units. width x height, guaranteed to be integers
+  children: any;
 
-  // intent: PlayerIntentState;
-  // virtualSize: Vector2; // in pixels
-  virtualGridDims: Vector2; // in grid units. width x height, width is guaranteed to be half-integer value
-  // this object reference is guaranteed to be stable unless jump cb is called
-
-  jumpOffset?: Vector2; // if non-null, jump callback was recently requested, and this is the recommended jump offset in grid dims
-  virtualCoordsToLocation: (v: Vector2) => Vector3;
-  virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
-  // specify virtual coordinates of the node and the new status to cause an update.
-  onJump: (args: { direction: Vector2 }) => void;
-  cursoredVirtualNode: Vector2 | undefined;
-  setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
 }) {
-  // console.log('Game area component rerender');
+  const { hexGridPx, virtualGridDims } = props;
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
-  const gridWidth = hexGridPx.x;
-  const gridHeight = hexGridPx.y;
+  const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
   // Receives a Vector2 instance jumpOffset,
   // and uses offset to jump to a new scroll position
   useEffect(() => {
-    const jumpOffset = props.jumpOffset;
-    // console.log({ receivedJumpOffset: jumpOffset }, +new Date());
     if (!jumpOffset) return;
     const ref = container.current;
     if (!ref) return;
     ref.scrollTo(
-      ref.scrollLeft - jumpOffset.x * gridWidth,
-      ref.scrollTop - jumpOffset.y * gridHeight
+      ref.scrollLeft - jumpOffset.x * hexGridPx.x,
+      ref.scrollTop - jumpOffset.y * hexGridPx.y
     );
-  }, [props.jumpOffset]);
+  }, [jumpOffset]);
+
+  const handleJump = useCallback(
+    (args: { direction: Vector2 }) => {
+      // direction: if we hit bottom right of screen, direction == (1,1)
+      // console.log({ direction: args.direction });
+      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
+      jumpAmounts = jumpAmounts
+        .clampX(1, virtualGridDims.x - 1)
+        .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
+      const jumpOffset = jumpAmounts.multiply(args.direction);
+      console.log({ jumpOffset });
+      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+        return it
+          .addX(jumpOffset.x)
+          .add(new Vector3(-1, -2, 0).multiply(jumpOffset.y / 2));
+      });
+      setJumpOffset(jumpOffset.multiply(1));
+    },
+    [virtualGridDims, props.updaters]
+  );
 
   /**
    * Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
@@ -61,28 +68,28 @@ function Component(props: {
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop; // only used as boolean to see if it changed
       let newScrollLeft = target.scrollLeft;
-      if (target.scrollTop < gridHeight * 0.4) {
+      if (target.scrollTop < hexGridPx.y * 0.4) {
         // between 0.1 and 0.4 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
-        newScrollTop += gridHeight * 2;
+        newScrollTop += hexGridPx.y * 2;
         direction.y -= 1;
       }
       if (
         target.scrollTop >
-        (props.virtualGridDims.y - 0.4) * gridHeight - props.appSize.y
+        (props.virtualGridDims.y - 0.4) * hexGridPx.y - props.appSize.y
       ) {
-        newScrollTop -= gridHeight * 2;
+        newScrollTop -= hexGridPx.y * 2;
         direction.y += 1;
       }
-      if (target.scrollLeft < gridWidth * 0.9) {
+      if (target.scrollLeft < hexGridPx.x * 0.9) {
         // between 0.6 and 0.9 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
-        newScrollLeft += gridWidth * 2;
+        newScrollLeft += hexGridPx.x * 2;
         direction.x -= 1;
       }
       if (
         target.scrollLeft >
-        (props.virtualGridDims.x - 0.9) * gridWidth - props.appSize.x
+        (props.virtualGridDims.x - 0.9) * hexGridPx.x - props.appSize.x
       ) {
-        newScrollLeft -= gridWidth * 2;
+        newScrollLeft -= hexGridPx.x * 2;
         direction.x += 1;
       }
       // console.log(target);
@@ -95,7 +102,7 @@ function Component(props: {
       ) {
         // console.log('jump!', +new Date());
         // target.scrollTo(newScrollLeft, newScrollTop);
-        props.onJump({ direction: new Vector2(direction.x, direction.y) });
+        handleJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
     [props.appSize.x, props.appSize.y]
@@ -108,9 +115,9 @@ function Component(props: {
       container.current !== previousContainer.current
     ) {
       container.current.scrollTop =
-        (props.virtualGridDims.y * gridHeight - props.appSize.y) / 2;
+        (props.virtualGridDims.y * hexGridPx.y - props.appSize.y) / 2;
       container.current.scrollLeft =
-        ((props.virtualGridDims.x + 0.5) * gridWidth - props.appSize.x) / 2;
+        ((props.virtualGridDims.x + 0.5) * hexGridPx.x - props.appSize.x) / 2;
     }
     previousContainer.current = container.current;
   }, [container.current, props.appSize]);
