@@ -41,7 +41,7 @@ function Component(props: Props) {
     updaters,
     keyboardScrollDirection,
   } = props;
-  console.log('infinite scroll manager rerender');
+  // console.log('infinite scroll manager rerender');
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;

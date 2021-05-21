@@ -43,7 +43,7 @@ function Component(props: {
     cursoredVirtualNode,
     setCursoredVirtualNode,
   } = props;
-  console.log('Game area grid rerender');
+  // console.log('Game area grid rerender');
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation

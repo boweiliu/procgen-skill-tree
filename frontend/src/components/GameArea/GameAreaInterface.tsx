@@ -85,7 +85,7 @@ export function GameAreaInterface(props: {
   }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
-    console.log('sub game state recalculated!');
+    // console.log('sub game state recalculated!');
     return {
       playerUI: {
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
