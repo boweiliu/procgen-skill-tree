@@ -204,7 +204,7 @@ function Component(props: {
     [props.updaters, virtualDimsToLocation]
   );
 
-  // manage keyboard wasdezx navigation
+  // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
     const newIntent = props.gameState.intent.newIntent;
     const newLocation = virtualDimsToLocation(
