@@ -7,9 +7,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { GameState, NodeAllocatedStatus } from '../../data/GameState';
-import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { hexGridPx } from './GameAreaInterface';
+import { NodeAllocatedStatus } from '../../data/GameState';
 
 export type UpdateStatusCb = (args: {
   virtualCoords: Vector2;

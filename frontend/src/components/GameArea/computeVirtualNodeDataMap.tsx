@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React from 'react';
 import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
