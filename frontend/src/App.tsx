@@ -106,10 +106,25 @@ function App() {
         setSidebarHidden={() => {
           updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
         }}
+        placement={'right'}
       >
         <Tabs
           value={0}
           labels={['Selected node', 'Total stats', 'Quests', 'Debug']}
+          onChange={(value: number) => {}}
+        ></Tabs>
+        content
+      </Sidebar>
+      <Sidebar
+        hidden={!gameState.playerUI.isSidebarOpen}
+        setSidebarHidden={() => {
+          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
+        }}
+        placement={'left'}
+      >
+        <Tabs
+          value={0}
+          labels={['Help', 'History']}
           onChange={(value: number) => {}}
         ></Tabs>
         content

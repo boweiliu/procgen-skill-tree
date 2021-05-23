@@ -16,6 +16,18 @@
   z-index: 100;
 }
 
+.right-sidebar {
+  position: fixed;
+  left: auto;
+  right: 0;
+}
+
+.left-sidebar {
+  position: fixed;
+  left: 0;
+  right: auto;
+}
+
 .close {
   text-align: right;
   margin-bottom: 8px;
