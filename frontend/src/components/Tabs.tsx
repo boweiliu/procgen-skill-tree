@@ -1,10 +1,15 @@
 import React from 'react';
 import './Tabs.css';
 
-export default function Tabs({ value, labels, onChange }: any) {
+export default function Tabs(props: {
+  value: number;
+  labels: React.ReactNode[];
+  onChange: (t: number) => void;
+}) {
+  const { value, labels, onChange } = props;
   return (
     <div className={'tab-label-container'}>
-      {labels.map((label: any, i: any) => (
+      {labels.map((label: React.ReactNode, i: number) => (
         <Tab onClick={onChange} value={i} active={value === i} key={i}>
           {label}
         </Tab>
@@ -13,7 +18,13 @@ export default function Tabs({ value, labels, onChange }: any) {
   );
 }
 
-export function Tab({ onClick, value, active, children }: any) {
+export function Tab<T>(props: {
+  onClick: (t: T) => void;
+  value: T;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  const { onClick, value, active, children } = props;
   const handleClick = () => {
     onClick(value);
   };

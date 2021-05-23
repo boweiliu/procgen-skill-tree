@@ -108,11 +108,9 @@ function App() {
         }}
       >
         <Tabs
-          onClick={() => {}}
           value={0}
-          labels={['foo', 'bar']}
+          labels={['foo', 'bar', 'asd']}
           onChange={(value: number) => {}}
-          active
         ></Tabs>
         <br />
         content
