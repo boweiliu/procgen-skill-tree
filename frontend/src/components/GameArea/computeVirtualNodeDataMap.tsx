@@ -98,7 +98,7 @@ export function computeVirtualNodeDataMap(args: {
             {location.equals(Vector3.Zero) ? (
               <>
                 {' '}
-                <br /> <div>Your starting node</div>
+                <br /> <div>The starting node</div>
               </>
             ) : (
               <> </>
