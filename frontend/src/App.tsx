@@ -66,7 +66,10 @@ function App() {
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
-        <UseGameStateContext.Provider value={gameStateContextValue}>
+        <UseGameStateContext.Provider
+          // NOTE(bowei): this context provider is absolutely unnecessary, but keeping it here for now in case i forget how to use context managers
+          value={gameStateContextValue}
+        >
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
         <GameAreaInterface
