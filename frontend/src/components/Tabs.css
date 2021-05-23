@@ -1,4 +1,6 @@
 .tab-label-container {
+  margin-right: -8px;
+  margin-left: -8px;
   display: flex;
   /* flex: content; */
   flex-direction: row;
@@ -7,17 +9,15 @@
   margin-bottom: 8px;
 }
 
-.tab-label-container-padding-left {
+.tab-label-container:before,
+.tab-label-container:after {
+  content: '';
   width: 4px;
-  flex: 0 1 auto;
   border-bottom-style: solid;
   border-bottom-width: 2px;
 }
-.tab-label-container-padding-right {
-  width: 4px;
-  flex: 1 1 auto;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
+.tab-label-container:after {
+  flex-grow: 1;
 }
 
 .tab-label {
