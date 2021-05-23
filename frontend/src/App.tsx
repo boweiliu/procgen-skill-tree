@@ -109,7 +109,7 @@ function App() {
       >
         <Tabs
           value={0}
-          labels={['foo', 'bar', 'asd']}
+          labels={['Selected node', 'Total stats', 'Quests', 'Debug']}
           onChange={(value: number) => {}}
         ></Tabs>
         content

@@ -1,7 +1,9 @@
 .layout {
   position: fixed;
-  right: 0;
   left: auto;
+  right: 0;
+  /* left: 0;
+  right: auto; */
   height: 100%;
   width: fit-content;
   padding: 8px;
@@ -14,6 +16,7 @@
 }
 
 .close {
+  text-align: right;
   margin-bottom: 8px;
 }
 
