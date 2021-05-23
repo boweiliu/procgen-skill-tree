@@ -112,7 +112,6 @@ function App() {
           labels={['foo', 'bar', 'asd']}
           onChange={(value: number) => {}}
         ></Tabs>
-        <br />
         content
       </Sidebar>
       <KeyboardListenerComponent

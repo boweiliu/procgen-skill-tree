@@ -13,7 +13,6 @@ export default function Sidebar({ children, hidden, setSidebarHidden }: any) {
       >
         ❎ Close
       </div>
-      <br />
       <>{children}</>
     </div>
   );

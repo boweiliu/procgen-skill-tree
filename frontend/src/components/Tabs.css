@@ -4,6 +4,7 @@
   flex-direction: row;
   border-bottom-style: solid;
   border-bottom-width: 2px;
+  margin-bottom: 8px;
 }
 
 .tab-label {
@@ -16,7 +17,7 @@
   margin-left: 2px;
 }
 .tab-label:hover {
-  /* font-weight: 700; */
+  font-weight: 700;
   cursor: pointer;
   color: inherit;
 }

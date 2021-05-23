@@ -185,8 +185,8 @@ function Component(props: Props) {
   return (
     <div
       ref={container}
-      // className="game-area hidden-scrollbars"
-      className="game-area"
+      className="game-area hidden-scrollbars"
+      // className="game-area"
       hidden={props.hidden}
       onScroll={handleScroll}
     >
