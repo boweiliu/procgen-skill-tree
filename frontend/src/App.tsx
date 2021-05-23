@@ -132,10 +132,8 @@ function App() {
       <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
-      ></KeyboardListenerComponent>
-      <WindowListenerComponent
-        updaters={updaters.windowState}
-      ></WindowListenerComponent>
+      />
+      <WindowListenerComponent updaters={updaters.windowState} />
     </div>
   );
 }
