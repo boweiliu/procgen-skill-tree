@@ -15,6 +15,7 @@ export default function Tabs(props: {
           {label}
         </Tab>
       ))}
+      <div className={'tab-label-container-padding'}></div>
     </div>
   );
 }
