@@ -7,8 +7,15 @@
   margin-bottom: 8px;
 }
 
-.tab-label-container-padding {
+.tab-label-container-padding-left {
   width: 4px;
+  flex: 0 1 auto;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+}
+.tab-label-container-padding-right {
+  width: 4px;
+  flex: 1 1 auto;
   border-bottom-style: solid;
   border-bottom-width: 2px;
 }
