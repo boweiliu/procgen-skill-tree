@@ -2,8 +2,8 @@
   display: flex;
   /* flex: content; */
   flex-direction: row;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
+  /* border-bottom-style: solid;
+  border-bottom-width: 2px; */
   margin-bottom: 8px;
 }
 
@@ -14,7 +14,7 @@
   border-width: 2px;
   border-radius: 8px 8px 0px 0px;
   padding: 4px;
-  margin-left: 2px;
+  /* margin-left: 2px; */
 }
 .tab-label:hover {
   font-weight: 700;
@@ -23,4 +23,6 @@
 }
 .inactive {
   color: rgba(0, 0, 0, 0.4);
+  border-bottom-style: solid;
+  border-bottom-color: #000000;
 }

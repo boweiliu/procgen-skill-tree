@@ -124,10 +124,10 @@ function App() {
       >
         <Tabs
           value={0}
-          labels={['Help', 'History']}
+          labels={['[empty]']}
           onChange={(value: number) => {}}
         ></Tabs>
-        content
+        Nothing here!
       </Sidebar>
       <KeyboardListenerComponent
         intent={gameState.intent}

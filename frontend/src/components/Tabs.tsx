@@ -9,6 +9,7 @@ export default function Tabs(props: {
   const { value, labels, onChange } = props;
   return (
     <div className={'tab-label-container'}>
+      <div className={'tab-label-container-padding'}></div>
       {labels.map((label: React.ReactNode, i: number) => (
         <Tab onClick={onChange} value={i} active={value === i} key={i}>
           {label}
