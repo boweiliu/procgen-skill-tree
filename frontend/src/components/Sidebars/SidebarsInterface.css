@@ -3,6 +3,9 @@
   margin-bottom: 8px;
   justify-content: space-between;
 }
+.sidebar-header-gap {
+  width: 8px;
+}
 
 .sidebar-header-button {
   text-align: right;

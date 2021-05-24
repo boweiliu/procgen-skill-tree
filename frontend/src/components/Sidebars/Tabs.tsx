@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './Tabs.css';
 
-export default function Tabs(props: {
+export const Tabs = React.memo(Component);
+
+function Component(props: {
   value: number;
   labels: React.ReactNode[];
   onChange: (t: number) => void;
@@ -18,16 +20,16 @@ export default function Tabs(props: {
   );
 }
 
-export function Tab<T>(props: {
+function Tab<T>(props: {
   onClick: (t: T) => void;
   value: T;
   active: boolean;
   children: React.ReactNode;
 }) {
   const { onClick, value, active, children } = props;
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     onClick(value);
-  };
+  }, [onClick, value]);
   return (
     <div className={active ? 'tab-label active' : 'tab-label inactive'}>
       <div onClick={handleClick}>{children}</div>
