@@ -65,7 +65,6 @@ export function SidebarsInterface(props: {
     setLeftSidebarTabs,
     rightSidebarTabs,
     setRightSidebarTabs,
-    leftActiveTabIndex,
     setLeftActiveTabIndex,
     rightActiveTabIndex,
     setRightActiveTabIndex,
@@ -98,7 +97,6 @@ export function SidebarsInterface(props: {
     setRightSidebarTabs,
     leftActiveTabIndex,
     setLeftActiveTabIndex,
-    rightActiveTabIndex,
     setRightActiveTabIndex,
     setRightSidebarUnhidden,
   ]);
