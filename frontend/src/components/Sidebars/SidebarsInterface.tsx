@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import Sidebar from '../Sidebar';
-import Tabs from '../Tabs';
+import Sidebar from './Sidebar';
+import Tabs from './Tabs';
 
 /**
  * Manages both sidebars (left & right) as well as anything directly adjacent to them.
