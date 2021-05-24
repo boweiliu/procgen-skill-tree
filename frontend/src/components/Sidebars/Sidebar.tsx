@@ -5,10 +5,9 @@ import './Sidebar.css';
 export default function Sidebar(props: {
   children: React.ReactNode;
   hidden: boolean;
-  setSidebarHidden: () => void;
   placement: 'left' | 'right';
 }) {
-  const { children, hidden, setSidebarHidden, placement } = props;
+  const { children, hidden, placement } = props;
 
   return (
     <div
@@ -17,14 +16,6 @@ export default function Sidebar(props: {
       }
       hidden={hidden}
     >
-      <div
-        className="close"
-        onClick={() => {
-          setSidebarHidden();
-        }}
-      >
-        ❎ Close
-      </div>
       <>{children}</>
     </div>
   );

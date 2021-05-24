@@ -27,14 +27,3 @@
   left: 0;
   right: auto;
 }
-
-.close {
-  text-align: right;
-  margin-bottom: 8px;
-}
-
-.close:hover {
-  font-weight: 700;
-  cursor: pointer;
-  color: inherit;
-}
