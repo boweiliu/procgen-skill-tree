@@ -1,0 +1,21 @@
+.sidebar-header {
+  display: flex;
+  margin-bottom: 8px;
+  justify-content: space-between;
+}
+.sidebar-header-gap {
+  width: 8px;
+}
+
+.sidebar-header-button {
+  text-align: right;
+}
+.sidebar-header-button:last-child {
+  margin-left: auto;
+}
+
+.sidebar-header-button:hover {
+  font-weight: 700;
+  cursor: pointer;
+  color: inherit;
+}
