@@ -15,8 +15,6 @@ import {
   UpdaterGeneratorType2,
   updaterGenerator2,
 } from './lib/util/updaterGenerator';
-import Sidebar from './components/Sidebar';
-import Tabs from './components/Tabs';
 import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
 import { SidebarsInterface } from './components/Sidebars/SidebarsInterface';
 
