@@ -18,6 +18,7 @@ import {
 import Sidebar from './components/Sidebar';
 import Tabs from './components/Tabs';
 import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
+import { SidebarsInterface } from './components/Sidebars/SidebarsInterface';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create(+new Date())
@@ -104,34 +105,7 @@ function App() {
         </button>
       </div>
 
-      <Sidebar
-        hidden={!gameState.playerUI.isSidebarOpen}
-        setSidebarHidden={() => {
-          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
-        }}
-        placement={'right'}
-      >
-        <Tabs
-          value={0}
-          labels={['Selected node', 'Total stats', 'Quests', 'Debug']}
-          onChange={(value: number) => {}}
-        ></Tabs>
-        content
-      </Sidebar>
-      <Sidebar
-        hidden={!gameState.playerUI.isSidebarOpen}
-        setSidebarHidden={() => {
-          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
-        }}
-        placement={'left'}
-      >
-        <Tabs
-          value={0}
-          labels={['[empty]']}
-          onChange={(value: number) => {}}
-        ></Tabs>
-        Nothing here!
-      </Sidebar>
+      <SidebarsInterface gameState={gameState} updaters={updaters} />
       <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
