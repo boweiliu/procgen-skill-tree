@@ -54,7 +54,7 @@ export function SidebarsInterface(props: {
       .concat(rightSidebarTabs.slice(rightActiveTabIndex + 1));
     setRightSidebarTabs(newRightSidebarTabs);
     setRightActiveTabIndex(
-      Math.min(rightActiveTabIndex, newRightSidebarTabs.length - 1)
+      Math.max(0, Math.min(rightActiveTabIndex, newRightSidebarTabs.length - 1))
     );
     const newLeftSidebarTabs = [...leftSidebarTabs, currentRightTab];
     setLeftSidebarTabs(newLeftSidebarTabs);
@@ -84,7 +84,7 @@ export function SidebarsInterface(props: {
       .concat(leftSidebarTabs.slice(leftActiveTabIndex + 1));
     setLeftSidebarTabs(newLeftSidebarTabs);
     setLeftActiveTabIndex(
-      Math.min(leftActiveTabIndex, newLeftSidebarTabs.length - 1)
+      Math.max(Math.min(leftActiveTabIndex, newLeftSidebarTabs.length - 1), 0)
     );
     const newRightSidebarTabs = [...rightSidebarTabs, currentLeftTab];
     setRightSidebarTabs(newRightSidebarTabs);
