@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import Sidebar from './Sidebar';
@@ -39,7 +39,7 @@ export function SidebarsInterface(props: {
   const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
   const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
 
-  const emptyTabLabels = ['[empty]'];
+  const emptyTabLabels = ['EMPTY'];
 
   const onSendTabLeft = useCallback(() => {
     if (rightSidebarTabs.length === 0) {
@@ -101,6 +101,33 @@ export function SidebarsInterface(props: {
     setRightSidebarUnhidden,
   ]);
 
+  // Find out which tab is active on either side
+  const leftTabName = useMemo(() => {
+    if (leftSidebarTabs.length === 0) {
+      return 'EMPTY';
+    } else {
+      return leftSidebarTabs[leftActiveTabIndex];
+    }
+  }, [leftSidebarTabs, leftActiveTabIndex]);
+
+  const leftTabContent = useMemo(() => {
+    if (leftTabName === 'EMPTY') {
+      return <>Nothing here!</>;
+    } else if (leftTabName === 'SELECTED_NODE') {
+      return <>selected node info???</>;
+    } else if (leftTabName === 'STATS') {
+      return <>stats info???</>;
+    } else if (leftTabName === 'QUESTS') {
+      return <>quests info???</>;
+    } else if (leftTabName === 'DEBUG') {
+      return <>debug panel</>;
+    } else if (leftTabName === 'HELP') {
+      return <>How to play the game</>;
+    } else {
+      window.alert('ERROR');
+    }
+  }, [leftTabName]);
+
   return (
     <>
       <Sidebar
@@ -127,7 +154,7 @@ export function SidebarsInterface(props: {
           labels={leftSidebarTabs.length ? leftSidebarTabs : emptyTabLabels}
           onChange={setLeftActiveTabIndex}
         ></Tabs>
-        Nothing here!
+        {leftTabContent}
       </Sidebar>
       <Sidebar hidden={!gameState.playerUI.isSidebarOpen} placement={'right'}>
         <div className="sidebar-header">
