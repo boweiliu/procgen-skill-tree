@@ -1,5 +1,6 @@
 .text {
-  position: relative;
+  position: absolute;
+  width: 100px;
   text-align: left;
   font-size: 11px;
   color: white;
