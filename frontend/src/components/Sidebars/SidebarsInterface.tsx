@@ -1,10 +1,10 @@
+import './SidebarsInterface.css';
 import React, { useCallback, useMemo, useState } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import Sidebar from './Sidebar';
 import { Tabs } from './Tabs';
-
-import './SidebarsInterface.css';
+import { TabContentInterface, TAB_NAME } from './TabContentInterface';
 
 const emptyTabLabels = ['EMPTY'];
 
@@ -102,31 +102,21 @@ export function SidebarsInterface(props: {
   ]);
 
   // Find out which tab is active on either side
-  const leftTabName = useMemo(() => {
+  const leftTabName: TAB_NAME = useMemo(() => {
     if (leftSidebarTabs.length === 0) {
-      return 'EMPTY';
+      return TAB_NAME.EMPTY;
     } else {
-      return leftSidebarTabs[leftActiveTabIndex];
+      return leftSidebarTabs[leftActiveTabIndex] as TAB_NAME;
     }
   }, [leftSidebarTabs, leftActiveTabIndex]);
 
-  const leftTabContent = useMemo(() => {
-    if (leftTabName === 'EMPTY') {
-      return <>Nothing here!</>;
-    } else if (leftTabName === 'SELECTED_NODE') {
-      return <>selected node info???</>;
-    } else if (leftTabName === 'STATS') {
-      return <>stats info???</>;
-    } else if (leftTabName === 'QUESTS') {
-      return <>quests info???</>;
-    } else if (leftTabName === 'DEBUG') {
-      return <>debug panel</>;
-    } else if (leftTabName === 'HELP') {
-      return <>How to play the game</>;
+  const rightTabName: TAB_NAME = useMemo(() => {
+    if (rightSidebarTabs.length === 0) {
+      return TAB_NAME.EMPTY;
     } else {
-      window.alert('ERROR');
+      return rightSidebarTabs[rightActiveTabIndex] as TAB_NAME;
     }
-  }, [leftTabName]);
+  }, [rightSidebarTabs, rightActiveTabIndex]);
 
   return (
     <>
@@ -154,7 +144,11 @@ export function SidebarsInterface(props: {
           labels={leftSidebarTabs.length ? leftSidebarTabs : emptyTabLabels}
           onChange={setLeftActiveTabIndex}
         ></Tabs>
-        {leftTabContent}
+        <TabContentInterface
+          gameState={gameState}
+          updaters={updaters}
+          tabName={leftTabName}
+        />
       </Sidebar>
       <Sidebar hidden={!gameState.playerUI.isSidebarOpen} placement={'right'}>
         <div className="sidebar-header">
@@ -176,7 +170,11 @@ export function SidebarsInterface(props: {
           labels={rightSidebarTabs.length ? rightSidebarTabs : emptyTabLabels}
           onChange={setRightActiveTabIndex}
         ></Tabs>
-        content
+        <TabContentInterface
+          gameState={gameState}
+          updaters={updaters}
+          tabName={rightTabName}
+        />
       </Sidebar>
     </>
   );
