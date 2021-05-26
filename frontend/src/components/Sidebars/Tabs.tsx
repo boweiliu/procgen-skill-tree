@@ -20,9 +20,11 @@ function Component(props: {
   );
 }
 
-function Tab<T>(props: {
-  onClick: (t: T) => void;
-  value: T;
+const Tab = React.memo(TabComponent);
+
+function TabComponent(props: {
+  onClick: (t: number) => void;
+  value: number;
   active: boolean;
   children: React.ReactNode;
 }) {

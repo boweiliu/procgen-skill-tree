@@ -6,6 +6,8 @@ import { Tabs } from './Tabs';
 
 import './SidebarsInterface.css';
 
+const emptyTabLabels = ['EMPTY'];
+
 /**
  * Manages both sidebars (left & right) as well as anything directly adjacent to them.
  */
@@ -38,8 +40,6 @@ export function SidebarsInterface(props: {
   ]);
   const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
   const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
-
-  const emptyTabLabels = ['EMPTY'];
 
   const onSendTabLeft = useCallback(() => {
     if (rightSidebarTabs.length === 0) {
