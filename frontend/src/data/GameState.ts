@@ -120,8 +120,8 @@ export enum NodeAllocatedStatus {
   // DEPRECATED
   TAKEN = 'TAKEN',
 
+  VISIBLE = 'VISIBLE', // used in the fogOfWarStatus Map -- corresponds to "TAKEN"
   // NOT DEPRECATED
-  VISIBLE = 'VISIBLE',
   HIDDEN = 'HIDDEN',
   AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
   UNREACHABLE = 'UNREACHABLE',
@@ -139,6 +139,10 @@ export type ComputedState = {
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
 
   // NOT DEPRECATED
+  /**
+   * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
+   * Also stores the allocatability (whether it's connected to the existing tree).
+   */
   fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };

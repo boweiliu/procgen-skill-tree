@@ -32,7 +32,7 @@ export type PlayerSaveState = {
 
   /**
    * Indicated which nodes are allocated or not. NOTE: does not contain fog of war information
-   * TODO(bowei): this should be lazyHashMap with default == HIDDEN
+   * TODO(bowei): this should be lazyHashMap with either TAKEN or NOT_TAKEN
    */
   allocationStatusMap: KeyedHashMap<Vector3, NodeAllocatedStatus>;
   // lockMap: LazyHashMap<Vector3, LockData | undefined>;

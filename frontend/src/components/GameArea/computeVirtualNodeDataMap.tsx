@@ -58,6 +58,7 @@ export function computeVirtualNodeDataMap(args: {
     for (let col = 0; col < virtualGridDims.y; col++) {
       const virtualVec = new Vector2(row, col);
       const location = virtualCoordsToLocation(virtualVec);
+
       const maybeStatus = fogOfWarStatusMap?.get(location);
       const takenStatus = allocationStatusMap.get(location);
       const nodeStatus =
