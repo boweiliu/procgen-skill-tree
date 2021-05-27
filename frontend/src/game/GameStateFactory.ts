@@ -2,9 +2,11 @@ import {
   GameState,
   PointNodeRef,
   LockStatus,
-  NodeAllocatedStatus,
   noIntent,
   WindowState,
+  NodeTakenStatus,
+  NodeReachableStatus,
+  NodeVisibleStatus,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
 import {
@@ -88,8 +90,9 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
-        allocationStatusMap: new KeyedHashMap<Vector3, NodeAllocatedStatus>([
-          [Vector3.Zero, NodeAllocatedStatus.TAKEN],
+        // make sure to allocate the beginning node
+        allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
+          [Vector3.Zero, NodeTakenStatus.true],
         ]),
       },
       playerUI: {
@@ -111,6 +114,7 @@ export class GameStateFactory {
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
     gameState.computed.lockStatusMap = new HashMap();
     gameState.computed.fogOfWarStatusMap = new HashMap();
+    gameState.computed.reachableStatusMap = new HashMap();
 
     /**
      * Initialize fog of war and visible locks
@@ -140,14 +144,16 @@ export class GameStateFactory {
     // now fog of war flow vision based on computed lock statuses
     {
       let prevMap = gameState.computed.fogOfWarStatusMap;
+      let prevReachableStatusMap = gameState.computed.reachableStatusMap;
       let nodeLocation = Vector3.Zero;
       // let newStatus = NodeAllocatedStatus.TAKEN;
       const prevGameState = gameState;
 
-      prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+      prevMap.put(nodeLocation, NodeVisibleStatus.true);
 
       getWithinDistance(nodeLocation, 1).forEach((n) => {
-        prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+        prevMap.put(n, NodeVisibleStatus.true);
+        prevReachableStatusMap.put(n, NodeReachableStatus.true);
       });
 
       // make sure we make use of lock state
@@ -170,13 +176,10 @@ export class GameStateFactory {
         0,
         validLocks
       ).forEach((n) => {
-        if (
-          (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-          NodeAllocatedStatus.HIDDEN
-        ) {
+        if (!prevMap.get(n)?.visible) {
           // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
           prevGameState.worldGen.lockMap.precompute(n);
-          prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+          prevMap.put(n, NodeVisibleStatus.true);
         }
       });
     }

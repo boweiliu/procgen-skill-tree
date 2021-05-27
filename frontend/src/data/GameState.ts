@@ -117,15 +117,46 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
 }
 
 export enum NodeAllocatedStatus {
-  // DEPRECATED
-  TAKEN = 'TAKEN',
-  VISIBLE = 'VISIBLE', // used in the fogOfWarStatus Map -- corresponds to "TAKEN"
-
-  // NOT DEPRECATED
-  HIDDEN = 'HIDDEN', // hidden due to fog of war
-  AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes
+  TAKEN = 'TAKEN', // already allocated
+  AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes, but not already allocated
   UNREACHABLE = 'UNREACHABLE', // visible but not immediately allocatable due to being not adjacent
+  HIDDEN = 'HIDDEN', // hidden due to fog of war
 }
+
+/**
+ * taken implies reachable. reachable implies visible.
+ */
+export type NodeTakenStatus = {
+  taken: boolean;
+};
+export type NodeVisibleStatus = {
+  visible: boolean;
+};
+export type NodeReachableStatus = {
+  reachable: boolean;
+};
+/**
+ * Immutable, readable booleans
+ */
+export enum BoolEnum {
+  true = 'true',
+  false = 'false',
+}
+// eslint-disable-next-line
+export const NodeTakenStatus: { [k in BoolEnum]: NodeTakenStatus } = {
+  true: { taken: true },
+  false: { taken: false },
+};
+// eslint-disable-next-line
+export const NodeVisibleStatus: { [k in BoolEnum]: NodeVisibleStatus } = {
+  true: { visible: true },
+  false: { visible: false },
+};
+// eslint-disable-next-line
+export const NodeReachableStatus: { [k in BoolEnum]: NodeReachableStatus } = {
+  true: { reachable: true },
+  false: { reachable: false },
+};
 
 export enum LockStatus {
   CLOSED = 'CLOSED',
@@ -143,7 +174,8 @@ export type ComputedState = {
    * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
    * Also stores the allocatability (whether it's connected to the existing tree).
    */
-  fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
+  fogOfWarStatusMap?: HashMap<Vector3, NodeVisibleStatus>;
+  reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };
 

@@ -1,5 +1,10 @@
 import * as Pixi from 'pixi.js';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  LockStatus,
+  NodeReachableStatus,
+  NodeTakenStatus,
+  NodeVisibleStatus,
+} from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
@@ -21,8 +26,9 @@ type Props = {
   };
   appSize: Vector2;
   virtualGridLocation: Const<Vector3>;
-  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeAllocatedStatus>>;
-  fogOfWarStatusMap: Const<HashMap<Vector3, NodeAllocatedStatus>>;
+  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
+  fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
+  reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
   lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
   lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
 };
@@ -92,26 +98,40 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        props.fogOfWarStatusMap.get(virtualLocation) ||
-        NodeAllocatedStatus.HIDDEN;
-      const nodeAllocatedStatus =
-        props.allocationStatusMap.get(virtualLocation) ||
-        NodeAllocatedStatus.HIDDEN;
+        props.fogOfWarStatusMap.get(virtualLocation) || NodeVisibleStatus.false;
+      const nodeTakenStatus =
+        props.allocationStatusMap.get(virtualLocation) || NodeTakenStatus.false;
+      const nodeReachableStatus =
+        props.reachableStatusMap.get(virtualLocation) ||
+        NodeReachableStatus.false;
       const lockData = props.lockMap.get(virtualLocation);
       const lockStatus = props.lockStatusMap.get(virtualLocation);
 
-      if (nodeVisibleStatus === NodeAllocatedStatus.HIDDEN) {
-        graphics.visible = false;
-      } else if (nodeAllocatedStatus === NodeAllocatedStatus.TAKEN) {
+      if (nodeTakenStatus.taken) {
         graphics.visible = true;
         graphics.tint = COLORS.borderBlack;
-      } else if (
-        nodeVisibleStatus === NodeAllocatedStatus.AVAILABLE ||
-        nodeVisibleStatus === NodeAllocatedStatus.UNREACHABLE
-      ) {
+      } else if (nodeReachableStatus.reachable) {
+        graphics.visible = true;
+        graphics.tint = COLORS.nodeLavender;
+      } else if (nodeVisibleStatus.visible) {
         graphics.visible = true;
         graphics.tint = COLORS.nodePink;
+      } else {
+        // hidden
+        graphics.visible = false;
       }
+      // if (nodeVisibleStatus === NodeAllocatedStatus.HIDDEN) {
+      //   graphics.visible = false;
+      // } else if (nodeTakenStatus?.taken) {
+      //   graphics.visible = true;
+      //   graphics.tint = COLORS.borderBlack;
+      // } else if (
+      //   nodeVisibleStatus === NodeAllocatedStatus.AVAILABLE ||
+      //   nodeVisibleStatus === NodeAllocatedStatus.UNREACHABLE
+      // ) {
+      //   graphics.visible = true;
+      //   graphics.tint = COLORS.nodePink;
+      // }
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);

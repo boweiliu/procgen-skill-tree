@@ -1,5 +1,11 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+  NodeReachableStatus,
+  NodeTakenStatus,
+  NodeVisibleStatus,
+} from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
@@ -37,10 +43,11 @@ export const STARTING_NODE_DESCRIPTION = 'The starting node.';
  * text & tooltip info about the node at those coordinates.
  */
 export function computeVirtualNodeDataMap(args: {
-  allocationStatusMap: KeyedHashMap<Vector3, NodeAllocatedStatus>;
+  allocationStatusMap: KeyedHashMap<Vector3, NodeTakenStatus>;
   nodeContentsMap: LazyHashMap<Vector3, NodeContents>;
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
-  fogOfWarStatusMap: HashMap<Vector3, NodeAllocatedStatus> | undefined;
+  fogOfWarStatusMap: HashMap<Vector3, NodeVisibleStatus> | undefined;
+  reachableStatusMap: HashMap<Vector3, NodeReachableStatus> | undefined;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
 }): KeyedHashMap<Vector2, NodeReactData> {
@@ -49,6 +56,7 @@ export function computeVirtualNodeDataMap(args: {
     nodeContentsMap,
     lockMap,
     fogOfWarStatusMap,
+    reachableStatusMap,
     virtualGridDims,
     virtualCoordsToLocation,
   } = args;
@@ -59,12 +67,16 @@ export function computeVirtualNodeDataMap(args: {
       const virtualVec = new Vector2(row, col);
       const location = virtualCoordsToLocation(virtualVec);
 
-      const maybeStatus = fogOfWarStatusMap?.get(location);
+      const fogOfWarStatus = fogOfWarStatusMap?.get(location);
+      const reachableStatus = reachableStatusMap?.get(location);
       const takenStatus = allocationStatusMap.get(location);
-      const nodeStatus =
-        takenStatus === NodeAllocatedStatus.TAKEN
-          ? NodeAllocatedStatus.TAKEN
-          : maybeStatus || NodeAllocatedStatus.HIDDEN;
+      const nodeStatus = takenStatus?.taken
+        ? NodeAllocatedStatus.TAKEN
+        : reachableStatus?.reachable
+        ? NodeAllocatedStatus.AVAILABLE
+        : fogOfWarStatus?.visible
+        ? NodeAllocatedStatus.UNREACHABLE
+        : NodeAllocatedStatus.HIDDEN;
       const id = location.hash();
       const lockData = lockMap.get(location);
       const nodeContents = nodeContentsMap.get(location);

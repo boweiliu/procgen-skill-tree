@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { GameState, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  GameState,
+  NodeAllocatedStatus,
+  NodeReachableStatus,
+  NodeTakenStatus,
+} from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -58,6 +63,7 @@ function Component(props: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
       virtualGridDims,
       virtualCoordsToLocation,
     });
@@ -66,6 +72,7 @@ function Component(props: {
     gameState.worldGen.nodeContentsMap,
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
     virtualGridDims,
     virtualCoordsToLocation,
   ]);
@@ -77,12 +84,12 @@ function Component(props: {
 
       // console.log({ got: 'here handleUpdateNodeStatus' });
       const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
-      const prevStatus =
-        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
-        NodeAllocatedStatus.HIDDEN;
+      const reachableStatus =
+        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
+        NodeReachableStatus.false;
       if (newStatus === NodeAllocatedStatus.TAKEN) {
-        if (prevStatus !== NodeAllocatedStatus.AVAILABLE) {
-          console.log('cant do that', prevStatus);
+        if (reachableStatus !== NodeReachableStatus.true) {
+          console.log('cant do that, not reachable:', reachableStatus);
           return;
         }
         const maybeLock = gameState.worldGen.lockMap.get(nodeLocation);
@@ -92,13 +99,10 @@ function Component(props: {
         }
       }
 
-      if (
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) !==
-        NodeAllocatedStatus.TAKEN
-      ) {
+      if (!gameState.playerSave.allocationStatusMap.get(nodeLocation)?.taken) {
         props.actions.allocateNode.enqueueAction({
           nodeLocation,
-          newStatus: NodeAllocatedStatus.TAKEN,
+          newStatus: NodeTakenStatus.true,
         });
       }
     },
@@ -107,8 +111,7 @@ function Component(props: {
       props.actions,
       virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
-      gameState.computed.fogOfWarStatusMap,
-      // gameState.computed.lockStatusMap,
+      gameState.computed.reachableStatusMap,
       gameState.worldGen.lockMap,
     ]
   );

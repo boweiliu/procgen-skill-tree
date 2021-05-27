@@ -9,8 +9,9 @@ let COLORS = {
 
   // shitty colors
   // backgroundBlue: 0xffffff,
-  nodePink: 0x332244,
-  nodeLavender: 0x777777,
+  // nodePink: 0x332244,
+  nodePink: 0x333333, // try this?
+  nodeLavender: 0x4b4b4b,
   nodeBlue: 0xdddddd,
 
   // used for lock nodes
