@@ -72,6 +72,7 @@ function Component(props: {
     gameState.worldGen.nodeContentsMap,
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
     virtualGridDims,
     virtualCoordsToLocation,
   ]);
@@ -110,8 +111,7 @@ function Component(props: {
       props.actions,
       virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
-      gameState.computed.fogOfWarStatusMap,
-      // gameState.computed.lockStatusMap,
+      gameState.computed.reachableStatusMap,
       gameState.worldGen.lockMap,
     ]
   );

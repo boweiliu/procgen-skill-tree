@@ -1,7 +1,6 @@
 import * as Pixi from 'pixi.js';
 import {
   LockStatus,
-  NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
   NodeVisibleStatus,

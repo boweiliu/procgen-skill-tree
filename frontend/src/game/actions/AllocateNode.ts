@@ -1,7 +1,6 @@
 import {
   GameState,
   LockStatus,
-  NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
   NodeVisibleStatus,

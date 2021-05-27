@@ -2,7 +2,6 @@ import {
   GameState,
   PointNodeRef,
   LockStatus,
-  NodeAllocatedStatus,
   noIntent,
   WindowState,
   NodeTakenStatus,
