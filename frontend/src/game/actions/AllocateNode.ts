@@ -2,6 +2,7 @@ import {
   GameState,
   LockStatus,
   NodeAllocatedStatus,
+  NodeReachableStatus,
   NodeTakenStatus,
 } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -60,6 +61,17 @@ export class AllocateNodeAction {
         return prevMap.clone();
       }
     );
+
+    this.updaters.computed.reachableStatusMap?.enqueueUpdate((prevMap) => {
+      if (!prevMap) {
+        return prevMap;
+      }
+
+      getWithinDistance(nodeLocation, 1).forEach((n) => {
+        prevMap.put(n, NodeReachableStatus.true);
+      });
+      return prevMap.clone();
+    });
 
     this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
       (prevMap, prevGameState) => {

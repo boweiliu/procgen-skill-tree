@@ -178,6 +178,7 @@ export type ComputedState = {
    * Also stores the allocatability (whether it's connected to the existing tree).
    */
   fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
+  reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };
 

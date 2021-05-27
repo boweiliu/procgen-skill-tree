@@ -6,6 +6,7 @@ import {
   noIntent,
   WindowState,
   NodeTakenStatus,
+  NodeReachableStatus,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
 import {
@@ -89,6 +90,7 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
+        // make sure to allocate the beginning node
         allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
           [Vector3.Zero, NodeTakenStatus.true],
         ]),
@@ -112,6 +114,7 @@ export class GameStateFactory {
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
     gameState.computed.lockStatusMap = new HashMap();
     gameState.computed.fogOfWarStatusMap = new HashMap();
+    gameState.computed.reachableStatusMap = new HashMap();
 
     /**
      * Initialize fog of war and visible locks
@@ -141,6 +144,7 @@ export class GameStateFactory {
     // now fog of war flow vision based on computed lock statuses
     {
       let prevMap = gameState.computed.fogOfWarStatusMap;
+      let prevReachableStatusMap = gameState.computed.reachableStatusMap;
       let nodeLocation = Vector3.Zero;
       // let newStatus = NodeAllocatedStatus.TAKEN;
       const prevGameState = gameState;
@@ -149,6 +153,7 @@ export class GameStateFactory {
 
       getWithinDistance(nodeLocation, 1).forEach((n) => {
         prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+        prevReachableStatusMap.put(n, NodeReachableStatus.true);
       });
 
       // make sure we make use of lock state
