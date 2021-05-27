@@ -81,8 +81,14 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
     Math.round(xyCoords.y * 100) / 100
   );
 
+  const takenStatus = (
+    gameState.playerSave.allocationStatusMap?.get(location)?.taken || false
+  ).toString();
   const reachableStatus = (
     gameState.computed.reachableStatusMap?.get(location)?.reachable || false
+  ).toString();
+  const visibleStatus = (
+    gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false
   ).toString();
 
   return (
@@ -94,7 +100,9 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <br></br>
         <div>Description: {description}</div>
         <br></br>
+        <div>Taken?: {takenStatus}</div>
         <div>Reachable?: {reachableStatus}</div>
+        <div>Visible?: {visibleStatus}</div>
       </div>
     </>
   );
