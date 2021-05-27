@@ -4,6 +4,7 @@ import {
   NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
+  NodeVisibleStatus,
 } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
@@ -45,7 +46,7 @@ export function computeVirtualNodeDataMap(args: {
   allocationStatusMap: KeyedHashMap<Vector3, NodeTakenStatus>;
   nodeContentsMap: LazyHashMap<Vector3, NodeContents>;
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
-  fogOfWarStatusMap: HashMap<Vector3, NodeAllocatedStatus> | undefined;
+  fogOfWarStatusMap: HashMap<Vector3, NodeVisibleStatus> | undefined;
   reachableStatusMap: HashMap<Vector3, NodeReachableStatus> | undefined;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
@@ -73,7 +74,9 @@ export function computeVirtualNodeDataMap(args: {
         ? NodeAllocatedStatus.TAKEN
         : reachableStatus?.reachable
         ? NodeAllocatedStatus.AVAILABLE
-        : fogOfWarStatus || NodeAllocatedStatus.HIDDEN;
+        : fogOfWarStatus?.visible
+        ? NodeAllocatedStatus.UNREACHABLE
+        : NodeAllocatedStatus.HIDDEN;
       const id = location.hash();
       const lockData = lockMap.get(location);
       const nodeContents = nodeContentsMap.get(location);

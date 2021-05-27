@@ -4,6 +4,7 @@ import {
   NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
+  NodeVisibleStatus,
 } from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
@@ -27,7 +28,7 @@ type Props = {
   appSize: Vector2;
   virtualGridLocation: Const<Vector3>;
   allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
-  fogOfWarStatusMap: Const<HashMap<Vector3, NodeAllocatedStatus>>;
+  fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
   reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
   lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
   lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
@@ -98,22 +99,22 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        props.fogOfWarStatusMap.get(virtualLocation) ||
-        NodeAllocatedStatus.HIDDEN;
-      const nodeTakenStatus = props.allocationStatusMap.get(virtualLocation);
+        props.fogOfWarStatusMap.get(virtualLocation) || NodeVisibleStatus.false;
+      const nodeTakenStatus =
+        props.allocationStatusMap.get(virtualLocation) || NodeTakenStatus.false;
       const nodeReachableStatus =
         props.reachableStatusMap.get(virtualLocation) ||
         NodeReachableStatus.false;
       const lockData = props.lockMap.get(virtualLocation);
       const lockStatus = props.lockStatusMap.get(virtualLocation);
 
-      if (nodeTakenStatus?.taken) {
+      if (nodeTakenStatus.taken) {
         graphics.visible = true;
         graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         graphics.visible = true;
         graphics.tint = COLORS.nodeLavender;
-      } else if (nodeVisibleStatus === NodeAllocatedStatus.UNREACHABLE) {
+      } else if (nodeVisibleStatus.visible) {
         graphics.visible = true;
         graphics.tint = COLORS.nodePink;
       } else {

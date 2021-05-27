@@ -177,7 +177,7 @@ export type ComputedState = {
    * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
    * Also stores the allocatability (whether it's connected to the existing tree).
    */
-  fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
+  fogOfWarStatusMap?: HashMap<Vector3, NodeVisibleStatus>;
   reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };

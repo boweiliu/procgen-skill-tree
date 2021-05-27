@@ -4,6 +4,7 @@ import {
   NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
+  NodeVisibleStatus,
 } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -78,10 +79,10 @@ export class AllocateNodeAction {
         if (!prevMap) {
           return prevMap;
         }
-        prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+        prevMap.put(nodeLocation, NodeVisibleStatus.true);
 
         getWithinDistance(nodeLocation, 1).forEach((n) => {
-          prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+          prevMap.put(n, NodeVisibleStatus.true);
         });
 
         // make sure we make use of lock state
@@ -104,13 +105,10 @@ export class AllocateNodeAction {
           0,
           validLocks
         ).forEach((n) => {
-          if (
-            (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-            NodeAllocatedStatus.HIDDEN
-          ) {
+          if (!prevMap.get(n)?.visible) {
             // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
             prevGameState.worldGen.lockMap.precompute(n);
-            prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+            prevMap.put(n, NodeVisibleStatus.true);
           }
         });
 
