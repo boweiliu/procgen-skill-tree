@@ -95,7 +95,7 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
     <>
       <div className="tab-content-body">
         <div>
-          Location: ( {xyCoords.x} , {xyCoords.y} )
+          Location: ( {xyCoords.x} , {xyCoords.y} ) , z-layer = {location.z}
         </div>
         <br></br>
         <div>Description: {description}</div>
@@ -103,6 +103,9 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <div>Taken?: {takenStatus}</div>
         <div>Reachable?: {reachableStatus}</div>
         <div>Visible?: {visibleStatus}</div>
+        <div>Locked?: {'???'}</div>
+        <br></br>
+        <div>Contents: {'???'}</div>
       </div>
     </>
   );

@@ -120,18 +120,6 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // hidden
         graphics.visible = false;
       }
-      // if (nodeVisibleStatus === NodeAllocatedStatus.HIDDEN) {
-      //   graphics.visible = false;
-      // } else if (nodeTakenStatus?.taken) {
-      //   graphics.visible = true;
-      //   graphics.tint = COLORS.borderBlack;
-      // } else if (
-      //   nodeVisibleStatus === NodeAllocatedStatus.AVAILABLE ||
-      //   nodeVisibleStatus === NodeAllocatedStatus.UNREACHABLE
-      // ) {
-      //   graphics.visible = true;
-      //   graphics.tint = COLORS.nodePink;
-      // }
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
