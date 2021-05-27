@@ -1,6 +1,10 @@
 import React from 'react';
+import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import { Vector2 } from '../../lib/util/geometry/vector2';
+import { Vector3 } from '../../lib/util/geometry/vector3';
+import { STARTING_NODE_DESCRIPTION } from '../GameArea/computeVirtualNodeDataMap';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -45,7 +49,9 @@ export const SelectedNodeTabContent = React.memo(
 );
 function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
   const { gameState } = props;
-  if (gameState.playerUI.cursoredNodeLocation === undefined) {
+  const location = gameState.playerUI.cursoredNodeLocation;
+
+  if (location === undefined) {
     return (
       <>
         <div>Nothing selected!</div>
@@ -57,9 +63,35 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
     );
   }
 
+  let description = '';
+  if (location.equals(Vector3.Zero)) {
+    description = STARTING_NODE_DESCRIPTION;
+  } else if (gameState.worldGen.lockMap?.get(location) !== undefined) {
+    description = 'A locked node.';
+  } else {
+    description = 'An allocatable node.';
+  }
+
+  let xyCoords = new Vector2(
+    location.x - location.y / 2,
+    (location.y * Math.sqrt(3)) / 2
+  );
+  xyCoords = new Vector2(
+    Math.round(xyCoords.x * 100) / 100,
+    Math.round(xyCoords.y * 100) / 100
+  );
+
   return (
     <>
-      <div>selected node info???</div>
+      <div className="tab-content-body">
+        <div>
+          Location: ( {xyCoords.x} , {xyCoords.y} )
+        </div>
+        <br></br>
+        <div>Description: {description}</div>
+        <br></br>
+        <div>Status: </div>
+      </div>
     </>
   );
 }

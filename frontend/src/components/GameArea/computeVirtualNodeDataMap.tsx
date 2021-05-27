@@ -28,6 +28,10 @@ export type NodeReactData = {
   id: string;
 };
 
+// Text to display both in the tooltip and sidebar for node description.
+// Currently we only have a description for the starting node.
+export const STARTING_NODE_DESCRIPTION = 'The starting node.';
+
 /**
  * Computes a hash map of vector2 virtual hex grid coordinates to
  * text & tooltip info about the node at those coordinates.
@@ -98,7 +102,7 @@ export function computeVirtualNodeDataMap(args: {
             {location.equals(Vector3.Zero) ? (
               <>
                 {' '}
-                <br /> <div>The starting node</div>
+                <br /> <div>{STARTING_NODE_DESCRIPTION}</div>
               </>
             ) : (
               <> </>
