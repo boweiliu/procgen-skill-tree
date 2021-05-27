@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   GameState,
   NodeAllocatedStatus,
+  NodeReachableStatus,
   NodeTakenStatus,
 } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
@@ -62,6 +63,7 @@ function Component(props: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
       virtualGridDims,
       virtualCoordsToLocation,
     });
@@ -81,12 +83,12 @@ function Component(props: {
 
       // console.log({ got: 'here handleUpdateNodeStatus' });
       const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
-      const prevStatus =
-        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
-        NodeAllocatedStatus.HIDDEN;
+      const reachableStatus =
+        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
+        NodeReachableStatus.false;
       if (newStatus === NodeAllocatedStatus.TAKEN) {
-        if (prevStatus !== NodeAllocatedStatus.AVAILABLE) {
-          console.log('cant do that', prevStatus);
+        if (reachableStatus !== NodeReachableStatus.true) {
+          console.log('cant do that, not reachable:', reachableStatus);
           return;
         }
         const maybeLock = gameState.worldGen.lockMap.get(nodeLocation);

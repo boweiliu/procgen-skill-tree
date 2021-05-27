@@ -81,6 +81,10 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
     Math.round(xyCoords.y * 100) / 100
   );
 
+  const reachableStatus = (
+    gameState.computed.reachableStatusMap?.get(location)?.reachable || false
+  ).toString();
+
   return (
     <>
       <div className="tab-content-body">
@@ -90,7 +94,7 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <br></br>
         <div>Description: {description}</div>
         <br></br>
-        <div>Status: </div>
+        <div>Reachable?: {reachableStatus}</div>
       </div>
     </>
   );

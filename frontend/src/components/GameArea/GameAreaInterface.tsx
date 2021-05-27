@@ -45,6 +45,7 @@ export type GameAreaSubState = {
   };
   computed: {
     fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
+    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
     lockStatusMap: typeof gameState.computed.lockStatusMap;
   };
   intent: typeof gameState.intent;
@@ -101,6 +102,7 @@ export function GameAreaInterface(props: {
       },
       computed: {
         fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+        reachableStatusMap: gameState.computed.reachableStatusMap,
         lockStatusMap: gameState.computed.lockStatusMap,
       },
       intent: gameState.intent,
@@ -113,6 +115,7 @@ export function GameAreaInterface(props: {
     gameState.worldGen.nodeContentsMap,
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
     gameState.computed.lockStatusMap,
     gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
   ]);
