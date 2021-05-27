@@ -119,12 +119,12 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
 export enum NodeAllocatedStatus {
   // DEPRECATED
   TAKEN = 'TAKEN',
-
   VISIBLE = 'VISIBLE', // used in the fogOfWarStatus Map -- corresponds to "TAKEN"
+
   // NOT DEPRECATED
-  HIDDEN = 'HIDDEN',
-  AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
-  UNREACHABLE = 'UNREACHABLE',
+  HIDDEN = 'HIDDEN', // hidden due to fog of war
+  AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes
+  UNREACHABLE = 'UNREACHABLE', // visible but not immediately allocatable due to being not adjacent
 }
 
 export enum LockStatus {
