@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { GameState, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  GameState,
+  NodeAllocatedStatus,
+  NodeTakenStatus,
+} from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -92,13 +96,10 @@ function Component(props: {
         }
       }
 
-      if (
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) !==
-        NodeAllocatedStatus.TAKEN
-      ) {
+      if (!gameState.playerSave.allocationStatusMap.get(nodeLocation)?.taken) {
         props.actions.allocateNode.enqueueAction({
           nodeLocation,
-          newStatus: NodeAllocatedStatus.TAKEN,
+          newStatus: NodeTakenStatus.true,
         });
       }
     },

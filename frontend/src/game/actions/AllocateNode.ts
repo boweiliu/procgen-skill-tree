@@ -2,6 +2,7 @@ import {
   GameState,
   LockStatus,
   NodeAllocatedStatus,
+  NodeTakenStatus,
 } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -9,7 +10,7 @@ import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';
 
 export interface AllocateNodeInput {
   nodeLocation: Vector3;
-  newStatus: NodeAllocatedStatus.TAKEN;
+  newStatus: NodeTakenStatus;
 }
 
 // TODO(bowei): unhardcode

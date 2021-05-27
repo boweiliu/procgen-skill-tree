@@ -5,6 +5,7 @@ import {
   NodeAllocatedStatus,
   noIntent,
   WindowState,
+  NodeTakenStatus,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
 import {
@@ -88,8 +89,8 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
-        allocationStatusMap: new KeyedHashMap<Vector3, NodeAllocatedStatus>([
-          [Vector3.Zero, NodeAllocatedStatus.TAKEN],
+        allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
+          [Vector3.Zero, NodeTakenStatus.true],
         ]),
       },
       playerUI: {

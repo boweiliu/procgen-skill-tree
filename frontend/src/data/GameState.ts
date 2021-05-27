@@ -116,16 +116,50 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   });
 }
 
+/**
+ * DEPRECATED
+ */
 export enum NodeAllocatedStatus {
   // DEPRECATED
   TAKEN = 'TAKEN',
   VISIBLE = 'VISIBLE', // used in the fogOfWarStatus Map -- corresponds to "TAKEN"
 
-  // NOT DEPRECATED
   HIDDEN = 'HIDDEN', // hidden due to fog of war
   AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes
   UNREACHABLE = 'UNREACHABLE', // visible but not immediately allocatable due to being not adjacent
 }
+
+/**
+ * taken implies reachable. reachable implies visible.
+ */
+export type NodeTakenStatus = {
+  taken: boolean;
+};
+export type NodeVisibleStatus = {
+  visible: boolean;
+};
+export type NodeReachableStatus = {
+  reachable: boolean;
+};
+/**
+ * Immutable, readable booleans
+ */
+export enum BoolEnum {
+  true = 'true',
+  false = 'false',
+}
+export const NodeTakenStatus: { [k in BoolEnum]: NodeTakenStatus } = {
+  true: { taken: true },
+  false: { taken: false },
+};
+export const NodeVisibleStatus: { [k in BoolEnum]: NodeVisibleStatus } = {
+  true: { visible: true },
+  false: { visible: false },
+};
+export const NodeReachableStatus: { [k in BoolEnum]: NodeReachableStatus } = {
+  true: { reachable: true },
+  false: { reachable: false },
+};
 
 export enum LockStatus {
   CLOSED = 'CLOSED',

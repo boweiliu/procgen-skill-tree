@@ -1,5 +1,9 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+  NodeTakenStatus,
+} from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
@@ -37,7 +41,7 @@ export const STARTING_NODE_DESCRIPTION = 'The starting node.';
  * text & tooltip info about the node at those coordinates.
  */
 export function computeVirtualNodeDataMap(args: {
-  allocationStatusMap: KeyedHashMap<Vector3, NodeAllocatedStatus>;
+  allocationStatusMap: KeyedHashMap<Vector3, NodeTakenStatus>;
   nodeContentsMap: LazyHashMap<Vector3, NodeContents>;
   lockMap: LazyHashMap<Vector3, LockData | undefined>;
   fogOfWarStatusMap: HashMap<Vector3, NodeAllocatedStatus> | undefined;
@@ -61,10 +65,9 @@ export function computeVirtualNodeDataMap(args: {
 
       const maybeStatus = fogOfWarStatusMap?.get(location);
       const takenStatus = allocationStatusMap.get(location);
-      const nodeStatus =
-        takenStatus === NodeAllocatedStatus.TAKEN
-          ? NodeAllocatedStatus.TAKEN
-          : maybeStatus || NodeAllocatedStatus.HIDDEN;
+      const nodeStatus = takenStatus?.taken
+        ? NodeAllocatedStatus.TAKEN
+        : maybeStatus || NodeAllocatedStatus.HIDDEN;
       const id = location.hash();
       const lockData = lockMap.get(location);
       const nodeContents = nodeContentsMap.get(location);

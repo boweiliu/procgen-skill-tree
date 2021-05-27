@@ -1,5 +1,9 @@
 import * as Pixi from 'pixi.js';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+  NodeTakenStatus,
+} from '../../data/GameState';
 import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
@@ -21,7 +25,7 @@ type Props = {
   };
   appSize: Vector2;
   virtualGridLocation: Const<Vector3>;
-  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeAllocatedStatus>>;
+  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
   fogOfWarStatusMap: Const<HashMap<Vector3, NodeAllocatedStatus>>;
   lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
   lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
@@ -94,15 +98,15 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeVisibleStatus =
         props.fogOfWarStatusMap.get(virtualLocation) ||
         NodeAllocatedStatus.HIDDEN;
-      const nodeAllocatedStatus =
-        props.allocationStatusMap.get(virtualLocation) ||
-        NodeAllocatedStatus.HIDDEN;
+      const nodeAllocatedStatus = props.allocationStatusMap.get(
+        virtualLocation
+      );
       const lockData = props.lockMap.get(virtualLocation);
       const lockStatus = props.lockStatusMap.get(virtualLocation);
 
       if (nodeVisibleStatus === NodeAllocatedStatus.HIDDEN) {
         graphics.visible = false;
-      } else if (nodeAllocatedStatus === NodeAllocatedStatus.TAKEN) {
+      } else if (nodeAllocatedStatus?.taken) {
         graphics.visible = true;
         graphics.tint = COLORS.borderBlack;
       } else if (
