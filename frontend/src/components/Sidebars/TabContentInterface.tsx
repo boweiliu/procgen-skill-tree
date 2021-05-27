@@ -18,9 +18,9 @@ export function TabContentInterface(props: {
 }) {
   const { tabName } = props;
   if (tabName === TAB_NAME.EMPTY) {
-    return <>Nothing here!</>;
+    return <EmptyTabContent />;
   } else if (tabName === TAB_NAME.SELECTED_NODE) {
-    return <>selected node info???</>;
+    return <SelectedNodeTabContent gameState={props.gameState} />;
   } else if (tabName === TAB_NAME.STATS) {
     return <>stats info???</>;
   } else if (tabName === TAB_NAME.QUESTS) {
@@ -32,4 +32,34 @@ export function TabContentInterface(props: {
   } else {
     return <> </>;
   }
+}
+
+export const EmptyTabContent = React.memo(EmptyTabContentComponent);
+function EmptyTabContentComponent(props: {}) {
+  console.log('got here empty tab content');
+  return <div>Nothing here!</div>;
+}
+
+export const SelectedNodeTabContent = React.memo(
+  SelectedNodeTabContentComponent
+);
+function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
+  const { gameState } = props;
+  if (gameState.playerUI.cursoredNodeLocation === undefined) {
+    return (
+      <>
+        <div>Nothing selected!</div>
+        <div>
+          <br></br>
+        </div>
+        <div>Hover and click the question mark tooltip to select a node.</div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div>selected node info???</div>
+    </>
+  );
 }
