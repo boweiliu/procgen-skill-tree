@@ -2,6 +2,7 @@ import './GameAreaGrid.css';
 import './GameArea.css';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import classnames from 'classnames';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -40,8 +41,9 @@ function Component(props: Props) {
     appSize,
     updaters,
     keyboardScrollDirection,
+    debug,
   } = props;
-  // console.log('infinite scroll manager rerender');
+  console.log('infinite scroll manager rerender');
 
   const container = useRef<HTMLDivElement>(null);
   const previousContainer = useRef<HTMLDivElement>(null) as any;
@@ -185,8 +187,10 @@ function Component(props: Props) {
   return (
     <div
       ref={container}
-      className="game-area hidden-scrollbars"
-      // className="game-area"
+      className={classnames({
+        'game-area': true,
+        'hidden-scrollbars': !(debug?.debugShowScrollbars || false),
+      })}
       hidden={props.hidden}
       onScroll={handleScroll}
     >

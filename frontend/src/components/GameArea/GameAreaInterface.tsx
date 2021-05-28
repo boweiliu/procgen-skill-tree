@@ -49,6 +49,9 @@ export type GameAreaSubState = {
     lockStatusMap: typeof gameState.computed.lockStatusMap;
   };
   intent: typeof gameState.intent;
+  debug: {
+    debugShowScrollbars: typeof gameState.debug.debugShowScrollbars;
+  };
 };
 
 /**
@@ -109,6 +112,9 @@ export function GameAreaInterface(props: {
         lockStatusMap: gameState.computed.lockStatusMap,
       },
       intent: gameState.intent,
+      debug: {
+        debugShowScrollbars: gameState.debug.debugShowScrollbars,
+      },
     };
   }, [
     gameState.playerUI.virtualGridLocation,
@@ -121,6 +127,7 @@ export function GameAreaInterface(props: {
     gameState.computed.reachableStatusMap,
     gameState.computed.lockStatusMap,
     gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
+    gameState.debug.debugShowScrollbars,
   ]);
 
   // TODO(bowei): improve this abstraction??

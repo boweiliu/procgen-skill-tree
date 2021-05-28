@@ -173,6 +173,13 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const toggleScrollbars = useCallback(() => {
+    props.updaters.debug.debugShowScrollbars?.enqueueUpdate((prev) => {
+      const next = !prev;
+      return next;
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -192,7 +199,7 @@ export function DebugTabContent(props: {
       <div className="tab-content-body">
         <br></br>
         <div>
-          <button>Toggle scrollbars</button>
+          <button onClick={toggleScrollbars}>Toggle scrollbars</button>
         </div>
         <div>
           <button onClick={virtualGridDimsTrigger}>

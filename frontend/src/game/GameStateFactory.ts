@@ -113,6 +113,7 @@ export class GameStateFactory {
       windowState,
       debug: {
         retriggerVirtualGridDims: () => {},
+        debugShowScrollbars: false,
       },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };

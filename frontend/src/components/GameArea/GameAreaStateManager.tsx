@@ -32,7 +32,7 @@ function Component(props: {
   actions: { allocateNode: AllocateNodeAction };
 }) {
   const { gameState, appSize, virtualGridDims } = props;
-  // console.log("GameArea state manager rerender");
+  console.log('GameArea state manager rerender');
 
   // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
   const virtualCoordsToLocation = useCallback(
@@ -260,6 +260,7 @@ function Component(props: {
         hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}
         keyboardScrollDirection={keyboardScrollDirection}
+        debug={gameState.debug}
       >
         <GameAreaGrid
           virtualGridDims={virtualGridDims}

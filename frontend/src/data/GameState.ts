@@ -224,5 +224,5 @@ export type PlayerUIState = {
 
 export type DebugState = {
   retriggerVirtualGridDims: () => void;
-  debugShowScrollbars?: boolean;
+  debugShowScrollbars: boolean; // default false
 };
