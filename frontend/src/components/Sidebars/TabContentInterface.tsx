@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -15,27 +15,53 @@ export enum TAB_NAME {
   HELP = 'HELP',
 }
 
+// in charge of constructing content. no css
 export function TabContentInterface(props: {
   tabName: TAB_NAME;
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 }) {
   const { tabName } = props;
-  if (tabName === TAB_NAME.EMPTY) {
-    return <EmptyTabContent />;
-  } else if (tabName === TAB_NAME.SELECTED_NODE) {
-    return <SelectedNodeTabContent gameState={props.gameState} />;
-  } else if (tabName === TAB_NAME.STATS) {
-    return <>stats info???</>;
-  } else if (tabName === TAB_NAME.QUESTS) {
-    return <>quests info???</>;
-  } else if (tabName === TAB_NAME.DEBUG) {
-    return <>debug panel</>;
-  } else if (tabName === TAB_NAME.HELP) {
-    return <>How to play the game</>;
-  } else {
-    return <> </>;
-  }
+
+  const tabComponents = {
+    [TAB_NAME.EMPTY]: <EmptyTabContent />,
+    [TAB_NAME.SELECTED_NODE]: (
+      <SelectedNodeTabContent gameState={props.gameState} />
+    ),
+    [TAB_NAME.STATS]: <>stats info???</>,
+    [TAB_NAME.QUESTS]: <>quests info???</>,
+    [TAB_NAME.DEBUG]: (
+      <DebugTabContent
+        gameState={props.gameState}
+        updaters={props.updaters}
+        hidden={tabName !== TAB_NAME.DEBUG}
+      />
+    ),
+    [TAB_NAME.HELP]: <>How to play the game</>,
+  };
+
+  return <TabContentSelector tabComponents={tabComponents} tabName={tabName} />;
+}
+
+// layout & switch statement. pure. no knowledge of game state
+function TabContentSelector(props: {
+  tabComponents: { [k in TAB_NAME]: React.ReactNode };
+  tabName: TAB_NAME;
+}) {
+  const selectedTabName = props.tabName;
+  const tabNames = Object.keys(TAB_NAME) as TAB_NAME[];
+
+  return (
+    <>
+      {tabNames.map((tabName) => {
+        return (
+          <div hidden={tabName !== selectedTabName}>
+            {props.tabComponents[tabName]!}
+          </div>
+        );
+      })}
+    </>
+  );
 }
 
 export const EmptyTabContent = React.memo(EmptyTabContentComponent);
@@ -106,6 +132,58 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <div>Locked?: {'???'}</div>
         <br></br>
         <div>Contents: {'???'}</div>
+      </div>
+    </>
+  );
+}
+
+export function DebugTabContent(props: {
+  gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
+  hidden: boolean;
+}) {
+  const { gameState } = props;
+  const { tick } = gameState;
+
+  const [lastUpdated, setLastUpdated] = useState(+new Date());
+  const [slowRenderMsgs, setSlowRenderMsgs] = useState<string[]>([]);
+
+  useEffect(() => {
+    const now = new Date();
+    const msSinceLastTick = +now - lastUpdated;
+    if (msSinceLastTick > 50) {
+      const msg = `Tick ${tick} took ${msSinceLastTick}ms at ${
+        now.toTimeString().split(' ')[0]
+      }`;
+      console.log(msg);
+      setSlowRenderMsgs((prev) => {
+        return [msg, ...prev];
+      });
+    }
+    setLastUpdated(+new Date());
+  }, [tick, lastUpdated, setLastUpdated, setSlowRenderMsgs]);
+
+  if (props.hidden) {
+    return <> </>;
+  }
+
+  return (
+    <>
+      <div> debug tab </div>
+      <div className="tab-content-body">
+        <br></br>
+        <div>Recent slow renders:</div>
+        {slowRenderMsgs.slice(0, 5).map((it) => {
+          return <div>{it}</div>;
+        })}
+        <br></br>
+      </div>
+      <div> buttons </div>
+      <div className="tab-content-body">
+        <br></br>
+        <div>
+          <button>Toggle scrollbars</button>
+        </div>
       </div>
     </>
   );

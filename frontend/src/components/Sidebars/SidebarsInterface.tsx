@@ -143,7 +143,7 @@ export function SidebarsInterface(props: {
           value={leftActiveTabIndex || 0}
           labels={leftSidebarTabs.length ? leftSidebarTabs : emptyTabLabels}
           onChange={setLeftActiveTabIndex}
-        ></Tabs>
+        />
         <TabContentInterface
           gameState={gameState}
           updaters={updaters}
@@ -169,7 +169,7 @@ export function SidebarsInterface(props: {
           value={rightActiveTabIndex || 0}
           labels={rightSidebarTabs.length ? rightSidebarTabs : emptyTabLabels}
           onChange={setRightActiveTabIndex}
-        ></Tabs>
+        />
         <TabContentInterface
           gameState={gameState}
           updaters={updaters}
