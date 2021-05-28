@@ -19,12 +19,13 @@ import { Vector3 } from '../lib/util/geometry/vector3';
 import { LazyHashMap } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
-import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
+import { ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
 import {
   NodeContents,
   NodeContentsFactory,
 } from './worldGen/nodeContents/NodeContentsFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
+import { LockFactory } from './worldGen/LockFactory';
 
 export type GameStateConfig = any;
 

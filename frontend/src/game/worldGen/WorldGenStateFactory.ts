@@ -6,13 +6,10 @@ import {
   ZLevelGen,
   ResourceModifier,
   ResourceNontrivialType,
-  LockStatus,
 } from '../../data/GameState';
-import { LockData } from '../../data/PlayerSaveState';
 import { NodeType } from '../../data/WorldGenState';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { Vector3 } from '../../lib/util/geometry/vector3';
 import { INTMAX32, squirrel3 } from '../../lib/util/random';
 
 export type WorldGenStateConfig = any;
@@ -253,44 +250,5 @@ export class PointNodeGenFactory {
         nodeType,
       };
     }
-  }
-}
-
-type LockFactoryConfig = {};
-
-export class LockFactory {
-  public config: LockFactoryConfig;
-
-  constructor(config: LockFactoryConfig) {
-    this.config = config;
-  }
-
-  public create(args: {
-    seed: number;
-    location: Vector3;
-  }): LockData | undefined {
-    const id = squirrel3(
-      args.seed +
-        args.location.x +
-        args.location.y +
-        squirrel3(args.seed + args.location.x + args.location.z)
-    );
-    const p = id / INTMAX32;
-
-    let lockData: LockData = {
-      shortTextTarget: '🔒',
-      shortTextTimer: '',
-      lockStatus: LockStatus.TICKING,
-    };
-    if (args.location.equals(Vector3.Zero)) {
-      return undefined;
-    }
-    // TODO(bowei): unhardcode
-    // locks occur at this frequency
-    if (p < 0.47) {
-      return lockData;
-    }
-
-    return undefined;
   }
 }
