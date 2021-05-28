@@ -165,7 +165,7 @@ export function DebugTabContent(props: {
 
   const virtualGridDimsTrigger = useCallback(() => {
     console.log('tried triggered update from debug tab');
-    // NOTE(bowei): this apparently takes around 120ms
+    // NOTE(bowei): this apparently takes around 100ms alone. full jump takes ~200ms
     props.updaters.debug.retriggerVirtualGridDims.enqueueUpdate((prev) => {
       return () => {
         console.log('force triggered update from debug tab');
