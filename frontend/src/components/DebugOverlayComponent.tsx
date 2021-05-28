@@ -35,7 +35,7 @@ function ReactFps() {
     const timer = setTimeout(() => {
       setCounter((it) => it + 1);
       reactFpsTracker.current.tick(0);
-    }, 5);
+    }, 5); // try to refresh every 5 millis
     return () => clearTimeout(timer);
   }, [counter]);
 
