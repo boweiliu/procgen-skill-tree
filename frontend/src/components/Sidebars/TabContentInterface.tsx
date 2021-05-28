@@ -55,7 +55,7 @@ function TabContentSelector(props: {
     <>
       {tabNames.map((tabName) => {
         return (
-          <div hidden={tabName !== selectedTabName}>
+          <div key={tabName} hidden={tabName !== selectedTabName}>
             {props.tabComponents[tabName]!}
           </div>
         );
