@@ -15,6 +15,7 @@ export function SidebarsInterface(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 }) {
+  // NOTE(bowei): commenting out this entire component subtree increases react rerenders per sec from 80-ish to 100-ish while doing nothing other than scrolling without triggering jumps.
   const { gameState, updaters } = props;
 
   const setLeftSidebarHidden = useCallback(() => {
