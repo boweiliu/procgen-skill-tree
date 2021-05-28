@@ -50,6 +50,7 @@ export type GameState = {
   computed: ComputedState;
   intent: PlayerIntentState;
   windowState: WindowState;
+  debug: DebugState;
 };
 
 /**
@@ -219,4 +220,8 @@ export type PlayerUIState = {
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;
+};
+
+export type DebugState = {
+  retriggerVirtualGridDims: () => void;
 };

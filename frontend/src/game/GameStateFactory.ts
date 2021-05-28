@@ -111,6 +111,9 @@ export class GameStateFactory {
         endedIntent: noIntent,
       },
       windowState,
+      debug: {
+        retriggerVirtualGridDims: () => {},
+      },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
     gameState.computed.lockStatusMap = new HashMap();

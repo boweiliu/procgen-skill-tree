@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -163,6 +163,16 @@ export function DebugTabContent(props: {
     setLastUpdated(+new Date());
   }, [tick, lastUpdated, setLastUpdated, setSlowRenderMsgs]);
 
+  const virtualGridDimsTrigger = useCallback(() => {
+    console.log('tried triggered update from debug tab');
+    // NOTE(bowei): this apparently takes around 120ms
+    props.updaters.debug.retriggerVirtualGridDims.enqueueUpdate((prev) => {
+      return () => {
+        console.log('force triggered update from debug tab');
+      };
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -183,6 +193,11 @@ export function DebugTabContent(props: {
         <br></br>
         <div>
           <button>Toggle scrollbars</button>
+        </div>
+        <div>
+          <button onClick={virtualGridDimsTrigger}>
+            Trigger virtual grid dims rerender
+          </button>
         </div>
       </div>
     </>

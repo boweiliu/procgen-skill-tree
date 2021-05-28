@@ -70,7 +70,10 @@ export function GameAreaInterface(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
+  const onDebugRetrigger = gameState.debug.retriggerVirtualGridDims;
   const virtualGridDims = useMemo(() => {
+    onDebugRetrigger();
+
     let x = Math.floor(
       (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
     );
@@ -83,7 +86,7 @@ export function GameAreaInterface(props: {
     // y = Math.max(5, y);
 
     return new Vector2(x, y);
-  }, [appSize]);
+  }, [appSize, onDebugRetrigger]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
     // console.log('sub game state recalculated!');
