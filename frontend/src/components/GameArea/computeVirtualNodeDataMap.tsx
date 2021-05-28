@@ -10,6 +10,7 @@ import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeSymbolMap,
+  ModifierSymbolMap,
   nodeContentsConditionToString,
   nodeContentsLineToString,
 } from '../../game/worldGen/nodeContents/NodeContentsRendering';
@@ -80,11 +81,12 @@ export function computeVirtualNodeDataMap(args: {
       const id = location.hash();
       const lockData = lockMap.get(location);
       const nodeContents = nodeContentsMap.get(location);
-      let shortText1 = '+';
+      let shortText1 = '';
       if (nodeContents.lines[0]) {
-        // the origin node is empty
+        shortText1 += ModifierSymbolMap[nodeContents.lines[0].modifier];
         shortText1 += AttributeSymbolMap[nodeContents.lines[0].attribute];
       } else {
+        // the origin node is empty
         shortText1 = '';
       }
       if (
@@ -92,10 +94,12 @@ export function computeVirtualNodeDataMap(args: {
         nodeContents.lines[0].attribute !== nodeContents.lines[1].attribute
       ) {
         // add another symbol if it's a mixed node
+        // TODO(bowei): make sure that node contents generation cannot mix modifiers!!
         shortText1 += AttributeSymbolMap[nodeContents.lines[1].attribute];
       }
       let shortText2 = '';
       if (nodeContents.condition) {
+        // SPENDing
         shortText2 = '-' + AttributeSymbolMap[nodeContents.condition.attribute];
       }
 
