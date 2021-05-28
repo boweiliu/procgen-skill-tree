@@ -190,8 +190,8 @@ export function DebugTabContent(props: {
       <div className="tab-content-body">
         <br></br>
         <div>Recent slow renders:</div>
-        {slowRenderMsgs.slice(0, 5).map((it) => {
-          return <div>{it}</div>;
+        {slowRenderMsgs.slice(0, 5).map((it, idx) => {
+          return <div key={idx}>{it}</div>;
         })}
         <br></br>
       </div>
