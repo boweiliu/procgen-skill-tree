@@ -51,6 +51,7 @@ export type GameAreaSubState = {
   intent: typeof gameState.intent;
   debug: {
     debugShowScrollbars: typeof gameState.debug.debugShowScrollbars;
+    rerenderGameAreaGrid: typeof gameState.debug.rerenderGameAreaGrid;
   };
 };
 
@@ -73,7 +74,7 @@ export function GameAreaInterface(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
-  const onDebugRetrigger = gameState.debug.retriggerVirtualGridDims;
+  const onDebugRetrigger = gameState.debug.retriggerVirtualGridDims; // triggered from debug tab to check performance
   const virtualGridDims = useMemo(() => {
     onDebugRetrigger();
 
@@ -114,6 +115,7 @@ export function GameAreaInterface(props: {
       intent: gameState.intent,
       debug: {
         debugShowScrollbars: gameState.debug.debugShowScrollbars,
+        rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
       },
     };
   }, [
@@ -128,6 +130,7 @@ export function GameAreaInterface(props: {
     gameState.computed.lockStatusMap,
     gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
     gameState.debug.debugShowScrollbars,
+    gameState.debug.rerenderGameAreaGrid,
   ]);
 
   // TODO(bowei): improve this abstraction??

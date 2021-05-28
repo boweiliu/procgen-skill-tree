@@ -34,6 +34,7 @@ function Component(props: {
   updateNodeStatusCb: UpdateStatusCb;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  debug?: any;
 }) {
   const {
     virtualGridDims,
@@ -42,8 +43,11 @@ function Component(props: {
     updateNodeStatusCb,
     cursoredVirtualNode,
     setCursoredVirtualNode,
+    debug,
   } = props;
-  // console.log('Game area grid rerender');
+
+  debug.rerenderGameAreaGrid();
+  console.log('Game area grid rerender');
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation

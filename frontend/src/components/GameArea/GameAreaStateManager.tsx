@@ -251,6 +251,18 @@ function Component(props: {
     props.gameState.intent.activeIntent.PAN_SOUTH,
   ]);
 
+  const infiniteScrollManagerDebug = useMemo(() => {
+    return {
+      debugShowScrollbars: gameState.debug.debugShowScrollbars,
+    };
+  }, [gameState.debug.debugShowScrollbars]);
+
+  const gameAreaGridDebug = useMemo(() => {
+    return {
+      rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+    };
+  }, [gameState.debug.rerenderGameAreaGrid]);
+
   return (
     <>
       <InfiniteScrollManager
@@ -260,7 +272,7 @@ function Component(props: {
         hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}
         keyboardScrollDirection={keyboardScrollDirection}
-        debug={gameState.debug}
+        debug={infiniteScrollManagerDebug}
       >
         <GameAreaGrid
           virtualGridDims={virtualGridDims}
@@ -269,6 +281,7 @@ function Component(props: {
           updateNodeStatusCb={handleUpdateNodeStatus}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
           setCursoredVirtualNode={setCursoredVirtualNode}
+          debug={gameAreaGridDebug}
         />
       </InfiniteScrollManager>
     </>

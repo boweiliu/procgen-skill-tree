@@ -180,6 +180,14 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const gameAreaGridRerender = useCallback(() => {
+    props.updaters.debug.rerenderGameAreaGrid.enqueueUpdate((prev) => {
+      return () => {
+        console.log('force triggered react rerender from debug tab');
+      };
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -204,6 +212,11 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={virtualGridDimsTrigger}>
             Trigger virtual grid dims rerender
+          </button>
+        </div>
+        <div>
+          <button onClick={gameAreaGridRerender}>
+            Trigger only virtual game area grid react rerender
           </button>
         </div>
       </div>
