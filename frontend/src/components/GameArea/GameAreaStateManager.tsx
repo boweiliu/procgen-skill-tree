@@ -254,8 +254,9 @@ function Component(props: {
   const infiniteScrollManagerDebug = useMemo(() => {
     return {
       debugShowScrollbars: gameState.debug.debugShowScrollbars,
+      enableScrollJump: gameState.debug.enableScrollJump,
     };
-  }, [gameState.debug.debugShowScrollbars]);
+  }, [gameState.debug.debugShowScrollbars, gameState.debug.enableScrollJump]);
 
   const gameAreaGridDebug = useMemo(() => {
     return {

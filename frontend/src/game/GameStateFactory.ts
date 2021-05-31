@@ -115,6 +115,7 @@ export class GameStateFactory {
         retriggerVirtualGridDims: () => {},
         debugShowScrollbars: false,
         rerenderGameAreaGrid: () => {},
+        enableScrollJump: true,
       },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };

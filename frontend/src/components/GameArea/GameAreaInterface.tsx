@@ -52,6 +52,7 @@ export type GameAreaSubState = {
   debug: {
     debugShowScrollbars: typeof gameState.debug.debugShowScrollbars;
     rerenderGameAreaGrid: typeof gameState.debug.rerenderGameAreaGrid;
+    enableScrollJump: typeof gameState.debug.enableScrollJump;
   };
 };
 
@@ -116,6 +117,7 @@ export function GameAreaInterface(props: {
       debug: {
         debugShowScrollbars: gameState.debug.debugShowScrollbars,
         rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+        enableScrollJump: gameState.debug.enableScrollJump,
       },
     };
   }, [
@@ -131,6 +133,7 @@ export function GameAreaInterface(props: {
     gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
     gameState.debug.debugShowScrollbars,
     gameState.debug.rerenderGameAreaGrid,
+    gameState.debug.enableScrollJump,
   ]);
 
   // TODO(bowei): improve this abstraction??

@@ -188,10 +188,21 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const onDisableScrollJump = useCallback(() => {
+    props.updaters.debug.enableScrollJump.enqueueUpdate(() => {
+      return false;
+    });
+  }, [props.updaters]);
+
+  const onEnableScrollJump = useCallback(() => {
+    props.updaters.debug.enableScrollJump.enqueueUpdate(() => {
+      return true;
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
-
   return (
     <>
       <div> debug tab </div>
@@ -217,6 +228,16 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={gameAreaGridRerender}>
             Trigger only virtual game area grid react rerender
+          </button>
+        </div>
+        <div>
+          <button onClick={onDisableScrollJump}>
+            Disable scroll jump trigger
+          </button>
+        </div>
+        <div>
+          <button onClick={onEnableScrollJump}>
+            Reenable scroll jump trigger
           </button>
         </div>
       </div>

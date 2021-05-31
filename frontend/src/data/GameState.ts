@@ -226,4 +226,5 @@ export type DebugState = {
   retriggerVirtualGridDims: () => void;
   debugShowScrollbars: boolean; // default false
   rerenderGameAreaGrid: () => void;
+  enableScrollJump: boolean; // default true
 };

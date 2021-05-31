@@ -103,9 +103,17 @@ function Component(props: Props) {
   );
 
   // Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
+  const enableScrollJump = debug.enableScrollJump;
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // console.log("NOW IN handlescroll");
+
+      // fast exit if debug
+      if (!enableScrollJump) {
+        // console.log("skipped scroll trigger due to debug", { debug });
+        return;
+      }
+
       // handle scroll
       let direction = { x: 0, y: 0 };
       const target = e.target! as Element;
@@ -148,7 +156,7 @@ function Component(props: Props) {
         handleJump({ direction: new Vector2(direction.x, direction.y) });
       }
     },
-    [appSize, handleJump, hexGridPx, virtualGridDims]
+    [appSize, handleJump, hexGridPx, virtualGridDims, enableScrollJump]
   );
 
   // control scroll with keyboard
