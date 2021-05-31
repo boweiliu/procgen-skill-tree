@@ -69,6 +69,7 @@ function Component(props: {
         .map((_, y) => (
           <Row
             key={virtualCoordsToLocation(new Vector2(0, y)).y.toString()} // important to force react to hang on to the old row
+            // key={y} // stupid, for debug
             rowIdx={y}
           >
             {Array(virtualGridDims.x)
@@ -78,7 +79,9 @@ function Component(props: {
                 const nodeData = virtualNodeDataMap.get(virtualCoords)!;
                 return (
                   <GameAreaCell
-                    key={nodeData?.id ?? `loading${x}`}
+                    // key={nodeData?.id ?? `loading${x}`}
+                    // key={x.toString() + "," + y.toString()} // stupid debug??
+                    key={x} // debug??
                     nodeData={nodeData}
                     idx={x + debugOffsetX}
                     rowIdx={y}
