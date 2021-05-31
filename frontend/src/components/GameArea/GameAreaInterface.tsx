@@ -54,6 +54,7 @@ export type GameAreaSubState = {
     rerenderGameAreaGrid: typeof gameState.debug.rerenderGameAreaGrid;
     enableScrollJump: typeof gameState.debug.enableScrollJump;
     getForceJumpOffset: typeof gameState.debug.getForceJumpOffset;
+    getOffsetX: typeof gameState.debug.getOffsetX;
   };
 };
 
@@ -120,6 +121,7 @@ export function GameAreaInterface(props: {
         rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
         enableScrollJump: gameState.debug.enableScrollJump,
         getForceJumpOffset: gameState.debug.getForceJumpOffset,
+        getOffsetX: gameState.debug.getOffsetX,
       },
     };
   }, [
@@ -137,6 +139,7 @@ export function GameAreaInterface(props: {
     gameState.debug.rerenderGameAreaGrid,
     gameState.debug.enableScrollJump,
     gameState.debug.getForceJumpOffset,
+    gameState.debug.getOffsetX,
   ]);
 
   // TODO(bowei): improve this abstraction??

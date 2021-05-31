@@ -117,6 +117,7 @@ export class GameStateFactory {
         rerenderGameAreaGrid: () => {},
         enableScrollJump: true,
         getForceJumpOffset: () => {},
+        getOffsetX: () => {},
       },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };

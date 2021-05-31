@@ -47,6 +47,7 @@ function Component(props: {
   } = props;
 
   debug.rerenderGameAreaGrid();
+  const debugOffsetX = debug?.getOffsetX();
   console.log('Game area grid rerender');
 
   /**
@@ -77,9 +78,9 @@ function Component(props: {
                 const nodeData = virtualNodeDataMap.get(virtualCoords)!;
                 return (
                   <GameAreaCell
-                    nodeData={nodeData}
                     key={nodeData?.id ?? `loading${x}`}
-                    idx={x}
+                    nodeData={nodeData}
+                    idx={x + debugOffsetX}
                     rowIdx={y}
                     onUpdateStatus={updateNodeStatusCb}
                     isCursored={

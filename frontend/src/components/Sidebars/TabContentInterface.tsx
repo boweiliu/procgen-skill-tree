@@ -209,6 +209,15 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const addDebugOffsetX = useCallback(() => {
+    props.updaters.debug.getOffsetX.enqueueUpdate((prev) => {
+      const offsetX = prev() || 0;
+      return () => {
+        return offsetX + 1;
+      };
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -253,6 +262,9 @@ export function DebugTabContent(props: {
           <button onClick={forceVirtualGridJump}>
             Force virtual grid jump only
           </button>
+        </div>
+        <div>
+          <button onClick={addDebugOffsetX}>add weird x offset to grid</button>
         </div>
       </div>
     </>

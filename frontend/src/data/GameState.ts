@@ -228,4 +228,5 @@ export type DebugState = {
   rerenderGameAreaGrid: () => void;
   enableScrollJump: boolean; // default true
   getForceJumpOffset: () => Vector2 | void;
+  getOffsetX: () => number | void;
 };

@@ -266,8 +266,9 @@ function Component(props: {
   const gameAreaGridDebug = useMemo(() => {
     return {
       rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+      getOffsetX: gameState.debug.getOffsetX,
     };
-  }, [gameState.debug.rerenderGameAreaGrid]);
+  }, [gameState.debug.rerenderGameAreaGrid, gameState.debug.getOffsetX]);
 
   return (
     <>
