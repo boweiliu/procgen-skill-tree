@@ -87,7 +87,7 @@ function Component(props: Props) {
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
 
-      const newJumpOffset = jumpAmounts.multiply(args.direction);
+      const newJumpOffset = jumpAmounts.multiply(args.direction); // integer vector
 
       // console.log({ newJumpOffset });
 
@@ -101,6 +101,18 @@ function Component(props: Props) {
     },
     [virtualGridDims, updaters]
   );
+
+  const getForceJumpOffset = debug.getForceJumpOffset;
+  useEffect(() => {
+    const newJumpOffset = getForceJumpOffset?.();
+    if (newJumpOffset) {
+      updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
+        return it
+          .addX(newJumpOffset.x)
+          .add(new Vector3(-1, -2, 0).multiply(newJumpOffset.y / 2));
+      });
+    }
+  }, [updaters, getForceJumpOffset]);
 
   // Detect if the user has scrolled to the edge of the screen, and if so trigger a scroll jump
   const enableScrollJump = debug.enableScrollJump;

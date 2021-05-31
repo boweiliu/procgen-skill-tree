@@ -200,6 +200,15 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const forceVirtualGridJump = useCallback(() => {
+    props.updaters.debug.getForceJumpOffset.enqueueUpdate((prev) => {
+      return () => {
+        console.log('force triggered virtual jump only');
+        return new Vector2(1, 2);
+      };
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -238,6 +247,11 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={onEnableScrollJump}>
             Reenable scroll jump trigger
+          </button>
+        </div>
+        <div>
+          <button onClick={forceVirtualGridJump}>
+            Force virtual grid jump only
           </button>
         </div>
       </div>

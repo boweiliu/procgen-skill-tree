@@ -227,4 +227,5 @@ export type DebugState = {
   debugShowScrollbars: boolean; // default false
   rerenderGameAreaGrid: () => void;
   enableScrollJump: boolean; // default true
+  getForceJumpOffset: () => Vector2 | void;
 };

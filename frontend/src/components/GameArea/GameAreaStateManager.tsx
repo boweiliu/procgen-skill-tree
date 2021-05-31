@@ -255,8 +255,13 @@ function Component(props: {
     return {
       debugShowScrollbars: gameState.debug.debugShowScrollbars,
       enableScrollJump: gameState.debug.enableScrollJump,
+      getForceJumpOffset: gameState.debug.getForceJumpOffset,
     };
-  }, [gameState.debug.debugShowScrollbars, gameState.debug.enableScrollJump]);
+  }, [
+    gameState.debug.debugShowScrollbars,
+    gameState.debug.enableScrollJump,
+    gameState.debug.getForceJumpOffset,
+  ]);
 
   const gameAreaGridDebug = useMemo(() => {
     return {
