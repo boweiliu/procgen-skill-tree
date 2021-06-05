@@ -47,7 +47,7 @@ function Component(props: {
   } = props;
 
   debug.rerenderGameAreaGrid();
-  const debugOffsetX = debug?.getOffsetX();
+  const debugOffsetX = debug?.getOffsetX() || 0;
   console.log('Game area grid rerender');
 
   /**

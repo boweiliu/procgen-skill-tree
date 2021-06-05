@@ -82,7 +82,7 @@ function Component(props: {
     (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
       const { virtualCoords, newStatus } = args;
 
-      // console.log({ got: 'here handleUpdateNodeStatus' });
+      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
       const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
       const reachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
