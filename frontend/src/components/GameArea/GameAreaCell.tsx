@@ -21,19 +21,23 @@ import { NodeAllocatedStatus } from '../../data/GameState';
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
+  key,
   idx,
   rowIdx,
   onUpdateStatus,
   nodeData,
   isCursored,
   onUpdateCursored,
+  debugIsCursored,
 }: {
+  key: string | number;
   idx: number;
   onUpdateStatus: UpdateStatusCb;
   rowIdx: number;
   nodeData: NodeReactData;
   isCursored: boolean;
   onUpdateCursored: (v: Vector2 | undefined) => void;
+  debugIsCursored: boolean;
 }) {
   // console.log('GameAreaCell rerendered');
 
@@ -63,10 +67,12 @@ function GameAreaCellComponent({
 
   return (
     <Cell
+      key={key}
       onClickCenter={handleClick}
       nodeData={nodeData}
       onClickQuestionMark={handleClickQuestionMark}
       isCursored={isCursored}
+      // debugIsCursored={debugIsCursored}
     ></Cell>
   );
 }
@@ -81,21 +87,26 @@ function GameAreaCellComponent({
  */
 const Cell = React.memo(CellComponent);
 function CellComponent({
+  key,
   onClickCenter,
   onClickQuestionMark,
   nodeData,
   isCursored,
+  debugIsCursored,
 }: {
+  key: string | number;
   onClickCenter: React.MouseEventHandler;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
   isCursored: boolean;
+  debugIsCursored?: boolean;
 }) {
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
+  const x: React.ReactElement = null as any;
 
   return (
-    <div className="hex-block hex-full-block">
+    <div className="hex-block hex-full-block" key={key}>
       <div
         className={classnames(
           'hex-center',
@@ -148,6 +159,7 @@ function CellComponent({
       <div className="empty-positioned selection-cursor-wrapper">
         <div
           className="absolute-positioned selection-cursor"
+          // hidden={!debugIsCursored}
           hidden={!isCursored}
         ></div>
       </div>

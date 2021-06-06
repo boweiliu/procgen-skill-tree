@@ -267,8 +267,13 @@ function Component(props: {
     return {
       rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
       getOffsetX: gameState.debug.getOffsetX,
+      isFlipCursored: gameState.debug.isFlipCursored,
     };
-  }, [gameState.debug.rerenderGameAreaGrid, gameState.debug.getOffsetX]);
+  }, [
+    gameState.debug.rerenderGameAreaGrid,
+    gameState.debug.getOffsetX,
+    gameState.debug.isFlipCursored,
+  ]);
 
   return (
     <>

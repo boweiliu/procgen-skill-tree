@@ -48,6 +48,7 @@ function Component(props: {
 
   debug.rerenderGameAreaGrid();
   const debugOffsetX = debug?.getOffsetX() || 0;
+  const flipCursored = debug?.isFlipCursored() || false;
   console.log('Game area grid rerender');
 
   /**
@@ -77,6 +78,12 @@ function Component(props: {
               .map((_, x) => {
                 const virtualCoords = new Vector2(x, y);
                 const nodeData = virtualNodeDataMap.get(virtualCoords)!;
+                let isCursored =
+                  !!cursoredVirtualNode &&
+                  cursoredVirtualNode.equals(virtualCoords);
+                // if (flipCursored) {
+                //   isCursored = !isCursored;
+                // }
                 return (
                   <GameAreaCell
                     // key={nodeData?.id ?? `loading${x}`}
@@ -86,10 +93,8 @@ function Component(props: {
                     idx={x + debugOffsetX}
                     rowIdx={y}
                     onUpdateStatus={updateNodeStatusCb}
-                    isCursored={
-                      !!cursoredVirtualNode &&
-                      cursoredVirtualNode.equals(virtualCoords)
-                    }
+                    isCursored={isCursored}
+                    debugIsCursored={flipCursored ? !isCursored : isCursored}
                     onUpdateCursored={setCursoredVirtualNode}
                   />
                 );

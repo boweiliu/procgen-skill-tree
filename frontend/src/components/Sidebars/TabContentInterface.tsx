@@ -218,6 +218,15 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const flipCursored = useCallback(() => {
+    props.updaters.debug.isFlipCursored.enqueueUpdate((prev) => {
+      const flipCursored = prev() || false;
+      return () => {
+        return !flipCursored;
+      };
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -265,6 +274,11 @@ export function DebugTabContent(props: {
         </div>
         <div>
           <button onClick={addDebugOffsetX}>add weird x offset to grid</button>
+        </div>
+        <div>
+          <button onClick={flipCursored}>
+            weird flip cursored state on all nodes
+          </button>
         </div>
       </div>
     </>

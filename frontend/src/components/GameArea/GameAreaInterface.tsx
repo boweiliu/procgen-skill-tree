@@ -55,6 +55,7 @@ export type GameAreaSubState = {
     enableScrollJump: typeof gameState.debug.enableScrollJump;
     getForceJumpOffset: typeof gameState.debug.getForceJumpOffset;
     getOffsetX: typeof gameState.debug.getOffsetX;
+    isFlipCursored: typeof gameState.debug.isFlipCursored;
   };
 };
 
@@ -122,6 +123,7 @@ export function GameAreaInterface(props: {
         enableScrollJump: gameState.debug.enableScrollJump,
         getForceJumpOffset: gameState.debug.getForceJumpOffset,
         getOffsetX: gameState.debug.getOffsetX,
+        isFlipCursored: gameState.debug.isFlipCursored,
       },
     };
   }, [
@@ -140,6 +142,7 @@ export function GameAreaInterface(props: {
     gameState.debug.enableScrollJump,
     gameState.debug.getForceJumpOffset,
     gameState.debug.getOffsetX,
+    gameState.debug.isFlipCursored,
   ]);
 
   // TODO(bowei): improve this abstraction??

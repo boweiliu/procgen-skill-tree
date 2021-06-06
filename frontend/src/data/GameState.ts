@@ -229,4 +229,5 @@ export type DebugState = {
   enableScrollJump: boolean; // default true
   getForceJumpOffset: () => Vector2 | void;
   getOffsetX: () => number | void;
+  isFlipCursored: () => boolean | void;
 };

@@ -118,6 +118,7 @@ export class GameStateFactory {
         enableScrollJump: true,
         getForceJumpOffset: () => {},
         getOffsetX: () => {},
+        isFlipCursored: () => {},
       },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
