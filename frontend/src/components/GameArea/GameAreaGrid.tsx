@@ -1,14 +1,19 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { NodeReactData } from './computeVirtualNodeDataMap';
+import {
+  computeNodeReactData,
+  computeNodeReactDataMap,
+  NodeReactData,
+} from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
 import { NodeAllocatedStatus } from '../../data/GameState';
 import { GameAreaSubState } from './GameAreaInterface';
+import { LazyHashMap } from '../../lib/util/lazy';
 
 export type UpdateStatusCb = (args: {
   virtualCoords: Vector2;
@@ -54,7 +59,7 @@ function Component(props: {
   gameState: GameGridSubState;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
-  virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
+  // virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
   updateNodeStatusCb: UpdateStatusCb;
   updateNodeStatusByLocationCb: (args: {
     nodeLocation: Vector3;
@@ -69,7 +74,7 @@ function Component(props: {
     gameState,
     virtualGridDims,
     virtualCoordsToLocation,
-    virtualNodeDataMap,
+    // virtualNodeDataMap,
     updateNodeStatusCb,
     updateNodeStatusByLocationCb,
     cursoredVirtualNode,
@@ -82,6 +87,20 @@ function Component(props: {
   const debugOffsetX = debug?.getOffsetX() || 0;
   const flipCursored = debug?.isFlipCursored() || false;
   console.log('Game area grid rerender');
+
+  const nodeReactDataMap = useRef(
+    new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
+      computeNodeReactData({ location, gameState })
+    )
+  );
+
+  // when fog of war status or whatever changes, re-compute ALL the node react data
+  useEffect(() => {
+    nodeReactDataMap.current.clear();
+    nodeReactDataMap.current.setFactory((location: Vector3) =>
+      computeNodeReactData({ location, gameState })
+    );
+  }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -109,7 +128,8 @@ function Component(props: {
               .fill(0)
               .map((_, x) => {
                 const virtualCoords = new Vector2(x, y);
-                const nodeData = virtualNodeDataMap.get(virtualCoords)!;
+                const location = virtualCoordsToLocation(virtualCoords);
+                const nodeData = nodeReactDataMap.current.get(location);
                 let isCursored =
                   !!cursoredVirtualNode &&
                   cursoredVirtualNode.equals(virtualCoords);
@@ -118,9 +138,10 @@ function Component(props: {
                 // }
                 return (
                   <GameAreaCell
-                    // key={nodeData?.id ?? `loading${x}`}
+                    // key={nodeData.id}
+                    key={nodeData.id ?? `loading${x}`}
                     // key={x.toString() + "," + y.toString()} // stupid debug??
-                    key={x} // debug??
+                    // key={x} // debug??
                     nodeData={nodeData}
                     idx={x + debugOffsetX}
                     rowIdx={y}

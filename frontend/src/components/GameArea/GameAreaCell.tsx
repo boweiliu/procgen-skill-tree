@@ -105,7 +105,11 @@ function CellComponent({
   const isLocked = !!nodeData.lockData;
 
   return (
-    <div className="hex-block hex-full-block" key={key}>
+    <div
+      className="hex-block hex-full-block"
+      key={key}
+      id={key?.toString() || ''}
+    >
       <div
         className={classnames(
           'hex-center',

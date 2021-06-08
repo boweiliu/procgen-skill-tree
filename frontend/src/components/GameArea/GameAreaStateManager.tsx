@@ -330,7 +330,7 @@ function Component(props: {
         <GameAreaGrid
           gameState={subGameState}
           virtualGridDims={virtualGridDims}
-          virtualNodeDataMap={virtualNodeDataMap}
+          // virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
           updateNodeStatusCb={handleUpdateNodeStatus}
           updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
