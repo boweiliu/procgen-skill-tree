@@ -10,7 +10,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaGrid } from './GameAreaGrid';
+import { GameAreaGrid, GameGridSubState } from './GameAreaGrid';
 import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
@@ -288,6 +288,34 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
+  const subGameState: GameGridSubState = useMemo(() => {
+    return {
+      playerUI: {
+        cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      },
+      playerSave: {
+        allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      },
+      worldGen: {
+        nodeContentsMap: gameState.worldGen.nodeContentsMap,
+        lockMap: gameState.worldGen.lockMap,
+      },
+      computed: {
+        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+        reachableStatusMap: gameState.computed.reachableStatusMap,
+        lockStatusMap: gameState.computed.lockStatusMap,
+      },
+    };
+  }, [
+    gameState.playerUI.cursoredNodeLocation,
+    gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
+    gameState.worldGen.lockMap,
+    gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
+    gameState.computed.lockStatusMap,
+  ]);
+
   return (
     <>
       <InfiniteScrollManager
@@ -300,6 +328,7 @@ function Component(props: {
         debug={infiniteScrollManagerDebug}
       >
         <GameAreaGrid
+          gameState={subGameState}
           virtualGridDims={virtualGridDims}
           virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
@@ -307,6 +336,7 @@ function Component(props: {
           updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
           setCursoredVirtualNode={setCursoredVirtualNode}
+          setCursoredLocation={setCursoredLocation}
           debug={gameAreaGridDebug}
         />
       </InfiniteScrollManager>

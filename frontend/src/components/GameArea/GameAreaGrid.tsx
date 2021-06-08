@@ -8,11 +8,34 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
 import { NodeAllocatedStatus } from '../../data/GameState';
+import { GameAreaSubState } from './GameAreaInterface';
 
 export type UpdateStatusCb = (args: {
   virtualCoords: Vector2;
   newStatus: NodeAllocatedStatus;
 }) => void;
+
+/**
+ * The subset of the game state that is relevant to game area components.
+ */
+const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
+export type GameGridSubState = {
+  playerUI: {
+    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+  };
+  playerSave: {
+    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
+  };
+  worldGen: {
+    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
+    lockMap: typeof gameState.worldGen.lockMap;
+  };
+  computed: {
+    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
+    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
+    lockStatusMap: typeof gameState.computed.lockStatusMap;
+  };
+};
 
 export const GameAreaGrid = React.memo(Component);
 /**
@@ -28,6 +51,7 @@ export const GameAreaGrid = React.memo(Component);
  * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored, or undefined to clear cursor
  */
 function Component(props: {
+  gameState: GameGridSubState;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
   virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
@@ -38,9 +62,11 @@ function Component(props: {
   }) => void;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  setCursoredLocation: (v: Vector3 | undefined) => void;
   debug?: any;
 }) {
   const {
+    gameState,
     virtualGridDims,
     virtualCoordsToLocation,
     virtualNodeDataMap,
@@ -48,10 +74,11 @@ function Component(props: {
     updateNodeStatusByLocationCb,
     cursoredVirtualNode,
     setCursoredVirtualNode,
+    setCursoredLocation,
     debug,
   } = props;
 
-  debug.rerenderGameAreaGrid();
+  debug?.rerenderGameAreaGrid();
   const debugOffsetX = debug?.getOffsetX() || 0;
   const flipCursored = debug?.isFlipCursored() || false;
   console.log('Game area grid rerender');
