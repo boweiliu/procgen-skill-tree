@@ -103,7 +103,6 @@ function CellComponent({
 }) {
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
-  const x: React.ReactElement = null as any;
 
   return (
     <div className="hex-block hex-full-block" key={key}>

@@ -32,6 +32,7 @@ export type NodeReactData = {
     lockStatus: LockStatus;
   };
   status: NodeAllocatedStatus;
+  nodeLocation: Vector3;
   id: string;
 };
 
@@ -104,6 +105,7 @@ export function computeVirtualNodeDataMap(args: {
       }
 
       const nodeData: NodeReactData = {
+        nodeLocation: location,
         shortText: shortText2 ? (
           <>
             {shortText1}

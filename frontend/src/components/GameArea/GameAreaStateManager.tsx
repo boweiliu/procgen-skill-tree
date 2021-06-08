@@ -73,17 +73,16 @@ function Component(props: {
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
     gameState.computed.reachableStatusMap,
+    gameState.playerUI.cursoredNodeLocation,
     virtualGridDims,
     virtualCoordsToLocation,
   ]);
 
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
-  const handleUpdateNodeStatus = useCallback(
-    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
-      const { virtualCoords, newStatus } = args;
+  const handleUpdateNodeStatusByLocation = useCallback(
+    (args: { nodeLocation: Vector3; newStatus: NodeAllocatedStatus }) => {
+      const { nodeLocation, newStatus } = args;
 
-      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
-      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
       const reachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
@@ -109,14 +108,36 @@ function Component(props: {
     [
       // props.updaters,
       props.actions,
-      virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
       gameState.computed.reachableStatusMap,
       gameState.worldGen.lockMap,
     ]
   );
+  const handleUpdateNodeStatus = useCallback(
+    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+      const { virtualCoords, newStatus } = args;
+
+      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
+      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
+      handleUpdateNodeStatusByLocation({ nodeLocation, newStatus });
+    },
+    [virtualCoordsToLocation, handleUpdateNodeStatusByLocation]
+  );
 
   // Manage cursor "node selected" state
+  const setCursoredLocation = useCallback(
+    (v: Vector3 | undefined) => {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        return v;
+      });
+      if (!!v) {
+        // also open the sidebar
+        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+      }
+    },
+    [props.updaters]
+  );
+
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       // console.log({
@@ -131,17 +152,9 @@ function Component(props: {
 
   const setCursoredVirtualNode = useCallback(
     (v: Vector2 | undefined) => {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-        let updated = v ? virtualCoordsToLocation(v) : undefined;
-        console.log({ updated });
-        return updated;
-      });
-      if (!!v) {
-        // also open the sidebar
-        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
-      }
+      setCursoredLocation(v ? virtualCoordsToLocation(v) : undefined);
     },
-    [props.updaters, virtualCoordsToLocation]
+    [setCursoredLocation, virtualCoordsToLocation]
   );
 
   // manage keyboard wasdezx cusored node navigation
@@ -291,6 +304,7 @@ function Component(props: {
           virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
           updateNodeStatusCb={handleUpdateNodeStatus}
+          updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
           setCursoredVirtualNode={setCursoredVirtualNode}
           debug={gameAreaGridDebug}

@@ -32,6 +32,10 @@ function Component(props: {
   virtualCoordsToLocation: (v: Vector2) => Vector3;
   virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
   updateNodeStatusCb: UpdateStatusCb;
+  updateNodeStatusByLocationCb: (args: {
+    nodeLocation: Vector3;
+    newStatus: NodeAllocatedStatus;
+  }) => void;
   cursoredVirtualNode: Vector2 | undefined;
   setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   debug?: any;
@@ -41,6 +45,7 @@ function Component(props: {
     virtualCoordsToLocation,
     virtualNodeDataMap,
     updateNodeStatusCb,
+    updateNodeStatusByLocationCb,
     cursoredVirtualNode,
     setCursoredVirtualNode,
     debug,
