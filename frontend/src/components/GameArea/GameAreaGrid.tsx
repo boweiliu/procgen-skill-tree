@@ -82,10 +82,15 @@ function Component(props: {
     setCursoredLocation,
     debug,
   } = props;
+  const startTime = +new Date();
+
+  useEffect(() => {
+    console.log('callbacks got refreshed!');
+  }, [updateNodeStatusByLocationCb, setCursoredLocation]);
 
   debug?.rerenderGameAreaGrid();
-  const debugOffsetX = debug?.getOffsetX() || 0;
-  const flipCursored = debug?.isFlipCursored() || false;
+  const debugOffsetX = debug?.getOffsetX?.() || 0;
+  const flipCursored = debug?.isFlipCursored?.() || false;
   console.log('Game area grid rerender');
 
   const nodeReactDataMap = useRef(
@@ -114,7 +119,7 @@ function Component(props: {
    * https://stackoverflow.com/questions/55546973/react-onmouseenter-event-triggering-on-child-element
    * https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
    */
-  return (
+  const result = (
     <>
       {Array(virtualGridDims.y)
         .fill(0)
@@ -136,26 +141,32 @@ function Component(props: {
                 // if (flipCursored) {
                 //   isCursored = !isCursored;
                 // }
+                const key = nodeData.id || `loading${x}`;
+                // console.log(`key should be ${key} from ${nodeData.toString()}`);
                 return (
                   <GameAreaCell
                     // key={nodeData.id}
-                    key={nodeData.id ?? `loading${x}`}
+                    key={key}
+                    id={key}
                     // key={x.toString() + "," + y.toString()} // stupid debug??
                     // key={x} // debug??
                     nodeData={nodeData}
-                    idx={x + debugOffsetX}
-                    rowIdx={y}
-                    onUpdateStatus={updateNodeStatusCb}
+                    onUpdateStatus={updateNodeStatusByLocationCb}
                     isCursored={isCursored}
                     debugIsCursored={flipCursored ? !isCursored : isCursored}
-                    onUpdateCursored={setCursoredVirtualNode}
+                    onUpdateCursored={setCursoredLocation}
                   />
                 );
-              })}
+              })
+              .slice(debug?.getOffsetX?.() || 0)}
           </Row>
         ))}
     </>
   );
+  const now = +new Date();
+  const elapsed = now - startTime;
+  console.log(`Game area grid elapsed ${elapsed}ms at ${now}`);
+  return result;
 }
 
 const Row = React.memo(RowComponent);

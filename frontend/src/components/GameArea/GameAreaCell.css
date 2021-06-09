@@ -48,6 +48,7 @@
 }
 
 /* used for node center tooltip */
+/* NOTE(Bowei): wtf this section is somehow terrible for performance */
 .hover-only {
   display: none;
 }

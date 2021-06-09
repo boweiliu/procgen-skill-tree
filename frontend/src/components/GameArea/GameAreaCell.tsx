@@ -7,6 +7,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { UpdateStatusCb } from './GameAreaGrid';
 import { NodeAllocatedStatus } from '../../data/GameState';
+import { Vector3 } from '../../lib/util/geometry/vector3';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
@@ -21,25 +22,26 @@ import { NodeAllocatedStatus } from '../../data/GameState';
  */
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
-  key,
-  idx,
-  rowIdx,
+  id,
   onUpdateStatus,
   nodeData,
   isCursored,
   onUpdateCursored,
   debugIsCursored,
 }: {
-  key: string | number;
-  idx: number;
-  onUpdateStatus: UpdateStatusCb;
-  rowIdx: number;
+  id: string;
+  onUpdateStatus: (args: {
+    nodeLocation: Vector3;
+    newStatus: NodeAllocatedStatus;
+  }) => void;
   nodeData: NodeReactData;
   isCursored: boolean;
-  onUpdateCursored: (v: Vector2 | undefined) => void;
+  onUpdateCursored: (v: Vector3 | undefined) => void;
   debugIsCursored: boolean;
 }) {
-  // console.log('GameAreaCell rerendered');
+  // const startTime = +new Date();
+  // console.log(`GameAreaCell key ${id} rerendered at ${startTime}`);
+  const { nodeLocation } = nodeData;
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -48,11 +50,11 @@ function GameAreaCellComponent({
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
       onUpdateStatus({
-        virtualCoords: new Vector2(idx, rowIdx), // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
+        nodeLocation,
         newStatus: NodeAllocatedStatus.TAKEN,
       });
     },
-    [onUpdateStatus, idx, rowIdx]
+    [onUpdateStatus, nodeLocation]
   );
 
   const handleClickQuestionMark = useCallback(
@@ -60,14 +62,15 @@ function GameAreaCellComponent({
       e.stopPropagation();
       e.preventDefault();
       // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
-      onUpdateCursored(isCursored ? undefined : new Vector2(idx, rowIdx));
+      onUpdateCursored(isCursored ? undefined : nodeLocation);
     },
-    [isCursored, onUpdateCursored, idx, rowIdx]
+    [isCursored, onUpdateCursored, nodeLocation]
   );
 
   return (
     <Cell
-      key={key}
+      key={id}
+      id={id}
       onClickCenter={handleClick}
       nodeData={nodeData}
       onClickQuestionMark={handleClickQuestionMark}
@@ -87,29 +90,92 @@ function GameAreaCellComponent({
  */
 const Cell = React.memo(CellComponent);
 function CellComponent({
-  key,
+  id,
   onClickCenter,
   onClickQuestionMark,
   nodeData,
   isCursored,
   debugIsCursored,
 }: {
-  key: string | number;
+  id: string;
   onClickCenter: React.MouseEventHandler;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
   isCursored: boolean;
   debugIsCursored?: boolean;
 }) {
+  const startTime = +new Date();
+  console.log(`GameAreaCellComponent key: ${id} rerendered at ${startTime}`);
+
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
 
   return (
-    <div
-      className="hex-block hex-full-block"
-      key={key}
-      id={key?.toString() || ''}
-    >
+    <div className="hex-block hex-full-block" key={id} id={id}>
+      <div
+        className={classnames(
+          'hex-center',
+          status === NodeAllocatedStatus.TAKEN
+            ? 'node-allocated'
+            : 'node-unallocated',
+          status === NodeAllocatedStatus.TAKEN ||
+            status === NodeAllocatedStatus.UNREACHABLE
+            ? 'border-unimportant'
+            : 'border-important'
+        )}
+        onClick={onClickCenter}
+        hidden={status === NodeAllocatedStatus.HIDDEN}
+      >
+        <div className="hex-center-text-wrapper">
+          <div className="tiny-text">{nodeData.shortText}</div>
+        </div>
+      </div>
+      {isLocked ? (
+        <div
+          className="hex-center-lock"
+          hidden={status === NodeAllocatedStatus.HIDDEN}
+        >
+          <div className="hex-center-lock-left">
+            <div className="tiny-text">
+              {nodeData.lockData?.shortTextTarget}
+            </div>
+          </div>
+          <div className="hex-center-lock-right">
+            <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
+          </div>
+        </div>
+      ) : null}
+      <div className="empty-positioned">
+        <div className="hover-only-2 absolute-positioned">
+          <div
+            className="question"
+            hidden={status === NodeAllocatedStatus.HIDDEN}
+            onClick={onClickQuestionMark}
+          >
+            ?
+          </div>
+        </div>
+      </div>
+      <div className="empty-positioned node-tooltip-wrapper">
+        <div
+          // wtf why is this slow
+          // className="hover-only absolute-positioned node-tooltip"
+          // className="absolute-positioned" // this is fine
+          className="absolute-positioned node-tooltip" // also fine
+        ></div>
+      </div>
+      <div className="empty-positioned selection-cursor-wrapper">
+        <div
+          className="absolute-positioned selection-cursor"
+          // hidden={!debugIsCursored}
+          hidden={!isCursored}
+        ></div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="hex-block hex-full-block" key={id} id={id}>
       <div
         className={classnames(
           'hex-center',
