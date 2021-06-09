@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/procgen-skill-tree/static/css/main.fdb86c3d.chunk.css",
-    "main.js": "/procgen-skill-tree/static/js/main.9a868d8f.chunk.js",
-    "main.js.map": "/procgen-skill-tree/static/js/main.9a868d8f.chunk.js.map",
+    "main.css": "/procgen-skill-tree/static/css/main.71f38d5f.chunk.css",
+    "main.js": "/procgen-skill-tree/static/js/main.57a65374.chunk.js",
+    "main.js.map": "/procgen-skill-tree/static/js/main.57a65374.chunk.js.map",
     "runtime-main.js": "/procgen-skill-tree/static/js/runtime-main.f51b2cfc.js",
     "runtime-main.js.map": "/procgen-skill-tree/static/js/runtime-main.f51b2cfc.js.map",
-    "static/js/2.44bdc572.chunk.js": "/procgen-skill-tree/static/js/2.44bdc572.chunk.js",
-    "static/js/2.44bdc572.chunk.js.map": "/procgen-skill-tree/static/js/2.44bdc572.chunk.js.map",
+    "static/js/2.dfa756e6.chunk.js": "/procgen-skill-tree/static/js/2.dfa756e6.chunk.js",
+    "static/js/2.dfa756e6.chunk.js.map": "/procgen-skill-tree/static/js/2.dfa756e6.chunk.js.map",
     "index.html": "/procgen-skill-tree/index.html",
-    "static/css/main.fdb86c3d.chunk.css.map": "/procgen-skill-tree/static/css/main.fdb86c3d.chunk.css.map",
-    "static/js/2.44bdc572.chunk.js.LICENSE.txt": "/procgen-skill-tree/static/js/2.44bdc572.chunk.js.LICENSE.txt",
+    "static/css/main.71f38d5f.chunk.css.map": "/procgen-skill-tree/static/css/main.71f38d5f.chunk.css.map",
+    "static/js/2.dfa756e6.chunk.js.LICENSE.txt": "/procgen-skill-tree/static/js/2.dfa756e6.chunk.js.LICENSE.txt",
     "static/media/index.css": "/procgen-skill-tree/static/media/pixelmix_bold.8628f266.ttf"
   },
   "entrypoints": [
     "static/js/runtime-main.f51b2cfc.js",
-    "static/js/2.44bdc572.chunk.js",
-    "static/css/main.fdb86c3d.chunk.css",
-    "static/js/main.9a868d8f.chunk.js"
+    "static/js/2.dfa756e6.chunk.js",
+    "static/css/main.71f38d5f.chunk.css",
+    "static/js/main.57a65374.chunk.js"
   ]
 }
