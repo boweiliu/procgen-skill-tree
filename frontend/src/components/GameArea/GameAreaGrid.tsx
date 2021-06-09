@@ -1,7 +1,7 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -93,19 +93,21 @@ function Component(props: {
   const flipCursored = debug?.isFlipCursored?.() || false;
   console.log('Game area grid rerender');
 
-  const nodeReactDataMap = useRef(
-    new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
-      computeNodeReactData({ location, gameState })
-    )
+  const nodeReactDataMap = useMemo(
+    () =>
+      new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
+        computeNodeReactData({ location, gameState })
+      ),
+    [gameState]
   );
 
   // when fog of war status or whatever changes, re-compute ALL the node react data
-  useEffect(() => {
-    nodeReactDataMap.current.clear();
-    nodeReactDataMap.current.setFactory((location: Vector3) =>
-      computeNodeReactData({ location, gameState })
-    );
-  }, [gameState]);
+  // useEffect(() => {
+  //   nodeReactDataMap.current.clear();
+  //   nodeReactDataMap.current.setFactory((location: Vector3) =>
+  //     computeNodeReactData({ location, gameState })
+  //   );
+  // }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -135,7 +137,7 @@ function Component(props: {
                 .map((_, x) => {
                   const virtualCoords = new Vector2(x, y);
                   const location = virtualCoordsToLocation(virtualCoords);
-                  const nodeData = nodeReactDataMap.current.get(location);
+                  const nodeData = nodeReactDataMap.get(location);
                   let isCursored =
                     !!cursoredVirtualNode &&
                     cursoredVirtualNode.equals(virtualCoords);
