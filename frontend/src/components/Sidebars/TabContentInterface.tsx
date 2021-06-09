@@ -151,7 +151,7 @@ export function DebugTabContent(props: {
   useEffect(() => {
     const now = new Date();
     const msSinceLastTick = +now - lastUpdated;
-    if (msSinceLastTick > 50) {
+    if (msSinceLastTick > 30) {
       const msg = `Tick ${tick} took ${msSinceLastTick}ms at ${
         now.toTimeString().split(' ')[0]
       }`;

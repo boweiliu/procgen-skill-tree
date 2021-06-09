@@ -9,8 +9,7 @@ import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaGrid } from './GameAreaGrid';
+import { GameAreaGrid, GameGridSubState } from './GameAreaGrid';
 import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
@@ -56,34 +55,11 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  // Hydrate the contents of all the nodes
-  const virtualNodeDataMap = useMemo(() => {
-    return computeVirtualNodeDataMap({
-      allocationStatusMap: gameState.playerSave.allocationStatusMap,
-      nodeContentsMap: gameState.worldGen.nodeContentsMap,
-      lockMap: gameState.worldGen.lockMap,
-      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-      reachableStatusMap: gameState.computed.reachableStatusMap,
-      virtualGridDims,
-      virtualCoordsToLocation,
-    });
-  }, [
-    gameState.playerSave.allocationStatusMap,
-    gameState.worldGen.nodeContentsMap,
-    gameState.worldGen.lockMap,
-    gameState.computed.fogOfWarStatusMap,
-    gameState.computed.reachableStatusMap,
-    virtualGridDims,
-    virtualCoordsToLocation,
-  ]);
-
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
-  const handleUpdateNodeStatus = useCallback(
-    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
-      const { virtualCoords, newStatus } = args;
+  const handleUpdateNodeStatusByLocation = useCallback(
+    (args: { nodeLocation: Vector3; newStatus: NodeAllocatedStatus }) => {
+      const { nodeLocation, newStatus } = args;
 
-      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
-      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
       const reachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
@@ -109,14 +85,36 @@ function Component(props: {
     [
       // props.updaters,
       props.actions,
-      virtualCoordsToLocation,
       gameState.playerSave.allocationStatusMap,
       gameState.computed.reachableStatusMap,
       gameState.worldGen.lockMap,
     ]
   );
+  const handleUpdateNodeStatus = useCallback(
+    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+      const { virtualCoords, newStatus } = args;
+
+      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
+      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
+      handleUpdateNodeStatusByLocation({ nodeLocation, newStatus });
+    },
+    [virtualCoordsToLocation, handleUpdateNodeStatusByLocation]
+  );
 
   // Manage cursor "node selected" state
+  const setCursoredLocation = useCallback(
+    (v: Vector3 | undefined) => {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        return v;
+      });
+      if (!!v) {
+        // also open the sidebar
+        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+      }
+    },
+    [props.updaters]
+  );
+
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       // console.log({
@@ -128,21 +126,6 @@ function Component(props: {
       return undefined;
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
-
-  const setCursoredVirtualNode = useCallback(
-    (v: Vector2 | undefined) => {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-        let updated = v ? virtualCoordsToLocation(v) : undefined;
-        console.log({ updated });
-        return updated;
-      });
-      if (!!v) {
-        // also open the sidebar
-        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
-      }
-    },
-    [props.updaters, virtualCoordsToLocation]
-  );
 
   // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
@@ -275,6 +258,34 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
+  const subGameState: GameGridSubState = useMemo(() => {
+    return {
+      playerUI: {
+        cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      },
+      playerSave: {
+        allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      },
+      worldGen: {
+        nodeContentsMap: gameState.worldGen.nodeContentsMap,
+        lockMap: gameState.worldGen.lockMap,
+      },
+      computed: {
+        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+        reachableStatusMap: gameState.computed.reachableStatusMap,
+        lockStatusMap: gameState.computed.lockStatusMap,
+      },
+    };
+  }, [
+    gameState.playerUI.cursoredNodeLocation,
+    gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
+    gameState.worldGen.lockMap,
+    gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
+    gameState.computed.lockStatusMap,
+  ]);
+
   return (
     <>
       <InfiniteScrollManager
@@ -287,12 +298,12 @@ function Component(props: {
         debug={infiniteScrollManagerDebug}
       >
         <GameAreaGrid
+          gameState={subGameState}
           virtualGridDims={virtualGridDims}
-          virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
-          updateNodeStatusCb={handleUpdateNodeStatus}
+          updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
-          setCursoredVirtualNode={setCursoredVirtualNode}
+          setCursoredLocation={setCursoredLocation}
           debug={gameAreaGridDebug}
         />
       </InfiniteScrollManager>
