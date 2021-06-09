@@ -156,14 +156,7 @@ function CellComponent({
           </div>
         </div>
       </div>
-      <div className="empty-positioned node-tooltip-wrapper">
-        <div
-          // wtf why is this slow
-          // className="hover-only absolute-positioned node-tooltip"
-          // className="absolute-positioned" // this is fine
-          className="absolute-positioned node-tooltip" // also fine
-        ></div>
-      </div>
+      <div className="empty-positioned node-tooltip-wrapper"></div>
       <div className="empty-positioned selection-cursor-wrapper">
         <div
           className="absolute-positioned selection-cursor"

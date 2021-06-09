@@ -81,13 +81,14 @@ function Component(props: Props) {
     (args: { direction: Vector2 }) => {
       // direction: if we hit bottom right of screen, direction == (1,1)
       // console.log({ direction: args.direction });
-      let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+      // let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+      let jumpAmounts = virtualGridDims.multiply(0.05).floor();
       jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
         .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
 
-      const newJumpOffset = jumpAmounts.multiply(args.direction); // integer vector
+      const newJumpOffset = jumpAmounts.multiply(args.direction); // multiply the magnitudes by unit-ish direction vector
 
       // console.log({ newJumpOffset });
 
@@ -131,14 +132,14 @@ function Component(props: Props) {
       const target = e.target! as Element;
       let newScrollTop = target.scrollTop; // only used as boolean to see if it changed
       let newScrollLeft = target.scrollLeft;
-      if (target.scrollTop < hexGridPx.y * 0.4) {
+      if (target.scrollTop < hexGridPx.y * 0.9) {
         // between 0.1 and 0.4 of leeway is recommended. increasing it more helps with lag but also incurs more virtual area cost.
         newScrollTop += hexGridPx.y * 2;
         direction.y -= 1;
       }
       if (
         target.scrollTop >
-        (virtualGridDims.y - 0.4) * hexGridPx.y - appSize.y
+        (virtualGridDims.y - 0.9) * hexGridPx.y - appSize.y
       ) {
         newScrollTop -= hexGridPx.y * 2;
         direction.y += 1;

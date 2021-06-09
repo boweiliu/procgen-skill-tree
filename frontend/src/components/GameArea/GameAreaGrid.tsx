@@ -89,7 +89,7 @@ function Component(props: {
   }, [updateNodeStatusByLocationCb, setCursoredLocation]);
 
   debug?.rerenderGameAreaGrid();
-  const debugOffsetX = debug?.getOffsetX?.() || 0;
+  const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
   const flipCursored = debug?.isFlipCursored?.() || false;
   console.log('Game area grid rerender');
 
@@ -129,36 +129,38 @@ function Component(props: {
             // key={y} // stupid, for debug
             rowIdx={y}
           >
-            {Array(virtualGridDims.x)
-              .fill(0)
-              .map((_, x) => {
-                const virtualCoords = new Vector2(x, y);
-                const location = virtualCoordsToLocation(virtualCoords);
-                const nodeData = nodeReactDataMap.current.get(location);
-                let isCursored =
-                  !!cursoredVirtualNode &&
-                  cursoredVirtualNode.equals(virtualCoords);
-                // if (flipCursored) {
-                //   isCursored = !isCursored;
-                // }
-                const key = nodeData.id || `loading${x}`;
-                // console.log(`key should be ${key} from ${nodeData.toString()}`);
-                return (
-                  <GameAreaCell
-                    // key={nodeData.id}
-                    key={key}
-                    id={key}
-                    // key={x.toString() + "," + y.toString()} // stupid debug??
-                    // key={x} // debug??
-                    nodeData={nodeData}
-                    onUpdateStatus={updateNodeStatusByLocationCb}
-                    isCursored={isCursored}
-                    debugIsCursored={flipCursored ? !isCursored : isCursored}
-                    onUpdateCursored={setCursoredLocation}
-                  />
-                );
-              })
-              .slice(debug?.getOffsetX?.() || 0)}
+            {
+              Array(virtualGridDims.x)
+                .fill(0)
+                .map((_, x) => {
+                  const virtualCoords = new Vector2(x, y);
+                  const location = virtualCoordsToLocation(virtualCoords);
+                  const nodeData = nodeReactDataMap.current.get(location);
+                  let isCursored =
+                    !!cursoredVirtualNode &&
+                    cursoredVirtualNode.equals(virtualCoords);
+                  // if (flipCursored) {
+                  //   isCursored = !isCursored;
+                  // }
+                  const key = nodeData.id || `loading${x}`;
+                  // console.log(`key should be ${key} from ${nodeData.toString()}`);
+                  return (
+                    <GameAreaCell
+                      // key={nodeData.id}
+                      key={key}
+                      id={key}
+                      // key={x.toString() + "," + y.toString()} // stupid debug??
+                      // key={x} // debug??
+                      nodeData={nodeData}
+                      onUpdateStatus={updateNodeStatusByLocationCb}
+                      isCursored={isCursored}
+                      debugIsCursored={flipCursored ? !isCursored : isCursored}
+                      onUpdateCursored={setCursoredLocation}
+                    />
+                  );
+                })
+              // .slice(debugOffsetX, virtualGridDims.x - 8 + debugOffsetX)
+            }
           </Row>
         ))}
     </>
