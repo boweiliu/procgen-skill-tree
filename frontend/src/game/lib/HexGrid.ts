@@ -1,5 +1,5 @@
 import { HashSet } from '../../lib/util/data_structures/hash';
-import { IVector3, Vector3 } from '../../lib/util/geometry/vector3';
+import { Vector3 } from '../../lib/util/geometry/vector3';
 
 export enum Direction {
   NORTHWEST = 'NORTHWEST',
@@ -15,7 +15,7 @@ export enum Direction {
 /**
  * Moving 1 unit of grid on a z level corresponds to moving this many units of grid in the same direction on the z level below.
  */
-const PER_Z_SCALE_FACTOR = 6;
+// const PER_Z_SCALE_FACTOR = 6;
 
 /**
  *   2   3

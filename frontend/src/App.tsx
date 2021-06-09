@@ -1,25 +1,22 @@
 import './App.css';
 
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DebugOverlayComponent } from './components/DebugOverlayComponent';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
 import { WindowListenerComponent } from './components/WindowListenerComponent';
 import { UseGameStateContext } from './contexts';
-import { GameState, appSizeFromWindowSize } from './data/GameState';
+import { GameState } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';
 import { batchifySetState } from './lib/util/batchify';
-import { Vector2 } from './lib/util/geometry/vector2';
 import { Lazy } from './lib/util/lazy';
 import {
   UpdaterGeneratorType2,
   updaterGenerator2,
 } from './lib/util/updaterGenerator';
-import { AllocateNodeAction } from './game/actions/AllocateNode';
-import Sidebar from './components/Sidebar';
-import Tabs, { Tab } from './components/Tabs';
 import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
+import { SidebarsInterface } from './components/Sidebars/SidebarsInterface';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
   new GameStateFactory({}).create(+new Date())
@@ -42,15 +39,7 @@ function App() {
     () => updaterGenerator2(initialGameState.get(), batchedSetGameState),
     [batchedSetGameState]
   );
-  const appSize = useMemo(() => {
-    return appSizeFromWindowSize(
-      new Vector2(
-        gameState.windowState.innerWidth,
-        gameState.windowState.innerHeight
-      )
-    );
-  }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
-  //*/
+
   const gameStateContextValue = useMemo(() => {
     return [gameState, updaters, fireBatch] as [
       GameState,
@@ -64,19 +53,22 @@ function App() {
     if (gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW) {
       updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
     }
-  }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW]);
+  }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW, updaters]);
 
   useEffect(() => {
     console.log('maybe toggling sidebar');
     if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
       updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
     }
-  }, [gameState.intent.newIntent.TOGGLE_SIDEBAR]);
+  }, [gameState.intent.newIntent.TOGGLE_SIDEBAR, updaters]);
 
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">
-        <UseGameStateContext.Provider value={gameStateContextValue}>
+        <UseGameStateContext.Provider
+          // NOTE(bowei): this context provider is absolutely unnecessary, but keeping it here for now in case i forget how to use context managers
+          value={gameStateContextValue}
+        >
           <PixiWrapperComponent hidden={gameState.playerUI.isPixiHidden} />
         </UseGameStateContext.Provider>
         <GameAreaInterface
@@ -111,29 +103,12 @@ function App() {
         </button>
       </div>
 
-      <Sidebar
-        hidden={!gameState.playerUI.isSidebarOpen}
-        setSidebarHidden={() => {
-          updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
-        }}
-      >
-        <Tabs
-          onClick={() => {}}
-          value={0}
-          labels={['foo', 'bar']}
-          onChange={(value: number) => {}}
-          active
-        ></Tabs>
-        <br />
-        content
-      </Sidebar>
+      <SidebarsInterface gameState={gameState} updaters={updaters} />
       <KeyboardListenerComponent
         intent={gameState.intent}
         updaters={updaters.intent}
-      ></KeyboardListenerComponent>
-      <WindowListenerComponent
-        updaters={updaters.windowState}
-      ></WindowListenerComponent>
+      />
+      <WindowListenerComponent updaters={updaters.windowState} />
     </div>
   );
 }

@@ -23,6 +23,10 @@ export const AttributeDescriptionMap = {
   [Attribute.DEL2]: 'Magic',
 };
 
+export const ModifierSymbolMap = {
+  [Modifier.FLAT]: '+',
+  [Modifier.INCREASED]: '%',
+};
 export const ModifierDescriptionMap = {
   [Modifier.FLAT]: 'flat',
   [Modifier.INCREASED]: 'increased',

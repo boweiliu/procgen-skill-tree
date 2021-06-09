@@ -1,9 +1,4 @@
-import {
-  GameState,
-  PlayerSaveState,
-  PointNodeRef,
-  ResourceType,
-} from '../data/GameState';
+import { GameState, PlayerSaveState, PointNodeRef } from '../data/GameState';
 import { NodeType } from '../data/WorldGenState';
 import { Const } from '../lib/util/misc';
 import { canAllocate } from './Neighbors';

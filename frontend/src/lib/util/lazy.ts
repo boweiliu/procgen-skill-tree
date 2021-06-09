@@ -1,4 +1,4 @@
-import { HashMap, KeyedHashMap } from './data_structures/hash';
+import { KeyedHashMap } from './data_structures/hash';
 import { Const } from './misc';
 
 /**
@@ -95,19 +95,31 @@ export class LazyHashMap<K extends { hash(): string }, V> {
     this._factory = factory;
   }
 
-  // setFactory(factory: (k: K) => V) : LazyHashMap<K, V> {
-  //   this._factory = factory;
-  //   return this;
-  // }
+  setFactory(factory: (k: K) => V): LazyHashMap<K, V> {
+    this._factory = factory;
+    return this;
+  }
 
+  // overrides any factory provided values
   put(key: K, value: V) {
     this._values.put(key, value);
   }
 
-  // remove(key: K): void {
-  //   this._values.remove(key);
-  // }
+  // removes the key from the list of memoized (cached) values and forces a re-call of the factory() provider.
+  // also removes the key from any manually put(ted) factory overrides.
+  remove(key: K): void {
+    this._values.remove(key);
+  }
 
+  invalidate(key: K): void {
+    this.remove(key);
+  }
+
+  clear(): void {
+    this._values = new KeyedHashMap();
+  }
+
+  // checks to see if the key is present. returns undefined if populating the key would require a factory() call.
   peek(key: K): V | undefined {
     return this._values.get(key);
   }
@@ -122,6 +134,7 @@ export class LazyHashMap<K extends { hash(): string }, V> {
     }
   }
 
+  // same as get(), but does not return the result. useful for forcing factory() call so the value is available quickly later.
   precompute(key: K) {
     if (this._values.contains(key)) {
       return;
@@ -131,19 +144,22 @@ export class LazyHashMap<K extends { hash(): string }, V> {
     }
   }
 
-  // returns true if the key was already instantiated
+  // returns true if the key was already instantiated, false otherwise.
   contains(key: K): boolean {
     return this._values.contains(key);
   }
 
+  // only contains populated (i.e. non-factory) entries.
   values(): V[] {
     return this._values.values();
   }
 
+  // only contains populated (i.e. non-factory) entries.
   keys(): K[] {
     return this._values.keys();
   }
 
+  // only contains populated (i.e. non-factory) entries.
   entries(): [K, V][] {
     return this._values.entries();
   }
@@ -162,12 +178,13 @@ export class LazyHashMap<K extends { hash(): string }, V> {
   //   return code.toString();
   // }
 
+  // only contains populated (i.e. non-factory) entries.
   size(): number {
     return this._values.size();
   }
 
-  clone(): LazyHashMap<K, V> {
-    let n = new LazyHashMap<K, V>(this._factory);
+  clone(newFactory?: (k: K) => V): LazyHashMap<K, V> {
+    let n = new LazyHashMap<K, V>(newFactory || this._factory);
     n._values = this._values.clone();
     return n;
   }

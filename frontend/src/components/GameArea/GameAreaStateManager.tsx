@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   GameState,
-  IntentName,
   NodeAllocatedStatus,
+  NodeReachableStatus,
+  NodeTakenStatus,
 } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
-import { GameAreaGrid } from './GameAreaGrid';
+import { GameAreaGrid, GameGridSubState } from './GameAreaGrid';
 import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
@@ -31,7 +31,7 @@ function Component(props: {
   actions: { allocateNode: AllocateNodeAction };
 }) {
   const { gameState, appSize, virtualGridDims } = props;
-  // console.log("GameArea state manager rerender");
+  // console.log('GameArea state manager rerender');
 
   // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
   const virtualCoordsToLocation = useCallback(
@@ -55,38 +55,17 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
 
-  // Hydrate the contents of all the nodes
-  const virtualNodeDataMap = useMemo(() => {
-    return computeVirtualNodeDataMap({
-      allocationStatusMap: gameState.playerSave.allocationStatusMap,
-      nodeContentsMap: gameState.worldGen.nodeContentsMap,
-      lockMap: gameState.worldGen.lockMap,
-      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-      virtualGridDims,
-      virtualCoordsToLocation,
-    });
-  }, [
-    gameState.playerSave.allocationStatusMap,
-    gameState.worldGen.nodeContentsMap,
-    gameState.worldGen.lockMap,
-    gameState.computed.fogOfWarStatusMap,
-    virtualGridDims,
-    virtualCoordsToLocation,
-  ]);
-
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
-  const handleUpdateNodeStatus = useCallback(
-    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
-      const { virtualCoords, newStatus } = args;
+  const handleUpdateNodeStatusByLocation = useCallback(
+    (args: { nodeLocation: Vector3; newStatus: NodeAllocatedStatus }) => {
+      const { nodeLocation, newStatus } = args;
 
-      // console.log({ got: 'here handleUpdateNodeStatus' });
-      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
-      const prevStatus =
-        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
-        NodeAllocatedStatus.HIDDEN;
+      const reachableStatus =
+        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
+        NodeReachableStatus.false;
       if (newStatus === NodeAllocatedStatus.TAKEN) {
-        if (prevStatus !== NodeAllocatedStatus.AVAILABLE) {
-          console.log('cant do that', prevStatus);
+        if (reachableStatus !== NodeReachableStatus.true) {
+          console.log('cant do that, not reachable:', reachableStatus);
           return;
         }
         const maybeLock = gameState.worldGen.lockMap.get(nodeLocation);
@@ -96,27 +75,46 @@ function Component(props: {
         }
       }
 
-      if (
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) !==
-        NodeAllocatedStatus.TAKEN
-      ) {
+      if (!gameState.playerSave.allocationStatusMap.get(nodeLocation)?.taken) {
         props.actions.allocateNode.enqueueAction({
           nodeLocation,
-          newStatus: NodeAllocatedStatus.TAKEN,
+          newStatus: NodeTakenStatus.true,
         });
       }
     },
     [
-      props.updaters,
-      virtualCoordsToLocation,
+      // props.updaters,
+      props.actions,
       gameState.playerSave.allocationStatusMap,
-      gameState.computed.fogOfWarStatusMap,
-      gameState.computed.lockStatusMap,
+      gameState.computed.reachableStatusMap,
       gameState.worldGen.lockMap,
     ]
   );
+  const handleUpdateNodeStatus = useCallback(
+    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+      const { virtualCoords, newStatus } = args;
+
+      // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
+      const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
+      handleUpdateNodeStatusByLocation({ nodeLocation, newStatus });
+    },
+    [virtualCoordsToLocation, handleUpdateNodeStatusByLocation]
+  );
 
   // Manage cursor "node selected" state
+  const setCursoredLocation = useCallback(
+    (v: Vector3 | undefined) => {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        return v;
+      });
+      if (!!v) {
+        // also open the sidebar
+        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+      }
+    },
+    [props.updaters]
+  );
+
   const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       // console.log({
@@ -129,58 +127,43 @@ function Component(props: {
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 
-  const setCursoredVirtualNode = useCallback(
-    (v: Vector2 | undefined) => {
-      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-        let updated = v ? virtualCoordsToLocation(v) : undefined;
-        console.log({ updated });
-        return updated;
-      });
-      if (!!v) {
-        // also open the sidebar
-        props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
-      }
-    },
-    [props.updaters, virtualCoordsToLocation]
-  );
-
   // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
-    const newIntent = props.gameState.intent.newIntent;
+    // const newIntent = props.gameState.intent.newIntent;
     const newLocation = virtualCoordsToLocation(
       virtualGridDims.divide(2).floor()
     );
-    if (newIntent[IntentName.MOVE_CURSOR_EAST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_EAST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addX(1) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_WEST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_WEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addX(-1) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_NORTHEAST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: 1, y: 1, z: 0 }) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_NORTHWEST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addY(1) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_SOUTHEAST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addY(-1) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_SOUTHWEST]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: -1, y: -1, z: 0 }) || newLocation
       );
     }
-    if (newIntent[IntentName.MOVE_CURSOR_SOUTH]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
         if (prev && prev.y % 2 === 0) {
           return prev?.add({ x: 0, y: -1, z: 0 });
@@ -191,7 +174,7 @@ function Component(props: {
         }
       });
     }
-    if (newIntent[IntentName.MOVE_CURSOR_NORTH]) {
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
         if (prev && prev.y % 2 === 0) {
           return prev?.add({ x: 1, y: 1, z: 0 });
@@ -202,7 +185,7 @@ function Component(props: {
         }
       });
     }
-    if (newIntent[IntentName.INTERACT_WITH_NODE]) {
+    if (props.gameState.intent.newIntent.INTERACT_WITH_NODE) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
           virtualCoords: cursoredVirtualNodeCoords,
@@ -221,6 +204,8 @@ function Component(props: {
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_WEST,
     props.updaters,
+    virtualCoordsToLocation,
+    virtualGridDims,
     cursoredVirtualNodeCoords,
     handleUpdateNodeStatus,
   ]);
@@ -249,6 +234,58 @@ function Component(props: {
     props.gameState.intent.activeIntent.PAN_SOUTH,
   ]);
 
+  const infiniteScrollManagerDebug = useMemo(() => {
+    return {
+      debugShowScrollbars: gameState.debug.debugShowScrollbars,
+      enableScrollJump: gameState.debug.enableScrollJump,
+      getForceJumpOffset: gameState.debug.getForceJumpOffset,
+    };
+  }, [
+    gameState.debug.debugShowScrollbars,
+    gameState.debug.enableScrollJump,
+    gameState.debug.getForceJumpOffset,
+  ]);
+
+  const gameAreaGridDebug = useMemo(() => {
+    return {
+      rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+      getOffsetX: gameState.debug.getOffsetX,
+      isFlipCursored: gameState.debug.isFlipCursored,
+    };
+  }, [
+    gameState.debug.rerenderGameAreaGrid,
+    gameState.debug.getOffsetX,
+    gameState.debug.isFlipCursored,
+  ]);
+
+  const subGameState: GameGridSubState = useMemo(() => {
+    return {
+      playerUI: {
+        cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      },
+      playerSave: {
+        allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      },
+      worldGen: {
+        nodeContentsMap: gameState.worldGen.nodeContentsMap,
+        lockMap: gameState.worldGen.lockMap,
+      },
+      computed: {
+        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+        reachableStatusMap: gameState.computed.reachableStatusMap,
+        lockStatusMap: gameState.computed.lockStatusMap,
+      },
+    };
+  }, [
+    gameState.playerUI.cursoredNodeLocation,
+    gameState.playerSave.allocationStatusMap,
+    gameState.worldGen.nodeContentsMap,
+    gameState.worldGen.lockMap,
+    gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
+    gameState.computed.lockStatusMap,
+  ]);
+
   return (
     <>
       <InfiniteScrollManager
@@ -258,14 +295,16 @@ function Component(props: {
         hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}
         keyboardScrollDirection={keyboardScrollDirection}
+        debug={infiniteScrollManagerDebug}
       >
         <GameAreaGrid
+          gameState={subGameState}
           virtualGridDims={virtualGridDims}
-          virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
-          updateNodeStatusCb={handleUpdateNodeStatus}
+          updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
-          setCursoredVirtualNode={setCursoredVirtualNode}
+          setCursoredLocation={setCursoredLocation}
+          debug={gameAreaGridDebug}
         />
       </InfiniteScrollManager>
     </>

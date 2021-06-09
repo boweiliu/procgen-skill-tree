@@ -1,6 +1,5 @@
-import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
-import { INTMAX32, squirrel3 } from '../../../lib/util/random';
+import { squirrel3 } from '../../../lib/util/random';
 import {
   randomDice,
   randomSwitch,
@@ -46,11 +45,26 @@ const WEIGHTS = {
   DECISION_0: {
     EMPTY: 800,
     NO_SPEND: 100,
-    SPEND: 10,
+    SPEND: 0,
   },
+  // how many different attributes are in the non-spend section
   DECISION_1: {
     SINGLE: 500,
-    DOUBLE: 100,
+    DOUBLE: 0,
+  },
+  // if we are doing a single attribute, what attribute is it going to be
+  SINGLE_COLORS: {
+    [Attribute.RED0]: 100,
+    [Attribute.RED1]: 100,
+    [Attribute.RED2]: 100,
+    [Attribute.DEL0]: 10,
+    [Attribute.DEL1]: 10,
+    [Attribute.DEL2]: 10,
+  },
+  // if we are doing a single attribute, what modifier is it going to be
+  SINGLE_MODIFIERS: {
+    [Modifier.FLAT]: 100,
+    [Modifier.INCREASED]: 75,
   },
 };
 
@@ -64,22 +78,12 @@ export class NodeContentsFactory {
   private createSingle(args: { randInt: number }): NodeContentsLine {
     const attribute = randomValue<typeof Attribute>({
       randInt: args.randInt,
-      weights: {
-        [Attribute.RED0]: 100,
-        [Attribute.RED1]: 100,
-        [Attribute.RED2]: 100,
-        [Attribute.DEL0]: 10,
-        [Attribute.DEL1]: 10,
-        [Attribute.DEL2]: 10,
-      },
+      weights: WEIGHTS.SINGLE_COLORS,
     });
 
     const modifier = randomValue<typeof Modifier>({
       randInt: squirrel3(args.randInt),
-      weights: {
-        [Modifier.FLAT]: 100,
-        [Modifier.INCREASED]: 75,
-      },
+      weights: WEIGHTS.SINGLE_MODIFIERS,
     });
 
     let amount = 0;

@@ -64,13 +64,13 @@ function Component(props: {
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--app-size-width',
-      ` ${props.appSize.x}px`
+      ` ${appSize.x}px`
     );
     document.documentElement.style.setProperty(
       '--app-size-height',
-      ` ${props.appSize.y}px`
+      ` ${appSize.y}px`
     );
-  }, [props.appSize]);
+  }, [appSize]);
 
   return <>{props.children}</>;
 }

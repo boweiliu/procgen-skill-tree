@@ -2,9 +2,11 @@ import {
   GameState,
   PointNodeRef,
   LockStatus,
-  NodeAllocatedStatus,
   noIntent,
   WindowState,
+  NodeTakenStatus,
+  NodeReachableStatus,
+  NodeVisibleStatus,
 } from '../data/GameState';
 import { LockData } from '../data/PlayerSaveState';
 import {
@@ -14,20 +16,16 @@ import {
 } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { assertOnlyCalledOnce } from '../lib/util/misc';
-import { Lazy, LazyHashMap } from '../lib/util/lazy';
+import { LazyHashMap } from '../lib/util/lazy';
 import { computePlayerResourceAmounts } from './ComputeState';
-import {
-  getCoordNeighbors,
-  getWithinDistance,
-  IReadonlySet,
-} from './lib/HexGrid';
-import { LockFactory, ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
+import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
+import { ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
 import {
   NodeContents,
   NodeContentsFactory,
 } from './worldGen/nodeContents/NodeContentsFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
+import { LockFactory } from './worldGen/LockFactory';
 
 export type GameStateConfig = any;
 
@@ -93,8 +91,9 @@ export class GameStateFactory {
         allocatedPointNodeHistory: [pointNodeRef],
         score: 0,
 
-        allocationStatusMap: new KeyedHashMap<Vector3, NodeAllocatedStatus>([
-          [Vector3.Zero, NodeAllocatedStatus.TAKEN],
+        // make sure to allocate the beginning node
+        allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
+          [Vector3.Zero, NodeTakenStatus.true],
         ]),
       },
       playerUI: {
@@ -112,10 +111,20 @@ export class GameStateFactory {
         endedIntent: noIntent,
       },
       windowState,
+      debug: {
+        retriggerVirtualGridDims: () => {},
+        debugShowScrollbars: false,
+        rerenderGameAreaGrid: () => {},
+        enableScrollJump: true,
+        getForceJumpOffset: () => {},
+        getOffsetX: () => {},
+        isFlipCursored: () => {},
+      },
     };
     gameState.computed = { ...computePlayerResourceAmounts(gameState) };
     gameState.computed.lockStatusMap = new HashMap();
     gameState.computed.fogOfWarStatusMap = new HashMap();
+    gameState.computed.reachableStatusMap = new HashMap();
 
     /**
      * Initialize fog of war and visible locks
@@ -128,7 +137,7 @@ export class GameStateFactory {
     // fill in lock statuses with computed statuses
     {
       let prevMap = gameState.computed.lockStatusMap;
-      let nodeLocation = Vector3.Zero;
+      // let nodeLocation = Vector3.Zero;
       const prevGameState = gameState;
 
       for (let [
@@ -145,14 +154,16 @@ export class GameStateFactory {
     // now fog of war flow vision based on computed lock statuses
     {
       let prevMap = gameState.computed.fogOfWarStatusMap;
+      let prevReachableStatusMap = gameState.computed.reachableStatusMap;
       let nodeLocation = Vector3.Zero;
-      let newStatus = NodeAllocatedStatus.TAKEN;
+      // let newStatus = NodeAllocatedStatus.TAKEN;
       const prevGameState = gameState;
 
-      prevMap.put(nodeLocation, NodeAllocatedStatus.VISIBLE);
+      prevMap.put(nodeLocation, NodeVisibleStatus.true);
 
       getWithinDistance(nodeLocation, 1).forEach((n) => {
-        prevMap.put(n, NodeAllocatedStatus.AVAILABLE);
+        prevMap.put(n, NodeVisibleStatus.true);
+        prevReachableStatusMap.put(n, NodeReachableStatus.true);
       });
 
       // make sure we make use of lock state
@@ -175,13 +186,10 @@ export class GameStateFactory {
         0,
         validLocks
       ).forEach((n) => {
-        if (
-          (prevMap.get(n) || NodeAllocatedStatus.HIDDEN) ===
-          NodeAllocatedStatus.HIDDEN
-        ) {
+        if (!prevMap.get(n)?.visible) {
           // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
           prevGameState.worldGen.lockMap.precompute(n);
-          prevMap.put(n, NodeAllocatedStatus.UNREACHABLE);
+          prevMap.put(n, NodeVisibleStatus.true);
         }
       });
     }

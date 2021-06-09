@@ -1,18 +1,39 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
+import React, { useEffect, useMemo } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { NodeReactData } from './computeVirtualNodeDataMap';
+import {
+  computeNodeReactData,
+  NodeReactData,
+} from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
 import { NodeAllocatedStatus } from '../../data/GameState';
+import { GameAreaSubState } from './GameAreaInterface';
+import { LazyHashMap } from '../../lib/util/lazy';
 
-export type UpdateStatusCb = (args: {
-  virtualCoords: Vector2;
-  newStatus: NodeAllocatedStatus;
-}) => void;
+/**
+ * The subset of the game state that is relevant to game area components.
+ */
+const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
+export type GameGridSubState = {
+  playerUI: {
+    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+  };
+  playerSave: {
+    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
+  };
+  worldGen: {
+    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
+    lockMap: typeof gameState.worldGen.lockMap;
+  };
+  computed: {
+    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
+    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
+    lockStatusMap: typeof gameState.computed.lockStatusMap;
+  };
+};
 
 export const GameAreaGrid = React.memo(Component);
 /**
@@ -28,22 +49,52 @@ export const GameAreaGrid = React.memo(Component);
  * @param setCursoredVirtualNode callback which takes virtual 2d coords and causes that node to now be cursored, or undefined to clear cursor
  */
 function Component(props: {
+  gameState: GameGridSubState;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
-  virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
-  updateNodeStatusCb: UpdateStatusCb;
+  updateNodeStatusByLocationCb: (args: {
+    nodeLocation: Vector3;
+    newStatus: NodeAllocatedStatus;
+  }) => void;
   cursoredVirtualNode: Vector2 | undefined;
-  setCursoredVirtualNode: (v: Vector2 | undefined) => void;
+  setCursoredLocation: (v: Vector3 | undefined) => void;
+  debug?: any;
 }) {
   const {
+    gameState,
     virtualGridDims,
     virtualCoordsToLocation,
-    virtualNodeDataMap,
-    updateNodeStatusCb,
+    updateNodeStatusByLocationCb,
     cursoredVirtualNode,
-    setCursoredVirtualNode,
+    setCursoredLocation,
+    debug,
   } = props;
+  const startTime = +new Date();
+
+  useEffect(() => {
+    console.log('callbacks got refreshed!');
+  }, [updateNodeStatusByLocationCb, setCursoredLocation]);
+
+  debug?.rerenderGameAreaGrid();
+  const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
+  const flipCursored = debug?.isFlipCursored?.() || false;
   console.log('Game area grid rerender');
+
+  const nodeReactDataMap = useMemo(
+    () =>
+      new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
+        computeNodeReactData({ location, gameState })
+      ),
+    [gameState]
+  );
+
+  // when fog of war status or whatever changes, re-compute ALL the node react data
+  // useEffect(() => {
+  //   nodeReactDataMap.current.clear();
+  //   nodeReactDataMap.current.setFactory((location: Vector3) =>
+  //     computeNodeReactData({ location, gameState })
+  //   );
+  // }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -57,39 +108,56 @@ function Component(props: {
    * https://stackoverflow.com/questions/55546973/react-onmouseenter-event-triggering-on-child-element
    * https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
    */
-  return (
+  const result = (
     <>
       {Array(virtualGridDims.y)
         .fill(0)
         .map((_, y) => (
           <Row
             key={virtualCoordsToLocation(new Vector2(0, y)).y.toString()} // important to force react to hang on to the old row
+            // key={y} // stupid, for debug
             rowIdx={y}
           >
-            {Array(virtualGridDims.x)
-              .fill(0)
-              .map((_, x) => {
-                const virtualCoords = new Vector2(x, y);
-                const nodeData = virtualNodeDataMap.get(virtualCoords)!;
-                return (
-                  <GameAreaCell
-                    nodeData={nodeData}
-                    key={nodeData?.id ?? `loading${x}`}
-                    idx={x}
-                    rowIdx={y}
-                    onUpdateStatus={updateNodeStatusCb}
-                    isCursored={
-                      !!cursoredVirtualNode &&
-                      cursoredVirtualNode.equals(virtualCoords)
-                    }
-                    onUpdateCursored={setCursoredVirtualNode}
-                  />
-                );
-              })}
+            {
+              Array(virtualGridDims.x)
+                .fill(0)
+                .map((_, x) => {
+                  const virtualCoords = new Vector2(x, y);
+                  const location = virtualCoordsToLocation(virtualCoords);
+                  const nodeData = nodeReactDataMap.get(location);
+                  let isCursored =
+                    !!cursoredVirtualNode &&
+                    cursoredVirtualNode.equals(virtualCoords);
+                  // if (flipCursored) {
+                  //   isCursored = !isCursored;
+                  // }
+                  const key = nodeData.id || `loading${x}`;
+                  // console.log(`key should be ${key} from ${nodeData.toString()}`);
+                  return (
+                    <GameAreaCell
+                      // key={nodeData.id}
+                      key={key}
+                      id={key}
+                      // key={x.toString() + "," + y.toString()} // stupid debug??
+                      // key={x} // debug??
+                      nodeData={nodeData}
+                      onUpdateStatus={updateNodeStatusByLocationCb}
+                      isCursored={isCursored}
+                      debugIsCursored={flipCursored ? !isCursored : isCursored}
+                      onUpdateCursored={setCursoredLocation}
+                    />
+                  );
+                })
+              // .slice(debugOffsetX, virtualGridDims.x - 8 + debugOffsetX)
+            }
           </Row>
         ))}
     </>
   );
+  const now = +new Date();
+  const elapsed = now - startTime;
+  console.log(`Game area grid elapsed ${elapsed}ms at ${now}`);
+  return result;
 }
 
 const Row = React.memo(RowComponent);

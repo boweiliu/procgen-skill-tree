@@ -24,7 +24,7 @@ export const borderWidth = 2; // border of circles, etc. in px
  * but need to 'jump' the scroll viewport less often.
  * Recommended default is 3.0
  */
-export const virtualAreaScaleMultiplier = 3.0;
+export const virtualAreaScaleMultiplier = 2.0;
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -45,9 +45,18 @@ export type GameAreaSubState = {
   };
   computed: {
     fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
+    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
     lockStatusMap: typeof gameState.computed.lockStatusMap;
   };
   intent: typeof gameState.intent;
+  debug: {
+    debugShowScrollbars: typeof gameState.debug.debugShowScrollbars;
+    rerenderGameAreaGrid: typeof gameState.debug.rerenderGameAreaGrid;
+    enableScrollJump: typeof gameState.debug.enableScrollJump;
+    getForceJumpOffset: typeof gameState.debug.getForceJumpOffset;
+    getOffsetX: typeof gameState.debug.getOffsetX;
+    isFlipCursored: typeof gameState.debug.isFlipCursored;
+  };
 };
 
 /**
@@ -69,7 +78,10 @@ export function GameAreaInterface(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
+  const onDebugRetrigger = gameState.debug.retriggerVirtualGridDims; // triggered from debug tab to check performance
   const virtualGridDims = useMemo(() => {
+    onDebugRetrigger();
+
     let x = Math.floor(
       (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
     );
@@ -82,10 +94,10 @@ export function GameAreaInterface(props: {
     // y = Math.max(5, y);
 
     return new Vector2(x, y);
-  }, [appSize, virtualAreaScaleMultiplier, hexGridPx]);
+  }, [appSize, onDebugRetrigger]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
-    console.log('sub game state recalculated!');
+    // console.log('sub game state recalculated!');
     return {
       playerUI: {
         virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -101,9 +113,18 @@ export function GameAreaInterface(props: {
       },
       computed: {
         fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+        reachableStatusMap: gameState.computed.reachableStatusMap,
         lockStatusMap: gameState.computed.lockStatusMap,
       },
       intent: gameState.intent,
+      debug: {
+        debugShowScrollbars: gameState.debug.debugShowScrollbars,
+        rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+        enableScrollJump: gameState.debug.enableScrollJump,
+        getForceJumpOffset: gameState.debug.getForceJumpOffset,
+        getOffsetX: gameState.debug.getOffsetX,
+        isFlipCursored: gameState.debug.isFlipCursored,
+      },
     };
   }, [
     gameState.playerUI.virtualGridLocation,
@@ -113,8 +134,15 @@ export function GameAreaInterface(props: {
     gameState.worldGen.nodeContentsMap,
     gameState.worldGen.lockMap,
     gameState.computed.fogOfWarStatusMap,
+    gameState.computed.reachableStatusMap,
     gameState.computed.lockStatusMap,
     gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
+    gameState.debug.debugShowScrollbars,
+    gameState.debug.rerenderGameAreaGrid,
+    gameState.debug.enableScrollJump,
+    gameState.debug.getForceJumpOffset,
+    gameState.debug.getOffsetX,
+    gameState.debug.isFlipCursored,
   ]);
 
   // TODO(bowei): improve this abstraction??

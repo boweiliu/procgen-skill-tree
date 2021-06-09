@@ -1,7 +1,6 @@
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { LazyHashMap } from '../lib/util/lazy';
 import { Const, enumKeys } from '../lib/util/misc';
 import { PlayerSaveState } from './PlayerSaveState';
 import { PointNodeRef } from './PointNodeRef';
@@ -51,6 +50,7 @@ export type GameState = {
   computed: ComputedState;
   intent: PlayerIntentState;
   windowState: WindowState;
+  debug: DebugState;
 };
 
 /**
@@ -118,15 +118,46 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
 }
 
 export enum NodeAllocatedStatus {
-  // DEPRECATED
-  TAKEN = 'TAKEN',
-
-  // NOT DEPRECATED
-  VISIBLE = 'VISIBLE',
-  HIDDEN = 'HIDDEN',
-  AVAILABLE = 'AVAILABLE', // availability status regardless of locks, only taking into account connectivity
-  UNREACHABLE = 'UNREACHABLE',
+  TAKEN = 'TAKEN', // already allocated
+  AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes, but not already allocated
+  UNREACHABLE = 'UNREACHABLE', // visible but not immediately allocatable due to being not adjacent
+  HIDDEN = 'HIDDEN', // hidden due to fog of war
 }
+
+/**
+ * taken implies reachable. reachable implies visible.
+ */
+export type NodeTakenStatus = {
+  taken: boolean;
+};
+export type NodeVisibleStatus = {
+  visible: boolean;
+};
+export type NodeReachableStatus = {
+  reachable: boolean;
+};
+/**
+ * Immutable, readable booleans
+ */
+export enum BoolEnum {
+  true = 'true',
+  false = 'false',
+}
+// eslint-disable-next-line
+export const NodeTakenStatus: { [k in BoolEnum]: NodeTakenStatus } = {
+  true: { taken: true },
+  false: { taken: false },
+};
+// eslint-disable-next-line
+export const NodeVisibleStatus: { [k in BoolEnum]: NodeVisibleStatus } = {
+  true: { visible: true },
+  false: { visible: false },
+};
+// eslint-disable-next-line
+export const NodeReachableStatus: { [k in BoolEnum]: NodeReachableStatus } = {
+  true: { reachable: true },
+  false: { reachable: false },
+};
 
 export enum LockStatus {
   CLOSED = 'CLOSED',
@@ -140,7 +171,12 @@ export type ComputedState = {
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
 
   // NOT DEPRECATED
-  fogOfWarStatusMap?: HashMap<Vector3, NodeAllocatedStatus>;
+  /**
+   * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
+   * Also stores the allocatability (whether it's connected to the existing tree).
+   */
+  fogOfWarStatusMap?: HashMap<Vector3, NodeVisibleStatus>;
+  reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };
 
@@ -184,4 +220,14 @@ export type PlayerUIState = {
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;
+};
+
+export type DebugState = {
+  retriggerVirtualGridDims: () => void;
+  debugShowScrollbars: boolean; // default false
+  rerenderGameAreaGrid: () => void;
+  enableScrollJump: boolean; // default true
+  getForceJumpOffset: () => Vector2 | void;
+  getOffsetX: () => number | void;
+  isFlipCursored: () => boolean | void;
 };

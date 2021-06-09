@@ -1,6 +1,4 @@
 import * as Pixi from 'pixi.js';
-import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS from '../colors';
 
 export interface SimpleTextureSet {

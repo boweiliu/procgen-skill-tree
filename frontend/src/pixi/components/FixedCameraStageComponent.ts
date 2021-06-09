@@ -1,16 +1,9 @@
 import * as Pixi from 'pixi.js';
 import { GameState } from '../../data/GameState';
-import {
-  computeQuestEfficiencyPercent,
-  remapQuestEfficiencyToDisplayable,
-} from '../../game/EfficiencyCalculator';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Const } from '../../lib/util/misc';
-import { EfficiencyBarComponent } from './EfficiencyBarComponent';
-import { FpsComponent } from './FpsComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
-import { ReticleComponent } from './ReticleComponent';
-import { TooltipComponent, TooltipInfo } from './TooltipComponent';
+import { TooltipInfo } from './TooltipComponent';
 
 type Props = {
   args: {
