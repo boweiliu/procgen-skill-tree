@@ -83,19 +83,26 @@ function Component(props: Props) {
       // console.log({ direction: args.direction });
       // let jumpAmounts = virtualGridDims.multiply(0.35).floor();
       let jumpAmounts = virtualGridDims.multiply(0.05).floor();
-      jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
+      // jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
       jumpAmounts = jumpAmounts
         .clampX(1, virtualGridDims.x - 1)
-        .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
+        .clampY(1, virtualGridDims.y - 1);
+      // .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
 
-      const newJumpOffset = jumpAmounts.multiply(args.direction); // multiply the magnitudes by unit-ish direction vector
+      // let newJumpOffset = jumpAmounts.multiply(args.direction); // multiply the magnitudes by unit-ish direction vector
+      let locationOffset = new Vector2(args.direction.x, -1 * args.direction.y); // biased
+      if (args.direction.x === args.direction.y) {
+        locationOffset = new Vector2(0, -1 * args.direction.y);
+      }
+
+      const newJumpOffset = new Vector2(locationOffset.x, 0).add(
+        new Vector2(-0.5, -1).multiply(locationOffset.y)
+      );
 
       // console.log({ newJumpOffset });
 
       updaters.playerUI.virtualGridLocation.enqueueUpdate((it) => {
-        return it
-          .addX(newJumpOffset.x)
-          .add(new Vector3(-1, -2, 0).multiply(newJumpOffset.y / 2));
+        return it.add(Vector3.FromVector2(locationOffset, 0));
       });
       // force a rerender
       setJumpOffset(newJumpOffset);

@@ -24,7 +24,7 @@ export const borderWidth = 2; // border of circles, etc. in px
  * but need to 'jump' the scroll viewport less often.
  * Recommended default is 3.0
  */
-export const virtualAreaScaleMultiplier = 3.0;
+export const virtualAreaScaleMultiplier = 2.0;
 
 /**
  * The subset of the game state that is relevant to game area components.
