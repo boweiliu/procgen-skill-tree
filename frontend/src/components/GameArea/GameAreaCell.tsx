@@ -145,77 +145,20 @@ function CellComponent({
           </div>
         </div>
       ) : null}
-      <div className="empty-positioned">
-        <div className="hover-only-2 absolute-positioned">
-          <div
-            className="question"
-            hidden={status === NodeAllocatedStatus.HIDDEN}
-            onClick={onClickQuestionMark}
-          >
-            ?
-          </div>
-        </div>
-      </div>
-      <div className="empty-positioned node-tooltip-wrapper"></div>
-      <div className="empty-positioned selection-cursor-wrapper">
-        <div
-          className="absolute-positioned selection-cursor"
-          // hidden={!debugIsCursored}
-          hidden={!isCursored}
-        ></div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="hex-block hex-full-block" key={id} id={id}>
-      <div
-        className={classnames(
-          'hex-center',
-          status === NodeAllocatedStatus.TAKEN
-            ? 'node-allocated'
-            : 'node-unallocated',
-          status === NodeAllocatedStatus.TAKEN ||
-            status === NodeAllocatedStatus.UNREACHABLE
-            ? 'border-unimportant'
-            : 'border-important'
-        )}
-        onClick={onClickCenter}
-        hidden={status === NodeAllocatedStatus.HIDDEN}
-      >
-        <div className="hex-center-text-wrapper">
-          <div className="tiny-text">{nodeData.shortText}</div>
-        </div>
-      </div>
-      {isLocked ? (
-        <div
-          className="hex-center-lock"
-          hidden={status === NodeAllocatedStatus.HIDDEN}
-        >
-          <div className="hex-center-lock-left">
-            <div className="tiny-text">
-              {nodeData.lockData?.shortTextTarget}
-            </div>
-          </div>
-          <div className="hex-center-lock-right">
-            <div className="tiny-text">{nodeData.lockData?.shortTextTimer}</div>
-          </div>
-        </div>
-      ) : null}
-      <div className="empty-positioned">
-        <div className="hover-only-2 absolute-positioned">
-          <div
-            className="question"
-            hidden={status === NodeAllocatedStatus.HIDDEN}
-            onClick={onClickQuestionMark}
-          >
-            ?
-          </div>
-        </div>
-      </div>
       <div className="empty-positioned node-tooltip-wrapper">
         <div className="hover-only absolute-positioned node-tooltip">
           {nodeData.toolTipText}
+        </div>
+      </div>
+      <div className="empty-positioned">
+        <div className="hover-only-2 absolute-positioned">
+          <div
+            className="question"
+            hidden={status === NodeAllocatedStatus.HIDDEN}
+            onClick={onClickQuestionMark}
+          >
+            ?
+          </div>
         </div>
       </div>
       <div className="empty-positioned selection-cursor-wrapper">

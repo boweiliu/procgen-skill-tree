@@ -52,10 +52,10 @@
 .hover-only {
   display: none;
 }
-.hex-center:hover ~ div .hover-only {
+.hex-center:hover + div .hover-only {
   display: block;
 }
-.hex-center-lock:hover ~ div .hover-only {
+.hex-center-lock:hover + div .hover-only {
   display: block;
 }
 
