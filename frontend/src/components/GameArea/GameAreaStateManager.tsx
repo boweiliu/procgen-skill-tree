@@ -9,7 +9,6 @@ import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { computeVirtualNodeDataMap } from './computeVirtualNodeDataMap';
 import { GameAreaGrid, GameGridSubState } from './GameAreaGrid';
 import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
@@ -55,28 +54,6 @@ function Component(props: {
     },
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
-
-  // Hydrate the contents of all the nodes
-  const virtualNodeDataMap = useMemo(() => {
-    return computeVirtualNodeDataMap({
-      allocationStatusMap: gameState.playerSave.allocationStatusMap,
-      nodeContentsMap: gameState.worldGen.nodeContentsMap,
-      lockMap: gameState.worldGen.lockMap,
-      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-      reachableStatusMap: gameState.computed.reachableStatusMap,
-      virtualGridDims,
-      virtualCoordsToLocation,
-    });
-  }, [
-    gameState.playerSave.allocationStatusMap,
-    gameState.worldGen.nodeContentsMap,
-    gameState.worldGen.lockMap,
-    gameState.computed.fogOfWarStatusMap,
-    gameState.computed.reachableStatusMap,
-    gameState.playerUI.cursoredNodeLocation,
-    virtualGridDims,
-    virtualCoordsToLocation,
-  ]);
 
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatusByLocation = useCallback(
@@ -149,13 +126,6 @@ function Component(props: {
       return undefined;
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
-
-  const setCursoredVirtualNode = useCallback(
-    (v: Vector2 | undefined) => {
-      setCursoredLocation(v ? virtualCoordsToLocation(v) : undefined);
-    },
-    [setCursoredLocation, virtualCoordsToLocation]
-  );
 
   // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
@@ -330,12 +300,9 @@ function Component(props: {
         <GameAreaGrid
           gameState={subGameState}
           virtualGridDims={virtualGridDims}
-          // virtualNodeDataMap={virtualNodeDataMap}
           virtualCoordsToLocation={virtualCoordsToLocation}
-          updateNodeStatusCb={handleUpdateNodeStatus}
           updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
-          setCursoredVirtualNode={setCursoredVirtualNode}
           setCursoredLocation={setCursoredLocation}
           debug={gameAreaGridDebug}
         />

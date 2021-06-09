@@ -1,24 +1,17 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useEffect, useMemo, useRef } from 'react';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
+import React, { useEffect, useMemo } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import {
   computeNodeReactData,
-  computeNodeReactDataMap,
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
 import { NodeAllocatedStatus } from '../../data/GameState';
 import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
-
-export type UpdateStatusCb = (args: {
-  virtualCoords: Vector2;
-  newStatus: NodeAllocatedStatus;
-}) => void;
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -59,14 +52,11 @@ function Component(props: {
   gameState: GameGridSubState;
   virtualGridDims: Vector2;
   virtualCoordsToLocation: (v: Vector2) => Vector3;
-  // virtualNodeDataMap: KeyedHashMap<Vector2, NodeReactData>;
-  updateNodeStatusCb: UpdateStatusCb;
   updateNodeStatusByLocationCb: (args: {
     nodeLocation: Vector3;
     newStatus: NodeAllocatedStatus;
   }) => void;
   cursoredVirtualNode: Vector2 | undefined;
-  setCursoredVirtualNode: (v: Vector2 | undefined) => void;
   setCursoredLocation: (v: Vector3 | undefined) => void;
   debug?: any;
 }) {
@@ -74,11 +64,8 @@ function Component(props: {
     gameState,
     virtualGridDims,
     virtualCoordsToLocation,
-    // virtualNodeDataMap,
-    updateNodeStatusCb,
     updateNodeStatusByLocationCb,
     cursoredVirtualNode,
-    setCursoredVirtualNode,
     setCursoredLocation,
     debug,
   } = props;

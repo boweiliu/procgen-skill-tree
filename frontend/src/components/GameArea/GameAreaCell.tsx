@@ -3,9 +3,7 @@ import './GameArea.css';
 
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import { Vector2 } from '../../lib/util/geometry/vector2';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { UpdateStatusCb } from './GameAreaGrid';
 import { NodeAllocatedStatus } from '../../data/GameState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 
