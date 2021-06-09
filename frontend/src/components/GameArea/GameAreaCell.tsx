@@ -146,7 +146,10 @@ function CellComponent({
         </div>
       ) : null}
       <div className="empty-positioned node-tooltip-wrapper">
-        <div className="hover-only absolute-positioned node-tooltip">
+        <div
+          // className="hover-only absolute-positioned node-tooltip"
+          hidden={true} // temp disabling this, the css is causing perf issues
+        >
           {nodeData.toolTipText}
         </div>
       </div>

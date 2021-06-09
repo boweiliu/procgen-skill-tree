@@ -53,6 +53,7 @@
   display: none;
 }
 .hex-center:hover + div .hover-only {
+  /* + and ~ here are both slow */
   display: block;
 }
 .hex-center-lock:hover + div .hover-only {
