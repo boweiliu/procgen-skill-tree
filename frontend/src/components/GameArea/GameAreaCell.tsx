@@ -102,8 +102,8 @@ function CellComponent({
   isCursored: boolean;
   debugIsCursored?: boolean;
 }) {
-  const startTime = +new Date();
-  console.log(`GameAreaCellComponent key: ${id} rerendered at ${startTime}`);
+  // const startTime = +new Date();
+  // console.log(`GameAreaCellComponent key: ${id} rerendered at ${startTime}`);
 
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
