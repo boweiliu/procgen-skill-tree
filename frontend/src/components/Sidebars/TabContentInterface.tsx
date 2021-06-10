@@ -13,6 +13,7 @@ export enum TAB_NAME {
   QUESTS = 'QUESTS',
   DEBUG = 'DEBUG',
   HELP = 'HELP',
+  STRATEGIC_VIEW = 'STRATEGIC_VIEW',
 }
 
 // in charge of constructing content. no css
@@ -30,6 +31,13 @@ export function TabContentInterface(props: {
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,
+    [TAB_NAME.STRATEGIC_VIEW]: (
+      <>
+        <div>Strategic view is not open!</div>
+        <br></br>
+        <div>Click [m] to toggle strategic view.</div>
+      </>
+    ),
     [TAB_NAME.DEBUG]: (
       <DebugTabContent
         gameState={props.gameState}

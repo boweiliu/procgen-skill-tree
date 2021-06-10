@@ -38,6 +38,7 @@ export function SidebarsInterface(props: {
     'QUESTS',
     'DEBUG',
     'HELP',
+    'STRATEGIC_VIEW',
   ]);
   const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
   const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
