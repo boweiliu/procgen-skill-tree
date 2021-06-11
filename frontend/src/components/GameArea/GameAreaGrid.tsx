@@ -16,24 +16,71 @@ import { LazyHashMap } from '../../lib/util/lazy';
 /**
  * The subset of the game state that is relevant to game area components.
  */
-const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
-export type GameGridSubState = {
-  playerUI: {
-    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+// const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
+export function extractGameGridSubState(gameState: GameAreaSubState) {
+  return {
+    playerUI: {
+      cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+    },
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    worldGen: {
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+    },
+    computed: {
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+      lockStatusMap: gameState.computed.lockStatusMap,
+    },
   };
-  playerSave: {
-    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
+}
+export type GameGridSubState = ReturnType<typeof extractGameGridSubState>;
+export const depsGameGridSubState = extractDeps(extractGameGridSubState);
+
+function extractAccessPaths<T, U>(foo: (t: T) => U): string[][] {
+  let accessPaths: string[][] = [[]];
+
+  const proxyHandler: ProxyHandler<{ path: string[] }> = {
+    get: (
+      target: { path: string[] },
+      p: string | number | symbol,
+      receiver: any
+    ): any => {
+      const newPath = target.path.concat([p.toString()]);
+      // detect if we are merely adding on to an existing path and if so update it in place
+      if (accessPaths[accessPaths.length - 1] === target.path) {
+        accessPaths[accessPaths.length - 1] = newPath;
+      } else {
+        accessPaths.push(newPath);
+      }
+      const newObj = new Proxy({ path: newPath }, proxyHandler);
+      return newObj;
+    },
   };
-  worldGen: {
-    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
-    lockMap: typeof gameState.worldGen.lockMap;
+
+  // run the function and record the paths
+  foo(new Proxy({ path: accessPaths[0] }, proxyHandler) as any);
+
+  return accessPaths;
+}
+
+function extractDeps<T, U>(foo: (t: T) => U): (t: T) => any[] {
+  const accessPaths = extractAccessPaths(foo);
+
+  return (t: T) => {
+    const deps = accessPaths.map((accessPath) => {
+      let ref: any = t;
+      for (let p of accessPath) {
+        ref = ref[p];
+      }
+      return ref;
+    });
+    console.log({ deps });
+    return deps;
   };
-  computed: {
-    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
-    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
-    lockStatusMap: typeof gameState.computed.lockStatusMap;
-  };
-};
+}
 
 export const GameAreaGrid = React.memo(Component);
 /**
@@ -71,6 +118,8 @@ function Component(props: {
   } = props;
   const startTime = +new Date();
 
+  //   useMemo(() => foo(gameState as any), extractAccesses(foo)(gameState as any));
+  //
   useEffect(() => {
     console.log('callbacks got refreshed!');
   }, [updateNodeStatusByLocationCb, setCursoredLocation]);
