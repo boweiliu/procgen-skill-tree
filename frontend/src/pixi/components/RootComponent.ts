@@ -113,12 +113,32 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       props: Props,
       state: State
     ): StrategicHexGridComponentProps => {
+      const { gameState } = props;
       return {
         args: {
           position: Vector2.Zero,
           textures: state.simpleTexture.get(),
         },
         appSize: props.appSize,
+        // TODO(bowei): how to memoize this??
+        gameState: {
+          playerUI: {
+            virtualGridLocation: gameState.playerUI.virtualGridLocation,
+            cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+          },
+          playerSave: {
+            allocationStatusMap: gameState.playerSave.allocationStatusMap,
+          },
+          computed: {
+            fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+            reachableStatusMap: gameState.computed.reachableStatusMap,
+            lockStatusMap: gameState.computed.lockStatusMap,
+          },
+          worldGen: {
+            nodeContentsMap: gameState.worldGen.nodeContentsMap,
+            lockMap: gameState.worldGen.lockMap,
+          },
+        },
         virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
         allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
         fogOfWarStatusMap: props.gameState.computed.fogOfWarStatusMap!,

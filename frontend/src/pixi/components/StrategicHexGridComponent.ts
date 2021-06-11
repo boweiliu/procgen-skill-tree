@@ -1,5 +1,6 @@
 import * as Pixi from 'pixi.js';
 import {
+  GameState,
   LockStatus,
   NodeReachableStatus,
   NodeTakenStatus,
@@ -25,12 +26,36 @@ type Props = {
     };
   };
   appSize: Vector2;
+  gameState: Const<StrategicHexGridSubState>;
   virtualGridLocation: Const<Vector3>;
   allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
   fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
   reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
   lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
   lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
+};
+
+/**
+ * The subset of the game state that is relevant to game area components.
+ */
+const gameState: GameState = {} as any; // easily extract types without type-ing them out
+export type StrategicHexGridSubState = {
+  playerUI: {
+    virtualGridLocation: typeof gameState.playerUI.virtualGridLocation;
+    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+  };
+  playerSave: {
+    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
+  };
+  computed: {
+    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
+    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
+    lockStatusMap: typeof gameState.computed.lockStatusMap;
+  };
+  worldGen: {
+    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
+    lockMap: typeof gameState.worldGen.lockMap;
+  };
 };
 
 type State = {};
@@ -153,6 +178,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // if (key === 'delta' || key === 'args' || key === 'updaters') {
       if (key === 'args') {
         continue;
+      }
+      if (key === 'gameState') {
+        const staleGameState = staleProps[key];
+        const gameState = props[key];
+        continue; // TODO(bowei): what to put here?
       }
       if (staleProps[key] !== props[key]) {
         console.log(`hexgrid shouldUpdate differed in ${key}, returning true`);
