@@ -198,10 +198,6 @@ export class ResourceTypeAndModifier {
 }
 
 export type PlayerUIState = {
-  // DEPRECATED
-  selectedPointNode: PointNodeRef | undefined;
-  activeTab: number;
-
   // NOT DEPRECATED
   isPixiHidden: boolean;
   /**

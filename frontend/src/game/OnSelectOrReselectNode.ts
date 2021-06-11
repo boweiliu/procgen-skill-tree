@@ -12,13 +12,13 @@ export function selectOrReselectNode(
   let justFailedToAllocate = false;
 
   // update selected to ourselves
-  updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
-    if (prev?.pointNodeId === selfPointNodeRef.pointNodeId) {
-      // console.log('just selected: ', this);
-      justTriedToAllocate = true;
-    }
-    return selfPointNodeRef;
-  });
+  // updaters.playerUI.selectedPointNode.enqueueUpdate((prev, gameState) => {
+  //   if (prev?.pointNodeId === selfPointNodeRef.pointNodeId) {
+  //     // console.log('just selected: ', this);
+  //     justTriedToAllocate = true;
+  //   }
+  //   return selfPointNodeRef;
+  // });
 
   // if we tried to allocate ourselves, see if we can
   updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
@@ -62,11 +62,11 @@ export function selectOrReselectNode(
   });
 
   // if we failed to allocate, shift the active tab so the player can see why
-  updaters.playerUI.activeTab.enqueueUpdate((prev, prevGameState) => {
-    if (justFailedToAllocate) {
-      justFailedToAllocate = false;
-      return 1;
-    }
-    return prev;
-  });
+  // updaters.playerUI.activeTab.enqueueUpdate((prev, prevGameState) => {
+  //   if (justFailedToAllocate) {
+  //     justFailedToAllocate = false;
+  //     return 1;
+  //   }
+  //   return prev;
+  // });
 }

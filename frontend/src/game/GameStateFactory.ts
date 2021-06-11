@@ -97,8 +97,6 @@ export class GameStateFactory {
         ]),
       },
       playerUI: {
-        selectedPointNode: undefined,
-        activeTab: 0,
         isPixiHidden: true,
         virtualGridLocation: Vector3.Zero,
         cursoredNodeLocation: undefined,
