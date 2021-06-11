@@ -12,7 +12,6 @@ import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { multiplyColor } from '../../lib/util/misc';
 import { TooltippableAreaComponent } from './TooltippableAreaComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
-import { selectOrReselectNode } from '../../game/OnSelectOrReselectNode';
 import { RootComponentState } from './RootComponent';
 import { PointNodeTextureSet } from '../textures/PointNodeTexture';
 import COLORS from '../colors';
@@ -265,7 +264,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       (event: Pixi.InteractionEvent) => {
         this._staleProps.args.markForceUpdate(this);
         this.state.numClicks++;
-        selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
+        // selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
         // event.stopPropagation();
       }
     );
