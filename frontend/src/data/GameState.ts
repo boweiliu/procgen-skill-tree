@@ -198,7 +198,9 @@ export class ResourceTypeAndModifier {
 }
 
 export type PlayerUIState = {
-  // NOT DEPRECATED
+  /**
+   * Determines if pixi (i.e. strategic view) is hidden or not.
+   */
   isPixiHidden: boolean;
   /**
    * Determines where in the universe the user has scrolled to.
