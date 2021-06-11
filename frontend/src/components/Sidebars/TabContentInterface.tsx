@@ -6,6 +6,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { STARTING_NODE_DESCRIPTION } from '../GameArea/computeVirtualNodeDataMap';
 import { DebugTabContent } from './DebugTab';
+import { StrategicTab } from './StrategicTab';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -32,13 +33,7 @@ export function TabContentInterface(props: {
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,
-    [TAB_NAME.STRATEGIC_VIEW]: (
-      <>
-        <div>Strategic view is not open!</div>
-        <br></br>
-        <div>Click [m] to toggle strategic view.</div>
-      </>
-    ),
+    [TAB_NAME.STRATEGIC_VIEW]: <StrategicTab gameState={props.gameState} />,
     [TAB_NAME.DEBUG]: (
       <DebugTabContent
         gameState={props.gameState}
@@ -73,6 +68,9 @@ function TabContentSelector(props: {
   );
 }
 
+/**
+ * Tabs
+ */
 export const EmptyTabContent = React.memo(EmptyTabContentComponent);
 function EmptyTabContentComponent(props: {}) {
   console.log('got here empty tab content');
@@ -82,6 +80,7 @@ function EmptyTabContentComponent(props: {}) {
 export const SelectedNodeTabContent = React.memo(
   SelectedNodeTabContentComponent
 );
+// TODO(bowei): trim down the game state here
 function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
