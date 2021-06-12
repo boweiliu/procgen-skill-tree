@@ -12,11 +12,11 @@ import { GameAreaCell } from './GameAreaCell';
 import { NodeAllocatedStatus } from '../../data/GameState';
 import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
+import { extractDeps } from '../../lib/util/misc';
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-// const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
 export function extractGameGridSubState(gameState: GameAreaSubState) {
   return {
     playerUI: {
@@ -38,49 +38,6 @@ export function extractGameGridSubState(gameState: GameAreaSubState) {
 }
 export type GameGridSubState = ReturnType<typeof extractGameGridSubState>;
 export const depsGameGridSubState = extractDeps(extractGameGridSubState);
-
-function extractAccessPaths<T, U>(foo: (t: T) => U): string[][] {
-  let accessPaths: string[][] = [[]];
-
-  const proxyHandler: ProxyHandler<{ path: string[] }> = {
-    get: (
-      target: { path: string[] },
-      p: string | number | symbol,
-      receiver: any
-    ): any => {
-      const newPath = target.path.concat([p.toString()]);
-      // detect if we are merely adding on to an existing path and if so update it in place
-      if (accessPaths[accessPaths.length - 1] === target.path) {
-        accessPaths[accessPaths.length - 1] = newPath;
-      } else {
-        accessPaths.push(newPath);
-      }
-      const newObj = new Proxy({ path: newPath }, proxyHandler);
-      return newObj;
-    },
-  };
-
-  // run the function and record the paths
-  foo(new Proxy({ path: accessPaths[0] }, proxyHandler) as any);
-
-  return accessPaths;
-}
-
-function extractDeps<T, U>(foo: (t: T) => U): (t: T) => any[] {
-  const accessPaths = extractAccessPaths(foo);
-
-  return (t: T) => {
-    const deps = accessPaths.map((accessPath) => {
-      let ref: any = t;
-      for (let p of accessPath) {
-        ref = ref[p];
-      }
-      return ref;
-    });
-    console.log({ deps });
-    return deps;
-  };
-}
 
 export const GameAreaGrid = React.memo(Component);
 /**
