@@ -26,19 +26,19 @@ type Props = {
     };
   };
   appSize: Vector2;
-  gameState: Const<StrategicHexGridSubState>;
-  virtualGridLocation: Const<Vector3>;
-  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
-  fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
-  reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
-  lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
-  lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
+  gameState: StrategicHexGridSubState;
+  // virtualGridLocation: Const<Vector3>;
+  // allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
+  // fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
+  // reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
+  // lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
+  // lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
 };
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractStrategicHexGridSubState(gameState: GameState) {
+export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
   return {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -115,6 +115,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.args.position);
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
+    const { gameState } = props;
 
     for (let [v, graphics] of this.hexGrid.entries()) {
       graphics.position = PixiPointFrom(
@@ -126,18 +127,20 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       //   continue;
       // }
       // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
-      const virtualLocation = props.virtualGridLocation.add(
+      const virtualLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        props.fogOfWarStatusMap.get(virtualLocation) || NodeVisibleStatus.false;
+        gameState.computed.fogOfWarStatusMap?.get(virtualLocation) ||
+        NodeVisibleStatus.false;
       const nodeTakenStatus =
-        props.allocationStatusMap.get(virtualLocation) || NodeTakenStatus.false;
+        gameState.playerSave.allocationStatusMap.get(virtualLocation) ||
+        NodeTakenStatus.false;
       const nodeReachableStatus =
-        props.reachableStatusMap.get(virtualLocation) ||
+        gameState.computed.reachableStatusMap?.get(virtualLocation) ||
         NodeReachableStatus.false;
-      const lockData = props.lockMap.get(virtualLocation);
-      const lockStatus = props.lockStatusMap.get(virtualLocation);
+      const lockData = gameState.worldGen.lockMap.get(virtualLocation);
+      const lockStatus = gameState.computed.lockStatusMap?.get(virtualLocation);
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
