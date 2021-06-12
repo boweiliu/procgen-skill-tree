@@ -220,7 +220,7 @@ export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
  * @returns a list. each element of the list represents an access path that is in the subset of paths kept by the pure filter function.
  * in the example above, the output would be [ ['a'],  ['b', 'c'] ]
  */
-function extractAccessPaths<T, U>(deepFilter: (t: T) => U): string[][] {
+export function extractAccessPaths<T, U>(deepFilter: (t: T) => U): string[][] {
   let accessPaths: string[][] = [[]];
 
   const proxyHandler: ProxyHandler<{ path: string[] }> = {
@@ -252,18 +252,20 @@ function extractAccessPaths<T, U>(deepFilter: (t: T) => U): string[][] {
  * @param deepFilter pojo filtering function, as above
  * @returns a function that takes a T instance and returns the list of properties accessed by deepFilter. useful in react useMemo calls
  */
-export function extractDeps<T, U>(deepFilter: (t: T) => U): (t: T) => any[] {
+export function extractDeps<T, U>(
+  deepFilter: (t: T) => U
+): (t: T | Const<U>) => any[] {
   const accessPaths = extractAccessPaths(deepFilter);
 
-  return (t: T) => {
+  return (t: T | U) => {
     const deps = accessPaths.map((accessPath) => {
       let ref: any = t;
       for (let p of accessPath) {
-        ref = ref[p];
+        ref = ref?.[p];
       }
       return ref;
     });
-    console.log({ deps });
+    // console.log({ deps });
     return deps;
   };
 }

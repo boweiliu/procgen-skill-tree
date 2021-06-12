@@ -255,6 +255,15 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   protected fireStateUpdaters?(): void;
   protected didMount?(): void;
   protected updateSelf?(nextProps: P): void;
+  /**
+   *
+   * @param staleProps
+   * @param staleState
+   * @param nextProps
+   * @param state
+   * @returns false if staleProps == nextProps and staleState == state (which will cause the component to be memoized)
+   *          true if the props or state differ significantly
+   */
   protected shouldUpdate?(
     staleProps: P,
     staleState: S,
