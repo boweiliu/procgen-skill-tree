@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { GameState, appSizeFromWindowSize } from '../../data/GameState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
+import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
 import { CssVariablesComponent } from './CssVariables';
@@ -29,35 +30,38 @@ export const virtualAreaScaleMultiplier = 2.0;
 /**
  * The subset of the game state that is relevant to game area components.
  */
-const gameState: GameState = {} as any; // easily extract types without type-ing them out
-export type GameAreaSubState = {
-  playerUI: {
-    virtualGridLocation: typeof gameState.playerUI.virtualGridLocation;
-    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
-    isPixiHidden: typeof gameState.playerUI.isPixiHidden;
+export function extractGameAreaSubState(gameState: GameState) {
+  return {
+    playerUI: {
+      virtualGridLocation: gameState.playerUI.virtualGridLocation,
+      cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      isPixiHidden: gameState.playerUI.isPixiHidden,
+    },
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    worldGen: {
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+    },
+    computed: {
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+      lockStatusMap: gameState.computed.lockStatusMap,
+    },
+    intent: gameState.intent,
+    debug: {
+      debugShowScrollbars: gameState.debug.debugShowScrollbars,
+      rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
+      enableScrollJump: gameState.debug.enableScrollJump,
+      getForceJumpOffset: gameState.debug.getForceJumpOffset,
+      getOffsetX: gameState.debug.getOffsetX,
+      isFlipCursored: gameState.debug.isFlipCursored,
+    },
   };
-  playerSave: {
-    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
-  };
-  worldGen: {
-    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
-    lockMap: typeof gameState.worldGen.lockMap;
-  };
-  computed: {
-    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
-    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
-    lockStatusMap: typeof gameState.computed.lockStatusMap;
-  };
-  intent: typeof gameState.intent;
-  debug: {
-    debugShowScrollbars: typeof gameState.debug.debugShowScrollbars;
-    rerenderGameAreaGrid: typeof gameState.debug.rerenderGameAreaGrid;
-    enableScrollJump: typeof gameState.debug.enableScrollJump;
-    getForceJumpOffset: typeof gameState.debug.getForceJumpOffset;
-    getOffsetX: typeof gameState.debug.getOffsetX;
-    isFlipCursored: typeof gameState.debug.isFlipCursored;
-  };
-};
+}
+export type GameAreaSubState = ReturnType<typeof extractGameAreaSubState>;
+export const depsGameAreaSubState = extractDeps(extractGameAreaSubState);
 
 /**
  * Handles managing constants (settings) as well as pruning down game state and updaters to what is actually relevant.
@@ -97,53 +101,8 @@ export function GameAreaInterface(props: {
   }, [appSize, onDebugRetrigger]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
-    // console.log('sub game state recalculated!');
-    return {
-      playerUI: {
-        virtualGridLocation: gameState.playerUI.virtualGridLocation,
-        cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
-        isPixiHidden: gameState.playerUI.isPixiHidden,
-      },
-      playerSave: {
-        allocationStatusMap: gameState.playerSave.allocationStatusMap,
-      },
-      worldGen: {
-        nodeContentsMap: gameState.worldGen.nodeContentsMap,
-        lockMap: gameState.worldGen.lockMap,
-      },
-      computed: {
-        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-        reachableStatusMap: gameState.computed.reachableStatusMap,
-        lockStatusMap: gameState.computed.lockStatusMap,
-      },
-      intent: gameState.intent,
-      debug: {
-        debugShowScrollbars: gameState.debug.debugShowScrollbars,
-        rerenderGameAreaGrid: gameState.debug.rerenderGameAreaGrid,
-        enableScrollJump: gameState.debug.enableScrollJump,
-        getForceJumpOffset: gameState.debug.getForceJumpOffset,
-        getOffsetX: gameState.debug.getOffsetX,
-        isFlipCursored: gameState.debug.isFlipCursored,
-      },
-    };
-  }, [
-    gameState.playerUI.virtualGridLocation,
-    gameState.playerUI.cursoredNodeLocation,
-    gameState.playerUI.isPixiHidden,
-    gameState.playerSave.allocationStatusMap,
-    gameState.worldGen.nodeContentsMap,
-    gameState.worldGen.lockMap,
-    gameState.computed.fogOfWarStatusMap,
-    gameState.computed.reachableStatusMap,
-    gameState.computed.lockStatusMap,
-    gameState.intent, // we're lazy here so we don't explicitly call out the intents, though we could
-    gameState.debug.debugShowScrollbars,
-    gameState.debug.rerenderGameAreaGrid,
-    gameState.debug.enableScrollJump,
-    gameState.debug.getForceJumpOffset,
-    gameState.debug.getOffsetX,
-    gameState.debug.isFlipCursored,
-  ]);
+    return extractGameAreaSubState(gameState);
+  }, depsGameAreaSubState(gameState));
 
   // TODO(bowei): improve this abstraction??
   const actions = useMemo(() => {

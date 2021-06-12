@@ -263,38 +263,9 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
-  // const deps = depsGameGridSubState(gameState);
-  // console.log("got deps", { deps });
   const subGameState = useMemo(() => {
     return extractGameGridSubState(gameState);
   }, depsGameGridSubState(gameState));
-  // const subGameState: GameGridSubState = useMemo(() => {
-  //   return {
-  //     playerUI: {
-  //       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
-  //     },
-  //     playerSave: {
-  //       allocationStatusMap: gameState.playerSave.allocationStatusMap,
-  //     },
-  //     worldGen: {
-  //       nodeContentsMap: gameState.worldGen.nodeContentsMap,
-  //       lockMap: gameState.worldGen.lockMap,
-  //     },
-  //     computed: {
-  //       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-  //       reachableStatusMap: gameState.computed.reachableStatusMap,
-  //       lockStatusMap: gameState.computed.lockStatusMap,
-  //     },
-  //   };
-  // }, [
-  //   gameState.playerUI.cursoredNodeLocation,
-  //   gameState.playerSave.allocationStatusMap,
-  //   gameState.worldGen.nodeContentsMap,
-  //   gameState.worldGen.lockMap,
-  //   gameState.computed.fogOfWarStatusMap,
-  //   gameState.computed.reachableStatusMap,
-  //   gameState.computed.lockStatusMap,
-  // ]);
 
   return (
     <>
