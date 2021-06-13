@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { GameState } from '../../data/GameState';
+import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import { AttributeSymbolMap } from '../../game/worldGen/nodeContents/NodeContentsRendering';
 
 export const StrategicTab = React.memo(StrategicTabComponent);
 
@@ -23,6 +25,16 @@ function StrategicTabComponent(props: { gameState: GameState }) {
       <div>{showAdvancedSearch ? 'Custom' : 'Basic'} search</div>
       <br></br>
       <div className="tab-content-body">
+        <br></br>
+        <div>
+          Symbols: {/* TODO(bowei): need tooltip text here */}
+          <button>{AttributeSymbolMap[Attribute.RED0]}</button>
+          <button>{AttributeSymbolMap[Attribute.RED1]}</button>
+          <button>{AttributeSymbolMap[Attribute.RED2]}</button>
+          <button>{AttributeSymbolMap[Attribute.DEL0]}</button>
+          <button>{AttributeSymbolMap[Attribute.DEL1]}</button>
+          <button>{AttributeSymbolMap[Attribute.DEL2]}</button>
+        </div>
         <br></br>
         <div>
           Highlight: <input type={'text'}></input>
