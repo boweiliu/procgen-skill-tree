@@ -84,7 +84,7 @@ function Component(props: {
   debug?.rerenderGameAreaGrid();
   const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
   const flipCursored = debug?.isFlipCursored?.() || false;
-  console.log('Game area grid rerender');
+  // console.log('Game area grid rerender');
 
   const nodeReactDataMap = useMemo(
     () =>

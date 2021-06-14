@@ -214,6 +214,10 @@ export type PlayerUIState = {
    * state of the sidebar component
    */
   isSidebarOpen: boolean;
+  /**
+   * whether or not the cursor is captured by a text entry element. if so, we need to allow default behavior on keyboard events
+   */
+  isTextBoxFocused: boolean;
 
   // WIP?
   virtualApproximateScroll?: Vector2;

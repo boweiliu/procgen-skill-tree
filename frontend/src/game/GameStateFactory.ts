@@ -101,6 +101,7 @@ export class GameStateFactory {
         virtualGridLocation: Vector3.Zero,
         cursoredNodeLocation: undefined,
         isSidebarOpen: false,
+        isTextBoxFocused: false,
       },
       computed: {},
       intent: {

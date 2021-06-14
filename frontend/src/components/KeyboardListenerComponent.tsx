@@ -4,7 +4,7 @@ import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
 type Props = {
   updaters: UpdaterGeneratorType2<PlayerIntentState, GameState>;
-  intent: PlayerIntentState;
+  isTextBoxFocused: boolean;
 };
 
 type State = {
@@ -64,18 +64,29 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
     this.state = {
       keyIntentConfig: defaultKeyIntentConfig,
     };
+  }
+
+  componentDidMount() {
+    console.log('adding event listeners for keyboard component');
     document.addEventListener('keydown', this.handleKeydown);
     document.addEventListener('keyup', this.handleKeyup);
   }
 
   // NOTE(bowei): does using e.repeat here break when window loses focus??
   handleKeydown = (e: KeyboardEvent) => {
-    // console.log("key down", new Date());
     const { keyIntentConfig } = this.state;
     const key: BrowserKeys = e.key;
     const configuredIntent = keyIntentConfig[key];
     if (configuredIntent) {
-      e.preventDefault();
+      if (this.props.isTextBoxFocused) {
+        console.log(
+          'bypassing keyboard event processing because text box is focused'
+        );
+        return;
+      } else {
+        // console.log("skipping default on keyboard event because text box is not focused");
+        e.preventDefault();
+      }
     }
 
     if (
@@ -114,10 +125,13 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
       });
     }
   };
+
   componentWillUnmount() {
+    console.log('removing event listeners for keyboard component');
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('keyup', this.handleKeyup);
   }
+
   render() {
     return <> </>;
   }
