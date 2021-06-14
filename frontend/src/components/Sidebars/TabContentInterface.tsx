@@ -33,7 +33,9 @@ export function TabContentInterface(props: {
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,
-    [TAB_NAME.STRATEGIC_VIEW]: <StrategicTab gameState={props.gameState} />,
+    [TAB_NAME.STRATEGIC_VIEW]: (
+      <StrategicTab gameState={props.gameState} updaters={props.updaters} />
+    ),
     [TAB_NAME.DEBUG]: (
       <DebugTabContent
         gameState={props.gameState}

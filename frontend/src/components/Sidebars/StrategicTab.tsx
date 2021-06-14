@@ -1,14 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
 import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import { AttributeSymbolMap } from '../../game/worldGen/nodeContents/NodeContentsRendering';
 
 export const StrategicTab = React.memo(StrategicTabComponent);
 
-function StrategicTabComponent(props: { gameState: GameState }) {
-  const { gameState } = props;
+// TODO(bowei): prune down state
+function StrategicTabComponent(props: {
+  gameState: GameState;
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
+}) {
+  const { gameState, updaters } = props;
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+
+  const onFocus = useCallback(() => {
+    props.updaters.playerUI.isTextBoxFocused.enqueueUpdate(true);
+  }, [updaters]);
+  const onBlur = useCallback(() => {
+    props.updaters.playerUI.isTextBoxFocused.enqueueUpdate(false);
+  }, [updaters]);
 
   if (gameState.playerUI.isPixiHidden) {
     return (
@@ -19,7 +31,6 @@ function StrategicTabComponent(props: { gameState: GameState }) {
       </>
     );
   }
-
   return (
     <>
       <div>{showAdvancedSearch ? 'Custom' : 'Basic'} search</div>
@@ -37,7 +48,8 @@ function StrategicTabComponent(props: { gameState: GameState }) {
         </div>
         <br></br>
         <div>
-          Highlight: <input type={'text'}></input>
+          Highlight:{' '}
+          <input type={'text'} onFocus={onFocus} onBlur={onBlur}></input>
           <button>✔️</button>
           <button>🚫</button>
         </div>
