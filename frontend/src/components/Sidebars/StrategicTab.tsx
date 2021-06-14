@@ -16,10 +16,10 @@ function StrategicTabComponent(props: {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const onFocus = useCallback(() => {
-    props.updaters.playerUI.isTextBoxFocused.enqueueUpdate(true);
+    updaters.playerUI.isTextBoxFocused.enqueueUpdate(true);
   }, [updaters]);
   const onBlur = useCallback(() => {
-    props.updaters.playerUI.isTextBoxFocused.enqueueUpdate(false);
+    updaters.playerUI.isTextBoxFocused.enqueueUpdate(false);
   }, [updaters]);
 
   if (gameState.playerUI.isPixiHidden) {
