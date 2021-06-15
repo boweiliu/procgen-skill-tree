@@ -75,12 +75,6 @@ function Component(props: {
   } = props;
   const startTime = +new Date();
 
-  //   useMemo(() => foo(gameState as any), extractAccesses(foo)(gameState as any));
-  //
-  useEffect(() => {
-    console.log('callbacks got refreshed!');
-  }, [updateNodeStatusByLocationCb, setCursoredLocation]);
-
   debug?.rerenderGameAreaGrid();
   const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
   const flipCursored = debug?.isFlipCursored?.() || false;
@@ -93,14 +87,6 @@ function Component(props: {
       ),
     [gameState]
   );
-
-  // when fog of war status or whatever changes, re-compute ALL the node react data
-  // useEffect(() => {
-  //   nodeReactDataMap.current.clear();
-  //   nodeReactDataMap.current.setFactory((location: Vector3) =>
-  //     computeNodeReactData({ location, gameState })
-  //   );
-  // }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
