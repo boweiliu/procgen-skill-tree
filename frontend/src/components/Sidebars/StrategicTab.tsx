@@ -14,6 +14,7 @@ function StrategicTabComponent(props: {
   const { gameState, updaters } = props;
 
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [highlightInputValue, setHighlightInputValue] = useState('');
 
   const onFocus = useCallback(() => {
     updaters.playerUI.isTextBoxFocused.enqueueUpdate(true);
@@ -39,7 +40,24 @@ function StrategicTabComponent(props: {
         <br></br>
         <div>
           Symbols: {/* TODO(bowei): need tooltip text here */}
-          <button>{AttributeSymbolMap[Attribute.RED0]}</button>
+          <button
+            onKeyDown={(e) => {
+              e.preventDefault();
+            }}
+            onMouseDown={(e) => {
+              // needed to preserve textbox focus: https://stackoverflow.com/questions/12154954/how-to-make-element-not-lose-focus-when-button-is-pressed
+              e.preventDefault();
+            }}
+            onPointerDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              setHighlightInputValue((prev) => prev + '[RED]');
+            }}
+          >
+            {AttributeSymbolMap[Attribute.RED0]}
+          </button>
           <button>{AttributeSymbolMap[Attribute.RED1]}</button>
           <button>{AttributeSymbolMap[Attribute.RED2]}</button>
           <button>{AttributeSymbolMap[Attribute.DEL0]}</button>
@@ -49,7 +67,15 @@ function StrategicTabComponent(props: {
         <br></br>
         <div>
           Highlight:{' '}
-          <input type={'text'} onFocus={onFocus} onBlur={onBlur}></input>
+          <input
+            type={'text'}
+            onFocus={onFocus}
+            onChange={(e) => {
+              setHighlightInputValue(e.target.value);
+            }}
+            onBlur={onBlur}
+            value={highlightInputValue}
+          ></input>
           <button>✔️</button>
           <button>🚫</button>
         </div>
