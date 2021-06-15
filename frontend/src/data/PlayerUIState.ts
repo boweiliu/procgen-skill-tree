@@ -139,8 +139,8 @@ const load = (): PlayerUIState | null => {
   return loaded;
 };
 
-const store = (obj: PlayerUIState) => {
-  const data = serialize(obj);
+const store = (s: PlayerUIState) => {
+  const data = serialize(s);
   window.localStorage.setItem(storageKey, data);
 };
 

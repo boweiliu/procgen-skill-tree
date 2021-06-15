@@ -35,7 +35,7 @@ export class GameStateFactory {
     const worldGenStateFactory = new WorldGenStateFactory({});
     const gameState: GameState = {
       tick: 0,
-      worldGen: worldGenStateFactory.create({ seed: mySeed }),
+      worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
       playerSave: newPlayerSaveState(),
       playerUI: PlayerUIState.tryLoad(),
       computed: {},
