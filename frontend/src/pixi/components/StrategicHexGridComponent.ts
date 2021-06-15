@@ -185,6 +185,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeContents = gameState.worldGen.nodeContentsMap.get(
         virtualLocation
       );
+
       if (
         nodeContents.lines?.[0]?.attribute === Attribute.RED0 ||
         nodeContents.lines?.[1]?.attribute === Attribute.RED0
@@ -194,6 +195,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.position.x -= props.args.textures.square.width / 2;
         // graphics.position.y -= props.args.textures.square.height / 2;
         // graphics.tint = COLORS.nodeBlue;
+        this.animations.put(v, {});
+      } else {
+        this.animations.put(v, null);
       }
     }
   }
