@@ -11,6 +11,10 @@ import {
   Attribute,
   NodeContents,
 } from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import {
+  AttributeDescriptionReverseMap,
+  ModifierDescriptionReverseMap,
+} from '../../game/worldGen/nodeContents/NodeContentsRendering';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -314,8 +318,67 @@ export function matchStrategicSearch(args: {
 }): boolean {
   const { nodeContents, query } = args;
 
-  return (
-    nodeContents.lines?.[0]?.attribute === Attribute.RED0 ||
-    nodeContents.lines?.[1]?.attribute === Attribute.RED0
-  );
+  // missing query! return no matches
+  if (!query) {
+    return false;
+  }
+
+  // first separate out the terms
+  const highlight1 = query.highlight1.value;
+  const terms = highlight1
+    .split(' ')
+    .filter((it) => !!it)
+    .map((wrappedTerm) => wrappedTerm.slice(1, wrappedTerm.length - 1));
+
+  // missing query! return no matches
+  if (terms.length === 0) {
+    return false;
+  }
+
+  // for ALL of the terms, make sure node contents matches
+  let unmatchedTerm: string | null = null;
+  console.log({ terms });
+  for (let term of terms) {
+    // is the term a attribute or modifier?
+    const maybeAttribute = AttributeDescriptionReverseMap[term];
+    const maybeModifier = ModifierDescriptionReverseMap[term];
+    if (!!maybeAttribute) {
+      if (
+        nodeContents.lines?.[0]?.attribute === maybeAttribute ||
+        nodeContents.lines?.[1]?.attribute === maybeAttribute
+      ) {
+        // console.log("matched by attribute" , maybeAttribute);
+      } else {
+        unmatchedTerm = maybeAttribute;
+        break;
+      }
+    } else if (!!maybeModifier) {
+      if (
+        nodeContents.lines?.[0]?.modifier === maybeModifier ||
+        nodeContents.lines?.[1]?.modifier === maybeModifier
+      ) {
+        // console.log("matched by modifier" , maybeModifier);
+      } else {
+        unmatchedTerm = maybeModifier;
+        break;
+      }
+    } else if (term === '*') {
+      if (
+        nodeContents.lines?.[0]?.attribute ||
+        nodeContents.lines?.[1]?.attribute
+      ) {
+        // console.log("matched by wild card attribute");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else {
+      console.error('unparsed term: ', term);
+      return false;
+    }
+  }
+  if (unmatchedTerm) {
+    return false; // match failed
+  }
+  return true;
 }

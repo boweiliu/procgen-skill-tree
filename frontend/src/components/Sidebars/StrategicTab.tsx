@@ -8,6 +8,8 @@ import {
 import {
   AttributeDescriptionMap,
   AttributeSymbolMap,
+  ModifierDescriptionMap,
+  ModifierSymbolMap,
 } from '../../game/worldGen/nodeContents/NodeContentsRendering';
 
 export const StrategicTab = React.memo(StrategicTabComponent);
@@ -90,18 +92,25 @@ function StrategicTabComponent(props: {
             updateTextInputValue={setHighlightInputValue}
             attribute={Attribute.DEL2}
           />
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            icon={'*'}
+            insertedText={'[*] '}
+          />
           <br></br>
           <TextInputButton
             updateTextInputValue={setHighlightInputValue}
             id={Modifier.FLAT}
-            icon={'+'}
-            insertedText={'[Flat] '}
+            icon={ModifierSymbolMap[Modifier.FLAT]}
+            insertedText={'[' + ModifierDescriptionMap[Modifier.FLAT] + '] '}
           />
           <TextInputButton
             updateTextInputValue={setHighlightInputValue}
             id={Modifier.INCREASED}
-            icon={'%'}
-            insertedText={'[Increased] '}
+            icon={ModifierSymbolMap[Modifier.INCREASED]}
+            insertedText={
+              '[' + ModifierDescriptionMap[Modifier.INCREASED] + '] '
+            }
           />
         </div>
         <br></br>

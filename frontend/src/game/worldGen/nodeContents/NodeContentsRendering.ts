@@ -23,6 +23,15 @@ export const AttributeDescriptionMap = {
   [Attribute.DEL2]: 'Magic',
 };
 
+export const AttributeDescriptionReverseMap: { [k: string]: Attribute } = {
+  Red: Attribute.RED0,
+  Green: Attribute.RED1,
+  Blue: Attribute.RED2,
+  Offense: Attribute.DEL0,
+  Defense: Attribute.DEL1,
+  Magic: Attribute.DEL2,
+};
+
 export const ModifierSymbolMap = {
   [Modifier.FLAT]: '+',
   [Modifier.INCREASED]: '%',
@@ -30,6 +39,10 @@ export const ModifierSymbolMap = {
 export const ModifierDescriptionMap = {
   [Modifier.FLAT]: 'flat',
   [Modifier.INCREASED]: 'increased',
+};
+export const ModifierDescriptionReverseMap: { [k: string]: Modifier } = {
+  flat: Modifier.FLAT,
+  increased: Modifier.INCREASED,
 };
 
 export function nodeContentsLineToString(line: NodeContentsLine): string {
