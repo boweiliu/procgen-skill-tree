@@ -249,7 +249,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected didMount() {
-    const { updaters } = this._staleProps; // we assume this will never change
+    // const { updaters } = this._staleProps; // we assume this will never change
 
     //     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
     //       this.state.pointerover = event;

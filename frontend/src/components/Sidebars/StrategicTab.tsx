@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
 import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';

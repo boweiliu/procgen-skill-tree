@@ -6,12 +6,10 @@ import {
   NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/GameState';
-import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { LazyHashMap } from '../../lib/util/lazy';
 import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
@@ -27,12 +25,6 @@ type Props = {
   };
   appSize: Vector2;
   gameState: StrategicHexGridSubState;
-  // virtualGridLocation: Const<Vector3>;
-  // allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
-  // fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
-  // reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
-  // lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
-  // lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
 };
 
 /**

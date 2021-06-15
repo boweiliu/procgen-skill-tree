@@ -43,7 +43,7 @@ export function computeNodeReactData(args: {
   const {
     fogOfWarStatusMap,
     reachableStatusMap,
-    lockStatusMap,
+    // lockStatusMap,
   } = args.gameState.computed;
   const { allocationStatusMap } = args.gameState.playerSave;
   const { lockMap, nodeContentsMap } = args.gameState.worldGen;

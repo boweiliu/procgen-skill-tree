@@ -3,7 +3,6 @@ import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { Const, enumKeys } from '../lib/util/misc';
 import { PlayerSaveState } from './PlayerSaveState';
-import { PointNodeRef } from './PointNodeRef';
 import {
   ResourceModifier,
   ResourceNontrivialType,

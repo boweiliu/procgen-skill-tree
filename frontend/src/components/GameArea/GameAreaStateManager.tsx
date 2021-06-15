@@ -11,7 +11,6 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
   GameAreaGrid,
-  GameGridSubState,
   extractGameGridSubState,
   depsGameGridSubState,
 } from './GameAreaGrid';
@@ -263,8 +262,10 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
+  // TODO(bowei): use custom hook here so react doesnt complain so much
   const subGameState = useMemo(() => {
     return extractGameGridSubState(gameState);
+    // eslint-disable-next-line
   }, depsGameGridSubState(gameState));
 
   return (
