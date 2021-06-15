@@ -235,9 +235,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.position.y -= props.args.textures.square.height / 2;
         // graphics.tint = COLORS.nodeBlue;
         this.animations.put(v, {
-          // max: addColor(COLORS.nodeBlue, graphics.tint),
-          // max: graphics.tint === COLORS.borderBlack ? COLORS.black : COLORS.nodeBlue,
-          max: COLORS.nodeBlue,
+          max: addColor(COLORS.nodeBlue, graphics.tint),
+          // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
+          // max: COLORS.nodeBlue,
           // max: graphics.tint,
           min: graphics.tint,
           periodSecs: 2,

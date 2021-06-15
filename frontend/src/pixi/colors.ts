@@ -12,7 +12,7 @@ let COLORS = {
   // nodePink: 0x332244,
   nodePink: 0x333333, // try this?
   nodeLavender: 0x4b4b4b,
-  nodeBlue: 0x888888,
+  nodeBlue: 0x444444,
 
   // used for lock nodes
   nodeAqua: 0xffaaaa,
