@@ -31,14 +31,14 @@ export function SidebarsInterface(props: {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
   }, [updaters]);
 
-  const [leftSidebarTabs, setLeftSidebarTabs] = useState<string[]>([]);
-  const [rightSidebarTabs, setRightSidebarTabs] = useState([
-    'SELECTED_NODE',
-    'STATS',
-    'QUESTS',
-    'DEBUG',
-    'HELP',
-    'STRATEGIC_VIEW',
+  const [leftSidebarTabs, setLeftSidebarTabs] = useState<TAB_NAME[]>([]);
+  const [rightSidebarTabs, setRightSidebarTabs] = useState<TAB_NAME[]>([
+    TAB_NAME.SELECTED_NODE,
+    TAB_NAME.STATS,
+    TAB_NAME.QUESTS,
+    TAB_NAME.DEBUG,
+    TAB_NAME.HELP,
+    TAB_NAME.STRATEGIC_VIEW,
   ]);
   const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
   const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
