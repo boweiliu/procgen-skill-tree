@@ -34,7 +34,7 @@ function GameAreaCellComponent({
   }) => void;
   nodeData: NodeReactData;
   isCursored: boolean;
-  onUpdateCursored: (v: Vector3 | undefined) => void;
+  onUpdateCursored: (v: Vector3 | null) => void;
   debugIsCursored: boolean;
 }) {
   // const startTime = +new Date();
@@ -60,7 +60,7 @@ function GameAreaCellComponent({
       e.stopPropagation();
       e.preventDefault();
       // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
-      onUpdateCursored(isCursored ? undefined : nodeLocation);
+      onUpdateCursored(isCursored ? null : nodeLocation);
     },
     [isCursored, onUpdateCursored, nodeLocation]
   );

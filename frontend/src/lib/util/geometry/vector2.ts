@@ -201,8 +201,8 @@ export class Vector2 {
     });
   }
 
-  equals(other: Vector2 | undefined): boolean {
-    if (other === undefined) {
+  equals(other: Vector2 | undefined | null): boolean {
+    if (other === undefined || other === null) {
       return false;
     }
 
@@ -316,10 +316,10 @@ export class Vector2 {
     return this.lerp(other, t);
   }
 
-  static Deserialize(obj: any): Vector2 | undefined {
+  static Deserialize(obj: any): Vector2 | null {
     if (!obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
       console.error('Failed deserializing point');
-      return undefined;
+      return null;
     }
 
     return new Vector2({

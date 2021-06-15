@@ -49,7 +49,7 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
   const locationToVirtualCoords = useCallback(
-    (location: Vector3): Vector2 | undefined => {
+    (location: Vector3): Vector2 | null => {
       return convertLocationToVirtualCoords({
         location,
         virtualGridDims,
@@ -107,7 +107,7 @@ function Component(props: {
 
   // Manage cursor "node selected" state
   const setCursoredLocation = useCallback(
-    (v: Vector3 | undefined) => {
+    (v: Vector3 | null) => {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
         return v;
       });
@@ -119,7 +119,7 @@ function Component(props: {
     [props.updaters]
   );
 
-  const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
+  const cursoredVirtualNodeCoords: Vector2 | null = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       // console.log({
       //   3: gameState.playerUI.cursoredNodeLocation,
@@ -127,7 +127,7 @@ function Component(props: {
       // });
       return locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation);
     } else {
-      return undefined;
+      return null;
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 

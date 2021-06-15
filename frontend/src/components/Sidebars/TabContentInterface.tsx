@@ -87,7 +87,7 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
 
-  if (location === undefined) {
+  if (location === null) {
     return (
       <>
         <div>Nothing selected!</div>

@@ -60,8 +60,8 @@ function Component(props: {
     nodeLocation: Vector3;
     newStatus: NodeAllocatedStatus;
   }) => void;
-  cursoredVirtualNode: Vector2 | undefined;
-  setCursoredLocation: (v: Vector3 | undefined) => void;
+  cursoredVirtualNode: Vector2 | null;
+  setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
 }) {
   const {

@@ -1,5 +1,18 @@
+import { TAB_NAME } from '../components/Sidebars/TabContentInterface';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
+
+export const initialTabLabels: { [k in 'left' | 'right']: TAB_NAME[] } = {
+  left: [],
+  right: [
+    TAB_NAME.SELECTED_NODE,
+    TAB_NAME.STATS,
+    TAB_NAME.QUESTS,
+    TAB_NAME.DEBUG,
+    TAB_NAME.HELP,
+    TAB_NAME.STRATEGIC_VIEW,
+  ],
+};
 
 export type PlayerUIState = {
   /**
@@ -13,7 +26,7 @@ export type PlayerUIState = {
   /**
    * Which, if any, node is highlighted with a selection cursor
    */
-  cursoredNodeLocation: Vector3 | undefined;
+  cursoredNodeLocation: Vector3 | null;
   /**
    * state of the sidebar component
    */
@@ -23,6 +36,20 @@ export type PlayerUIState = {
    */
   isTextBoxFocused: boolean;
 
+  /**
+   * Tab controls.
+   */
+  tabs: {
+    left: {
+      tabs: TAB_NAME[];
+      activeIndex: number;
+    };
+    right: {
+      tabs: TAB_NAME[];
+      activeIndex: number;
+    };
+  };
+
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;
@@ -30,9 +57,19 @@ export type PlayerUIState = {
 
 export const newPlayerUIState = (): PlayerUIState => {
   return {
+    tabs: {
+      left: {
+        tabs: initialTabLabels['left'],
+        activeIndex: 0,
+      },
+      right: {
+        tabs: initialTabLabels['right'],
+        activeIndex: 0,
+      },
+    },
     isPixiHidden: true,
     virtualGridLocation: Vector3.Zero,
-    cursoredNodeLocation: undefined,
+    cursoredNodeLocation: null,
     isSidebarOpen: false,
     isTextBoxFocused: false,
   };
@@ -49,25 +86,32 @@ const serialize = (s: PlayerUIState) => JSON.stringify(serializeToObject(s));
 
 const deserializeFromObject = (obj: {
   [k: string]: any;
-}): PlayerUIState | undefined => {
+}): PlayerUIState | null => {
   if (
     !obj.hasOwnProperty('isPixiHidden') ||
     !obj.hasOwnProperty('virtualGridLocation') ||
     !obj.hasOwnProperty('cursoredNodeLocation') ||
     !obj.hasOwnProperty('isSidebarOpen') ||
-    !obj.hasOwnProperty('isTextBoxFocused')
+    !obj.hasOwnProperty('isTextBoxFocused') ||
+    !obj.hasOwnProperty('tabs')
   ) {
-    console.error('Failed deserializing PlayerUIState');
+    console.error('Failed deserializing PlayerUIState: ', obj);
+    return null;
   }
 
   const virtualGridLocation = Vector3.Deserialize(obj.virtualGridLocation);
   if (!virtualGridLocation) {
-    return undefined;
+    return null;
+  }
+  const cursoredNodeLocation = Vector3.Deserialize(obj.cursoredNodeLocation);
+  if (!cursoredNodeLocation) {
+    return null;
   }
 
   return {
     ...obj,
     virtualGridLocation,
+    cursoredNodeLocation,
   } as PlayerUIState;
 };
 
@@ -93,9 +137,9 @@ const tryLoad = (): PlayerUIState => {
   }
 };
 
-const load = (): PlayerUIState | undefined => {
+const load = (): PlayerUIState | null => {
   const data = window.localStorage.getItem(storageKey);
-  const loaded = (data && deserialize(data)) || undefined;
+  const loaded = (data && deserialize(data)) || null;
   return loaded;
 };
 
