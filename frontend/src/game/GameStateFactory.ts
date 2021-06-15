@@ -18,6 +18,8 @@ import {
 } from './worldGen/nodeContents/NodeContentsFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 import { LockFactory } from './worldGen/LockFactory';
+import { newDebugState } from '../data/DebugState';
+import { newPlayerUIState } from '../data/PlayerUIState';
 
 export type GameStateConfig = any;
 
@@ -59,26 +61,13 @@ export class GameStateFactory {
         nodeContentsMap,
       },
       playerSave: newPlayerSaveState(),
-      playerUI: {
-        isPixiHidden: true,
-        virtualGridLocation: Vector3.Zero,
-        cursoredNodeLocation: undefined,
-        isSidebarOpen: false,
-        isTextBoxFocused: false,
-      },
+      playerUI: newPlayerUIState(),
       computed: {},
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
-      debug: {
-        retriggerVirtualGridDims: () => {},
-        debugShowScrollbars: false,
-        rerenderGameAreaGrid: () => {},
-        enableScrollJump: true,
-        getForceJumpOffset: () => {},
-        getOffsetX: () => {},
-        isFlipCursored: () => {},
-      },
+      debug: newDebugState(),
     };
+
     gameState.computed = {};
     gameState.computed.lockStatusMap = new HashMap();
     gameState.computed.fogOfWarStatusMap = new HashMap();
