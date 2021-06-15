@@ -144,6 +144,10 @@ const store = (obj: PlayerUIState) => {
   window.localStorage.setItem(storageKey, data);
 };
 
+const clear = () => {
+  window.localStorage.setItem(storageKey, '');
+};
+
 // eslint-disable-next-line
 export const PlayerUIState = {
   new: newPlayerUIState,
@@ -152,4 +156,5 @@ export const PlayerUIState = {
   tryLoad,
   load,
   store,
+  clear,
 };

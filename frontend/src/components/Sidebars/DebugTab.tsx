@@ -113,6 +113,11 @@ export function DebugTabContent(props: {
     }
   }, [props.updaters]);
 
+  const clearLocalStorage = useCallback(() => {
+    PlayerUIState.clear();
+    props.updaters.justDisabledSave.enqueueUpdate(true);
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -179,6 +184,11 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={loadLocalStorage}>
             load state from local storage
+          </button>
+        </div>
+        <div>
+          <button onClick={clearLocalStorage}>
+            clear local storage and disable saving
           </button>
         </div>
       </div>

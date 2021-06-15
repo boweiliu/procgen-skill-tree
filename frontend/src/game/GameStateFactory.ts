@@ -42,6 +42,7 @@ export class GameStateFactory {
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
       debug: newDebugState(),
+      justDisabledSave: false,
     };
 
     loadComputed(gameState);
@@ -65,6 +66,7 @@ export class GameStateFactory {
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
       debug: newDebugState(),
+      justDisabledSave: false,
     };
 
     loadComputed(gameState);

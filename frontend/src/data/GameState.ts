@@ -37,6 +37,7 @@ export type GameState = {
   intent: PlayerIntentState;
   windowState: WindowState;
   debug: DebugState;
+  justDisabledSave: boolean;
 };
 
 export type ComputedState = {
