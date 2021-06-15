@@ -37,9 +37,17 @@ function StrategicTabComponent(props: {
     });
   }, [updaters, highlightInputValue]);
 
+  // const onCancelSearch = useCallback(() => {
+  //   setHighlightInputValue(gameState.playerUI.strategicSearch.highlight1.value);
+  // }, [gameState.playerUI.strategicSearch.highlight1.value]);
   const onCancelSearch = useCallback(() => {
-    setHighlightInputValue(gameState.playerUI.strategicSearch.highlight1.value);
-  }, [gameState.playerUI.strategicSearch.highlight1.value]);
+    setHighlightInputValue('');
+    updaters.playerUI.strategicSearch.highlight1.enqueueUpdate(() => {
+      return {
+        value: '',
+      };
+    });
+  }, [updaters]);
 
   if (gameState.playerUI.isPixiHidden) {
     return (
@@ -87,13 +95,13 @@ function StrategicTabComponent(props: {
             updateTextInputValue={setHighlightInputValue}
             id={Modifier.FLAT}
             icon={'+'}
-            insertedText={'[Flat]'}
+            insertedText={'[Flat] '}
           />
           <TextInputButton
             updateTextInputValue={setHighlightInputValue}
             id={Modifier.INCREASED}
             icon={'%'}
-            insertedText={'[Increased]'}
+            insertedText={'[Increased] '}
           />
         </div>
         <br></br>
@@ -109,7 +117,7 @@ function StrategicTabComponent(props: {
             onBlur={onBlur}
             value={highlightInputValue}
           ></input>
-          <button onClick={onFireSearch}>✔️</button>
+          <button onClick={onFireSearch}>🔎</button>
           <button onClick={onCancelSearch}>🚫</button>
         </div>
         {showAdvancedSearch ? (
@@ -198,7 +206,7 @@ function SymbolButton(props: {
   return (
     <TextInputButton
       updateTextInputValue={props.updateTextInputValue}
-      insertedText={'[' + AttributeDescriptionMap[props.attribute] + ']'}
+      insertedText={'[' + AttributeDescriptionMap[props.attribute] + '] '}
       icon={AttributeSymbolMap[props.attribute]}
     />
   );

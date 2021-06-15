@@ -50,15 +50,17 @@ export type PlayerUIState = {
     };
   };
 
-  strategicSearch: {
-    highlight1: {
-      value: string;
-    };
-  };
+  strategicSearch: StrategicSearchState;
 
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;
+};
+
+export type StrategicSearchState = {
+  highlight1: {
+    value: string;
+  };
 };
 
 export const newPlayerUIState = (): PlayerUIState => {

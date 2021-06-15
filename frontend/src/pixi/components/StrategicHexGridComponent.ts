@@ -6,7 +6,11 @@ import {
   NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
-import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import { StrategicSearchState } from '../../data/PlayerUIState';
+import {
+  Attribute,
+  NodeContents,
+} from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -43,6 +47,7 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      strategicSearch: gameState.playerUI.strategicSearch,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -225,10 +230,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         virtualLocation
       );
 
-      if (
-        nodeContents.lines?.[0]?.attribute === Attribute.RED0 ||
-        nodeContents.lines?.[1]?.attribute === Attribute.RED0
-      ) {
+      const matched = matchStrategicSearch({
+        nodeContents,
+        query: gameState.playerUI.strategicSearch,
+      });
+
+      if (matched) {
         // graphics.texture = props.args.textures.square;
         // graphics.position = PixiPointFrom(basePosition);
         // graphics.position.x -= props.args.textures.square.width / 2;
@@ -300,3 +307,15 @@ const wrapped = engageLifecycle(StrategicHexGridComponent);
 type wrapped = StrategicHexGridComponent;
 export { wrapped as StrategicHexGridComponent };
 export type { Props as StrategicHexGridComponentProps };
+
+export function matchStrategicSearch(args: {
+  nodeContents: NodeContents;
+  query: StrategicSearchState;
+}): boolean {
+  const { nodeContents, query } = args;
+
+  return (
+    nodeContents.lines?.[0]?.attribute === Attribute.RED0 ||
+    nodeContents.lines?.[1]?.attribute === Attribute.RED0
+  );
+}
