@@ -2,7 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
 import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
-import { AttributeSymbolMap } from '../../game/worldGen/nodeContents/NodeContentsRendering';
+import {
+  AttributeDescriptionMap,
+  AttributeSymbolMap,
+} from '../../game/worldGen/nodeContents/NodeContentsRendering';
 
 export const StrategicTab = React.memo(StrategicTabComponent);
 
@@ -23,6 +26,18 @@ function StrategicTabComponent(props: {
     updaters.playerUI.isTextBoxFocused.enqueueUpdate(false);
   }, [updaters]);
 
+  const onFireSearch = useCallback(() => {
+    updaters.playerUI.strategicSearch.highlight1.enqueueUpdate(() => {
+      return {
+        value: highlightInputValue,
+      };
+    });
+  }, [updaters, highlightInputValue]);
+
+  const onCancelSearch = useCallback(() => {
+    setHighlightInputValue(gameState.playerUI.strategicSearch.highlight1.value);
+  }, [gameState.playerUI.strategicSearch.highlight1.value]);
+
   if (gameState.playerUI.isPixiHidden) {
     return (
       <>
@@ -40,27 +55,30 @@ function StrategicTabComponent(props: {
         <br></br>
         <div>
           Symbols: {/* TODO(bowei): need tooltip text here */}
-          <button
-            onMouseDown={(e) => {
-              // needed to preserve textbox focus: https://stackoverflow.com/questions/12154954/how-to-make-element-not-lose-focus-when-button-is-pressed
-              // keydown does NOT work here!
-              e.preventDefault();
-            }}
-            onPointerDown={(e) => {
-              e.preventDefault();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              setHighlightInputValue((prev) => prev + '[RED]');
-            }}
-          >
-            {AttributeSymbolMap[Attribute.RED0]}
-          </button>
-          <button>{AttributeSymbolMap[Attribute.RED1]}</button>
-          <button>{AttributeSymbolMap[Attribute.RED2]}</button>
-          <button>{AttributeSymbolMap[Attribute.DEL0]}</button>
-          <button>{AttributeSymbolMap[Attribute.DEL1]}</button>
-          <button>{AttributeSymbolMap[Attribute.DEL2]}</button>
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.RED0}
+          />
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.RED1}
+          />
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.RED2}
+          />
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.DEL0}
+          />
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.DEL1}
+          />
+          <SymbolButton
+            updateTextInputValue={setHighlightInputValue}
+            attribute={Attribute.DEL2}
+          />
         </div>
         <br></br>
         <div>
@@ -75,8 +93,8 @@ function StrategicTabComponent(props: {
             onBlur={onBlur}
             value={highlightInputValue}
           ></input>
-          <button>✔️</button>
-          <button>🚫</button>
+          <button onClick={onFireSearch}>✔️</button>
+          <button onClick={onCancelSearch}>🚫</button>
         </div>
         {showAdvancedSearch ? (
           <>
@@ -154,5 +172,31 @@ function StrategicTabComponent(props: {
         )}
       </div>
     </>
+  );
+}
+
+function SymbolButton(props: {
+  updateTextInputValue: (fn: (s: string) => string) => void;
+  attribute: Attribute;
+}) {
+  return (
+    <button
+      onMouseDown={(e) => {
+        // needed to preserve textbox focus: https://stackoverflow.com/questions/12154954/how-to-make-element-not-lose-focus-when-button-is-pressed
+        // keydown does NOT work here!
+        e.preventDefault();
+      }}
+      onPointerDown={(e) => {
+        e.preventDefault();
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        props.updateTextInputValue(
+          (prev) => prev + '[' + AttributeDescriptionMap[props.attribute] + ']'
+        );
+      }}
+    >
+      {AttributeSymbolMap[props.attribute]}
+    </button>
   );
 }

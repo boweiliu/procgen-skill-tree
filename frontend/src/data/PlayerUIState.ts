@@ -50,6 +50,12 @@ export type PlayerUIState = {
     };
   };
 
+  strategicSearch: {
+    highlight1: {
+      value: string;
+    };
+  };
+
   // WIP?
   virtualApproximateScroll?: Vector2;
   strategicGridLocation?: Vector3;
@@ -65,6 +71,11 @@ export const newPlayerUIState = (): PlayerUIState => {
       right: {
         tabs: initialTabLabels['right'],
         activeIndex: 0,
+      },
+    },
+    strategicSearch: {
+      highlight1: {
+        value: '',
       },
     },
     isPixiHidden: true,
@@ -92,7 +103,8 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
     !obj.hasOwnProperty('cursoredNodeLocation') ||
     !obj.hasOwnProperty('isSidebarOpen') ||
     !obj.hasOwnProperty('isTextBoxFocused') ||
-    !obj.hasOwnProperty('tabs')
+    !obj.hasOwnProperty('tabs') ||
+    !obj.hasOwnProperty('strategicSearch')
   ) {
     console.error('Failed deserializing PlayerUIState: ', obj);
     return null;
