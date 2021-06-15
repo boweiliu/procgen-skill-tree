@@ -6,7 +6,7 @@ import Sidebar from './Sidebar';
 import { Tabs } from './Tabs';
 import { TabContentInterface, TAB_NAME } from './TabContentInterface';
 
-const emptyTabLabels = ['EMPTY'];
+const emptyTabLabels: TAB_NAME[] = [TAB_NAME.EMPTY];
 
 /**
  * Manages both sidebars (left & right) as well as anything directly adjacent to them.
