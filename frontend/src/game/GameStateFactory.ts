@@ -4,7 +4,7 @@ import {
   NodeReachableStatus,
   NodeVisibleStatus,
 } from '../data/GameState';
-import { noIntent } from '../data/PlayerIntentState';
+import { newPlayerIntentState } from '../data/PlayerIntentState';
 import { newWindowState } from '../data/WindowState';
 import { LockData, newPlayerSaveState } from '../data/PlayerSaveState';
 import { HashMap } from '../lib/util/data_structures/hash';
@@ -67,11 +67,7 @@ export class GameStateFactory {
         isTextBoxFocused: false,
       },
       computed: {},
-      intent: {
-        activeIntent: noIntent,
-        newIntent: noIntent,
-        endedIntent: noIntent,
-      },
+      intent: newPlayerIntentState(),
       windowState: newWindowState(),
       debug: {
         retriggerVirtualGridDims: () => {},

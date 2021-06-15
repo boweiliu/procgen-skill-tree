@@ -45,3 +45,11 @@ export const noIntent = enumKeys(IntentName).reduce((object: Intent, key) => {
   object[key] = false;
   return object;
 }, {} as Intent);
+
+export const newPlayerIntentState = (): PlayerIntentState => {
+  return {
+    activeIntent: noIntent,
+    newIntent: noIntent,
+    endedIntent: noIntent,
+  };
+};
