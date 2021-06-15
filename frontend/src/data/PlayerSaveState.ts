@@ -1,4 +1,4 @@
-import { LockStatus, NodeTakenStatus } from './GameState';
+import { LockStatus, NodeTakenStatus } from './NodeStatus';
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { ResourceType } from './WorldGenState';

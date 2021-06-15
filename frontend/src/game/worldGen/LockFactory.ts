@@ -1,4 +1,4 @@
-import { LockStatus } from '../../data/GameState';
+import { LockStatus } from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { INTMAX32, squirrel3 } from '../../lib/util/random';

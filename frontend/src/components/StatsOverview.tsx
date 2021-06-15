@@ -9,7 +9,6 @@ import {
   ResourceModifier,
   ResourceNontrivialType,
   ResourceType,
-  ResourceTypeAndModifier,
 } from '../data/GameState';
 import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 
@@ -18,6 +17,23 @@ type Props = {
   playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
   allocatedPointNodeSet: HashSet<PointNodeRef>;
 };
+
+export class ResourceTypeAndModifier {
+  public type: ResourceNontrivialType;
+  public modifier: ResourceModifier;
+
+  constructor(args: {
+    type: ResourceNontrivialType;
+    modifier: ResourceModifier;
+  }) {
+    this.type = args.type;
+    this.modifier = args.modifier;
+  }
+
+  public hash(): string {
+    return this.type.toString() + ',' + this.modifier.toString();
+  }
+}
 
 // export default React.memo(StatsOverviewComponent); // fails with hashmap
 export default StatsOverviewComponent;

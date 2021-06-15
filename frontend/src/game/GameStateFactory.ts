@@ -1,9 +1,9 @@
+import { GameState } from '../data/GameState';
 import {
-  GameState,
   LockStatus,
   NodeReachableStatus,
   NodeVisibleStatus,
-} from '../data/GameState';
+} from '../data/NodeStatus';
 import { newPlayerIntentState } from '../data/PlayerIntentState';
 import { newWindowState } from '../data/WindowState';
 import { LockData, newPlayerSaveState } from '../data/PlayerSaveState';

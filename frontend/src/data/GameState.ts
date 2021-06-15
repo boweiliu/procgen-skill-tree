@@ -3,16 +3,16 @@ import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { Const } from '../lib/util/misc';
 import { DebugState } from './DebugState';
+import {
+  NodeVisibleStatus,
+  NodeReachableStatus,
+  LockStatus,
+} from './NodeStatus';
 import { PlayerIntentState } from './PlayerIntentState';
 import { PlayerSaveState } from './PlayerSaveState';
 import { PlayerUIState } from './PlayerUIState';
 import { WindowState } from './WindowState';
-import {
-  ResourceModifier,
-  ResourceNontrivialType,
-  ResourceType,
-  WorldGenState,
-} from './WorldGenState';
+import { WorldGenState } from './WorldGenState';
 
 export { PointNodeRef, ChunkRef } from './PointNodeRef';
 export type { PlayerSaveState, Quest } from './PlayerSaveState';
@@ -66,82 +66,17 @@ export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   });
 }
 
-export enum NodeAllocatedStatus {
-  TAKEN = 'TAKEN', // already allocated
-  AVAILABLE = 'AVAILABLE', // visible and adjacent to other allocated nodes, but not already allocated
-  UNREACHABLE = 'UNREACHABLE', // visible but not immediately allocatable due to being not adjacent
-  HIDDEN = 'HIDDEN', // hidden due to fog of war
-}
-
-/**
- * taken implies reachable. reachable implies visible.
- */
-export type NodeTakenStatus = {
-  taken: boolean;
-};
-export type NodeVisibleStatus = {
-  visible: boolean;
-};
-export type NodeReachableStatus = {
-  reachable: boolean;
-};
-/**
- * Immutable, readable booleans
- */
-export enum BoolEnum {
-  true = 'true',
-  false = 'false',
-}
-// eslint-disable-next-line
-export const NodeTakenStatus: { [k in BoolEnum]: NodeTakenStatus } = {
-  true: { taken: true },
-  false: { taken: false },
-};
-// eslint-disable-next-line
-export const NodeVisibleStatus: { [k in BoolEnum]: NodeVisibleStatus } = {
-  true: { visible: true },
-  false: { visible: false },
-};
-// eslint-disable-next-line
-export const NodeReachableStatus: { [k in BoolEnum]: NodeReachableStatus } = {
-  true: { reachable: true },
-  false: { reachable: false },
-};
-
-export enum LockStatus {
-  CLOSED = 'CLOSED',
-  TICKING = 'TICKING',
-  OPEN = 'OPEN',
-}
-
 export type ComputedState = {
-  // DEPRECATED
-  playerResourceAmounts?: { [k in ResourceType]: number };
-  playerResourceNodesAggregated?: HashMap<ResourceTypeAndModifier, number>;
-
-  // NOT DEPRECATED
   /**
    * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
-   * Also stores the allocatability (whether it's connected to the existing tree).
    */
   fogOfWarStatusMap?: HashMap<Vector3, NodeVisibleStatus>;
+  /**
+   * Stores the allocatability (whether it's connected to the existing tree).
+   */
   reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
+  /**
+   * WIP - not really used. intended to store lock open/close status
+   */
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
 };
-
-export class ResourceTypeAndModifier {
-  public type: ResourceNontrivialType;
-  public modifier: ResourceModifier;
-
-  constructor(args: {
-    type: ResourceNontrivialType;
-    modifier: ResourceModifier;
-  }) {
-    this.type = args.type;
-    this.modifier = args.modifier;
-  }
-
-  public hash(): string {
-    return this.type.toString() + ',' + this.modifier.toString();
-  }
-}

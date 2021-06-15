@@ -9,7 +9,7 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { NodeAllocatedStatus } from '../../data/GameState';
+import { NodeAllocatedStatus } from '../../data/NodeStatus';
 import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';

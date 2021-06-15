@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { GameState } from '../../data/GameState';
 import {
-  GameState,
   NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
-} from '../../data/GameState';
+} from '../../data/NodeStatus';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';

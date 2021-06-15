@@ -4,7 +4,7 @@ import './GameArea.css';
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { NodeAllocatedStatus } from '../../data/GameState';
+import { NodeAllocatedStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 
 /**
