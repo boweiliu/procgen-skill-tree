@@ -1,23 +1,15 @@
 import {
   GameState,
-  PointNodeRef,
   LockStatus,
   noIntent,
-  WindowState,
-  NodeTakenStatus,
   NodeReachableStatus,
   NodeVisibleStatus,
 } from '../data/GameState';
-import { LockData } from '../data/PlayerSaveState';
-import {
-  HashMap,
-  HashSet,
-  KeyedHashMap,
-} from '../lib/util/data_structures/hash';
-import { Vector2 } from '../lib/util/geometry/vector2';
+import { WindowState } from '../data/WindowState';
+import { LockData, newPlayerSaveState } from '../data/PlayerSaveState';
+import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { LazyHashMap } from '../lib/util/lazy';
-import { computePlayerResourceAmounts } from './ComputeState';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
 import {
@@ -47,14 +39,6 @@ export class GameStateFactory {
       z: 0,
       startingChunks: 0,
     });
-    const origin = new Vector2(0, 0);
-    const firstId = zLevel.chunks.get(origin)?.pointNodes.get(origin)?.id!;
-    const pointNodeRef: PointNodeRef = new PointNodeRef({
-      z: 0,
-      chunkCoord: origin,
-      pointNodeId: firstId,
-      pointNodeCoord: origin,
-    });
 
     const windowState: WindowState = {
       orientation: 'original',
@@ -80,22 +64,7 @@ export class GameStateFactory {
         lockMap: lockDataMap,
         nodeContentsMap,
       },
-      playerSave: {
-        // justAllocated: undefined,
-        activeQuest: undefined,
-        spSpentThisQuest: undefined,
-        questProgressHistory: [],
-        questInitialAmount: 0,
-        questsCompleted: [],
-        allocatedPointNodeSet: new HashSet([pointNodeRef]),
-        allocatedPointNodeHistory: [pointNodeRef],
-        score: 0,
-
-        // make sure to allocate the beginning node
-        allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
-          [Vector3.Zero, NodeTakenStatus.true],
-        ]),
-      },
+      playerSave: newPlayerSaveState(),
       playerUI: {
         isPixiHidden: true,
         virtualGridLocation: Vector3.Zero,
@@ -120,7 +89,7 @@ export class GameStateFactory {
         isFlipCursored: () => {},
       },
     };
-    gameState.computed = { ...computePlayerResourceAmounts(gameState) };
+    gameState.computed = {};
     gameState.computed.lockStatusMap = new HashMap();
     gameState.computed.fogOfWarStatusMap = new HashMap();
     gameState.computed.reachableStatusMap = new HashMap();
