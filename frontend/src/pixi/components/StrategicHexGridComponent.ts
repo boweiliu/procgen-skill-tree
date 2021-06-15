@@ -11,7 +11,13 @@ import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
+import {
+  Const,
+  extractDeps,
+  extractAccessPaths,
+  interpolateColor,
+  addColor,
+} from '../../lib/util/misc';
 import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
@@ -110,7 +116,40 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     for (let [v, graphics] of this.hexGrid.entries()) {
       const animation = this.animations.get(v);
       if (!animation) continue;
-      // graphics.tint
+
+      // the last frame was rendered at this phase in the animation
+      let phase = animation.phase || 0;
+
+      // increment it. phase of 1 == a full period == animation.period secs
+      let newPhase =
+        (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+
+      // animation starts with bezierX == 0, goes up to 1, then back down
+      let bezierX = 1 - Math.abs(newPhase * 2 - 1);
+      /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
+      // ease-in
+      // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
+      // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
+      // ease-in-out
+      let bezierY =
+        bezierX < 0.5
+          ? 2 * (bezierX * bezierX)
+          : 1 - 2 * (1 - bezierX) * (1 - bezierX);
+
+      // calculate the proper tint now
+      let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
+
+      // set the tint
+      // tintProp = tintProp * .75 + 0.25; // minimum opacity = 0.25
+      graphics.tint = interpolateColor({
+        target: animation.max,
+        base: animation.min,
+        proportion: tintProp,
+      });
+      // console.log({ delta, phase, newPhase, bezierX, tintProp, tint: graphics.tint });
+
+      // update phase on animation object
+      animation.phase = newPhase;
       // animation
     }
   }
@@ -195,7 +234,16 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.position.x -= props.args.textures.square.width / 2;
         // graphics.position.y -= props.args.textures.square.height / 2;
         // graphics.tint = COLORS.nodeBlue;
-        this.animations.put(v, {});
+        this.animations.put(v, {
+          // max: addColor(COLORS.nodeBlue, graphics.tint),
+          // max: graphics.tint === COLORS.borderBlack ? COLORS.black : COLORS.nodeBlue,
+          max: COLORS.nodeBlue,
+          // max: graphics.tint,
+          min: graphics.tint,
+          periodSecs: 2,
+          mode: 'start-min ease-in',
+          phase: 0,
+        });
       } else {
         this.animations.put(v, null);
       }
