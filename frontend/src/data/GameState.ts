@@ -12,21 +12,6 @@ import { PlayerUIState } from './PlayerUIState';
 import { WindowState } from './WindowState';
 import { WorldGenState } from './WorldGenState';
 
-export { PointNodeRef, ChunkRef } from './PointNodeRef';
-export type { PlayerSaveState, Quest } from './PlayerSaveState';
-export type {
-  WorldGenState,
-  ChunkGen,
-  ZLevelGen,
-  PointNodeGen,
-  ResourceType,
-} from './WorldGenState';
-export {
-  ChunkGenConstants,
-  ResourceModifier,
-  ResourceNontrivialType,
-} from './WorldGenState';
-
 /**
  * Data owned by the master "App" component, to be made available as props to ALL subcomponents (both pixi and react); react uses context providers to make this easier
  * 1. world generation data, stuff that was computed off of the random seed and is stored so we can do logic off of it,

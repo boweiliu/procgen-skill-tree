@@ -1,6 +1,6 @@
 import React from 'react';
-import { PointNodeRef, ResourceType, WorldGenState } from '../data/GameState';
-import { NodeType } from '../data/WorldGenState';
+import { PointNodeRef } from '../data/PointNodeRef';
+import { NodeType, WorldGenState } from '../data/WorldGenState';
 import { canAllocate } from '../game/Neighbors';
 import { HashSet } from '../lib/util/data_structures/hash';
 

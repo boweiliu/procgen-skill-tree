@@ -1,13 +1,13 @@
 import {
-  WorldGenState,
   ChunkGen,
-  PointNodeGen,
   ChunkGenConstants,
-  ZLevelGen,
+  NodeType,
+  PointNodeGen,
   ResourceModifier,
   ResourceNontrivialType,
-} from '../../data/GameState';
-import { NodeType } from '../../data/WorldGenState';
+  WorldGenState,
+  ZLevelGen,
+} from '../../data/WorldGenState';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { INTMAX32, squirrel3 } from '../../lib/util/random';

@@ -1,11 +1,8 @@
 import { HashSet } from '../lib/util/data_structures/hash';
 import { enumKeys } from '../lib/util/misc';
-import {
-  ChunkGenConstants,
-  PointNodeRef,
-  WorldGenState,
-} from '../data/GameState';
 import { Vector2 } from '../lib/util/geometry/vector2';
+import { PointNodeRef } from '../data/PointNodeRef';
+import { WorldGenState, ChunkGenConstants } from '../data/WorldGenState';
 
 enum Direction {
   NORTHWEST = 'NORTHWEST',

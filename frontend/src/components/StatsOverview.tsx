@@ -2,15 +2,13 @@ import './StatsOverview.css';
 
 import classnames from 'classnames';
 import React, { useState } from 'react';
+import { HashMap, HashSet } from '../lib/util/data_structures/hash';
 import {
-  GameState,
-  PointNodeRef,
-  Quest,
   ResourceModifier,
   ResourceNontrivialType,
   ResourceType,
-} from '../data/GameState';
-import { HashMap, HashSet } from '../lib/util/data_structures/hash';
+} from '../data/WorldGenState';
+import { PointNodeRef } from '../data/PointNodeRef';
 
 type Props = {
   playerResourceAmounts?: { [k in ResourceType]: number };

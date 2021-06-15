@@ -2,12 +2,14 @@ import './QuestProgress.css';
 
 import classnames from 'classnames';
 import React, { useState } from 'react';
-import { GameState, Quest, ResourceType } from '../data/GameState';
+import { GameState } from '../data/GameState';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import {
   Grade,
   remapEfficiencyGradeToNumber,
 } from '../game/EfficiencyCalculator';
+import { Quest } from '../data/PlayerSaveState';
+import { ResourceType } from '../data/WorldGenState';
 
 type Props = {
   spSpentThisQuest: number | undefined;

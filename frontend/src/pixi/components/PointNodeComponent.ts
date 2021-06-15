@@ -1,12 +1,7 @@
 import * as Pixi from 'pixi.js';
 import { RenderedChunkConstants } from './ChunkComponent';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import {
-  GameState,
-  PointNodeGen,
-  PointNodeRef,
-  ResourceModifier,
-} from '../../data/GameState';
+import { GameState } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { multiplyColor } from '../../lib/util/misc';
@@ -15,7 +10,13 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { RootComponentState } from './RootComponent';
 import { PointNodeTextureSet } from '../textures/PointNodeTexture';
 import COLORS from '../colors';
-import { NodeType, ResourceNontrivialType } from '../../data/WorldGenState';
+import {
+  NodeType,
+  PointNodeGen,
+  ResourceModifier,
+  ResourceNontrivialType,
+} from '../../data/WorldGenState';
+import { PointNodeRef } from '../../data/PointNodeRef';
 
 type Props = {
   delta: number;
