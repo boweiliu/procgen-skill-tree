@@ -3,6 +3,7 @@ import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { PlayerUIState } from '../../data/PlayerUIState';
+import { WorldGenStateFactory } from '../../game/worldGen/WorldGenStateFactory';
 
 export function DebugTabContent(props: {
   gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
@@ -115,6 +116,7 @@ export function DebugTabContent(props: {
 
   const clearLocalStorage = useCallback(() => {
     PlayerUIState.clear();
+    new WorldGenStateFactory({}).clear();
     props.updaters.justDisabledSave.enqueueUpdate(true);
   }, [props.updaters]);
 
