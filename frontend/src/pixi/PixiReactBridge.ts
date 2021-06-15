@@ -8,6 +8,7 @@ import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import COLORS from './colors';
 // eslint-disable-next-line
 import createBunnyExample from './BunnyExample';
+import { appSizeFromWindowSize } from '../data/WindowState';
 
 type Props = {
   args: {
@@ -22,13 +23,6 @@ type State = {
   appSize: Vector2;
   originalAppSize: Vector2;
 };
-
-function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
-  return new Vector2({
-    x: Math.min(1920, (window?.x || Infinity) - 24),
-    y: Math.min(1080, (window?.y || Infinity) - 24),
-  });
-}
 
 /**
  * Pixi side of a pixi-react bridge. This class owns a pixi application and receives props updates from react by way of rerender().

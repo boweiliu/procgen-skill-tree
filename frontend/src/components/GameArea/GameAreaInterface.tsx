@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { GameState, appSizeFromWindowSize } from '../../data/GameState';
+import { GameState } from '../../data/GameState';
+import { appSizeFromWindowSize } from '../../data/WindowState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { extractDeps } from '../../lib/util/misc';
