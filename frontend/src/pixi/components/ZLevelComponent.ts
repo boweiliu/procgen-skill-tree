@@ -1,11 +1,7 @@
 import * as Pixi from 'pixi.js';
-import {
-  ChunkGen,
-  ChunkRef,
-  GameState,
-  PointNodeRef,
-  ZLevelGen,
-} from '../../data/GameState';
+import { GameState } from '../../data/GameState';
+import { PointNodeRef, ChunkRef } from '../../data/PointNodeRef';
+import { ZLevelGen, ChunkGen } from '../../data/WorldGenState';
 import { ZLevelGenFactory } from '../../game/worldGen/WorldGenStateFactory';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';

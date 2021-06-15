@@ -1,12 +1,6 @@
 import * as Pixi from 'pixi.js';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
-import {
-  ChunkGen,
-  ChunkGenConstants,
-  ChunkRef,
-  GameState,
-  PointNodeRef,
-} from '../../data/GameState';
+import { GameState } from '../../data/GameState';
 import {
   PointNodeComponent,
   PointNodeComponentProps,
@@ -17,6 +11,8 @@ import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { RootComponentState } from './RootComponent';
 import { PointNodeTextureSet } from '../textures/PointNodeTexture';
+import { ChunkRef, PointNodeRef } from '../../data/PointNodeRef';
+import { ChunkGenConstants, ChunkGen } from '../../data/WorldGenState';
 
 export class RenderedChunkConstants {
   //   public static SPACING_PX: number = 24;
