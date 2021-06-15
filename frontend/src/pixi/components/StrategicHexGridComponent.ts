@@ -66,6 +66,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public state: State;
   private graphics: Pixi.Sprite;
   private hexGrid: KeyedHashMap<Vector2, Pixi.Sprite> = new KeyedHashMap();
+  private animations: KeyedHashMap<Vector2, any> = new KeyedHashMap();
 
   constructor(props: Props) {
     super(props);
@@ -107,7 +108,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected updateSelf(props: Props) {
     const { delta } = props;
     for (let [v, graphics] of this.hexGrid.entries()) {
+      const animation = this.animations.get(v);
+      if (!animation) continue;
       // graphics.tint
+      // animation
     }
   }
 
