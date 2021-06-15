@@ -37,3 +37,37 @@ export const newPlayerUIState = (): PlayerUIState => {
     isTextBoxFocused: false,
   };
 };
+
+const serializeToObject = (s: PlayerUIState): object => {
+  return {
+    ...s,
+    virtualGridLocation: Vector3.SerializeToObject(s.virtualGridLocation),
+  };
+};
+
+const serialize = (s: PlayerUIState) => JSON.stringify(serializeToObject(s));
+
+const deserializeFromObject = (obj: object): PlayerUIState => {
+  if (
+    !obj.hasOwnProperty('isPixiHidden') ||
+    !obj.hasOwnProperty('virtualGridLocation') ||
+    !obj.hasOwnProperty('cursoredNodeLocation') ||
+    !obj.hasOwnProperty('isSidebarOpen') ||
+    !obj.hasOwnProperty('isTextBoxFocused')
+  ) {
+    console.error('Failed deserializing PlayerUIState');
+  }
+
+  return {
+    ...obj,
+    virtualGridLocation: Vector3.Deserialize((obj as any).virtualGridLocation),
+  } as PlayerUIState;
+};
+
+const deserialize = (obj: string) => deserializeFromObject(JSON.parse(obj));
+
+export const PlayerUiState = {
+  new: newPlayerUIState,
+  serialize,
+  deserialize,
+};

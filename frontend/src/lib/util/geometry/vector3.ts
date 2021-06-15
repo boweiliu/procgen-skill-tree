@@ -380,6 +380,10 @@ export class Vector3 {
   }
 
   static Serialize(obj: IVector3): string {
-    return JSON.stringify({ x: obj.x, y: obj.y });
+    return JSON.stringify(this.SerializeToObject(obj));
+  }
+
+  static SerializeToObject(obj: IVector3): object {
+    return { x: obj.x, y: obj.y, z: obj.z };
   }
 }

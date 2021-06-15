@@ -328,6 +328,10 @@ export class Vector2 {
   }
 
   static Serialize(obj: Vector2): string {
-    return JSON.stringify({ x: obj.x, y: obj.y });
+    return JSON.stringify(this.SerializeToObject(obj));
+  }
+
+  static SerializeToObject(obj: Vector2): object {
+    return { x: obj.x, y: obj.y };
   }
 }
