@@ -6,3 +6,11 @@ export type WindowState = {
   innerWidth: number;
   innerHeight: number;
 };
+
+export const newWindowState = (): WindowState => {
+  return {
+    orientation: 'original',
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+  };
+};

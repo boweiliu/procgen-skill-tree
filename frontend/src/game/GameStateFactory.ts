@@ -1,11 +1,11 @@
 import {
   GameState,
   LockStatus,
-  noIntent,
   NodeReachableStatus,
   NodeVisibleStatus,
 } from '../data/GameState';
-import { WindowState } from '../data/WindowState';
+import { noIntent } from '../data/PlayerIntentState';
+import { newWindowState } from '../data/WindowState';
 import { LockData, newPlayerSaveState } from '../data/PlayerSaveState';
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
@@ -40,12 +40,6 @@ export class GameStateFactory {
       startingChunks: 0,
     });
 
-    const windowState: WindowState = {
-      orientation: 'original',
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-    };
-
     const lockFactory = new LockFactory({});
     const lockDataMap = new LazyHashMap<Vector3, LockData | undefined>((k) =>
       lockFactory.create({ seed: mySeed, location: k })
@@ -78,7 +72,7 @@ export class GameStateFactory {
         newIntent: noIntent,
         endedIntent: noIntent,
       },
-      windowState,
+      windowState: newWindowState(),
       debug: {
         retriggerVirtualGridDims: () => {},
         debugShowScrollbars: false,

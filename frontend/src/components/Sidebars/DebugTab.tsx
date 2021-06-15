@@ -101,6 +101,15 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const saveLocalStorage = useCallback(() => {
+    // WIP
+    // window.localStorage.setItem('gameState', props.gameState)
+  }, [props.gameState]);
+  const loadLocalStorage = useCallback(() => {
+    // WIP
+    // window.localStorage.setItem('gameState', props.gameState)
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -157,6 +166,16 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={toggleTextBoxFocused}>
             toggle text box focused
+          </button>
+        </div>
+        <div>
+          <button onClick={saveLocalStorage}>
+            save state to local storage
+          </button>
+        </div>
+        <div>
+          <button onClick={loadLocalStorage}>
+            load state from local storage
           </button>
         </div>
       </div>
