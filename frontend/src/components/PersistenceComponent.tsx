@@ -12,6 +12,8 @@ export function PersistenceComponent(props: { gameState: GameState }) {
     // return 'onunload'; // adds a console prompt
   }, [gameState.playerUI]);
 
+  // NOTE(bowei): window.addEventListener does not work here i think: https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+  // https://gist.github.com/muzfr7/7e15582add46e74dee111002ec6cf594
   useEffect(() => {
     window.onbeforeunload = onUnload;
     return () => {
