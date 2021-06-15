@@ -215,12 +215,13 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
       this.didForceUpdate?.();
       return;
+    } else {
+      this.updateChildren?.(nextProps);
+      this._updateChildren(nextProps); // implementation should call children._update in here
+      this.renderSelf(nextProps);
+      this._staleProps = nextProps;
+      new Promise((resolve) => resolve(this.didUpdate?.()));
     }
-    this.updateChildren?.(nextProps);
-    this._updateChildren(nextProps); // implementation should call children._update in here
-    this.renderSelf(nextProps);
-    this._staleProps = nextProps;
-    new Promise((resolve) => resolve(this.didUpdate?.()));
   }
 
   protected updateChildren?(nextProps: P): void;

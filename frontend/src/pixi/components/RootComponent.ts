@@ -116,6 +116,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     ): StrategicHexGridComponentProps => {
       const { gameState } = props;
       return {
+        delta: props.delta,
         args: {
           position: Vector2.Zero,
           textures: state.simpleTexture.get(),

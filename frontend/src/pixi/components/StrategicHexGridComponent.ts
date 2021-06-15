@@ -16,6 +16,7 @@ import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
+  delta: number;
   args: {
     position: Vector2;
     textures: {
@@ -103,7 +104,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
-  protected updateSelf(props: Props) {}
+  protected updateSelf(props: Props) {
+    const { delta } = props;
+    for (let [v, graphics] of this.hexGrid.entries()) {
+      // graphics.tint
+    }
+  }
 
   protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.args.position);
@@ -204,7 +210,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   ): boolean {
     for (let key of Object.keys(staleProps) as (keyof Props)[]) {
       // if (key === 'delta' || key === 'args' || key === 'updaters') {
-      if (key === 'args') {
+      if (key === 'args' || key === 'delta') {
         continue;
       }
       if (key === 'gameState') {
