@@ -316,9 +316,10 @@ export class Vector2 {
     return this.lerp(other, t);
   }
 
-  static Deserialize(obj: any): Vector2 {
+  static Deserialize(obj: any): Vector2 | undefined {
     if (!obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
       console.error('Failed deserializing point');
+      return undefined;
     }
 
     return new Vector2({

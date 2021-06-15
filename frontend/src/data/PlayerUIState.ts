@@ -47,7 +47,9 @@ const serializeToObject = (s: PlayerUIState): object => {
 
 const serialize = (s: PlayerUIState) => JSON.stringify(serializeToObject(s));
 
-const deserializeFromObject = (obj: object): PlayerUIState => {
+const deserializeFromObject = (obj: {
+  [k: string]: any;
+}): PlayerUIState | undefined => {
   if (
     !obj.hasOwnProperty('isPixiHidden') ||
     !obj.hasOwnProperty('virtualGridLocation') ||
@@ -58,16 +60,55 @@ const deserializeFromObject = (obj: object): PlayerUIState => {
     console.error('Failed deserializing PlayerUIState');
   }
 
+  const virtualGridLocation = Vector3.Deserialize(obj.virtualGridLocation);
+  if (!virtualGridLocation) {
+    return undefined;
+  }
+
   return {
     ...obj,
-    virtualGridLocation: Vector3.Deserialize((obj as any).virtualGridLocation),
+    virtualGridLocation,
   } as PlayerUIState;
 };
 
 const deserialize = (obj: string) => deserializeFromObject(JSON.parse(obj));
 
-export const PlayerUiState = {
+const storageKey = 'PlayerUIState';
+
+/**
+ * Tries to load from local storage and falls back to creating a new object if unsuccessful.
+ * see: https://gist.github.com/muzfr7/7e15582add46e74dee111002ec6cf594
+ * http://vaughnroyko.com/idbonbeforeunload/
+ * https://discourse.mozilla.org/t/saving-to-localstorage-on-window-close/35627/7
+ * https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+ * https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+ */
+const tryLoad = (): PlayerUIState => {
+  const loaded = load();
+  if (loaded) {
+    return loaded;
+  } else {
+    console.log('Failed to load PlayerUIState');
+    return newPlayerUIState();
+  }
+};
+
+const load = (): PlayerUIState | undefined => {
+  const data = window.localStorage.getItem(storageKey);
+  const loaded = (data && deserialize(data)) || undefined;
+  return loaded;
+};
+
+const store = (obj: PlayerUIState) => {
+  const data = serialize(obj);
+  window.localStorage.setItem(storageKey, data);
+};
+
+export const PlayerUIState = {
   new: newPlayerUIState,
   serialize,
   deserialize,
+  tryLoad,
+  load,
+  store,
 };

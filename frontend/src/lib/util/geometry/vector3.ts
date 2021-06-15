@@ -363,13 +363,14 @@ export class Vector3 {
   //   return this.lerp(other, t);
   // }
 
-  static Deserialize(obj: any): Vector3 {
+  static Deserialize(obj: any): Vector3 | undefined {
     if (
       !obj.hasOwnProperty('x') ||
       !obj.hasOwnProperty('y') ||
       !obj.hasOwnProperty('z')
     ) {
       console.error('Failed deserializing vector3');
+      return undefined;
     }
 
     return new Vector3({

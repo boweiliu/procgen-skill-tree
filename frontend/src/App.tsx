@@ -19,7 +19,7 @@ import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
 import { SidebarsInterface } from './components/Sidebars/SidebarsInterface';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
-  new GameStateFactory({}).create(+new Date())
+  new GameStateFactory({}).loadOrCreate(+new Date())
 );
 
 /**

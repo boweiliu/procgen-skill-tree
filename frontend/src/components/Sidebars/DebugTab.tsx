@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { Vector2 } from '../../lib/util/geometry/vector2';
+import { PlayerUIState } from '../../data/PlayerUIState';
 
 export function DebugTabContent(props: {
   gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
@@ -102,12 +103,14 @@ export function DebugTabContent(props: {
   }, [props.updaters]);
 
   const saveLocalStorage = useCallback(() => {
-    // WIP
-    // window.localStorage.setItem('gameState', props.gameState)
+    PlayerUIState.store(props.gameState.playerUI);
   }, [props.gameState]);
+
   const loadLocalStorage = useCallback(() => {
-    // WIP
-    // window.localStorage.setItem('gameState', props.gameState)
+    const loaded = PlayerUIState.load();
+    if (loaded) {
+      props.updaters.playerUI.enqueueUpdate(() => loaded);
+    }
   }, [props.updaters]);
 
   if (props.hidden) {
