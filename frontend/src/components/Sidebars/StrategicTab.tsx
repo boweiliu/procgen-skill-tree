@@ -41,11 +41,9 @@ function StrategicTabComponent(props: {
         <div>
           Symbols: {/* TODO(bowei): need tooltip text here */}
           <button
-            onKeyDown={(e) => {
-              e.preventDefault();
-            }}
             onMouseDown={(e) => {
               // needed to preserve textbox focus: https://stackoverflow.com/questions/12154954/how-to-make-element-not-lose-focus-when-button-is-pressed
+              // keydown does NOT work here!
               e.preventDefault();
             }}
             onPointerDown={(e) => {
@@ -71,6 +69,7 @@ function StrategicTabComponent(props: {
             type={'text'}
             onFocus={onFocus}
             onChange={(e) => {
+              // need to set value manually: https://stackoverflow.com/questions/41736213/why-cant-i-change-my-input-value-in-react-even-with-the-onchange-listener
               setHighlightInputValue(e.target.value);
             }}
             onBlur={onBlur}
