@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
-import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import {
+  Attribute,
+  Modifier,
+} from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeDescriptionMap,
   AttributeSymbolMap,
@@ -78,6 +81,19 @@ function StrategicTabComponent(props: {
           <SymbolButton
             updateTextInputValue={setHighlightInputValue}
             attribute={Attribute.DEL2}
+          />
+          <br></br>
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            id={Modifier.FLAT}
+            icon={'+'}
+            insertedText={'[Flat]'}
+          />
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            id={Modifier.INCREASED}
+            icon={'%'}
+            insertedText={'[Increased]'}
           />
         </div>
         <br></br>
@@ -180,6 +196,21 @@ function SymbolButton(props: {
   attribute: Attribute;
 }) {
   return (
+    <TextInputButton
+      updateTextInputValue={props.updateTextInputValue}
+      insertedText={'[' + AttributeDescriptionMap[props.attribute] + ']'}
+      icon={AttributeSymbolMap[props.attribute]}
+    />
+  );
+}
+
+function TextInputButton(props: {
+  updateTextInputValue: (fn: (s: string) => string) => void;
+  icon: string;
+  id?: any;
+  insertedText: string;
+}) {
+  return (
     <button
       onMouseDown={(e) => {
         // needed to preserve textbox focus: https://stackoverflow.com/questions/12154954/how-to-make-element-not-lose-focus-when-button-is-pressed
@@ -191,12 +222,10 @@ function SymbolButton(props: {
       }}
       onClick={(e) => {
         e.preventDefault();
-        props.updateTextInputValue(
-          (prev) => prev + '[' + AttributeDescriptionMap[props.attribute] + ']'
-        );
+        props.updateTextInputValue((prev) => prev + props.insertedText);
       }}
     >
-      {AttributeSymbolMap[props.attribute]}
+      {props.icon}
     </button>
   );
 }
