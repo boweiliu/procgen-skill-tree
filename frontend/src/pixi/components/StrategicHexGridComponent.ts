@@ -241,7 +241,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           // max: graphics.tint,
           min: graphics.tint,
           periodSecs: 2,
-          mode: 'start-min ease-in',
+          mode: 'start-min ease-in-out',
           phase: 0,
         });
       } else {
