@@ -102,6 +102,8 @@ export function GameAreaInterface(props: {
 
   const subGameState: GameAreaSubState = useMemo(() => {
     return extractGameAreaSubState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
   }, depsGameAreaSubState(gameState));
 
   // TODO(bowei): improve this abstraction??

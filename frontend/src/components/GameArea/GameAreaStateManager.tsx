@@ -262,9 +262,9 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
-  // TODO(bowei): use custom hook here so react doesnt complain so much
   const subGameState = useMemo(() => {
     return extractGameGridSubState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
     // eslint-disable-next-line
   }, depsGameGridSubState(gameState));
 

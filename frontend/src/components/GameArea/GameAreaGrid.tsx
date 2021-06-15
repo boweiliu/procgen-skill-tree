@@ -1,7 +1,7 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import {
@@ -76,7 +76,7 @@ function Component(props: {
   const startTime = +new Date();
 
   debug?.rerenderGameAreaGrid();
-  const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
+  // const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
   const flipCursored = debug?.isFlipCursored?.() || false;
   // console.log('Game area grid rerender');
 
