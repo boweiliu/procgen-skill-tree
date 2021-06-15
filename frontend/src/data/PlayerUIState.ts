@@ -104,6 +104,7 @@ const store = (obj: PlayerUIState) => {
   window.localStorage.setItem(storageKey, data);
 };
 
+// eslint-disable-next-line
 export const PlayerUIState = {
   new: newPlayerUIState,
   serialize,

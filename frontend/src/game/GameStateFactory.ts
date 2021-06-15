@@ -13,7 +13,7 @@ import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
-import { newPlayerUIState, PlayerUIState } from '../data/PlayerUIState';
+import { PlayerUIState } from '../data/PlayerUIState';
 
 export type GameStateConfig = any;
 
