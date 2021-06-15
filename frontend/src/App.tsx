@@ -17,9 +17,10 @@ import {
 } from './lib/util/updaterGenerator';
 import { GameAreaInterface } from './components/GameArea/GameAreaInterface';
 import { SidebarsInterface } from './components/Sidebars/SidebarsInterface';
+import { PersistenceComponent } from './components/PersistenceComponent';
 
 const initialGameState: Lazy<GameState> = new Lazy(() =>
-  new GameStateFactory({}).create(+new Date())
+  new GameStateFactory({}).loadOrCreate(+new Date())
 );
 
 /**
@@ -109,6 +110,7 @@ function App() {
         updaters={updaters.intent}
       />
       <WindowListenerComponent updaters={updaters.windowState} />
+      <PersistenceComponent gameState={gameState} />
     </div>
   );
 }

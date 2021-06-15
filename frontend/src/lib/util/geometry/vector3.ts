@@ -363,13 +363,14 @@ export class Vector3 {
   //   return this.lerp(other, t);
   // }
 
-  static Deserialize(obj: any): Vector3 {
+  static Deserialize(obj: any): Vector3 | undefined {
     if (
       !obj.hasOwnProperty('x') ||
       !obj.hasOwnProperty('y') ||
       !obj.hasOwnProperty('z')
     ) {
       console.error('Failed deserializing vector3');
+      return undefined;
     }
 
     return new Vector3({
@@ -380,6 +381,10 @@ export class Vector3 {
   }
 
   static Serialize(obj: IVector3): string {
-    return JSON.stringify({ x: obj.x, y: obj.y });
+    return JSON.stringify(this.SerializeToObject(obj));
+  }
+
+  static SerializeToObject(obj: IVector3): object {
+    return { x: obj.x, y: obj.y, z: obj.z };
   }
 }

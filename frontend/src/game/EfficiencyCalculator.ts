@@ -1,4 +1,4 @@
-import { PlayerSaveState } from '../data/GameState';
+import { PlayerSaveState } from '../data/PlayerSaveState';
 import { Const } from '../lib/util/misc';
 
 export function computeQuestEfficiencyPercent(

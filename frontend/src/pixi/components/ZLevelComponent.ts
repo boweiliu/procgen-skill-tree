@@ -1,12 +1,7 @@
 import * as Pixi from 'pixi.js';
-import {
-  ChunkGen,
-  ChunkRef,
-  GameState,
-  PointNodeRef,
-  ZLevelGen,
-} from '../../data/GameState';
-import { ZLevelGenFactory } from '../../game/worldGen/WorldGenStateFactory';
+import { GameState } from '../../data/GameState';
+import { PointNodeRef, ChunkRef } from '../../data/PointNodeRef';
+import { ZLevelGen, ChunkGen } from '../../data/WorldGenState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -59,17 +54,17 @@ class ZLevelComponent2 extends LifecycleHandlerBase<Props, State> {
   protected didMount() {
     const { updaters } = this._staleProps;
     // if we mounted but our data is not generated, please generate ourselves
-    updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
-      if (!prev[this._staleProps.z]) {
-        return {
-          [this._staleProps.z]: new ZLevelGenFactory({}).create({
-            seed: prevGameState.worldGen.seed,
-            z: this._staleProps.z,
-          }),
-        };
-      }
-      return prev;
-    });
+    // updaters.worldGen.zLevels.enqueueUpdate((prev, prevGameState) => {
+    //   if (!prev[this._staleProps.z]) {
+    //     return {
+    //       [this._staleProps.z]: new ZLevelGenFactory({}).create({
+    //         seed: prevGameState.worldGen.seed,
+    //         z: this._staleProps.z,
+    //       }),
+    //     };
+    //   }
+    //   return prev;
+    // });
   }
 
   protected didForceUpdateChild(instance: LifecycleHandlerBase<any, any>) {

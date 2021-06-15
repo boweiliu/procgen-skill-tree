@@ -1,11 +1,11 @@
 import * as Pixi from 'pixi.js';
+import { GameState } from '../../data/GameState';
 import {
-  GameState,
   LockStatus,
   NodeReachableStatus,
   NodeTakenStatus,
   NodeVisibleStatus,
-} from '../../data/GameState';
+} from '../../data/NodeStatus';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { Vector2 } from '../../lib/util/geometry/vector2';
+import { PlayerUIState } from '../../data/PlayerUIState';
 
 export function DebugTabContent(props: {
   gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
@@ -101,6 +102,17 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const saveLocalStorage = useCallback(() => {
+    PlayerUIState.store(props.gameState.playerUI);
+  }, [props.gameState]);
+
+  const loadLocalStorage = useCallback(() => {
+    const loaded = PlayerUIState.load();
+    if (loaded) {
+      props.updaters.playerUI.enqueueUpdate(() => loaded);
+    }
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -157,6 +169,16 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={toggleTextBoxFocused}>
             toggle text box focused
+          </button>
+        </div>
+        <div>
+          <button onClick={saveLocalStorage}>
+            save state to local storage
+          </button>
+        </div>
+        <div>
+          <button onClick={loadLocalStorage}>
+            load state from local storage
           </button>
         </div>
       </div>

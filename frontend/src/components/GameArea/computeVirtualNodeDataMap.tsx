@@ -1,5 +1,5 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
 import {
   AttributeSymbolMap,
   ModifierSymbolMap,

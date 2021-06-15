@@ -1,5 +1,6 @@
 import React from 'react';
-import { GameState, IntentName, PlayerIntentState } from '../data/GameState';
+import { GameState } from '../data/GameState';
+import { IntentName, PlayerIntentState } from '../data/PlayerIntentState';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
 type Props = {
