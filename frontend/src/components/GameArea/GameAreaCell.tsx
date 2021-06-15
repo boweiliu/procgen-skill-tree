@@ -2,9 +2,9 @@ import './GameAreaCell.css';
 import './GameArea.css';
 
 import classnames from 'classnames';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { NodeAllocatedStatus } from '../../data/GameState';
+import { NodeAllocatedStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 
 /**
@@ -34,7 +34,7 @@ function GameAreaCellComponent({
   }) => void;
   nodeData: NodeReactData;
   isCursored: boolean;
-  onUpdateCursored: (v: Vector3 | undefined) => void;
+  onUpdateCursored: (v: Vector3 | null) => void;
   debugIsCursored: boolean;
 }) {
   // const startTime = +new Date();
@@ -60,7 +60,7 @@ function GameAreaCellComponent({
       e.stopPropagation();
       e.preventDefault();
       // TODO(bowei): use nodeData.id here instead of (idx, rowIdx), so that onUpdateStatus callback doesn't ever have to be recreated in the parent statemanager
-      onUpdateCursored(isCursored ? undefined : nodeLocation);
+      onUpdateCursored(isCursored ? null : nodeLocation);
     },
     [isCursored, onUpdateCursored, nodeLocation]
   );
@@ -108,6 +108,17 @@ function CellComponent({
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
 
+  const [hovered, setHovered] = useState(false);
+
+  const onHover = (e: React.PointerEvent) => {
+    console.log(`got pointer enter on ${id}`);
+    setHovered(true);
+  };
+  const onUnhover = (e: React.PointerEvent) => {
+    console.log(`got pointer leave on ${id}`);
+    setHovered(false);
+  };
+
   return (
     <div className="hex-block hex-full-block" key={id} id={id}>
       <div
@@ -122,6 +133,8 @@ function CellComponent({
             : 'border-important'
         )}
         onClick={onClickCenter}
+        onPointerEnter={onHover}
+        onPointerLeave={onUnhover}
         hidden={status === NodeAllocatedStatus.HIDDEN}
       >
         <div className="hex-center-text-wrapper">
@@ -132,6 +145,8 @@ function CellComponent({
         <div
           className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
+          onPointerEnter={onHover}
+          onPointerLeave={onUnhover}
         >
           <div className="hex-center-lock-left">
             <div className="tiny-text">
@@ -145,8 +160,9 @@ function CellComponent({
       ) : null}
       <div className="empty-positioned node-tooltip-wrapper">
         <div
-          // className="hover-only absolute-positioned node-tooltip"
-          hidden={true} // temp disabling this, the css is causing perf issues
+          // className="hover-only absolute-positioned node-tooltip" // temp disabling this, the css is causing perf issues
+          className="absolute-positioned node-tooltip"
+          hidden={!hovered}
         >
           {nodeData.toolTipText}
         </div>

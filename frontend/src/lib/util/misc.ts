@@ -204,6 +204,83 @@ export function multiplyColor(color1: number, color2: number): number {
   return out;
 }
 
+export function addColor(color1: number, color2: number): number {
+  let reds = [color1 & 0xff0000, color2 & 0xff0000];
+  let blues = [color1 & 0x0000ff, color2 & 0x0000ff];
+  let greens = [color1 & 0x00ff00, color2 & 0x00ff00];
+  let out =
+    Math.round(Math.min(reds[0] / 0x010000 + reds[1] / 0x010000, 255)) *
+    0x010000;
+  out +=
+    Math.round(Math.min(greens[0] / 0x000100 + greens[1] / 0x000100, 255)) *
+    0x000100;
+  out += Math.round(Math.min(blues[0] + blues[1], 255));
+  return out;
+}
+
+/**
+ *
+ * @param args either { target, proportion, base } or { color, opacity, background } or target
+ * @param arg2 if args was a single number, this should be opacity
+ * @param arg3 if args was a single number, this should be background, or default to 0 (black) background
+ */
+export function interpolateColor(
+  args:
+    | { target: number; proportion: number; base?: number }
+    | { color: number; opacity: number; background?: number }
+    | number,
+  arg2?: number,
+  arg3?: number
+): number {
+  if (typeof args === 'object') {
+    if (args.hasOwnProperty('target')) {
+      let _args: any = args;
+      return _interpolateColor(_args);
+    } else if (args.hasOwnProperty('color')) {
+      let _args: any = args;
+      return _interpolateColor({
+        target: _args.color,
+        proportion: _args.opacity,
+        base: _args.background,
+      });
+    } else {
+      throw new Error(`missing parameter in interpolateColor: ${args}`);
+    }
+  } else {
+    if (arg2) {
+      return _interpolateColor({ target: args, proportion: arg2, base: arg3 });
+    } else {
+      throw new Error(
+        `missing parameter in interpolateColor: ${args} ${arg2} ${arg3}`
+      );
+    }
+  }
+}
+
+function _interpolateColor(args: {
+  target: number;
+  proportion: number;
+  base?: number;
+}): number {
+  const { target, base = 0, proportion = 1 } = args;
+  let reds = [target & 0xff0000, base & 0xff0000];
+  let blues = [target & 0x0000ff, base & 0x0000ff];
+  let greens = [target & 0x00ff00, base & 0x00ff00];
+  let out =
+    Math.round(
+      (reds[0] / 0x010000) * proportion +
+        (reds[1] / 0x010000) * (1 - proportion)
+    ) * 0x010000;
+  out +=
+    Math.round(
+      (greens[0] / 0x000100) * proportion +
+        (greens[1] / 0x000100) * (1 - proportion)
+    ) * 0x000100;
+  out += Math.round(blues[0] * proportion + blues[1] * (1 - proportion));
+
+  return out;
+}
+
 export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
   return Object.keys(enm) as T[];
 }
@@ -211,3 +288,61 @@ export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
 // export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
 //   return Object.keys(enm) as T[];
 // }
+
+/**
+ * Used on pojo filtering functions.
+ * Here deepFilter: T => U is expected to be a pure function of the form object => object with a subset of the same properties (deeply).
+ * for instance
+ * deepFilter: { a: number, b: { c: number , d: string } } => { a: number, b: { c: number } }
+ * @returns a list. each element of the list represents an access path that is in the subset of paths kept by the pure filter function.
+ * in the example above, the output would be [ ['a'],  ['b', 'c'] ]
+ */
+export function extractAccessPaths<T, U>(deepFilter: (t: T) => U): string[][] {
+  let accessPaths: string[][] = [[]];
+
+  const proxyHandler: ProxyHandler<{ path: string[] }> = {
+    get: (
+      target: { path: string[] },
+      p: string | number | symbol,
+      receiver: any
+    ): any => {
+      const newPath = target.path.concat([p.toString()]);
+      // detect if we are merely adding on to an existing path and if so update it in place
+      if (accessPaths[accessPaths.length - 1] === target.path) {
+        accessPaths[accessPaths.length - 1] = newPath;
+      } else {
+        accessPaths.push(newPath);
+      }
+      const newObj = new Proxy({ path: newPath }, proxyHandler);
+      return newObj;
+    },
+  };
+
+  // run the function and record the paths
+  deepFilter(new Proxy({ path: accessPaths[0] }, proxyHandler) as any);
+
+  return accessPaths;
+}
+
+/**
+ *
+ * @param deepFilter pojo filtering function, as above
+ * @returns a function that takes a T instance and returns the list of properties accessed by deepFilter. useful in react useMemo calls
+ */
+export function extractDeps<T, U>(
+  deepFilter: (t: T) => U
+): (t: T | Const<U>) => any[] {
+  const accessPaths = extractAccessPaths(deepFilter);
+
+  return (t: T | U) => {
+    const deps = accessPaths.map((accessPath) => {
+      let ref: any = t;
+      for (let p of accessPath) {
+        ref = ref?.[p];
+      }
+      return ref;
+    });
+    // console.log({ deps });
+    return deps;
+  };
+}

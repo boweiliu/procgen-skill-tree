@@ -1,15 +1,19 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { GameState } from '../../data/GameState';
 import {
-  GameState,
   NodeAllocatedStatus,
   NodeReachableStatus,
   NodeTakenStatus,
-} from '../../data/GameState';
+} from '../../data/NodeStatus';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { GameAreaGrid, GameGridSubState } from './GameAreaGrid';
+import {
+  GameAreaGrid,
+  extractGameGridSubState,
+  depsGameGridSubState,
+} from './GameAreaGrid';
 import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
@@ -45,7 +49,7 @@ function Component(props: {
     [gameState.playerUI.virtualGridLocation, virtualGridDims]
   );
   const locationToVirtualCoords = useCallback(
-    (location: Vector3): Vector2 | undefined => {
+    (location: Vector3): Vector2 | null => {
       return convertLocationToVirtualCoords({
         location,
         virtualGridDims,
@@ -103,7 +107,7 @@ function Component(props: {
 
   // Manage cursor "node selected" state
   const setCursoredLocation = useCallback(
-    (v: Vector3 | undefined) => {
+    (v: Vector3 | null) => {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
         return v;
       });
@@ -115,7 +119,7 @@ function Component(props: {
     [props.updaters]
   );
 
-  const cursoredVirtualNodeCoords: Vector2 | undefined = useMemo(() => {
+  const cursoredVirtualNodeCoords: Vector2 | null = useMemo(() => {
     if (gameState.playerUI.cursoredNodeLocation) {
       // console.log({
       //   3: gameState.playerUI.cursoredNodeLocation,
@@ -123,7 +127,7 @@ function Component(props: {
       // });
       return locationToVirtualCoords(gameState.playerUI.cursoredNodeLocation);
     } else {
-      return undefined;
+      return null;
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 
@@ -258,33 +262,11 @@ function Component(props: {
     gameState.debug.isFlipCursored,
   ]);
 
-  const subGameState: GameGridSubState = useMemo(() => {
-    return {
-      playerUI: {
-        cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
-      },
-      playerSave: {
-        allocationStatusMap: gameState.playerSave.allocationStatusMap,
-      },
-      worldGen: {
-        nodeContentsMap: gameState.worldGen.nodeContentsMap,
-        lockMap: gameState.worldGen.lockMap,
-      },
-      computed: {
-        fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-        reachableStatusMap: gameState.computed.reachableStatusMap,
-        lockStatusMap: gameState.computed.lockStatusMap,
-      },
-    };
-  }, [
-    gameState.playerUI.cursoredNodeLocation,
-    gameState.playerSave.allocationStatusMap,
-    gameState.worldGen.nodeContentsMap,
-    gameState.worldGen.lockMap,
-    gameState.computed.fogOfWarStatusMap,
-    gameState.computed.reachableStatusMap,
-    gameState.computed.lockStatusMap,
-  ]);
+  const subGameState = useMemo(() => {
+    return extractGameGridSubState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsGameGridSubState(gameState));
 
   return (
     <>

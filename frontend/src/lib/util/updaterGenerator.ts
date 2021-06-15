@@ -30,8 +30,13 @@ function updaterGenerator2Helper<T, W>(
   const updaters: UpdaterGeneratorType2<T, W> = {} as any;
   updaters.getUpdater = () => dataUpdater;
   updaters.enqueueUpdate = dataUpdater;
-  if (typeof dataObject !== 'object') return updaters;
-  else {
+  if (
+    dataObject === null ||
+    dataObject === undefined ||
+    typeof dataObject !== 'object'
+  ) {
+    return updaters;
+  } else {
     const keys: (keyof T)[] = Object.keys(dataObject) as any;
     keys.forEach((key: keyof T) => {
       if (key === 'enqueueUpdate' || key === 'getUpdater' || key === 'update') {

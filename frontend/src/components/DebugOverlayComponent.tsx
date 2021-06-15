@@ -2,7 +2,7 @@ import './DebugOverlayComponent.css';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FpsTracker } from '../lib/util/fpsTracker';
-import { WindowState } from '../data/GameState';
+import { WindowState } from '../data/WindowState';
 
 /**
  * Small overlay in the top left which displays window dimensions and fps.

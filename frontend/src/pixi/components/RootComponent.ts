@@ -13,6 +13,7 @@ import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
 import {
+  extractStrategicHexGridSubState,
   StrategicHexGridComponent,
   StrategicHexGridComponentProps,
 } from './StrategicHexGridComponent';
@@ -113,18 +114,15 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       props: Props,
       state: State
     ): StrategicHexGridComponentProps => {
+      const { gameState } = props;
       return {
+        delta: props.delta,
         args: {
           position: Vector2.Zero,
           textures: state.simpleTexture.get(),
         },
         appSize: props.appSize,
-        virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
-        allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
-        fogOfWarStatusMap: props.gameState.computed.fogOfWarStatusMap!,
-        reachableStatusMap: props.gameState.computed.reachableStatusMap!,
-        lockStatusMap: props.gameState.computed.lockStatusMap!,
-        lockMap: props.gameState.worldGen.lockMap,
+        gameState: extractStrategicHexGridSubState(gameState),
       };
     };
     this.strategicHexGrid = new StrategicHexGridComponent(

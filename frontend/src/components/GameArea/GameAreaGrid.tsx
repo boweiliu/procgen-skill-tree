@@ -1,7 +1,7 @@
 import './GameAreaGrid.css';
 import './GameArea.css';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import {
@@ -9,31 +9,35 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { NodeAllocatedStatus } from '../../data/GameState';
+import { NodeAllocatedStatus } from '../../data/NodeStatus';
 import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
+import { extractDeps } from '../../lib/util/misc';
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-const gameState: GameAreaSubState = {} as any; // easily extract types without type-ing them out
-export type GameGridSubState = {
-  playerUI: {
-    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+export function extractGameGridSubState(gameState: GameAreaSubState) {
+  return {
+    playerUI: {
+      cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+    },
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    worldGen: {
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+    },
+    computed: {
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+      lockStatusMap: gameState.computed.lockStatusMap,
+    },
   };
-  playerSave: {
-    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
-  };
-  worldGen: {
-    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
-    lockMap: typeof gameState.worldGen.lockMap;
-  };
-  computed: {
-    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
-    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
-    lockStatusMap: typeof gameState.computed.lockStatusMap;
-  };
-};
+}
+export type GameGridSubState = ReturnType<typeof extractGameGridSubState>;
+export const depsGameGridSubState = extractDeps(extractGameGridSubState);
 
 export const GameAreaGrid = React.memo(Component);
 /**
@@ -56,8 +60,8 @@ function Component(props: {
     nodeLocation: Vector3;
     newStatus: NodeAllocatedStatus;
   }) => void;
-  cursoredVirtualNode: Vector2 | undefined;
-  setCursoredLocation: (v: Vector3 | undefined) => void;
+  cursoredVirtualNode: Vector2 | null;
+  setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
 }) {
   const {
@@ -71,14 +75,10 @@ function Component(props: {
   } = props;
   const startTime = +new Date();
 
-  useEffect(() => {
-    console.log('callbacks got refreshed!');
-  }, [updateNodeStatusByLocationCb, setCursoredLocation]);
-
   debug?.rerenderGameAreaGrid();
-  const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
+  // const debugOffsetX = (debug?.getOffsetX?.() || 0) % 8;
   const flipCursored = debug?.isFlipCursored?.() || false;
-  console.log('Game area grid rerender');
+  // console.log('Game area grid rerender');
 
   const nodeReactDataMap = useMemo(
     () =>
@@ -87,14 +87,6 @@ function Component(props: {
       ),
     [gameState]
   );
-
-  // when fog of war status or whatever changes, re-compute ALL the node react data
-  // useEffect(() => {
-  //   nodeReactDataMap.current.clear();
-  //   nodeReactDataMap.current.setFactory((location: Vector3) =>
-  //     computeNodeReactData({ location, gameState })
-  //   );
-  // }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation

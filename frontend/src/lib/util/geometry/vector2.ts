@@ -201,8 +201,8 @@ export class Vector2 {
     });
   }
 
-  equals(other: Vector2 | undefined): boolean {
-    if (other === undefined) {
+  equals(other: Vector2 | undefined | null): boolean {
+    if (other === undefined || other === null) {
       return false;
     }
 
@@ -316,9 +316,10 @@ export class Vector2 {
     return this.lerp(other, t);
   }
 
-  static Deserialize(obj: any): Vector2 {
-    if (!obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
+  static Deserialize(obj: any): Vector2 | null {
+    if (!obj || !obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
       console.error('Failed deserializing point');
+      return null;
     }
 
     return new Vector2({
@@ -328,6 +329,10 @@ export class Vector2 {
   }
 
   static Serialize(obj: Vector2): string {
-    return JSON.stringify({ x: obj.x, y: obj.y });
+    return JSON.stringify(this.SerializeToObject(obj));
+  }
+
+  static SerializeToObject(obj: Vector2): object {
+    return { x: obj.x, y: obj.y };
   }
 }

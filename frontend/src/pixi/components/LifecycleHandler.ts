@@ -215,12 +215,13 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
       this.didForceUpdate?.();
       return;
+    } else {
+      this.updateChildren?.(nextProps);
+      this._updateChildren(nextProps); // implementation should call children._update in here
+      this.renderSelf(nextProps);
+      this._staleProps = nextProps;
+      new Promise((resolve) => resolve(this.didUpdate?.()));
     }
-    this.updateChildren?.(nextProps);
-    this._updateChildren(nextProps); // implementation should call children._update in here
-    this.renderSelf(nextProps);
-    this._staleProps = nextProps;
-    new Promise((resolve) => resolve(this.didUpdate?.()));
   }
 
   protected updateChildren?(nextProps: P): void;
@@ -255,6 +256,15 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   protected fireStateUpdaters?(): void;
   protected didMount?(): void;
   protected updateSelf?(nextProps: P): void;
+  /**
+   *
+   * @param staleProps
+   * @param staleState
+   * @param nextProps
+   * @param state
+   * @returns false if staleProps == nextProps and staleState == state (which will cause the component to be memoized)
+   *          true if the props or state differ significantly
+   */
   protected shouldUpdate?(
     staleProps: P,
     staleState: S,

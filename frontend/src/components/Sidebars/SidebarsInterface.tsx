@@ -1,12 +1,20 @@
 import './SidebarsInterface.css';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import Sidebar from './Sidebar';
 import { Tabs } from './Tabs';
 import { TabContentInterface, TAB_NAME } from './TabContentInterface';
 
-const emptyTabLabels = ['EMPTY'];
+export const emptyTabLabels: TAB_NAME[] = [TAB_NAME.EMPTY];
+export const initialTabLabels: TAB_NAME[] = [
+  TAB_NAME.SELECTED_NODE,
+  TAB_NAME.STATS,
+  TAB_NAME.QUESTS,
+  TAB_NAME.DEBUG,
+  TAB_NAME.HELP,
+  TAB_NAME.STRATEGIC_VIEW,
+];
 
 /**
  * Manages both sidebars (left & right) as well as anything directly adjacent to them.
@@ -15,7 +23,7 @@ export function SidebarsInterface(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 }) {
-  // NOTE(bowei): commenting out this entire component subtree increases react rerenders per sec from 80-ish to 100-ish while doing nothing other than scrolling without triggering jumps.
+  // NOTE(bowei): commenting out this entire component subtree increases react rerenders per sec from 80-ish to 100-ish while doing nothing other than scrolling (jumps disabled)
   const { gameState, updaters } = props;
 
   const setLeftSidebarHidden = useCallback(() => {
@@ -31,16 +39,22 @@ export function SidebarsInterface(props: {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
   }, [updaters]);
 
-  const [leftSidebarTabs, setLeftSidebarTabs] = useState<string[]>([]);
-  const [rightSidebarTabs, setRightSidebarTabs] = useState([
-    'SELECTED_NODE',
-    'STATS',
-    'QUESTS',
-    'DEBUG',
-    'HELP',
-  ]);
-  const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
-  const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
+  const tabsState = gameState.playerUI.tabs;
+  const tabsUpdaters = updaters.playerUI.tabs;
+
+  const leftSidebarTabs = tabsState.left.tabs;
+  const rightSidebarTabs = tabsState.right.tabs;
+  const leftActiveTabIndex = tabsState.left.activeIndex;
+  const rightActiveTabIndex = tabsState.right.activeIndex;
+  const setLeftSidebarTabs = tabsUpdaters.left.tabs.enqueueUpdate;
+  const setRightSidebarTabs = tabsUpdaters.right.tabs.enqueueUpdate;
+  const setLeftActiveTabIndex = tabsUpdaters.left.activeIndex.enqueueUpdate;
+  const setRightActiveTabIndex = tabsUpdaters.right.activeIndex.enqueueUpdate;
+
+  // const [leftSidebarTabs, setLeftSidebarTabs] = useState<TAB_NAME[]>([]);
+  // const [rightSidebarTabs, setRightSidebarTabs] = useState<TAB_NAME[]>(initialTabLabels);
+  // const [leftActiveTabIndex, setLeftActiveTabIndex] = useState(0);
+  // const [rightActiveTabIndex, setRightActiveTabIndex] = useState(0);
 
   const onSendTabLeft = useCallback(() => {
     if (rightSidebarTabs.length === 0) {

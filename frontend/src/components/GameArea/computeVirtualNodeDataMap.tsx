@@ -1,5 +1,5 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/GameState';
+import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
 import {
   AttributeSymbolMap,
   ModifierSymbolMap,
@@ -43,7 +43,7 @@ export function computeNodeReactData(args: {
   const {
     fogOfWarStatusMap,
     reachableStatusMap,
-    lockStatusMap,
+    // lockStatusMap,
   } = args.gameState.computed;
   const { allocationStatusMap } = args.gameState.playerSave;
   const { lockMap, nodeContentsMap } = args.gameState.worldGen;

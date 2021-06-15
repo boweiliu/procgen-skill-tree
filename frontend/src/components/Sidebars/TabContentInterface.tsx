@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { STARTING_NODE_DESCRIPTION } from '../GameArea/computeVirtualNodeDataMap';
+import { DebugTabContent } from './DebugTab';
+import { StrategicTab } from './StrategicTab';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -13,6 +15,7 @@ export enum TAB_NAME {
   QUESTS = 'QUESTS',
   DEBUG = 'DEBUG',
   HELP = 'HELP',
+  STRATEGIC_VIEW = 'STRATEGIC_VIEW',
 }
 
 // in charge of constructing content. no css
@@ -30,6 +33,9 @@ export function TabContentInterface(props: {
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,
+    [TAB_NAME.STRATEGIC_VIEW]: (
+      <StrategicTab gameState={props.gameState} updaters={props.updaters} />
+    ),
     [TAB_NAME.DEBUG]: (
       <DebugTabContent
         gameState={props.gameState}
@@ -64,6 +70,9 @@ function TabContentSelector(props: {
   );
 }
 
+/**
+ * Tabs
+ */
 export const EmptyTabContent = React.memo(EmptyTabContentComponent);
 function EmptyTabContentComponent(props: {}) {
   console.log('got here empty tab content');
@@ -73,11 +82,12 @@ function EmptyTabContentComponent(props: {}) {
 export const SelectedNodeTabContent = React.memo(
   SelectedNodeTabContentComponent
 );
+// TODO(bowei): trim down the game state here
 function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
 
-  if (location === undefined) {
+  if (location === null) {
     return (
       <>
         <div>Nothing selected!</div>
@@ -132,154 +142,6 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <div>Locked?: {'???'}</div>
         <br></br>
         <div>Contents: {'???'}</div>
-      </div>
-    </>
-  );
-}
-
-export function DebugTabContent(props: {
-  gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
-  updaters: UpdaterGeneratorType2<GameState, GameState>;
-  hidden: boolean;
-}) {
-  const { gameState } = props;
-  const { tick } = gameState;
-
-  const [lastUpdated, setLastUpdated] = useState(+new Date());
-  const [slowRenderMsgs, setSlowRenderMsgs] = useState<string[]>([]);
-
-  useEffect(() => {
-    const now = new Date();
-    const msSinceLastTick = +now - lastUpdated;
-    if (msSinceLastTick > 30) {
-      const msg = `Tick ${tick} took ${msSinceLastTick}ms at ${
-        now.toTimeString().split(' ')[0]
-      }`;
-      console.log(msg);
-      setSlowRenderMsgs((prev) => {
-        return [msg, ...prev];
-      });
-    }
-    setLastUpdated(+new Date());
-  }, [tick, lastUpdated, setLastUpdated, setSlowRenderMsgs]);
-
-  const virtualGridDimsTrigger = useCallback(() => {
-    console.log('tried triggered update from debug tab');
-    // NOTE(bowei): this apparently takes around 100ms alone. full jump takes ~200ms
-    props.updaters.debug.retriggerVirtualGridDims.enqueueUpdate((prev) => {
-      return () => {
-        console.log('force triggered update from debug tab');
-      };
-    });
-  }, [props.updaters]);
-
-  const toggleScrollbars = useCallback(() => {
-    props.updaters.debug.debugShowScrollbars?.enqueueUpdate((prev) => {
-      const next = !prev;
-      return next;
-    });
-  }, [props.updaters]);
-
-  const gameAreaGridRerender = useCallback(() => {
-    props.updaters.debug.rerenderGameAreaGrid.enqueueUpdate((prev) => {
-      return () => {
-        console.log('force triggered react rerender from debug tab');
-      };
-    });
-  }, [props.updaters]);
-
-  const onDisableScrollJump = useCallback(() => {
-    props.updaters.debug.enableScrollJump.enqueueUpdate(() => {
-      return false;
-    });
-  }, [props.updaters]);
-
-  const onEnableScrollJump = useCallback(() => {
-    props.updaters.debug.enableScrollJump.enqueueUpdate(() => {
-      return true;
-    });
-  }, [props.updaters]);
-
-  const forceVirtualGridJump = useCallback(() => {
-    props.updaters.debug.getForceJumpOffset.enqueueUpdate((prev) => {
-      return () => {
-        console.log('force triggered virtual jump only');
-        return new Vector2(1, 2);
-      };
-    });
-  }, [props.updaters]);
-
-  const addDebugOffsetX = useCallback(() => {
-    props.updaters.debug.getOffsetX.enqueueUpdate((prev) => {
-      const offsetX = prev() || 0;
-      return () => {
-        return offsetX + 1;
-      };
-    });
-  }, [props.updaters]);
-
-  const flipCursored = useCallback(() => {
-    props.updaters.debug.isFlipCursored.enqueueUpdate((prev) => {
-      const flipCursored = prev() || false;
-      return () => {
-        return !flipCursored;
-      };
-    });
-  }, [props.updaters]);
-
-  if (props.hidden) {
-    return <> </>;
-  }
-  return (
-    <>
-      <div> debug tab </div>
-      <div className="tab-content-body">
-        <br></br>
-        <div>Recent slow renders:</div>
-        {slowRenderMsgs.slice(0, 5).map((it, idx) => {
-          return <div key={idx}>{it}</div>;
-        })}
-        <br></br>
-      </div>
-      <div> buttons </div>
-      <div className="tab-content-body">
-        <br></br>
-        <div>
-          <button onClick={toggleScrollbars}>Toggle scrollbars</button>
-        </div>
-        <div>
-          <button onClick={virtualGridDimsTrigger}>
-            Trigger virtual grid dims rerender
-          </button>
-        </div>
-        <div>
-          <button onClick={gameAreaGridRerender}>
-            Trigger only virtual game area grid react rerender
-          </button>
-        </div>
-        <div>
-          <button onClick={onDisableScrollJump}>
-            Disable scroll jump trigger
-          </button>
-        </div>
-        <div>
-          <button onClick={onEnableScrollJump}>
-            Reenable scroll jump trigger
-          </button>
-        </div>
-        <div>
-          <button onClick={forceVirtualGridJump}>
-            Force virtual grid jump only
-          </button>
-        </div>
-        <div>
-          <button onClick={addDebugOffsetX}>add weird x offset to grid</button>
-        </div>
-        <div>
-          <button onClick={flipCursored}>
-            weird flip cursored state on all nodes
-          </button>
-        </div>
       </div>
     </>
   );

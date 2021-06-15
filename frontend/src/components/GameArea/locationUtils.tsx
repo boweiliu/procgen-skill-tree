@@ -49,14 +49,14 @@ export function convertLocationToVirtualCoords(args: {
   location: Vector3;
   virtualGridLocation: Vector3;
   virtualGridDims: Vector2;
-}): Vector2 | undefined {
+}): Vector2 | null {
   const { location, virtualGridLocation, virtualGridDims } = args;
   const virtualCenter = virtualGridDims.divide(2).floor();
   const offsetFromVirtualGridLocation = location.subtract(virtualGridLocation);
   let relativeVirtualCoords = Vector2.Zero;
 
   if (offsetFromVirtualGridLocation.z !== 0) {
-    return undefined;
+    return null;
   }
 
   if (offsetFromVirtualGridLocation.y % 2 === 0) {

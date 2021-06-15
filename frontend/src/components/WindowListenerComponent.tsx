@@ -1,6 +1,7 @@
 import React from 'react';
 // import UAParser from 'ua-parser-js';
-import { GameState, WindowState } from '../data/GameState';
+import { GameState } from '../data/GameState';
+import { WindowState } from '../data/WindowState';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 
 type Props = {

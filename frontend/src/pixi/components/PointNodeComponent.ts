@@ -1,22 +1,22 @@
 import * as Pixi from 'pixi.js';
 import { RenderedChunkConstants } from './ChunkComponent';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import {
-  GameState,
-  PointNodeGen,
-  PointNodeRef,
-  ResourceModifier,
-} from '../../data/GameState';
+import { GameState } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { multiplyColor } from '../../lib/util/misc';
 import { TooltippableAreaComponent } from './TooltippableAreaComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
-import { selectOrReselectNode } from '../../game/OnSelectOrReselectNode';
 import { RootComponentState } from './RootComponent';
 import { PointNodeTextureSet } from '../textures/PointNodeTexture';
 import COLORS from '../colors';
-import { NodeType, ResourceNontrivialType } from '../../data/WorldGenState';
+import {
+  NodeType,
+  PointNodeGen,
+  ResourceModifier,
+  ResourceNontrivialType,
+} from '../../data/WorldGenState';
+import { PointNodeRef } from '../../data/PointNodeRef';
 
 type Props = {
   delta: number;
@@ -250,7 +250,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected didMount() {
-    const { updaters } = this._staleProps; // we assume this will never change
+    // const { updaters } = this._staleProps; // we assume this will never change
 
     //     this.container.addListener('pointerover', (event: Pixi.InteractionEvent) => {
     //       this.state.pointerover = event;
@@ -265,7 +265,7 @@ class PointNodeComponent extends LifecycleHandlerBase<Props, State> {
       (event: Pixi.InteractionEvent) => {
         this._staleProps.args.markForceUpdate(this);
         this.state.numClicks++;
-        selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
+        // selectOrReselectNode(updaters, this._staleProps.selfPointNodeRef);
         // event.stopPropagation();
       }
     );
