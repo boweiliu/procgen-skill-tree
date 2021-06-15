@@ -6,6 +6,7 @@ import {
   NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
+import { Attribute } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -110,9 +111,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     const { gameState } = props;
 
     for (let [v, graphics] of this.hexGrid.entries()) {
-      graphics.position = PixiPointFrom(
-        props.appSize.divide(2).add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y))
-      );
+      const basePosition = props.appSize
+        .divide(2)
+        .add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y)); // 30 x 26 hex units
+      graphics.position = PixiPointFrom(basePosition);
       // if (v.x <= 1 && v.x >= -1 && v.y <= 1 && v.y >= -1) {
 
       // } else {
@@ -159,13 +161,29 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       if (lockData && lockStatus !== LockStatus.OPEN) {
         graphics.texture = props.args.textures.rect;
+        graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= props.args.textures.rect.width / 2;
         graphics.position.y -= props.args.textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
       } else {
         graphics.texture = props.args.textures.circle;
+        graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= props.args.textures.circle.width / 2;
         graphics.position.y -= props.args.textures.circle.height / 2;
+      }
+
+      const nodeContents = gameState.worldGen.nodeContentsMap.get(
+        virtualLocation
+      );
+      if (
+        nodeContents.lines?.[0]?.attribute === Attribute.RED0 ||
+        nodeContents.lines?.[1]?.attribute === Attribute.RED0
+      ) {
+        // graphics.texture = props.args.textures.square;
+        // graphics.position = PixiPointFrom(basePosition);
+        // graphics.position.x -= props.args.textures.square.width / 2;
+        // graphics.position.y -= props.args.textures.square.height / 2;
+        // graphics.tint = COLORS.nodeBlue;
       }
     }
   }
