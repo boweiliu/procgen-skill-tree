@@ -6,18 +6,12 @@ import {
 } from '../data/NodeStatus';
 import { newPlayerIntentState } from '../data/PlayerIntentState';
 import { newWindowState } from '../data/WindowState';
-import { LockData, newPlayerSaveState } from '../data/PlayerSaveState';
+import { newPlayerSaveState } from '../data/PlayerSaveState';
 import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
-import { LazyHashMap } from '../lib/util/lazy';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
-import { ZLevelGenFactory } from './worldGen/WorldGenStateFactory';
-import {
-  NodeContents,
-  NodeContentsFactory,
-} from './worldGen/nodeContents/NodeContentsFactory';
+import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
-import { LockFactory } from './worldGen/LockFactory';
 import { newDebugState } from '../data/DebugState';
 import { newPlayerUIState } from '../data/PlayerUIState';
 
@@ -36,30 +30,10 @@ export class GameStateFactory {
     }
     const mySeed = seed || 0x19283;
 
-    const zLevel = new ZLevelGenFactory({}).create({
-      seed: mySeed,
-      z: 0,
-      startingChunks: 0,
-    });
-
-    const lockFactory = new LockFactory({});
-    const lockDataMap = new LazyHashMap<Vector3, LockData | undefined>((k) =>
-      lockFactory.create({ seed: mySeed, location: k })
-    );
-    const nodeContentsFactory = new NodeContentsFactory({});
-    const nodeContentsMap = new LazyHashMap<Vector3, NodeContents>((k) =>
-      nodeContentsFactory.create({ seed: mySeed, location: k })
-    );
-
+    const worldGenStateFactory = new WorldGenStateFactory({});
     const gameState: GameState = {
       tick: 0,
-      worldGen: {
-        seed: mySeed,
-        // deprecated
-        zLevels: { 0: zLevel },
-        lockMap: lockDataMap,
-        nodeContentsMap,
-      },
+      worldGen: worldGenStateFactory.create({ seed: mySeed }),
       playerSave: newPlayerSaveState(),
       playerUI: newPlayerUIState(),
       computed: {},

@@ -6,10 +6,6 @@ import { LazyHashMap } from '../lib/util/lazy';
 import { LockData } from './PlayerSaveState';
 
 export type WorldGenState = {
-  // DEPRECATED
-  zLevels: { [z: number]: ZLevelGen };
-
-  // NOT DEPRECATED
   seed: number;
   /**
    * What sort of locks are generated. Does not store the live status of the locks.
