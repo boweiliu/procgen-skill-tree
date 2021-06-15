@@ -317,7 +317,7 @@ export class Vector2 {
   }
 
   static Deserialize(obj: any): Vector2 | null {
-    if (!obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
+    if (!obj || !obj.hasOwnProperty('x') || !obj.hasOwnProperty('y')) {
       console.error('Failed deserializing point');
       return null;
     }

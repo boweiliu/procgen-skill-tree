@@ -365,6 +365,7 @@ export class Vector3 {
 
   static Deserialize(obj: any): Vector3 | null {
     if (
+      !obj ||
       !obj.hasOwnProperty('x') ||
       !obj.hasOwnProperty('y') ||
       !obj.hasOwnProperty('z')

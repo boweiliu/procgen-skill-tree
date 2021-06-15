@@ -84,10 +84,9 @@ const serializeToObject = (s: PlayerUIState): object => {
 
 const serialize = (s: PlayerUIState) => JSON.stringify(serializeToObject(s));
 
-const deserializeFromObject = (obj: {
-  [k: string]: any;
-}): PlayerUIState | null => {
+const deserializeFromObject = (obj: any): PlayerUIState | null => {
   if (
+    !obj ||
     !obj.hasOwnProperty('isPixiHidden') ||
     !obj.hasOwnProperty('virtualGridLocation') ||
     !obj.hasOwnProperty('cursoredNodeLocation') ||
@@ -104,9 +103,6 @@ const deserializeFromObject = (obj: {
     return null;
   }
   const cursoredNodeLocation = Vector3.Deserialize(obj.cursoredNodeLocation);
-  if (!cursoredNodeLocation) {
-    return null;
-  }
 
   return {
     ...obj,
