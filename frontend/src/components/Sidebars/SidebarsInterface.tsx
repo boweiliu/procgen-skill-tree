@@ -1,5 +1,5 @@
 import './SidebarsInterface.css';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import Sidebar from './Sidebar';
