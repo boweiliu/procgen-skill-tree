@@ -211,3 +211,61 @@ export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
 // export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
 //   return Object.keys(enm) as T[];
 // }
+
+/**
+ * Used on pojo filtering functions.
+ * Here deepFilter: T => U is expected to be a pure function of the form object => object with a subset of the same properties (deeply).
+ * for instance
+ * deepFilter: { a: number, b: { c: number , d: string } } => { a: number, b: { c: number } }
+ * @returns a list. each element of the list represents an access path that is in the subset of paths kept by the pure filter function.
+ * in the example above, the output would be [ ['a'],  ['b', 'c'] ]
+ */
+export function extractAccessPaths<T, U>(deepFilter: (t: T) => U): string[][] {
+  let accessPaths: string[][] = [[]];
+
+  const proxyHandler: ProxyHandler<{ path: string[] }> = {
+    get: (
+      target: { path: string[] },
+      p: string | number | symbol,
+      receiver: any
+    ): any => {
+      const newPath = target.path.concat([p.toString()]);
+      // detect if we are merely adding on to an existing path and if so update it in place
+      if (accessPaths[accessPaths.length - 1] === target.path) {
+        accessPaths[accessPaths.length - 1] = newPath;
+      } else {
+        accessPaths.push(newPath);
+      }
+      const newObj = new Proxy({ path: newPath }, proxyHandler);
+      return newObj;
+    },
+  };
+
+  // run the function and record the paths
+  deepFilter(new Proxy({ path: accessPaths[0] }, proxyHandler) as any);
+
+  return accessPaths;
+}
+
+/**
+ *
+ * @param deepFilter pojo filtering function, as above
+ * @returns a function that takes a T instance and returns the list of properties accessed by deepFilter. useful in react useMemo calls
+ */
+export function extractDeps<T, U>(
+  deepFilter: (t: T) => U
+): (t: T | Const<U>) => any[] {
+  const accessPaths = extractAccessPaths(deepFilter);
+
+  return (t: T | U) => {
+    const deps = accessPaths.map((accessPath) => {
+      let ref: any = t;
+      for (let p of accessPath) {
+        ref = ref?.[p];
+      }
+      return ref;
+    });
+    // console.log({ deps });
+    return deps;
+  };
+}

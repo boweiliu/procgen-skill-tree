@@ -6,13 +6,11 @@ import {
   NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/GameState';
-import { LockData } from '../../data/PlayerSaveState';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { LazyHashMap } from '../../lib/util/lazy';
-import { Const } from '../../lib/util/misc';
+import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
@@ -26,37 +24,38 @@ type Props = {
     };
   };
   appSize: Vector2;
-  gameState: Const<StrategicHexGridSubState>;
-  virtualGridLocation: Const<Vector3>;
-  allocationStatusMap: Const<KeyedHashMap<Vector3, NodeTakenStatus>>;
-  fogOfWarStatusMap: Const<HashMap<Vector3, NodeVisibleStatus>>;
-  reachableStatusMap: Const<HashMap<Vector3, NodeReachableStatus>>;
-  lockStatusMap: Const<HashMap<Vector3, LockStatus | undefined>>;
-  lockMap: Const<LazyHashMap<Vector3, LockData | undefined>>;
+  gameState: StrategicHexGridSubState;
 };
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-const gameState: GameState = {} as any; // easily extract types without type-ing them out
-export type StrategicHexGridSubState = {
-  playerUI: {
-    virtualGridLocation: typeof gameState.playerUI.virtualGridLocation;
-    cursoredNodeLocation: typeof gameState.playerUI.cursoredNodeLocation;
+export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
+  return {
+    playerUI: {
+      virtualGridLocation: gameState.playerUI.virtualGridLocation,
+      cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+    },
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    computed: {
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+      lockStatusMap: gameState.computed.lockStatusMap,
+    },
+    worldGen: {
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+      lockMap: gameState.worldGen.lockMap,
+    },
   };
-  playerSave: {
-    allocationStatusMap: typeof gameState.playerSave.allocationStatusMap;
-  };
-  computed: {
-    fogOfWarStatusMap: typeof gameState.computed.fogOfWarStatusMap;
-    reachableStatusMap: typeof gameState.computed.reachableStatusMap;
-    lockStatusMap: typeof gameState.computed.lockStatusMap;
-  };
-  worldGen: {
-    nodeContentsMap: typeof gameState.worldGen.nodeContentsMap;
-    lockMap: typeof gameState.worldGen.lockMap;
-  };
-};
+}
+export type StrategicHexGridSubState = ReturnType<
+  typeof extractStrategicHexGridSubState
+>;
+export const depsStrategicHexGridSubState = extractDeps(
+  extractStrategicHexGridSubState
+);
 
 type State = {};
 
@@ -108,6 +107,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected renderSelf(props: Props) {
     this.container.position = PixiPointFrom(props.args.position);
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
+    const { gameState } = props;
 
     for (let [v, graphics] of this.hexGrid.entries()) {
       graphics.position = PixiPointFrom(
@@ -119,18 +119,20 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       //   continue;
       // }
       // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
-      const virtualLocation = props.virtualGridLocation.add(
+      const virtualLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        props.fogOfWarStatusMap.get(virtualLocation) || NodeVisibleStatus.false;
+        gameState.computed.fogOfWarStatusMap?.get(virtualLocation) ||
+        NodeVisibleStatus.false;
       const nodeTakenStatus =
-        props.allocationStatusMap.get(virtualLocation) || NodeTakenStatus.false;
+        gameState.playerSave.allocationStatusMap.get(virtualLocation) ||
+        NodeTakenStatus.false;
       const nodeReachableStatus =
-        props.reachableStatusMap.get(virtualLocation) ||
+        gameState.computed.reachableStatusMap?.get(virtualLocation) ||
         NodeReachableStatus.false;
-      const lockData = props.lockMap.get(virtualLocation);
-      const lockStatus = props.lockStatusMap.get(virtualLocation);
+      const lockData = gameState.worldGen.lockMap.get(virtualLocation);
+      const lockStatus = gameState.computed.lockStatusMap?.get(virtualLocation);
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
@@ -168,6 +170,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
+  /**
+   * @param staleProps
+   * @param staleState
+   * @param props
+   * @param state
+   * @returns false if staleProps == nextProps and staleState == state (which will cause the component to be memoized)
+   *          true if the props or state differ anywhere
+   */
   protected shouldUpdate(
     staleProps: Props,
     staleState: State,
@@ -182,7 +192,19 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (key === 'gameState') {
         const staleGameState = staleProps[key];
         const gameState = props[key];
-        continue; // TODO(bowei): what to put here?
+        const staleDeps = depsStrategicHexGridSubState(staleGameState);
+        const deps = depsStrategicHexGridSubState(gameState);
+        for (let i = 0; i < staleDeps.length; i++) {
+          if (deps[i] !== staleDeps[i]) {
+            console.log(
+              `hexgrid substate differed in ${i} : ${extractAccessPaths(
+                extractStrategicHexGridSubState
+              )[i].join('.')}, returning true for shouldupdate`
+            );
+            return true;
+          }
+        }
+        continue;
       }
       if (staleProps[key] !== props[key]) {
         console.log(`hexgrid shouldUpdate differed in ${key}, returning true`);

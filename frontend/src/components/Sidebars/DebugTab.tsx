@@ -93,6 +93,14 @@ export function DebugTabContent(props: {
     });
   }, [props.updaters]);
 
+  const toggleTextBoxFocused = useCallback(() => {
+    props.updaters.playerUI.isTextBoxFocused.enqueueUpdate((prev) => {
+      const isTextBoxFocused = !prev;
+      console.log({ isTextBoxFocused });
+      return isTextBoxFocused;
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -144,6 +152,11 @@ export function DebugTabContent(props: {
         <div>
           <button onClick={flipCursored}>
             weird flip cursored state on all nodes
+          </button>
+        </div>
+        <div>
+          <button onClick={toggleTextBoxFocused}>
+            toggle text box focused
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -33,7 +33,9 @@ export function TabContentInterface(props: {
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,
-    [TAB_NAME.STRATEGIC_VIEW]: <StrategicTab gameState={props.gameState} />,
+    [TAB_NAME.STRATEGIC_VIEW]: (
+      <StrategicTab gameState={props.gameState} updaters={props.updaters} />
+    ),
     [TAB_NAME.DEBUG]: (
       <DebugTabContent
         gameState={props.gameState}

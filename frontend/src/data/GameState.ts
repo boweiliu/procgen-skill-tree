@@ -3,7 +3,6 @@ import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { Const, enumKeys } from '../lib/util/misc';
 import { PlayerSaveState } from './PlayerSaveState';
-import { PointNodeRef } from './PointNodeRef';
 import {
   ResourceModifier,
   ResourceNontrivialType,
@@ -214,6 +213,10 @@ export type PlayerUIState = {
    * state of the sidebar component
    */
   isSidebarOpen: boolean;
+  /**
+   * whether or not the cursor is captured by a text entry element. if so, we need to allow default behavior on keyboard events
+   */
+  isTextBoxFocused: boolean;
 
   // WIP?
   virtualApproximateScroll?: Vector2;

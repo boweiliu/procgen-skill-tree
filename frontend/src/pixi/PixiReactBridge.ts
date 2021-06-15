@@ -187,10 +187,15 @@ export class PixiReactBridge {
 
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      // console.log('skipping update since pixi is not visible');
-      this.props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
-      this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
-      return; // skip update loop if pixi is hidden
+      if (this.props.gameState.tick % 10 === 0) {
+        // console.log('computing pixi update even though pixi is not visible');
+      } else {
+        // console.log('skipping update since pixi is not visible');
+        // have to manually update the tick number since updateSelf is not being called, because staleProps is not being updated
+        this.props.updaters.tick.enqueueUpdate((it) => it + 1); // TODO(bowei): reneable this
+        this.props.args.fireBatch(); // fire enqueued game state updates, which should come back from react in the rerender()
+        return; // skip update loop if pixi is hidden
+      }
     }
     // assume props is up to date
     this.updateSelf(this.props, this.staleProps);

@@ -13,6 +13,7 @@ import { FixedCameraStageComponent } from './FixedCameraStageComponent';
 import { TooltipInfo } from './TooltipComponent';
 import COLORS from '../colors';
 import {
+  extractStrategicHexGridSubState,
   StrategicHexGridComponent,
   StrategicHexGridComponentProps,
 } from './StrategicHexGridComponent';
@@ -120,31 +121,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
           textures: state.simpleTexture.get(),
         },
         appSize: props.appSize,
-        // TODO(bowei): how to memoize this??
-        gameState: {
-          playerUI: {
-            virtualGridLocation: gameState.playerUI.virtualGridLocation,
-            cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
-          },
-          playerSave: {
-            allocationStatusMap: gameState.playerSave.allocationStatusMap,
-          },
-          computed: {
-            fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
-            reachableStatusMap: gameState.computed.reachableStatusMap,
-            lockStatusMap: gameState.computed.lockStatusMap,
-          },
-          worldGen: {
-            nodeContentsMap: gameState.worldGen.nodeContentsMap,
-            lockMap: gameState.worldGen.lockMap,
-          },
-        },
-        virtualGridLocation: props.gameState.playerUI.virtualGridLocation,
-        allocationStatusMap: props.gameState.playerSave.allocationStatusMap,
-        fogOfWarStatusMap: props.gameState.computed.fogOfWarStatusMap!,
-        reachableStatusMap: props.gameState.computed.reachableStatusMap!,
-        lockStatusMap: props.gameState.computed.lockStatusMap!,
-        lockMap: props.gameState.worldGen.lockMap,
+        gameState: extractStrategicHexGridSubState(gameState),
       };
     };
     this.strategicHexGrid = new StrategicHexGridComponent(

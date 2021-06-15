@@ -79,15 +79,15 @@ function Component(props: Props) {
   // when we trigger a scroll jump, compute where we jump to, and don't forget to update the virtual grid location
   const handleJump = useCallback(
     (args: { direction: Vector2 }) => {
-      // direction: if we hit bottom right of screen, direction == (1,1)
-      // console.log({ direction: args.direction });
-      // let jumpAmounts = virtualGridDims.multiply(0.35).floor();
-      let jumpAmounts = virtualGridDims.multiply(0.05).floor();
-      // jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
-      jumpAmounts = jumpAmounts
-        .clampX(1, virtualGridDims.x - 1)
-        .clampY(1, virtualGridDims.y - 1);
-      // .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
+      // // direction: if we hit bottom right of screen, direction == (1,1)
+      // // console.log({ direction: args.direction });
+      // // let jumpAmounts = virtualGridDims.multiply(0.35).floor();
+      // let jumpAmounts = virtualGridDims.multiply(0.05).floor();
+      // // jumpAmounts = jumpAmounts.withY(Math.floor(jumpAmounts.y / 2) * 2);
+      // jumpAmounts = jumpAmounts
+      //   .clampX(1, virtualGridDims.x - 1)
+      //   .clampY(1, virtualGridDims.y - 1);
+      // // .clampY(2, Math.floor((virtualGridDims.y - 1) / 2) * 2);
 
       // let newJumpOffset = jumpAmounts.multiply(args.direction); // multiply the magnitudes by unit-ish direction vector
       let locationOffset = new Vector2(args.direction.x, -1 * args.direction.y); // biased
@@ -107,7 +107,7 @@ function Component(props: Props) {
       // force a rerender
       setJumpOffset(newJumpOffset);
     },
-    [virtualGridDims, updaters]
+    [updaters]
   );
 
   const getForceJumpOffset = debug.getForceJumpOffset;

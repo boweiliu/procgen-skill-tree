@@ -105,7 +105,7 @@ function App() {
 
       <SidebarsInterface gameState={gameState} updaters={updaters} />
       <KeyboardListenerComponent
-        intent={gameState.intent}
+        isTextBoxFocused={gameState.playerUI.isTextBoxFocused}
         updaters={updaters.intent}
       />
       <WindowListenerComponent updaters={updaters.windowState} />
