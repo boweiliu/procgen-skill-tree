@@ -7,10 +7,7 @@ import {
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
-import {
-  Attribute,
-  NodeContents,
-} from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeDescriptionReverseMap,
   ModifierDescriptionReverseMap,
