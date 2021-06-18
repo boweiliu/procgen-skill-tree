@@ -154,7 +154,7 @@
   border-right-style: none;
   border-width: calc(2 * var(--border-width));
   /* NOTE(bowei): specifically only ease-in. we want the entity to spend most of the time brightly lit up and briefly flash to dark and immediatly start bouncing back to light once it hits the darkest point. */
-  animation: blinker 1.5s ease-in infinite;
+  animation: blinker 1s ease-in infinite;
 }
 
 @keyframes blinker {

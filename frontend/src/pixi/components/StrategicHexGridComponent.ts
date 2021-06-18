@@ -75,12 +75,25 @@ export const depsStrategicHexGridSubState = extractDeps(
 
 type State = {};
 
+type HexGridAnimation = {
+  max: number;
+  min: number;
+  periodSecs: number;
+  mode: 'start-min ease-in-out';
+  phase: number;
+};
+
+type HexGridData = {
+  animation: HexGridAnimation | null;
+  node: Pixi.Sprite;
+  cursor: Pixi.Sprite | null;
+};
+
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
   private graphics: Pixi.Sprite;
-  private hexGrid: KeyedHashMap<Vector2, Pixi.Sprite> = new KeyedHashMap();
-  private animations: KeyedHashMap<Vector2, any> = new KeyedHashMap();
+  private hexGrid: KeyedHashMap<Vector2, HexGridData> = new KeyedHashMap();
 
   constructor(props: Props) {
     super(props);
@@ -114,15 +127,19 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
         );
         this.container.addChild(graphics);
-        this.hexGrid.put(new Vector2(i, j), graphics);
+        this.hexGrid.put(new Vector2(i, j), {
+          node: graphics,
+          animation: null,
+          cursor: null,
+        });
       }
     }
   }
 
   protected updateSelf(props: Props) {
     const { delta } = props;
-    for (let [v, graphics] of this.hexGrid.entries()) {
-      const animation = this.animations.get(v);
+    for (let [v, data] of this.hexGrid.entries()) {
+      const { node: graphics, animation } = data;
       if (!animation) continue;
 
       // the last frame was rendered at this phase in the animation
@@ -167,7 +184,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
     const { gameState } = props;
 
-    for (let [v, graphics] of this.hexGrid.entries()) {
+    for (let [v, data] of this.hexGrid.entries()) {
+      const { node: graphics } = data;
+
       const basePosition = props.appSize
         .divide(2)
         .add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y)); // 30 x 26 hex units
@@ -214,6 +233,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = false;
       }
 
+      // add onclick so that clicking on the node causes selected node tab to update
       if (graphics.visible) {
         graphics.interactive = true;
         graphics.buttonMode = true;
@@ -222,6 +242,19 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
             return nodeLocation;
           });
         });
+      }
+
+      // put a cursor near the node if it has been selected
+      if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
+        const cursor = new Pixi.Sprite();
+        // cursor.texture = props.args.textures.rect;
+        this.container.addChild(cursor);
+        data.cursor = cursor;
+      } else {
+        if (data.cursor) {
+          this.container.removeChild(data.cursor);
+        }
+        data.cursor = null;
       }
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
@@ -247,12 +280,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       });
 
       if (matched) {
-        // graphics.texture = props.args.textures.square;
-        // graphics.position = PixiPointFrom(basePosition);
-        // graphics.position.x -= props.args.textures.square.width / 2;
-        // graphics.position.y -= props.args.textures.square.height / 2;
-        // graphics.tint = COLORS.nodeBlue;
-        this.animations.put(v, {
+        const animation: HexGridAnimation = {
           max: addColor(COLORS.nodeBlue, graphics.tint),
           // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
           // max: COLORS.nodeBlue,
@@ -261,9 +289,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           periodSecs: 2,
           mode: 'start-min ease-in-out',
           phase: 0,
-        });
+        };
+        data.animation = animation;
       } else {
-        this.animations.put(v, null);
+        data.animation = null;
       }
     }
   }

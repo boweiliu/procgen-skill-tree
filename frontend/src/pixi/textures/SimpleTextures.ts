@@ -21,6 +21,10 @@ export function generateSimpleTextures(
   rect.drawRect(0, 0, 4, 20);
   // rect.pivot = PixiPointFrom(Vector2.Zero);
 
+  let verticalLine = new Pixi.Graphics();
+  verticalLine.beginFill(COLORS.white);
+  verticalLine.drawRect(0, 0, 4, 20);
+
   let square = new Pixi.Graphics();
   square.beginFill(COLORS.white);
   square.drawRect(0, 0, 16, 16);
