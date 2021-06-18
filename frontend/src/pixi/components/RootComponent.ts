@@ -121,6 +121,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
           position: Vector2.Zero,
           textures: state.simpleTexture.get(),
         },
+        updaters: props.updaters,
         appSize: props.appSize,
         gameState: extractStrategicHexGridSubState(gameState),
       };

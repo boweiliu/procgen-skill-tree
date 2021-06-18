@@ -23,6 +23,7 @@ import {
   interpolateColor,
   addColor,
 } from '../../lib/util/misc';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
@@ -36,6 +37,7 @@ type Props = {
       square: Pixi.Texture;
     };
   };
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
   appSize: Vector2;
   gameState: StrategicHexGridSubState;
 };
@@ -176,20 +178,20 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       //   continue;
       // }
       // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
-      const virtualLocation = gameState.playerUI.virtualGridLocation.add(
+      const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        gameState.computed.fogOfWarStatusMap?.get(virtualLocation) ||
+        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeVisibleStatus.false;
       const nodeTakenStatus =
-        gameState.playerSave.allocationStatusMap.get(virtualLocation) ||
+        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeTakenStatus.false;
       const nodeReachableStatus =
-        gameState.computed.reachableStatusMap?.get(virtualLocation) ||
+        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
-      const lockData = gameState.worldGen.lockMap.get(virtualLocation);
-      const lockStatus = gameState.computed.lockStatusMap?.get(virtualLocation);
+      const lockData = gameState.worldGen.lockMap.get(nodeLocation);
+      const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
@@ -212,6 +214,16 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = false;
       }
 
+      if (graphics.visible) {
+        graphics.interactive = true;
+        graphics.buttonMode = true;
+        graphics.on('pointerdown', () => {
+          props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+            return nodeLocation;
+          });
+        });
+      }
+
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       if (lockData && lockStatus !== LockStatus.OPEN) {
@@ -227,9 +239,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.y -= props.args.textures.circle.height / 2;
       }
 
-      const nodeContents = gameState.worldGen.nodeContentsMap.get(
-        virtualLocation
-      );
+      const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
 
       const matched = matchStrategicSearch({
         nodeContents,
@@ -273,8 +283,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     state: State
   ): boolean {
     for (let key of Object.keys(staleProps) as (keyof Props)[]) {
-      // if (key === 'delta' || key === 'args' || key === 'updaters') {
-      if (key === 'args' || key === 'delta') {
+      if (key === 'delta' || key === 'args' || key === 'updaters') {
+        // if (key === 'args' || key === 'delta') {
         continue;
       }
       if (key === 'gameState') {
