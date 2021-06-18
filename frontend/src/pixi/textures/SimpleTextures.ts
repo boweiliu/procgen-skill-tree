@@ -5,6 +5,7 @@ export interface SimpleTextureSet {
   circle: Pixi.Texture;
   rect: Pixi.Texture;
   square: Pixi.Texture;
+  verticalLine: Pixi.Texture;
 }
 
 export function generateSimpleTextures(
@@ -34,5 +35,10 @@ export function generateSimpleTextures(
     circle: renderer.generateTexture(circle, Pixi.SCALE_MODES.LINEAR, 1),
     rect: renderer.generateTexture(rect, Pixi.SCALE_MODES.LINEAR, 1),
     square: renderer.generateTexture(square, Pixi.SCALE_MODES.LINEAR, 1),
+    verticalLine: renderer.generateTexture(
+      verticalLine,
+      Pixi.SCALE_MODES.LINEAR,
+      1
+    ),
   };
 }

@@ -25,17 +25,14 @@ import {
 } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
+import { SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
   delta: number;
   args: {
     position: Vector2;
-    textures: {
-      circle: Pixi.Texture;
-      rect: Pixi.Texture;
-      square: Pixi.Texture;
-    };
+    textures: SimpleTextureSet;
   };
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   appSize: Vector2;
@@ -138,7 +135,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
   protected updateSelf(props: Props) {
     const { delta } = props;
-    for (let [v, data] of this.hexGrid.entries()) {
+    for (let data of this.hexGrid.values()) {
       const { node: graphics, animation } = data;
       if (!animation) continue;
 
@@ -247,7 +244,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // put a cursor near the node if it has been selected
       if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
         const cursor = new Pixi.Sprite();
-        // cursor.texture = props.args.textures.rect;
+        cursor.texture = props.args.textures.verticalLine;
         this.container.addChild(cursor);
         data.cursor = cursor;
       } else {
