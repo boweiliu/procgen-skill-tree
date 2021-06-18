@@ -76,12 +76,13 @@ type HexGridAnimation = {
   max: number;
   min: number;
   periodSecs: number;
-  mode: 'start-min ease-in-out';
+  mode: 'start-max ease-in-out' | 'start-max ease-in';
   phase: number;
 };
 
 type HexGridData = {
   animation: HexGridAnimation | null;
+  cursorAnimation: HexGridAnimation | null;
   node: Pixi.Sprite;
   cursor: Pixi.Sprite | null;
 };
@@ -128,6 +129,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           node: graphics,
           animation: null,
           cursor: null,
+          cursorAnimation: null,
         });
       }
     }
@@ -137,42 +139,74 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     const { delta } = props;
     for (let data of this.hexGrid.values()) {
       const { node: graphics, animation } = data;
-      if (!animation) continue;
+      if (animation) {
+        // the last frame was rendered at this phase in the animation
+        let phase = animation.phase || 0;
 
-      // the last frame was rendered at this phase in the animation
-      let phase = animation.phase || 0;
+        // increment it. phase of 1 == a full period == animation.period secs
+        let newPhase =
+          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
 
-      // increment it. phase of 1 == a full period == animation.period secs
-      let newPhase =
-        (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+        // animation starts with bezierX == 0, goes up to 1, then back down
+        let bezierX = 1 - Math.abs(newPhase * 2 - 1);
+        /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
+        // ease-in
+        // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
+        // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
+        // ease-in-out
+        let bezierY =
+          bezierX < 0.5
+            ? 2 * (bezierX * bezierX)
+            : 1 - 2 * (1 - bezierX) * (1 - bezierX);
 
-      // animation starts with bezierX == 0, goes up to 1, then back down
-      let bezierX = 1 - Math.abs(newPhase * 2 - 1);
-      /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
-      // ease-in
-      // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
-      // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
-      // ease-in-out
-      let bezierY =
-        bezierX < 0.5
-          ? 2 * (bezierX * bezierX)
-          : 1 - 2 * (1 - bezierX) * (1 - bezierX);
+        // calculate the proper tint now
+        let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
 
-      // calculate the proper tint now
-      let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
+        // set the tint
+        // tintProp = tintProp * .75 + 0.25; // minimum opacity = 0.25
+        graphics.tint = interpolateColor({
+          target: animation.max,
+          base: animation.min,
+          proportion: tintProp,
+        });
+        // console.log({ delta, phase, newPhase, bezierX, tintProp, tint: graphics.tint });
 
-      // set the tint
-      // tintProp = tintProp * .75 + 0.25; // minimum opacity = 0.25
-      graphics.tint = interpolateColor({
-        target: animation.max,
-        base: animation.min,
-        proportion: tintProp,
-      });
-      // console.log({ delta, phase, newPhase, bezierX, tintProp, tint: graphics.tint });
+        // update phase on animation object
+        animation.phase = newPhase;
+      }
 
-      // update phase on animation object
-      animation.phase = newPhase;
-      // animation
+      if (data.cursor && data.cursorAnimation) {
+        let animation = data.cursorAnimation;
+
+        // the last frame was rendered at this phase in the animation
+        let phase = animation.phase || 0;
+
+        // increment it. phase of 1 == a full period == animation.period secs
+        let newPhase =
+          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+
+        // animation starts with bezierX == 0, goes up to 1, then back down
+        let bezierX = 1 - Math.abs(newPhase * 2 - 1);
+        /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
+        // ease-in
+        // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
+        // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
+        // ease-in-out
+        let bezierY = bezierX * bezierX;
+
+        // calculate the proper tint now
+        let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
+
+        // set the tint
+        data.cursor.tint = interpolateColor({
+          target: animation.max,
+          base: animation.min,
+          proportion: tintProp,
+        });
+
+        // update phase on animation object
+        animation.phase = newPhase;
+      }
     }
   }
 
@@ -241,19 +275,6 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         });
       }
 
-      // put a cursor near the node if it has been selected
-      if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
-        const cursor = new Pixi.Sprite();
-        cursor.texture = props.args.textures.verticalLine;
-        this.container.addChild(cursor);
-        data.cursor = cursor;
-      } else {
-        if (data.cursor) {
-          this.container.removeChild(data.cursor);
-        }
-        data.cursor = null;
-      }
-
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       if (lockData && lockStatus !== LockStatus.OPEN) {
@@ -284,12 +305,45 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           // max: graphics.tint,
           min: graphics.tint,
           periodSecs: 2,
-          mode: 'start-min ease-in-out',
+          mode: 'start-max ease-in-out',
           phase: 0,
         };
         data.animation = animation;
       } else {
         data.animation = null;
+      }
+
+      // put a cursor near the node if it has been selected
+      if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
+        if (!data.cursor) {
+          const cursor = new Pixi.Sprite();
+          cursor.texture = props.args.textures.verticalLine;
+          // cursor.tint = graphics.tint;
+          // cursor.tint = addColor(COLORS.nodeBlue, graphics.tint);
+          cursor.tint = COLORS.borderWhite;
+          this.container.addChild(cursor);
+          data.cursor = cursor;
+
+          data.cursorAnimation = {
+            max: COLORS.borderWhite,
+            min: graphics.tint,
+            periodSecs: 1,
+            mode: 'start-max ease-in',
+            phase: 0,
+          };
+        }
+      } else {
+        if (data.cursor) {
+          this.container.removeChild(data.cursor);
+        }
+        data.cursor = null;
+      }
+      if (data.cursor) {
+        data.cursor.position = PixiPointFrom(basePosition);
+        // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
+        data.cursor.position.x -= 30 / 2; // - props.args.textures.verticalLine.width / 3;
+        data.cursor.position.x += props.args.textures.verticalLine.width / 3;
+        data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }
     }
   }
