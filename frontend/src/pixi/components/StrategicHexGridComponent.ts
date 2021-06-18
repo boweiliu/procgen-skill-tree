@@ -326,7 +326,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
           data.cursorAnimation = {
             max: COLORS.borderWhite,
-            min: graphics.tint,
+            min: interpolateColor({
+              color: COLORS.borderWhite,
+              opacity: 0.25,
+              background: COLORS.backgroundBlue,
+            }),
             periodSecs: 1,
             mode: 'start-max ease-in',
             phase: 0,
