@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
-import { GameState } from '../../data/GameState';
-import { NodeTakenStatus } from '../../data/NodeStatus';
-import { AllocateNodeAction } from '../../game/actions/AllocateNode';
-import { Vector2 } from '../../lib/util/geometry/vector2';
-import { Vector3 } from '../../lib/util/geometry/vector3';
+import { GameState } from '../../../data/GameState';
+import { NodeTakenStatus } from '../../../data/NodeStatus';
+import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
+import { Vector2 } from '../../../lib/util/geometry/vector2';
+import { Vector3 } from '../../../lib/util/geometry/vector3';
 import {
   nodeContentsToDom,
   STARTING_NODE_DESCRIPTION,
-} from '../GameArea/computeVirtualNodeDataMap';
+} from '../../GameArea/computeVirtualNodeDataMap';
 
 export const SelectedNodeTabContent = React.memo(
   SelectedNodeTabContentComponent

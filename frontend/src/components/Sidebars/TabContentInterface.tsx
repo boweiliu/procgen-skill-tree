@@ -2,9 +2,9 @@ import React from 'react';
 import './TabContent.css';
 import { GameState } from '../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { DebugTabContent } from './DebugTab';
-import { StrategicTab } from './StrategicTab';
-import { SelectedNodeTabContent } from './SelectedNodeTab';
+import { DebugTabContent } from './Tabs/DebugTab';
+import { StrategicTab } from './Tabs/StrategicTab';
+import { SelectedNodeTabContent } from './Tabs/SelectedNodeTab';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 
 export enum TAB_NAME {
