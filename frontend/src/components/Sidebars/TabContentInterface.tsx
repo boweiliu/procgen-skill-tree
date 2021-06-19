@@ -5,6 +5,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { DebugTabContent } from './DebugTab';
 import { StrategicTab } from './StrategicTab';
 import { SelectedNodeTabContent } from './SelectedNodeTab';
+import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -21,13 +22,17 @@ export function TabContentInterface(props: {
   tabName: TAB_NAME;
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
+  actions: { allocateNode: AllocateNodeAction };
 }) {
   const { tabName } = props;
 
   const tabComponents = {
     [TAB_NAME.EMPTY]: <EmptyTabContent />,
     [TAB_NAME.SELECTED_NODE]: (
-      <SelectedNodeTabContent gameState={props.gameState} />
+      <SelectedNodeTabContent
+        gameState={props.gameState}
+        actions={props.actions}
+      />
     ),
     [TAB_NAME.STATS]: <>stats info???</>,
     [TAB_NAME.QUESTS]: <>quests info???</>,

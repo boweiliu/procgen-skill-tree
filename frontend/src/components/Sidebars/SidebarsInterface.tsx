@@ -5,6 +5,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import Sidebar from './Sidebar';
 import { Tabs } from './Tabs';
 import { TabContentInterface, TAB_NAME } from './TabContentInterface';
+import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 
 export const emptyTabLabels: TAB_NAME[] = [TAB_NAME.EMPTY];
 export const initialTabLabels: TAB_NAME[] = [
@@ -133,6 +134,11 @@ export function SidebarsInterface(props: {
     }
   }, [rightSidebarTabs, rightActiveTabIndex]);
 
+  // TODO(bowei): improve this abstraction??
+  const actions = useMemo(() => {
+    return { allocateNode: new AllocateNodeAction(props.updaters) };
+  }, [props.updaters]);
+
   return (
     <>
       <Sidebar
@@ -163,6 +169,7 @@ export function SidebarsInterface(props: {
           gameState={gameState}
           updaters={updaters}
           tabName={leftTabName}
+          actions={actions}
         />
       </Sidebar>
       <Sidebar hidden={!gameState.playerUI.isSidebarOpen} placement={'right'}>
@@ -189,6 +196,7 @@ export function SidebarsInterface(props: {
           gameState={gameState}
           updaters={updaters}
           tabName={rightTabName}
+          actions={actions}
         />
       </Sidebar>
     </>
