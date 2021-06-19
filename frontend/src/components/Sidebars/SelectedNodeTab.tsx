@@ -98,7 +98,7 @@ function SelectedNodeTabContentComponent(props: {
           <div>Contents: {nodeContentsDom}</div>
           <br></br>
           <button disabled={!canBeAllocated} onClick={onAllocate}>
-            Allocate
+            Allocate (hotkey: spacebar)
           </button>
         </div>
       </>
