@@ -46,12 +46,12 @@ export const ModifierDescriptionReverseMap: { [k: string]: Modifier } = {
 };
 
 export function nodeContentsLineToString(line: NodeContentsLine): string {
+  const desc = AttributeDescriptionMap[line.attribute];
+  const symbol = AttributeSymbolMap[line.attribute];
   if (line.modifier === Modifier.FLAT) {
-    return `+${line.amount} ${AttributeDescriptionMap[line.attribute]}`;
+    return `+${line.amount} ${symbol} (${desc})`;
   } else {
-    return `${line.amount}% increased ${
-      AttributeDescriptionMap[line.attribute]
-    }`;
+    return `${line.amount}% increased ${symbol} (${desc})`;
   }
 }
 
