@@ -126,6 +126,8 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
   const visibleStatus = (
     gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false
   ).toString();
+  const lockData = gameState.worldGen.lockMap?.get(location) || null;
+  // const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
 
   return (
     <>
@@ -139,7 +141,10 @@ function SelectedNodeTabContentComponent(props: { gameState: GameState }) {
         <div>Taken?: {takenStatus}</div>
         <div>Reachable?: {reachableStatus}</div>
         <div>Visible?: {visibleStatus}</div>
-        <div>Locked?: {'???'}</div>
+        <div>Locked?: {(!!lockData).toString()}</div>
+        <div>
+          Can be allocated?: {(reachableStatus && !lockData).toString()}
+        </div>
         <br></br>
         <div>Contents: {'???'}</div>
       </div>
