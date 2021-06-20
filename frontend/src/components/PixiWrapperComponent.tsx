@@ -12,9 +12,8 @@ const initialApplication = new Lazy(() => new PixiReactBridge());
 export function PixiWrapperComponent(props: { hidden: boolean }) {
   const [application] = useState(initialApplication.get());
   const container = useRef<HTMLDivElement>(null);
-  const [gameState, gameStateUpdaters, fireBatchedSetGameState] = useContext(
-    UseGameStateContext
-  );
+  const [gameState, gameStateUpdaters, fireBatchedSetGameState] =
+    useContext(UseGameStateContext);
 
   useEffect(() => {
     // remove old application if it exists

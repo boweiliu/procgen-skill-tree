@@ -49,10 +49,12 @@ function updaterGenerator2Helper<T, W>(
       ) {
         if (typeof newValueOrCallback === 'function') {
           dataUpdater((oldData: T, wholeData: W) => {
-            const newKey = (newValueOrCallback as (
-              prev: T[typeof key],
-              whole: W
-            ) => T[typeof key])(oldData[key], wholeData);
+            const newKey = (
+              newValueOrCallback as (
+                prev: T[typeof key],
+                whole: W
+              ) => T[typeof key]
+            )(oldData[key], wholeData);
             if (oldData[key] === newKey) {
               return oldData; // no update detected, no need to update anything
             } else {
@@ -70,10 +72,10 @@ function updaterGenerator2Helper<T, W>(
           }));
         }
       }
-      updaters[key] = (updaterGenerator2Helper<T[typeof key], W>(
+      updaters[key] = updaterGenerator2Helper<T[typeof key], W>(
         dataObject[key],
         keyUpdater
-      ) as unknown) as typeof updaters[typeof key];
+      ) as unknown as typeof updaters[typeof key];
     });
     return updaters;
   }

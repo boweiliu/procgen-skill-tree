@@ -48,7 +48,7 @@ export class Lazy<T> {
 export function LazyProxy<
   T extends { [key: string]: any } | { [i: number]: any }
 >(factory: () => T): Const<T> {
-  return (new Proxy(new Lazy(factory), {
+  return new Proxy(new Lazy(factory), {
     get: (target, property, receiver) => {
       if (property === 'toJSON') {
         return () => {
@@ -77,7 +77,7 @@ export function LazyProxy<
       // This is called when iterating over array i.e. array.forEach()
       return property in target.get();
     },
-  }) as unknown) as Const<T>;
+  }) as unknown as Const<T>;
 }
 
 /**
