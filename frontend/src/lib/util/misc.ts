@@ -254,3 +254,5 @@ export function extractDeps<T, U>(
     return deps;
   };
 }
+
+export class DeserializationError extends Error {}

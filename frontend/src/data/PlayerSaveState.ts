@@ -1,6 +1,7 @@
 import { LockStatus, NodeTakenStatus } from './NodeStatus';
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
+import { DeserializationError } from '../lib/util/misc';
 
 export type PlayerSaveState = {
   /**
@@ -28,7 +29,10 @@ export const newPlayerSaveState = (): PlayerSaveState => {
 const serializeToObject = (s: PlayerSaveState): object => {
   return {
     ...s,
-    allocationStatusMap: KeyedHashMap.SerializeToObject(s.allocationStatusMap),
+    allocationStatusMap: KeyedHashMap.SerializeToObject<
+      Vector3,
+      NodeTakenStatus
+    >(s.allocationStatusMap, Vector3.SerializeToObject),
   };
 };
 
@@ -43,7 +47,15 @@ const deserializeFromObject = (obj: any): PlayerSaveState | null => {
   const allocationStatusMap = KeyedHashMap.Deserialize<
     Vector3,
     NodeTakenStatus
-  >(obj.allocationStatusMap);
+  >(obj.allocationStatusMap, (it) => {
+    const result = Vector3.Deserialize(it);
+    if (!result) {
+      throw new DeserializationError(
+        `Failed deserializing vector3 ${JSON.stringify(it)}`
+      );
+    }
+    return result;
+  });
   if (!allocationStatusMap) {
     console.error('Failed deserializing PlayerSaveState: ', obj);
     return null;
