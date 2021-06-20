@@ -19,12 +19,12 @@ export function generateSimpleTextures(
   let rect = new Pixi.Graphics();
   rect.beginFill(COLORS.white);
   // rect.drawRect(-6, -10, 12, 20);
-  rect.drawRect(0, 0, 6, 20);
+  rect.drawRect(0, 0, 5, 18);
   // rect.pivot = PixiPointFrom(Vector2.Zero);
 
   let verticalLine = new Pixi.Graphics();
   verticalLine.beginFill(COLORS.white);
-  verticalLine.drawRect(0, 0, 3, 18);
+  verticalLine.drawRect(0, 0, 3, 16);
   verticalLine.drawRect(0, 0, 6, 3);
   verticalLine.drawRect(0, 15, 6, 3);
 
