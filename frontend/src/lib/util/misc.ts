@@ -155,6 +155,7 @@ export class Util {
 
 /**
  * A deep readonly type - given an object type, all subobjects and their subobjects are also marked as readonly.
+ * see also: https://twitter.com/mgechev/status/1240178886979223552?lang=en
  */
 export type Const<T> = T extends Function
   ? T
