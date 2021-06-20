@@ -52,6 +52,7 @@ const defaultKeyIntentConfig = {
   // x: IntentName.MOVE_CURSOR_SOUTHEAST,
   // c: IntentName.MOVE_CURSOR_SOUTHEAST,
   ' ': IntentName.INTERACT_WITH_NODE,
+  z: IntentName.ZOOM_RECENTER_AT_NODE,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };

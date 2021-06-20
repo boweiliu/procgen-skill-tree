@@ -25,8 +25,8 @@ function SelectedNodeTabContentComponent(props: {
 
   const onAllocate = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       if (location) {
-        e.preventDefault();
         props.actions.allocateNode.enqueueAction({
           nodeLocation: location,
           newStatus: NodeTakenStatus.true,
@@ -38,8 +38,8 @@ function SelectedNodeTabContentComponent(props: {
 
   const onZoom = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       if (location) {
-        e.preventDefault();
         // set virtual grid location
         props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
           return location;

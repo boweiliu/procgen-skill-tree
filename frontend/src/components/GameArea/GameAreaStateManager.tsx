@@ -214,6 +214,27 @@ function Component(props: {
     handleUpdateNodeStatus,
   ]);
 
+  useEffect(() => {
+    const location = gameState.playerUI.cursoredNodeLocation;
+    if (location) {
+      // set virtual grid location
+      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+        return location;
+      });
+
+      props.updaters.playerUI.triggerScrollRecenterCb.enqueueUpdate(() => {
+        return () => {
+          // this is not guaranteed to ever be called
+          console.log('zoomed to location: ', { location });
+        };
+      });
+    }
+  }, [
+    props.gameState.intent.newIntent.ZOOM_RECENTER_AT_NODE,
+    gameState.playerUI.cursoredNodeLocation,
+    props.updaters,
+  ]);
+
   // Manage keyboard scrolling here
   // TODO(bowei): move this into infinite scroll manager. the only reason this is here is because we have access to intent object conveniently here
   const keyboardScrollDirection: Vector2 = useMemo(() => {
