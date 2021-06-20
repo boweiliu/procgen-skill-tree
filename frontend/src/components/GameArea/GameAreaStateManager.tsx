@@ -215,19 +215,21 @@ function Component(props: {
   ]);
 
   useEffect(() => {
-    const location = gameState.playerUI.cursoredNodeLocation;
-    if (location) {
-      // set virtual grid location
-      props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
-        return location;
-      });
+    if (props.gameState.intent.newIntent.ZOOM_RECENTER_AT_NODE) {
+      const location = gameState.playerUI.cursoredNodeLocation;
+      if (location) {
+        // set virtual grid location
+        props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+          return location;
+        });
 
-      props.updaters.playerUI.triggerScrollRecenterCb.enqueueUpdate(() => {
-        return () => {
-          // this is not guaranteed to ever be called
-          console.log('zoomed to location: ', { location });
-        };
-      });
+        props.updaters.playerUI.triggerScrollRecenterCb.enqueueUpdate(() => {
+          return () => {
+            // this is not guaranteed to ever be called
+            console.log('zoomed to location: ', { location });
+          };
+        });
+      }
     }
   }, [
     props.gameState.intent.newIntent.ZOOM_RECENTER_AT_NODE,
