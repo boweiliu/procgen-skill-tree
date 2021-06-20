@@ -273,6 +273,7 @@ function Component(props: {
       <InfiniteScrollManager
         hidden={!gameState.playerUI.isPixiHidden}
         appSize={appSize}
+        triggerScrollRecenterCb={gameState.playerUI.triggerScrollRecenterCb}
         updaters={props.updaters}
         hexGridPx={hexGridPx}
         virtualGridDims={virtualGridDims}

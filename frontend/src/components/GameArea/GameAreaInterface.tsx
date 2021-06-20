@@ -38,6 +38,7 @@ export function extractGameAreaSubState(gameState: GameState) {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
       isPixiHidden: gameState.playerUI.isPixiHidden,
+      triggerScrollRecenterCb: gameState.playerUI.triggerScrollRecenterCb,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,

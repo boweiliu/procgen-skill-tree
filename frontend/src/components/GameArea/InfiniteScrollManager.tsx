@@ -19,7 +19,7 @@ type Props = {
   virtualGridDims: Vector2; // in grid units. width x height, guaranteed to be integers
   children?: any;
   debug?: any;
-
+  triggerScrollRecenterCb: () => void;
   updaters: UpdaterGeneratorType2<GameState, GameState>; // TODO(bowei): remove this
   keyboardScrollDirection: Vector2;
 };
@@ -41,29 +41,37 @@ function Component(props: Props) {
     virtualGridDims,
     appSize,
     updaters,
+    triggerScrollRecenterCb,
     keyboardScrollDirection,
     debug,
   } = props;
   // console.log('infinite scroll manager rerender');
 
   const container = useRef<HTMLDivElement>(null);
-  const previousContainer = useRef<HTMLDivElement>(null) as any;
 
   const [jumpOffset, setJumpOffset] = useState(new Vector2(0, 0));
 
   // Set initial position in the center, exactly once!
+  // useEffect(() => {
+  //   if (
+  //     container.current != null &&
+  //     container.current !== previousContainer.current
+  //   ) {
+  //     // TODO(bowei): figure out where the actual center is, so we can center the screen on the starting node perfectly
+  //     const center = getVirtualGridCenterPx({ virtualGridDims, hexGridPx });
+  //     container.current.scrollTop = center.y - appSize.y / 2;
+  //     container.current.scrollLeft = center.x - appSize.x / 2;
+  //   }
+  //   previousContainer.current = container.current;
+  // }, [appSize, virtualGridDims, hexGridPx]);
   useEffect(() => {
-    if (
-      container.current != null &&
-      container.current !== previousContainer.current
-    ) {
-      // TODO(bowei): figure out where the actual center is, so we can center the screen on the starting node perfectly
+    if (container.current) {
+      triggerScrollRecenterCb();
       const center = getVirtualGridCenterPx({ virtualGridDims, hexGridPx });
       container.current.scrollTop = center.y - appSize.y / 2;
       container.current.scrollLeft = center.x - appSize.x / 2;
     }
-    previousContainer.current = container.current;
-  }, [appSize, virtualGridDims, hexGridPx]);
+  }, [appSize, virtualGridDims, hexGridPx, triggerScrollRecenterCb]);
 
   // Uses offset to jump to a new scroll position, exactly once
   useEffect(() => {
