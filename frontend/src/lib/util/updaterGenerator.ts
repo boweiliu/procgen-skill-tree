@@ -48,7 +48,7 @@ function updaterGenerator2Helper<T, W>(
         newValueOrCallback: UpdaterFnParam2<T[typeof key], W>
       ) {
         if (typeof newValueOrCallback === 'function') {
-          dataUpdater((oldData: T, wholeData: W) => {
+          dataUpdater((oldData: Const<T>, wholeData: W) => {
             const newKey = (
               newValueOrCallback as (
                 prev: T[typeof key],
