@@ -1,30 +1,44 @@
+const RED_MASK = 0xff0000;
+const GREEN_MASK = 0x00ff00;
+const BLUE_MASK = 0x0000ff;
+const RED_UNIT = 0x010000;
+const GREEN_UNIT = 0x000100;
+const BLUE_UNIT = 0x000001;
+const COLOR_MAX = 255;
+
 /**
  * Multiplies colors (0xFFFFFF === 1). use for applying tints manually.
  * @param color1 A base color
  * @param color2 A tint
  */
-
 export function multiplyColor(color1: number, color2: number): number {
-  let reds = [color1 & 0xff0000, color2 & 0xff0000];
-  let blues = [color1 & 0x0000ff, color2 & 0x0000ff];
-  let greens = [color1 & 0x00ff00, color2 & 0x00ff00];
-  let out = Math.round(((reds[0] / 0x010000) * reds[1]) / 0xffffff) * 0x010000;
-  out += Math.round(((greens[0] / 0x000100) * greens[1]) / 0x00ff00) * 0x000100;
-  out += Math.round((blues[0] * blues[1]) / 0x0000ff);
+  let reds = [color1 & RED_MASK, color2 & RED_MASK];
+  let greens = [color1 & GREEN_MASK, color2 & GREEN_MASK];
+  let blues = [color1 & BLUE_MASK, color2 & BLUE_MASK];
+  let out = Math.round(((reds[0] / RED_UNIT) * reds[1]) / RED_MASK) * RED_UNIT;
+  out +=
+    Math.round(((greens[0] / GREEN_UNIT) * greens[1]) / GREEN_MASK) *
+    GREEN_UNIT;
+  out +=
+    Math.round(((blues[0] / BLUE_UNIT) * blues[1]) / BLUE_MASK) * BLUE_UNIT;
   return out;
 }
 
 export function addColor(color1: number, color2: number): number {
-  let reds = [color1 & 0xff0000, color2 & 0xff0000];
-  let blues = [color1 & 0x0000ff, color2 & 0x0000ff];
-  let greens = [color1 & 0x00ff00, color2 & 0x00ff00];
+  let reds = [color1 & RED_MASK, color2 & RED_MASK];
+  let greens = [color1 & GREEN_MASK, color2 & GREEN_MASK];
+  let blues = [color1 & BLUE_MASK, color2 & BLUE_MASK];
   let out =
-    Math.round(Math.min(reds[0] / 0x010000 + reds[1] / 0x010000, 255)) *
-    0x010000;
+    Math.round(Math.min(reds[0] / RED_UNIT + reds[1] / RED_UNIT, COLOR_MAX)) *
+    RED_UNIT;
   out +=
-    Math.round(Math.min(greens[0] / 0x000100 + greens[1] / 0x000100, 255)) *
-    0x000100;
-  out += Math.round(Math.min(blues[0] + blues[1], 255));
+    Math.round(
+      Math.min(greens[0] / GREEN_UNIT + greens[1] / GREEN_UNIT, COLOR_MAX)
+    ) * GREEN_UNIT;
+  out +=
+    Math.round(
+      Math.min(blues[0] / BLUE_UNIT + blues[1] / BLUE_UNIT, COLOR_MAX)
+    ) * BLUE_UNIT;
   return out;
 }
 /**
@@ -72,20 +86,72 @@ function _interpolateColor(args: {
   base?: number;
 }): number {
   const { target, base = 0, proportion = 1 } = args;
-  let reds = [target & 0xff0000, base & 0xff0000];
-  let blues = [target & 0x0000ff, base & 0x0000ff];
-  let greens = [target & 0x00ff00, base & 0x00ff00];
+  let reds = [target & RED_MASK, base & RED_MASK];
+  let greens = [target & GREEN_MASK, base & GREEN_MASK];
+  let blues = [target & BLUE_MASK, base & BLUE_MASK];
   let out =
     Math.round(
-      (reds[0] / 0x010000) * proportion +
-        (reds[1] / 0x010000) * (1 - proportion)
-    ) * 0x010000;
+      (reds[0] / RED_UNIT) * proportion +
+        (reds[1] / RED_UNIT) * (1 - proportion)
+    ) * RED_UNIT;
   out +=
     Math.round(
-      (greens[0] / 0x000100) * proportion +
-        (greens[1] / 0x000100) * (1 - proportion)
-    ) * 0x000100;
-  out += Math.round(blues[0] * proportion + blues[1] * (1 - proportion));
+      (greens[0] / GREEN_UNIT) * proportion +
+        (greens[1] / GREEN_UNIT) * (1 - proportion)
+    ) * GREEN_UNIT;
+  out +=
+    Math.round(
+      (blues[0] / BLUE_UNIT) * proportion +
+        (blues[1] / BLUE_UNIT) * (1 - proportion)
+    ) * BLUE_UNIT;
 
   return out;
+}
+
+// h in degrees; s, v in [0, 1]
+type Hsv = {
+  h: number;
+  s: number;
+  v: number;
+};
+
+export function hexToHsv(color: number): Hsv {
+  const [r, g, b] = [
+    (color & RED_MASK) / RED_UNIT / COLOR_MAX,
+    (color & GREEN_MASK) / GREEN_UNIT / COLOR_MAX,
+    (color & BLUE_MASK) / BLUE_UNIT / COLOR_MAX,
+  ];
+  const v = Math.max(r, g, b);
+  const cMin = Math.min(r, g, b);
+  const range = v - cMin;
+  const hueSector =
+    range &&
+    (v === r
+      ? (g - b) / range
+      : v === g
+      ? 2 + (b - r) / range
+      : 4 + (r - g) / range);
+  const h = 60 * (hueSector < 0 ? hueSector + 6 : hueSector);
+  return {
+    h,
+    s: v && range / v,
+    v,
+  };
+}
+
+export function hsvToHex(hsv: Hsv): number {
+  const [r, g, b] = [
+    hsvToHexHelper(5, hsv),
+    hsvToHexHelper(3, hsv),
+    hsvToHexHelper(1, hsv),
+  ];
+  return r * RED_UNIT + g * RED_UNIT + b * RED_UNIT;
+}
+
+function hsvToHexHelper(colorDirection: number, hsv: Hsv) {
+  const { h, s, v } = hsv;
+  const k = (colorDirection + h / 60) % 6;
+  const colorPercentUnclamped = Math.min(k, 4 - k);
+  const colorPercent = Math.max(0, Math.min(colorPercentUnclamped, 1));
+  return Math.round(v * (1 - s * colorPercent) * COLOR_MAX);
 }
