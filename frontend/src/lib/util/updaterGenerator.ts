@@ -51,10 +51,13 @@ function updaterGenerator2Helper<T, W>(
           dataUpdater((oldData: Const<T>, wholeData: W) => {
             const newKey = (
               newValueOrCallback as (
-                prev: T[typeof key],
+                prev: Const<T[typeof key]>,
                 whole: W
               ) => T[typeof key]
-            )(oldData[key], wholeData);
+            )(
+              oldData[key] as any as Const<T[typeof key]>, // NOTE(bowei): typescript does not recognize Const<T>[typeof key] == Const<T[typeof key]>
+              wholeData
+            );
             if (oldData[key] === newKey) {
               return oldData; // no update detected, no need to update anything
             } else {
