@@ -242,7 +242,7 @@ export function extractDeps<T, U>(
 ): (t: T | Const<U>) => any[] {
   const accessPaths = extractAccessPaths(deepFilter);
 
-  return (t: T | U) => {
+  return (t: T | Const<U>) => {
     const deps = accessPaths.map((accessPath) => {
       let ref: any = t;
       for (let p of accessPath) {
