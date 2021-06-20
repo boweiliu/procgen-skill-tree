@@ -7,6 +7,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
+import { getVirtualGridCenterPx } from './locationUtils';
 
 const SCROLL_INTERVAL_MS = 8; // polling interval - how often to check keyboard scroll state. recommended 60 FPS == 16ms or faster.
 const SCROLL_VELOCITY = 0.75; // pixels per ms. independent of interval_ms tick rate
@@ -57,10 +58,9 @@ function Component(props: Props) {
       container.current !== previousContainer.current
     ) {
       // TODO(bowei): figure out where the actual center is, so we can center the screen on the starting node perfectly
-      container.current.scrollTop =
-        (virtualGridDims.y * hexGridPx.y - appSize.y) / 2;
-      container.current.scrollLeft =
-        ((virtualGridDims.x + 0.5) * hexGridPx.x - appSize.x) / 2;
+      const center = getVirtualGridCenterPx({ virtualGridDims, hexGridPx });
+      container.current.scrollTop = center.y - appSize.y / 2;
+      container.current.scrollLeft = center.x - appSize.x / 2;
     }
     previousContainer.current = container.current;
   }, [appSize, virtualGridDims, hexGridPx]);

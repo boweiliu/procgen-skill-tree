@@ -1,9 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameState } from '../../../data/GameState';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { PlayerUIState } from '../../../data/PlayerUIState';
 import { WorldGenStateFactory } from '../../../game/worldGen/WorldGenStateFactory';
+import { appSizeFromWindowSize } from '../../../data/WindowState';
+import {
+  hexGridPx,
+  virtualAreaScaleMultiplier,
+} from '../../GameArea/GameAreaInterface';
 
 export function DebugTabContent(props: {
   gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
@@ -15,6 +20,30 @@ export function DebugTabContent(props: {
 
   const [lastUpdated, setLastUpdated] = useState(+new Date());
   const [slowRenderMsgs, setSlowRenderMsgs] = useState<string[]>([]);
+
+  const appSize = useMemo(() => {
+    return appSizeFromWindowSize(
+      new Vector2(
+        gameState.windowState.innerWidth,
+        gameState.windowState.innerHeight
+      )
+    );
+  }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
+
+  const virtualGridDims = useMemo(() => {
+    let x = Math.floor(
+      (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
+    );
+    let y = Math.floor((appSize.y * virtualAreaScaleMultiplier) / hexGridPx.y);
+
+    // y = (Math.floor((y - 1) / 2) * 2) + 1; // force y to be odd
+
+    // needs to be at least 3.8 x 4.8 so we have room for jumps
+    // x = Math.max(4, x);
+    // y = Math.max(5, y);
+
+    return new Vector2(x, y);
+  }, [appSize]);
 
   useEffect(() => {
     const now = new Date();
@@ -139,6 +168,11 @@ export function DebugTabContent(props: {
       <div>
         ( {gameState.playerUI.virtualGridLocation.x} ,{' '}
         {gameState.playerUI.virtualGridLocation.y} )
+      </div>
+      <br></br>
+      <div> virtual grid dims </div>
+      <div>
+        ( {virtualGridDims.x} , {virtualGridDims.y} )
       </div>
       <br></br>
       <div> buttons </div>
