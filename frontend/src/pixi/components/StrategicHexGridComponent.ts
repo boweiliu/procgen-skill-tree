@@ -1,4 +1,5 @@
 import * as Pixi from 'pixi.js';
+import chroma from 'chroma-js';
 import { GameState } from '../../data/GameState';
 import {
   LockStatus,
@@ -18,7 +19,7 @@ import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
-import { hexToHsv, hsvToHex, interpolateColor } from '../../lib/util/color';
+import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
 import { SimpleTextureSet } from '../textures/SimpleTextures';
@@ -295,13 +296,16 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
-      const nodeContentsHsv = hexToHsv(nodeContentsToColor(nodeContents));
-      graphics.tint = hsvToHex({
-        h: nodeContentsHsv.h,
-        s: nodeContentsHsv.s,
-        // s: 0,
-        v: hexToHsv(graphics.tint).v,
-      });
+      const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
+      const originalLch = chroma(graphics.tint).lch();
+      graphics.tint = chroma
+        .lch(
+          originalLch[0],
+          // nodeContentsLch[1],
+          0.5 * (originalLch[1] + nodeContentsLch[1]),
+          nodeContentsLch[2]
+        )
+        .num();
 
       const matched = matchStrategicSearch({
         nodeContents,
