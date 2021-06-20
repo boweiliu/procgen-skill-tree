@@ -16,12 +16,8 @@ import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import {
-  Const,
-  extractDeps,
-  extractAccessPaths,
-  interpolateColor,
-} from '../../lib/util/misc';
+import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
+import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
 import { SimpleTextureSet } from '../textures/SimpleTextures';

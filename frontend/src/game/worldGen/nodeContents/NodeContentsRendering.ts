@@ -14,6 +14,16 @@ export const AttributeSymbolMap = {
   [Attribute.DEL2]: '✨',
 };
 
+// Use hue and saturation from this map; HSV value is determined by node allocation state
+export const AttributeColorMap = {
+  [Attribute.RED0]: 0xff0000,
+  [Attribute.RED1]: 0x00ff00,
+  [Attribute.RED2]: 0x0000ff,
+  [Attribute.DEL0]: 0x849091,
+  [Attribute.DEL1]: 0xffc400,
+  [Attribute.DEL2]: 0xffff43,
+};
+
 export const AttributeDescriptionMap = {
   [Attribute.RED0]: 'Red',
   [Attribute.RED1]: 'Green',

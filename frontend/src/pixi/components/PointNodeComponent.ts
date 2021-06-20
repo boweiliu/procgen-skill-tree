@@ -4,7 +4,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { GameState } from '../../data/GameState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { multiplyColor } from '../../lib/util/misc';
+import { multiplyColor } from '../../lib/util/color';
 import { TooltippableAreaComponent } from './TooltippableAreaComponent';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { RootComponentState } from './RootComponent';
