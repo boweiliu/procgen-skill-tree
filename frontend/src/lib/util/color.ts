@@ -115,6 +115,9 @@ type Hsv = {
   v: number;
 };
 
+// source: https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately/54024653#54024653
+// and https://stackoverflow.com/questions/8022885/rgb-to-hsv-color-in-javascript
+// tested using: https://stackoverflow.com/questions/52193529/is-it-possible-to-import-a-typescript-into-a-running-instance-of-ts-node-repl
 export function hexToHsv(color: number): Hsv {
   const [r, g, b] = [
     (color & RED_MASK) / RED_UNIT / COLOR_MAX,
