@@ -145,7 +145,7 @@ export function hsvToHex(hsv: Hsv): number {
     hsvToHexHelper(3, hsv),
     hsvToHexHelper(1, hsv),
   ];
-  return r * RED_UNIT + g * RED_UNIT + b * RED_UNIT;
+  return r * RED_UNIT + g * GREEN_UNIT + b * BLUE_UNIT;
 }
 
 function hsvToHexHelper(colorDirection: number, hsv: Hsv) {
@@ -153,5 +153,6 @@ function hsvToHexHelper(colorDirection: number, hsv: Hsv) {
   const k = (colorDirection + h / 60) % 6;
   const colorPercentUnclamped = Math.min(k, 4 - k);
   const colorPercent = Math.max(0, Math.min(colorPercentUnclamped, 1));
+  // console.log({ h, s, v , colorDirection, k, colorPercentUnclamped, colorPercent, })
   return Math.round(v * (1 - s * colorPercent) * COLOR_MAX);
 }
