@@ -268,8 +268,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (graphics.visible) {
         graphics.interactive = true;
         graphics.buttonMode = true;
+        graphics.removeAllListeners(); // NOTE(bowei): there's a double render which would otherwise attach 2 event handlers.
         graphics.on('pointerdown', () => {
+          // console.log("pointerdown in strategic hex grid pixi" , { nodeLocation });
           props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+            // console.log("enqueue update in pointerdown in strategic hex grid" , { prev, nodeLocation });
+            if (prev && prev.equals(nodeLocation)) {
+              return null;
+            }
             return nodeLocation;
           });
         });
@@ -428,7 +434,7 @@ export function matchStrategicSearch(args: {
 
   // for ALL of the terms, make sure node contents matches
   let unmatchedTerm: string | null = null;
-  console.log({ terms });
+  // console.log({ terms });
   for (let term of terms) {
     // is the term a attribute or modifier?
     const maybeAttribute = AttributeDescriptionReverseMap[term];
