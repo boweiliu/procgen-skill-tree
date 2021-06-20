@@ -134,6 +134,13 @@ export function DebugTabContent(props: {
         })}
         <br></br>
       </div>
+      <br></br>
+      <div> virtual grid location </div>
+      <div>
+        ( {gameState.playerUI.virtualGridLocation.x} ,{' '}
+        {gameState.playerUI.virtualGridLocation.y} )
+      </div>
+      <br></br>
       <div> buttons </div>
       <div className="tab-content-body">
         <br></br>
