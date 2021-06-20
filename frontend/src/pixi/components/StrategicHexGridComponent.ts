@@ -21,7 +21,6 @@ import {
   extractDeps,
   extractAccessPaths,
   interpolateColor,
-  addColor,
 } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
@@ -303,9 +302,15 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         query: gameState.playerUI.strategicSearch,
       });
 
+      // If was selected by the highlight search, make it shiny
       if (matched) {
         const animation: HexGridAnimation = {
-          max: addColor(COLORS.nodeBlue, graphics.tint),
+          // max: addColor(COLORS.nodeBlue, graphics.tint),
+          max: interpolateColor({
+            color: graphics.tint,
+            opacity: 0.75,
+            background: COLORS.white,
+          }),
           // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
           // max: COLORS.nodeBlue,
           // max: graphics.tint,
