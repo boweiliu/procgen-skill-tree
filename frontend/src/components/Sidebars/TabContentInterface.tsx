@@ -31,6 +31,7 @@ export function TabContentInterface(props: {
     [TAB_NAME.SELECTED_NODE]: (
       <SelectedNodeTabContent
         gameState={props.gameState}
+        updaters={props.updaters}
         actions={props.actions}
       />
     ),

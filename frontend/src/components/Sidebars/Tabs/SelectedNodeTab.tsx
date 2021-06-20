@@ -4,6 +4,7 @@ import { NodeTakenStatus } from '../../../data/NodeStatus';
 import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
+import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
 import {
   nodeContentsToDom,
   STARTING_NODE_DESCRIPTION,
@@ -16,6 +17,7 @@ export const SelectedNodeTabContent = React.memo(
 // TODO(bowei): trim down the game state here
 function SelectedNodeTabContentComponent(props: {
   gameState: GameState;
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
   const { gameState } = props;
@@ -32,6 +34,19 @@ function SelectedNodeTabContentComponent(props: {
       }
     },
     [props.actions.allocateNode, location]
+  );
+
+  const onZoom = useCallback(
+    (e: React.MouseEvent) => {
+      if (location) {
+        e.preventDefault();
+        // set virtual grid location
+        props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+          return location;
+        });
+      }
+    },
+    [props.updaters, location]
   );
 
   if (location === null) {
@@ -92,6 +107,10 @@ function SelectedNodeTabContentComponent(props: {
       <div className="tab-content-body">
         <div>
           Location: ( {xyCoords.x} , {xyCoords.y} ) , z-layer = {location.z}
+        </div>
+        <br></br>
+        <div>
+          <button onClick={onZoom}>Zoom to here (hotkey: z)</button>
         </div>
         <br></br>
         <div>Description: {description}</div>
