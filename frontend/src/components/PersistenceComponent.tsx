@@ -17,10 +17,16 @@ export function PersistenceComponent(props: { gameState: GameState }) {
       console.log('skipping save because it was just disabled!');
     } else {
       PlayerUIState.store(gameState.playerUI);
+      PlayerSaveState.store(gameState.playerSave);
       new WorldGenStateFactory({}).store(gameState.worldGen);
     }
     // return 'onunload'; // adds a console prompt
-  }, [gameState.playerUI, gameState.justDisabledSave, gameState.worldGen]);
+  }, [
+    gameState.playerUI,
+    gameState.justDisabledSave,
+    gameState.worldGen,
+    gameState.playerSave,
+  ]);
 
   // NOTE(bowei): window.addEventListener does not work here i think: https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
   // https://gist.github.com/muzfr7/7e15582add46e74dee111002ec6cf594
