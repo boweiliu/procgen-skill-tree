@@ -41,67 +41,79 @@ function SelectedNodeTabContentComponent(props: {
         <div>
           <br></br>
         </div>
-        <div>Hover and click the question mark tooltip to select a node.</div>
-      </>
-    );
-  } else {
-    let description = '';
-    if (location.equals(Vector3.Zero)) {
-      description = STARTING_NODE_DESCRIPTION;
-    } else if (gameState.worldGen.lockMap?.get(location) !== undefined) {
-      description = 'A locked node.';
-    } else {
-      description = 'An allocatable node.';
-    }
-
-    let xyCoords = new Vector2(
-      location.x - location.y / 2,
-      (location.y * Math.sqrt(3)) / 2
-    );
-    xyCoords = new Vector2(
-      Math.round(xyCoords.x * 100) / 100,
-      Math.round(xyCoords.y * 100) / 100
-    );
-
-    const takenStatus =
-      gameState.playerSave.allocationStatusMap?.get(location)?.taken || false;
-    const reachableStatus =
-      gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
-    const visibleStatus =
-      gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false;
-    const lockData = gameState.worldGen.lockMap?.get(location) || null;
-    // const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
-
-    const canBeAllocated = reachableStatus && !lockData && !takenStatus;
-
-    const nodeContents =
-      gameState.worldGen.nodeContentsMap.get(location) || null;
-    const nodeContentsDom = nodeContents.lines[0]
-      ? nodeContentsToDom(nodeContents)
-      : 'empty';
-
-    return (
-      <>
-        <div className="tab-content-body">
-          <div>
-            Location: ( {xyCoords.x} , {xyCoords.y} ) , z-layer = {location.z}
-          </div>
-          <br></br>
-          <div>Description: {description}</div>
-          <br></br>
-          <div>Taken?: {takenStatus.toString()}</div>
-          <div>Reachable?: {reachableStatus.toString()}</div>
-          <div>Visible?: {visibleStatus.toString()}</div>
-          <div>Locked?: {(!!lockData).toString()}</div>
-          <div>Can be allocated?: {canBeAllocated.toString()}</div>
-          <br></br>
-          <div>Contents: {nodeContentsDom}</div>
-          <br></br>
-          <button disabled={!canBeAllocated} onClick={onAllocate}>
-            Allocate (hotkey: spacebar)
-          </button>
-        </div>
+        <div>Hover and click the</div>
+        <div> question mark tooltip to</div>
+        <div>select a node.</div>
       </>
     );
   }
+  let xyCoords = new Vector2(
+    location.x - location.y / 2,
+    (location.y * Math.sqrt(3)) / 2
+  );
+  xyCoords = new Vector2(
+    Math.round(xyCoords.x * 100) / 100,
+    Math.round(xyCoords.y * 100) / 100
+  );
+
+  const takenStatus =
+    gameState.playerSave.allocationStatusMap?.get(location)?.taken || false;
+  const reachableStatus =
+    gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
+  const visibleStatus =
+    gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false;
+  const lockData = visibleStatus
+    ? gameState.worldGen.lockMap?.get(location) || null
+    : null;
+  // const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
+
+  const canBeAllocated = reachableStatus && !lockData && !takenStatus;
+
+  let description = '';
+  if (location.equals(Vector3.Zero)) {
+    description = STARTING_NODE_DESCRIPTION;
+  } else if (!visibleStatus) {
+    description = 'Unknown.';
+  } else if (gameState.worldGen.lockMap?.get(location) !== undefined) {
+    description = 'A locked node.';
+  } else {
+    description = 'An allocatable node.';
+  }
+
+  const nodeContents = visibleStatus
+    ? gameState.worldGen.nodeContentsMap.get(location) || null
+    : null;
+  const nodeContentsDom = nodeContents?.lines[0]
+    ? nodeContentsToDom(nodeContents)
+    : 'empty';
+
+  return (
+    <>
+      <div className="tab-content-body">
+        <div>
+          Location: ( {xyCoords.x} , {xyCoords.y} ) , z-layer = {location.z}
+        </div>
+        <br></br>
+        <div>Description: {description}</div>
+        <br></br>
+        <div>Taken?: {takenStatus.toString()}</div>
+        <div>Reachable?: {reachableStatus.toString()}</div>
+        <div>Visible?: {visibleStatus.toString()}</div>
+        {visibleStatus ? (
+          <>
+            <div>Locked?: {(!!lockData).toString()}</div>
+            <div>Can be allocated?: {canBeAllocated.toString()}</div>
+            <br></br>
+            <div>Contents: {nodeContentsDom}</div>
+            <br></br>
+            <button disabled={!canBeAllocated} onClick={onAllocate}>
+              Allocate (hotkey: spacebar)
+            </button>
+          </>
+        ) : (
+          <> </>
+        )}
+      </div>
+    </>
+  );
 }
