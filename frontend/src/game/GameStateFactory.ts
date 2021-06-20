@@ -14,10 +14,11 @@ import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
 import { PlayerUIState } from '../data/PlayerUIState';
+import { loadOrCreate } from '../components/PersistenceComponent';
 
 export type GameStateConfig = any;
 
-const DEFAULT_SEED = 0x19283;
+export const DEFAULT_SEED = 0x19283;
 
 export class GameStateFactory {
   public config: GameStateConfig;
@@ -30,24 +31,7 @@ export class GameStateFactory {
    * Tries to read out game state info from localstorage. if not present, creates a new state
    */
   public loadOrCreate(seed: number | undefined | null = undefined): GameState {
-    const mySeed = seed || DEFAULT_SEED;
-
-    const worldGenStateFactory = new WorldGenStateFactory({});
-    const gameState: GameState = {
-      tick: 0,
-      worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
-      playerSave: newPlayerSaveState(),
-      playerUI: PlayerUIState.tryLoad(),
-      computed: {},
-      intent: newPlayerIntentState(),
-      windowState: newWindowState(),
-      debug: newDebugState(),
-      justDisabledSave: false,
-    };
-
-    loadComputed(gameState);
-
-    return gameState;
+    return loadOrCreate(seed);
   }
 
   public create(seed: number | undefined | null = undefined): GameState {
@@ -110,40 +94,50 @@ export function loadComputed(gameState: GameState): GameState {
   {
     let prevMap = gameState.computed.fogOfWarStatusMap;
     let prevReachableStatusMap = gameState.computed.reachableStatusMap;
-    let nodeLocation = Vector3.Zero;
     // let newStatus = NodeAllocatedStatus.TAKEN;
     const prevGameState = gameState;
 
-    prevMap.put(nodeLocation, NodeVisibleStatus.true);
+    gameState.playerSave.allocationStatusMap
+      .entries()
+      .filter(([loc, status]) => {
+        return status.taken === true;
+      })
+      .map((it) => it[0])
+      .forEach((nodeLocation) => {
+        prevMap.put(nodeLocation, NodeVisibleStatus.true);
 
-    getWithinDistance(nodeLocation, 1).forEach((n) => {
-      prevMap.put(n, NodeVisibleStatus.true);
-      prevReachableStatusMap.put(n, NodeReachableStatus.true);
-    });
-
-    // make sure we make use of lock state
-    // getWithinDistance(nodeLocation, 3).forEach((n) => {
-    // const validLocks = prevGameState.worldGen.lockMap
-    const validLocks: IReadonlySet<Vector3> = {
-      // TODO(bowei): optimize this?
-      contains: (v: Vector3) => {
-        // const maybeLock = prevGameState.worldGen.lockMap.get(v);
-        const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
-        if (maybeLock && maybeLock !== LockStatus.OPEN) {
-          return true;
-        }
-        return false;
-      },
-    };
-    getWithinDistance(nodeLocation, FOG_OF_WAR_DISTANCE, 0, validLocks).forEach(
-      (n) => {
-        if (!prevMap.get(n)?.visible) {
-          // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-          prevGameState.worldGen.lockMap.precompute(n);
+        getWithinDistance(nodeLocation, 1).forEach((n) => {
           prevMap.put(n, NodeVisibleStatus.true);
-        }
-      }
-    );
+          prevReachableStatusMap.put(n, NodeReachableStatus.true);
+        });
+
+        // make sure we make use of lock state
+        // getWithinDistance(nodeLocation, 3).forEach((n) => {
+        // const validLocks = prevGameState.worldGen.lockMap
+        const validLocks: IReadonlySet<Vector3> = {
+          // TODO(bowei): optimize this?
+          contains: (v: Vector3) => {
+            // const maybeLock = prevGameState.worldGen.lockMap.get(v);
+            const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
+            if (maybeLock && maybeLock !== LockStatus.OPEN) {
+              return true;
+            }
+            return false;
+          },
+        };
+        getWithinDistance(
+          nodeLocation,
+          FOG_OF_WAR_DISTANCE,
+          0,
+          validLocks
+        ).forEach((n) => {
+          if (!prevMap.get(n)?.visible) {
+            // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+            prevGameState.worldGen.lockMap.precompute(n);
+            prevMap.put(n, NodeVisibleStatus.true);
+          }
+        });
+      });
   }
   return gameState;
 }

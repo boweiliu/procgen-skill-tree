@@ -92,3 +92,26 @@ export function convertLocationToVirtualCoords(args: {
 
   return virtualCenter.add(relativeVirtualCoords);
 }
+
+/**
+ *
+ * @param args
+ * @return the number of pixels, measured from the top left of the virtual area, to the center of the "virtualCenter" node
+ */
+export function getVirtualGridCenterPx(args: {
+  virtualGridDims: Vector2;
+  hexGridPx: Vector2;
+}) {
+  const { virtualGridDims, hexGridPx } = args;
+
+  const virtualCenter = virtualGridDims.divide(2).floor();
+  let centerPxY = (virtualCenter.y + 0.5) * hexGridPx.y;
+
+  // even rows are left-aligned, odd rows are right-aligned
+  let centerPxX = (virtualCenter.x + 0.5) * hexGridPx.x;
+  if (virtualCenter.y % 2 === 1) {
+    centerPxX += 0.5 * hexGridPx.x;
+  }
+
+  return new Vector2(centerPxX, centerPxY);
+}

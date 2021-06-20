@@ -35,6 +35,10 @@ export type PlayerUIState = {
    * whether or not the cursor is captured by a text entry element. if so, we need to allow default behavior on keyboard events
    */
   isTextBoxFocused: boolean;
+  /**
+   * change this state in order to trigger a useeffect which causes scroll to recenter. this function is not guaranteed to be ever be called
+   */
+  triggerScrollRecenterCb: () => void;
 
   /**
    * Tab controls.
@@ -65,6 +69,7 @@ export type StrategicSearchState = {
 
 export const newPlayerUIState = (): PlayerUIState => {
   return {
+    triggerScrollRecenterCb: () => {},
     tabs: {
       left: {
         tabs: initialTabLabels['left'],
@@ -91,6 +96,7 @@ export const newPlayerUIState = (): PlayerUIState => {
 const serializeToObject = (s: PlayerUIState): object => {
   return {
     ...s,
+    triggerScrollRecenterCb: undefined,
     virtualGridLocation: Vector3.SerializeToObject(s.virtualGridLocation),
   };
 };
@@ -114,15 +120,17 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
 
   const virtualGridLocation = Vector3.Deserialize(obj.virtualGridLocation);
   if (!virtualGridLocation) {
+    console.error('Failed deserializing PlayerUIState: ', obj);
     return null;
   }
   const cursoredNodeLocation = Vector3.Deserialize(obj.cursoredNodeLocation);
 
   return {
-    ...obj,
+    ...(obj as PlayerUIState),
     virtualGridLocation,
     cursoredNodeLocation,
-  } as PlayerUIState;
+    triggerScrollRecenterCb: () => {},
+  };
 };
 
 const deserialize = (obj: string) => deserializeFromObject(JSON.parse(obj));

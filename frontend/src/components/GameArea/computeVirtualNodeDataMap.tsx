@@ -1,5 +1,6 @@
 import React from 'react';
 import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
+import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeSymbolMap,
   ModifierSymbolMap,
@@ -22,6 +23,7 @@ export type NodeReactData = {
     shortTextTimer: string;
     lockStatus: LockStatus;
   };
+  nodeContents: NodeContents;
   status: NodeAllocatedStatus;
   nodeLocation: Vector3;
   id: string;
@@ -106,20 +108,10 @@ export function computeNodeReactData(args: {
           <> </>
         )}
         {nodeContents.lines[0] ? <br /> : <></>}
-        <div>
-          {nodeContents.lines[0] &&
-            nodeContentsLineToString(nodeContents.lines[0])}
-        </div>
-        <div>
-          {nodeContents.lines[1] &&
-            nodeContentsLineToString(nodeContents.lines[1])}
-        </div>
-        <div>
-          {nodeContents.condition &&
-            nodeContentsConditionToString(nodeContents.condition)}
-        </div>
+        {nodeContentsToDom(nodeContents)}
       </>
     ),
+    nodeContents,
     fullText: <> </>,
     status: nodeStatus,
     lockData,
@@ -136,4 +128,23 @@ export function computeNodeReactDataMap(args: {
   });
 
   return map;
+}
+
+export function nodeContentsToDom(nodeContents: NodeContents) {
+  return (
+    <>
+      <div>
+        {nodeContents.lines[0] &&
+          nodeContentsLineToString(nodeContents.lines[0])}
+      </div>
+      <div>
+        {nodeContents.lines[1] &&
+          nodeContentsLineToString(nodeContents.lines[1])}
+      </div>
+      <div>
+        {nodeContents.condition &&
+          nodeContentsConditionToString(nodeContents.condition)}
+      </div>
+    </>
+  );
 }

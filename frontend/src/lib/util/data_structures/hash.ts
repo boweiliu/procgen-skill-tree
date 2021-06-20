@@ -1,3 +1,5 @@
+import { DeserializationError } from '../misc';
+
 /**
  * Intended as a typescript-friendly replacement for {[k: string]: boolean} that allows us to specify what the key type should be (
  * rather than allowing any keyType.toString() to be a valid key, and without going through the trouble of declaring distinguishable
@@ -212,6 +214,56 @@ export class KeyedHashMap<K extends { hash(): string }, V> {
 
   size(): number {
     return Object.keys(this._kvalues).length;
+  }
+
+  static SerializeToObject<K extends { hash(): string }, V>(
+    obj: KeyedHashMap<K, V>,
+    keySerializer?: (k: K) => object,
+    valueSerializer?: (v: V) => object
+  ): object {
+    return obj.entries().map((entry) => {
+      const [k, v] = entry;
+
+      return [
+        keySerializer ? keySerializer(k) : k,
+        valueSerializer ? valueSerializer(v) : v,
+      ];
+    });
+  }
+
+  static Deserialize<K extends { hash(): string }, V>(
+    obj: any,
+    keyDeserializer?: (o: any) => K,
+    valueDeserializer?: (o: any) => V
+  ): KeyedHashMap<K, V> | null {
+    if (!obj || !Array.isArray(obj)) {
+      console.error('Failed deserializing keyed hash map');
+      return null;
+    }
+
+    try {
+      const entries = obj.map((entry): [K, V] => {
+        if (!entry || !Array.isArray(entry) || entry.length !== 2) {
+          throw new DeserializationError(
+            `Failed deserializing entry ${JSON.stringify(entry)}`
+          );
+        }
+        const [k, v] = entry as [any, any];
+
+        const key: K = keyDeserializer ? keyDeserializer(k) : k;
+        const value: V = valueDeserializer ? valueDeserializer(v) : v;
+
+        return [key, value];
+      });
+      return new KeyedHashMap(entries);
+    } catch (e) {
+      if (e instanceof DeserializationError) {
+        console.error('Failed deserializing keyed hash map', e);
+        return null;
+      } else {
+        throw e;
+      }
+    }
   }
 }
 

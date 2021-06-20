@@ -14,9 +14,10 @@ import { GameAreaStateManager } from './GameAreaStateManager';
  * 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
  * for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
  */
-export const hexGridPx = new Vector2(268, 232);
+// export const hexGridPx = new Vector2(268, 232);
+export const hexGridPx = new Vector2(194, 168);
 
-export const hexCenterRadius = 48; // Radius of the circles representing allocatable nodes, in px
+export const hexCenterRadius = 44; // Radius of the circles representing allocatable nodes, in px
 
 export const borderWidth = 2; // border of circles, etc. in px
 
@@ -37,6 +38,7 @@ export function extractGameAreaSubState(gameState: GameState) {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
       isPixiHidden: gameState.playerUI.isPixiHidden,
+      triggerScrollRecenterCb: gameState.playerUI.triggerScrollRecenterCb,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,

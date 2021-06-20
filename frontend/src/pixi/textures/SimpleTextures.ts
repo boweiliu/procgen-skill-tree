@@ -5,6 +5,7 @@ export interface SimpleTextureSet {
   circle: Pixi.Texture;
   rect: Pixi.Texture;
   square: Pixi.Texture;
+  verticalLine: Pixi.Texture;
 }
 
 export function generateSimpleTextures(
@@ -18,8 +19,14 @@ export function generateSimpleTextures(
   let rect = new Pixi.Graphics();
   rect.beginFill(COLORS.white);
   // rect.drawRect(-6, -10, 12, 20);
-  rect.drawRect(0, 0, 4, 20);
+  rect.drawRect(0, 0, 5, 18);
   // rect.pivot = PixiPointFrom(Vector2.Zero);
+
+  let verticalLine = new Pixi.Graphics();
+  verticalLine.beginFill(COLORS.white);
+  verticalLine.drawRect(0, 0, 3, 16);
+  verticalLine.drawRect(0, 0, 6, 3);
+  verticalLine.drawRect(0, 15, 6, 3);
 
   let square = new Pixi.Graphics();
   square.beginFill(COLORS.white);
@@ -30,5 +37,10 @@ export function generateSimpleTextures(
     circle: renderer.generateTexture(circle, Pixi.SCALE_MODES.LINEAR, 1),
     rect: renderer.generateTexture(rect, Pixi.SCALE_MODES.LINEAR, 1),
     square: renderer.generateTexture(square, Pixi.SCALE_MODES.LINEAR, 1),
+    verticalLine: renderer.generateTexture(
+      verticalLine,
+      Pixi.SCALE_MODES.LINEAR,
+      1
+    ),
   };
 }

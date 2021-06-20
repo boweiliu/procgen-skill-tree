@@ -181,7 +181,7 @@ export class PixiReactBridge {
 
   baseGameLoop(delta: number) {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      if (this.props.gameState.tick % 10 === 0) {
+      if (this.props.gameState.tick % 60 === 0) {
         // console.log('computing pixi update even though pixi is not visible');
       } else {
         // console.log('skipping update since pixi is not visible');

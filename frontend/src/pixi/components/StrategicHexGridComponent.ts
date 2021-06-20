@@ -1,4 +1,5 @@
 import * as Pixi from 'pixi.js';
+import chroma from 'chroma-js';
 import { GameState } from '../../data/GameState';
 import {
   LockStatus,
@@ -7,38 +8,30 @@ import {
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
-import {
-  Attribute,
-  NodeContents,
-} from '../../game/worldGen/nodeContents/NodeContentsFactory';
+import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeDescriptionReverseMap,
   ModifierDescriptionReverseMap,
+  nodeContentsToColor,
 } from '../../game/worldGen/nodeContents/NodeContentsRendering';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
 import { KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import {
-  Const,
-  extractDeps,
-  extractAccessPaths,
-  interpolateColor,
-  addColor,
-} from '../../lib/util/misc';
+import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
+import { interpolateColor } from '../../lib/util/color';
+import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
+import { SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 
 type Props = {
   delta: number;
   args: {
     position: Vector2;
-    textures: {
-      circle: Pixi.Texture;
-      rect: Pixi.Texture;
-      square: Pixi.Texture;
-    };
+    textures: SimpleTextureSet;
   };
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
   appSize: Vector2;
   gameState: StrategicHexGridSubState;
 };
@@ -76,12 +69,26 @@ export const depsStrategicHexGridSubState = extractDeps(
 
 type State = {};
 
+type HexGridAnimation = {
+  max: number;
+  min: number;
+  periodSecs: number;
+  mode: 'start-max ease-in-out' | 'start-max ease-in';
+  phase: number;
+};
+
+type HexGridData = {
+  animation: HexGridAnimation | null;
+  cursorAnimation: HexGridAnimation | null;
+  node: Pixi.Sprite;
+  cursor: Pixi.Sprite | null;
+};
+
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
   private graphics: Pixi.Sprite;
-  private hexGrid: KeyedHashMap<Vector2, Pixi.Sprite> = new KeyedHashMap();
-  private animations: KeyedHashMap<Vector2, any> = new KeyedHashMap();
+  private hexGrid: KeyedHashMap<Vector2, HexGridData> = new KeyedHashMap();
 
   constructor(props: Props) {
     super(props);
@@ -115,51 +122,88 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
         );
         this.container.addChild(graphics);
-        this.hexGrid.put(new Vector2(i, j), graphics);
+        this.hexGrid.put(new Vector2(i, j), {
+          node: graphics,
+          animation: null,
+          cursor: null,
+          cursorAnimation: null,
+        });
       }
     }
   }
 
   protected updateSelf(props: Props) {
     const { delta } = props;
-    for (let [v, graphics] of this.hexGrid.entries()) {
-      const animation = this.animations.get(v);
-      if (!animation) continue;
+    for (let data of this.hexGrid.values()) {
+      const { node: graphics, animation } = data;
+      if (animation) {
+        // the last frame was rendered at this phase in the animation
+        let phase = animation.phase || 0;
 
-      // the last frame was rendered at this phase in the animation
-      let phase = animation.phase || 0;
+        // increment it. phase of 1 == a full period == animation.period secs
+        let newPhase =
+          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
 
-      // increment it. phase of 1 == a full period == animation.period secs
-      let newPhase =
-        (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+        // animation starts with bezierX == 0, goes up to 1, then back down
+        let bezierX = 1 - Math.abs(newPhase * 2 - 1);
+        /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
+        // ease-in
+        // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
+        // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
+        // ease-in-out
+        let bezierY =
+          bezierX < 0.5
+            ? 2 * (bezierX * bezierX)
+            : 1 - 2 * (1 - bezierX) * (1 - bezierX);
 
-      // animation starts with bezierX == 0, goes up to 1, then back down
-      let bezierX = 1 - Math.abs(newPhase * 2 - 1);
-      /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
-      // ease-in
-      // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
-      // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
-      // ease-in-out
-      let bezierY =
-        bezierX < 0.5
-          ? 2 * (bezierX * bezierX)
-          : 1 - 2 * (1 - bezierX) * (1 - bezierX);
+        // calculate the proper tint now
+        let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
 
-      // calculate the proper tint now
-      let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
+        // set the tint
+        // tintProp = tintProp * .75 + 0.25; // minimum opacity = 0.25
+        graphics.tint = interpolateColor({
+          target: animation.max,
+          base: animation.min,
+          proportion: tintProp,
+        });
+        // console.log({ delta, phase, newPhase, bezierX, tintProp, tint: graphics.tint });
 
-      // set the tint
-      // tintProp = tintProp * .75 + 0.25; // minimum opacity = 0.25
-      graphics.tint = interpolateColor({
-        target: animation.max,
-        base: animation.min,
-        proportion: tintProp,
-      });
-      // console.log({ delta, phase, newPhase, bezierX, tintProp, tint: graphics.tint });
+        // update phase on animation object
+        animation.phase = newPhase;
+      }
 
-      // update phase on animation object
-      animation.phase = newPhase;
-      // animation
+      if (data.cursor && data.cursorAnimation) {
+        let animation = data.cursorAnimation;
+
+        // the last frame was rendered at this phase in the animation
+        let phase = animation.phase || 0;
+
+        // increment it. phase of 1 == a full period == animation.period secs
+        let newPhase =
+          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+
+        // animation starts with bezierX == 0, goes up to 1, then back down
+        let bezierX = 1 - Math.abs(newPhase * 2 - 1);
+        /* NOTE(bowei): specifically ease-in-out. we want to draw attention both to the lit-up state and to the base state. */
+        // ease-in
+        // let bezierY = ( bezierX * bezierX); // we use the shitty approximation cubicBezier(0.42,0,1,1) == x ** 2.
+        // let bezierY = (bezierX * bezierX) * (1.5 - 0.5 * bezierX); // adjustment to decrease the slope at x=1 from 2 to 1.5
+        // ease-in-out
+        let bezierY = bezierX * bezierX;
+
+        // calculate the proper tint now
+        let tintProp = 1 - bezierY; // animation should start with tint == 1, go back down to 0, go back up
+
+        // set the tint
+        data.cursor.tint = interpolateColor({
+          target: animation.max,
+          base: animation.min,
+          proportion: tintProp,
+        });
+
+        // update phase on animation object
+        animation.phase = newPhase;
+      }
     }
   }
 
@@ -168,7 +212,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
     const { gameState } = props;
 
-    for (let [v, graphics] of this.hexGrid.entries()) {
+    for (let [v, data] of this.hexGrid.entries()) {
+      const { node: graphics } = data;
+
       const basePosition = props.appSize
         .divide(2)
         .add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y)); // 30 x 26 hex units
@@ -179,20 +225,20 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       //   continue;
       // }
       // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
-      const virtualLocation = gameState.playerUI.virtualGridLocation.add(
+      const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        gameState.computed.fogOfWarStatusMap?.get(virtualLocation) ||
+        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeVisibleStatus.false;
       const nodeTakenStatus =
-        gameState.playerSave.allocationStatusMap.get(virtualLocation) ||
+        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeTakenStatus.false;
       const nodeReachableStatus =
-        gameState.computed.reachableStatusMap?.get(virtualLocation) ||
+        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
-      const lockData = gameState.worldGen.lockMap.get(virtualLocation);
-      const lockStatus = gameState.computed.lockStatusMap?.get(virtualLocation);
+      const lockData = gameState.worldGen.lockMap.get(nodeLocation);
+      const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
@@ -215,6 +261,23 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = false;
       }
 
+      // add onclick so that clicking on the node causes selected node tab to update
+      if (graphics.visible) {
+        graphics.interactive = true;
+        graphics.buttonMode = true;
+        graphics.removeAllListeners(); // NOTE(bowei): there's a double render which would otherwise attach 2 event handlers.
+        graphics.on('pointerdown', () => {
+          // console.log("pointerdown in strategic hex grid pixi" , { nodeLocation });
+          props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+            // console.log("enqueue update in pointerdown in strategic hex grid" , { prev, nodeLocation });
+            if (prev && prev.equals(nodeLocation)) {
+              return null;
+            }
+            return nodeLocation;
+          });
+        });
+      }
+
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       if (lockData && lockStatus !== LockStatus.OPEN) {
@@ -230,33 +293,82 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.y -= props.args.textures.circle.height / 2;
       }
 
-      const nodeContents = gameState.worldGen.nodeContentsMap.get(
-        virtualLocation
-      );
+      const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
+
+      // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
+      const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
+      const originalLch = chroma(graphics.tint).lch();
+      graphics.tint = chroma
+        .lch(
+          originalLch[0],
+          // nodeContentsLch[1],
+          0.5 * (originalLch[1] + nodeContentsLch[1]),
+          nodeContentsLch[2]
+        )
+        .num();
 
       const matched = matchStrategicSearch({
         nodeContents,
         query: gameState.playerUI.strategicSearch,
       });
 
+      // If was selected by the highlight search, make it shiny
       if (matched) {
-        // graphics.texture = props.args.textures.square;
-        // graphics.position = PixiPointFrom(basePosition);
-        // graphics.position.x -= props.args.textures.square.width / 2;
-        // graphics.position.y -= props.args.textures.square.height / 2;
-        // graphics.tint = COLORS.nodeBlue;
-        this.animations.put(v, {
-          max: addColor(COLORS.nodeBlue, graphics.tint),
+        const animation: HexGridAnimation = {
+          // max: addColor(COLORS.nodeBlue, graphics.tint),
+          max: interpolateColor({
+            color: graphics.tint,
+            opacity: 0.75,
+            background: COLORS.white,
+          }),
           // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
           // max: COLORS.nodeBlue,
           // max: graphics.tint,
           min: graphics.tint,
           periodSecs: 2,
-          mode: 'start-min ease-in-out',
+          mode: 'start-max ease-in-out',
           phase: 0,
-        });
+        };
+        data.animation = animation;
       } else {
-        this.animations.put(v, null);
+        data.animation = null;
+      }
+
+      // put a cursor near the node if it has been selected
+      if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
+        if (!data.cursor) {
+          const cursor = new Pixi.Sprite();
+          cursor.texture = props.args.textures.verticalLine;
+          // cursor.tint = graphics.tint;
+          // cursor.tint = addColor(COLORS.nodeBlue, graphics.tint);
+          cursor.tint = COLORS.borderWhite;
+          this.container.addChild(cursor);
+          data.cursor = cursor;
+
+          data.cursorAnimation = {
+            max: COLORS.borderWhite,
+            min: interpolateColor({
+              color: COLORS.borderWhite,
+              opacity: 0.25,
+              background: COLORS.backgroundBlue,
+            }),
+            periodSecs: 1,
+            mode: 'start-max ease-in',
+            phase: 0,
+          };
+        }
+      } else {
+        if (data.cursor) {
+          this.container.removeChild(data.cursor);
+        }
+        data.cursor = null;
+      }
+      if (data.cursor) {
+        data.cursor.position = PixiPointFrom(basePosition);
+        // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
+        data.cursor.position.x -= 30 / 2; // - props.args.textures.verticalLine.width / 3;
+        data.cursor.position.x += props.args.textures.verticalLine.width / 3;
+        data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }
     }
   }
@@ -276,8 +388,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     state: State
   ): boolean {
     for (let key of Object.keys(staleProps) as (keyof Props)[]) {
-      // if (key === 'delta' || key === 'args' || key === 'updaters') {
-      if (key === 'args' || key === 'delta') {
+      if (key === 'delta' || key === 'args' || key === 'updaters') {
+        // if (key === 'args' || key === 'delta') {
         continue;
       }
       if (key === 'gameState') {
@@ -337,7 +449,7 @@ export function matchStrategicSearch(args: {
 
   // for ALL of the terms, make sure node contents matches
   let unmatchedTerm: string | null = null;
-  console.log({ terms });
+  // console.log({ terms });
   for (let term of terms) {
     // is the term a attribute or modifier?
     const maybeAttribute = AttributeDescriptionReverseMap[term];

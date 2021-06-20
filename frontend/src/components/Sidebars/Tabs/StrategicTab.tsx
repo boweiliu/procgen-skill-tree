@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { GameState } from '../../data/GameState';
+import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
+import { GameState } from '../../../data/GameState';
 import {
   Attribute,
   Modifier,
-} from '../../game/worldGen/nodeContents/NodeContentsFactory';
+} from '../../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeDescriptionMap,
   AttributeSymbolMap,
   ModifierDescriptionMap,
   ModifierSymbolMap,
-} from '../../game/worldGen/nodeContents/NodeContentsRendering';
+} from '../../../game/worldGen/nodeContents/NodeContentsRendering';
 
 export const StrategicTab = React.memo(StrategicTabComponent);
 
