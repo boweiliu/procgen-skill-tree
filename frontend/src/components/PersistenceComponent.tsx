@@ -2,6 +2,11 @@ import React, { useCallback, useEffect } from 'react';
 import { GameState } from '../data/GameState';
 import { PlayerUIState } from '../data/PlayerUIState';
 import { WorldGenStateFactory } from '../game/worldGen/WorldGenStateFactory';
+import { newPlayerIntentState } from '../data/PlayerIntentState';
+import { newDebugState } from '../data/DebugState';
+import { newWindowState } from '../data/WindowState';
+import { PlayerSaveState } from '../data/PlayerSaveState';
+import { loadComputed, DEFAULT_SEED } from '../game/GameStateFactory';
 
 export function PersistenceComponent(props: { gameState: GameState }) {
   const { gameState } = props;
@@ -27,4 +32,30 @@ export function PersistenceComponent(props: { gameState: GameState }) {
   });
 
   return <> </>;
+}
+
+/**
+ * Tries to read out game state info from localstorage. if not present, creates a new state
+ */
+export function loadOrCreate(
+  seed: number | undefined | null = undefined
+): GameState {
+  const mySeed = seed || DEFAULT_SEED;
+
+  const worldGenStateFactory = new WorldGenStateFactory({});
+  const gameState: GameState = {
+    tick: 0,
+    worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
+    playerSave: PlayerSaveState.tryLoad(),
+    playerUI: PlayerUIState.tryLoad(),
+    computed: {},
+    intent: newPlayerIntentState(),
+    windowState: newWindowState(),
+    debug: newDebugState(),
+    justDisabledSave: false,
+  };
+
+  loadComputed(gameState);
+
+  return gameState;
 }

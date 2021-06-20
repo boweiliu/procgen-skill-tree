@@ -14,10 +14,11 @@ import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
 import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
 import { PlayerUIState } from '../data/PlayerUIState';
+import { loadOrCreate } from '../components/PersistenceComponent';
 
 export type GameStateConfig = any;
 
-const DEFAULT_SEED = 0x19283;
+export const DEFAULT_SEED = 0x19283;
 
 export class GameStateFactory {
   public config: GameStateConfig;
@@ -30,24 +31,7 @@ export class GameStateFactory {
    * Tries to read out game state info from localstorage. if not present, creates a new state
    */
   public loadOrCreate(seed: number | undefined | null = undefined): GameState {
-    const mySeed = seed || DEFAULT_SEED;
-
-    const worldGenStateFactory = new WorldGenStateFactory({});
-    const gameState: GameState = {
-      tick: 0,
-      worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
-      playerSave: newPlayerSaveState(),
-      playerUI: PlayerUIState.tryLoad(),
-      computed: {},
-      intent: newPlayerIntentState(),
-      windowState: newWindowState(),
-      debug: newDebugState(),
-      justDisabledSave: false,
-    };
-
-    loadComputed(gameState);
-
-    return gameState;
+    return loadOrCreate(seed);
   }
 
   public create(seed: number | undefined | null = undefined): GameState {

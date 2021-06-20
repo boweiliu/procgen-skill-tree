@@ -213,6 +213,33 @@ export class KeyedHashMap<K extends { hash(): string }, V> {
   size(): number {
     return Object.keys(this._kvalues).length;
   }
+
+  static SerializeToObject<K extends { hash(): string }, V>(
+    obj: KeyedHashMap<K, V>
+  ): object {
+    return obj.entries();
+  }
+
+  static Deserialize<K extends { hash(): string }, V>(
+    obj: any
+  ): KeyedHashMap<K, V> | null {
+    if (!obj || !Array.isArray(obj)) {
+      console.error('Failed deserializing keyed hash map');
+      return null;
+    }
+    for (let o of obj) {
+      if (
+        !o ||
+        !Array.isArray(o) ||
+        o.length !== 2 ||
+        !o[0].hasOwnProperty('hash')
+      ) {
+        console.error('Failed deserializing keyed hash map');
+        return null;
+      }
+    }
+    return new KeyedHashMap(obj);
+  }
 }
 
 export class DefaultHashMap<K extends { hash(): string }, V> {

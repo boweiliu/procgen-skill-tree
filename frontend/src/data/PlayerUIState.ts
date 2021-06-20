@@ -120,16 +120,17 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
 
   const virtualGridLocation = Vector3.Deserialize(obj.virtualGridLocation);
   if (!virtualGridLocation) {
+    console.error('Failed deserializing PlayerUIState: ', obj);
     return null;
   }
   const cursoredNodeLocation = Vector3.Deserialize(obj.cursoredNodeLocation);
 
   return {
-    ...obj,
+    ...(obj as PlayerUIState),
     virtualGridLocation,
     cursoredNodeLocation,
     triggerScrollRecenterCb: () => {},
-  } as PlayerUIState;
+  };
 };
 
 const deserialize = (obj: string) => deserializeFromObject(JSON.parse(obj));
