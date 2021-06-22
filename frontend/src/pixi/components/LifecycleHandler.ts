@@ -253,9 +253,26 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     this._childrenToConstruct = new ChildrenArray();
   }
 
+  /**
+   * If this component has state managed by updaters, and the updaters object has batched enqueueUpdate calls,
+   * put the fireBatch method here so the lifecycle handler fires the state updaters at the correct time.
+   */
   protected fireStateUpdaters?(): void;
+
+  /**
+   * Called after this class's constructor is finished calling and this component and all its children are finished rendering
+   */
   protected didMount?(): void;
+
+  /**
+   * Called every tick, regardless of whether shouldUpdate is true or false.
+   * put e.g. animation progression here
+   * Also here is where this.state should be updated given the newest copy of this.props
+   *
+   * @param nextProps
+   */
   protected updateSelf?(nextProps: P): void;
+
   /**
    *
    * @param staleProps
@@ -291,6 +308,11 @@ export const LifecycleHandler = new Proxy(LifecycleHandlerBase, {
   },
 });
 
+/**
+ * Wrapper - this MUST be called on new lifecycle handler extensions in order to hook up the _didConstruct lifecycle automatically.
+ * @param derived the class that extends LifecycleHandler
+ * @returns the wrapped class which should be exported
+ */
 export function engageLifecycle<T extends object>(derived: T): T {
   return new Proxy<T>(derived, {
     construct: (target, args) => {

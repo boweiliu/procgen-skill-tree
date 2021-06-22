@@ -24,6 +24,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
 import { SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
+import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 
 type Props = {
   delta: number;
@@ -84,6 +85,9 @@ type HexGridData = {
   cursor: Pixi.Sprite | null;
 };
 
+// sqrt(3)/2 approximation - see hexGridPx
+const strategicHexGridPx = new Vector2(30, 26);
+
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: State;
@@ -92,10 +96,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-      numClicks: 0,
-      descriptionText: '',
-    };
+    this.state = {};
     this.updateSelf(props);
     this.container = new Pixi.Container();
 
@@ -119,7 +120,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         //   graphics.tint = COLORS.borderBlack;
         // }
         graphics.position = PixiPointFrom(
-          props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
+          props.appSize
+            .divide(2)
+            .add(
+              new Vector2(
+                strategicHexGridPx.x * i - (strategicHexGridPx.x / 2) * j,
+                -strategicHexGridPx.y * j
+              )
+            )
         );
         this.container.addChild(graphics);
         this.hexGrid.put(new Vector2(i, j), {
@@ -142,7 +150,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // increment it. phase of 1 == a full period == animation.period secs
         let newPhase =
-          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+          (phase +
+            (delta * (1 / PIXI_TICKS_PER_SECOND) * 1) / animation.periodSecs) %
+          1;
 
         // animation starts with bezierX == 0, goes up to 1, then back down
         let bezierX = 1 - Math.abs(newPhase * 2 - 1);
@@ -180,7 +190,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // increment it. phase of 1 == a full period == animation.period secs
         let newPhase =
-          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+          (phase +
+            (delta * (1 / PIXI_TICKS_PER_SECOND) * 1) / animation.periodSecs) %
+          1;
 
         // animation starts with bezierX == 0, goes up to 1, then back down
         let bezierX = 1 - Math.abs(newPhase * 2 - 1);
@@ -208,23 +220,23 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
+    const { gameState } = props;
     this.container.position = PixiPointFrom(props.args.position);
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
-    const { gameState } = props;
 
     for (let [v, data] of this.hexGrid.entries()) {
       const { node: graphics } = data;
 
       const basePosition = props.appSize
         .divide(2)
-        .add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y)); // 30 x 26 hex units
+        .add(
+          new Vector2(
+            strategicHexGridPx.x * v.x - (strategicHexGridPx.x / 2) * v.y,
+            -strategicHexGridPx.y * v.y
+          )
+        );
       graphics.position = PixiPointFrom(basePosition);
-      // if (v.x <= 1 && v.x >= -1 && v.y <= 1 && v.y >= -1) {
 
-      // } else {
-      //   continue;
-      // }
-      // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
       const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
@@ -366,7 +378,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (data.cursor) {
         data.cursor.position = PixiPointFrom(basePosition);
         // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
-        data.cursor.position.x -= 30 / 2; // - props.args.textures.verticalLine.width / 3;
+        data.cursor.position.x -= strategicHexGridPx.x / 2; // - props.args.textures.verticalLine.width / 3;
         data.cursor.position.x += props.args.textures.verticalLine.width / 3;
         data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }

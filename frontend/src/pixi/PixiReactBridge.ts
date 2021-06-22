@@ -24,6 +24,13 @@ type State = {
   originalAppSize: Vector2;
 };
 
+const DEFAULT_APP_SIZE = new Vector2(800, 600);
+
+export const PIXI_TICKS_PER_SECOND = 60; // pixi's onTick [delta] parameter is measured in ticks -- use this to convert to seconds
+
+// pixi code will not run while it is backgrounded, to save compute, but will run every [BACKGROUND_UPDATE_INTERVAL_TICKS] to keep roughly up-to-date
+const BACKGROUND_UPDATE_INTERVAL_TICKS = 60;
+
 /**
  * Pixi side of a pixi-react bridge. This class owns a pixi application and receives props updates from react by way of rerender().
  * Those props updates do not apply immediately but are queued up and apply all at once on the next tick in the baseGameLoop().
@@ -50,7 +57,7 @@ export class PixiReactBridge {
       // assertOnlyCalledOnce("Pixi react bridge constructor"); // annoying with react hot reload, disable for now}
     }
 
-    let appSize = new Vector2(800, 600);
+    let appSize = DEFAULT_APP_SIZE;
     this.state = {
       appSize,
       originalAppSize: appSize,
@@ -179,9 +186,14 @@ export class PixiReactBridge {
     this.app.renderer.resize(this.state.appSize.x, this.state.appSize.y);
   }
 
-  baseGameLoop(delta: number) {
+  /**
+   *
+   * @param delta passed from pixi - indicates the amount of time elapsed since this function was last called, measured in ticks.
+   * fairly sure tick is exactly 1/60 sec, but might depend on pixi default FPS (120 on some systems???)
+   */
+  baseGameLoop(delta: number): void {
     if (this.props.gameState.playerUI.isPixiHidden) {
-      if (this.props.gameState.tick % 60 === 0) {
+      if (this.props.gameState.tick % BACKGROUND_UPDATE_INTERVAL_TICKS === 0) {
         // console.log('computing pixi update even though pixi is not visible');
       } else {
         // console.log('skipping update since pixi is not visible');
