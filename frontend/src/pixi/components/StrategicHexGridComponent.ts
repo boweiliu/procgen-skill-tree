@@ -239,7 +239,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
             -strategicHexGridPx.y * v.y
           )
         );
-      graphics.position = PixiPointFrom(basePosition);
+      // graphics.position = PixiPointFrom(basePosition);
+      let baseTint: number = 0x000000;
 
       const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
@@ -258,20 +259,24 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
-        graphics.tint = COLORS.borderBlack;
+        baseTint = COLORS.borderBlack;
+        // graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         // only recolor if it is not locked
         if (!lockData || lockStatus === LockStatus.OPEN) {
           graphics.visible = true;
-          graphics.tint = COLORS.nodeLavender;
+          baseTint = COLORS.nodeLavender;
+          // graphics.tint = COLORS.nodeLavender;
         } else {
           // use the ordinary visible-but-unreachable coloring
           graphics.visible = true;
-          graphics.tint = COLORS.nodePink;
+          baseTint = COLORS.nodePink;
+          // graphics.tint = COLORS.nodePink;
         }
       } else if (nodeVisibleStatus.visible) {
         graphics.visible = true;
-        graphics.tint = COLORS.nodePink;
+        baseTint = COLORS.nodePink;
+        // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
         graphics.visible = false;
@@ -297,6 +302,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
             return nodeLocation;
           });
         });
+      } else {
+        graphics.interactive = false;
+        graphics.buttonMode = false;
       }
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
@@ -318,8 +326,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
       const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
-      const originalLch = chroma(graphics.tint).lch();
-      graphics.tint = chroma
+      const originalLch = chroma(baseTint).lch();
+      baseTint = chroma
         .lch(
           originalLch[0],
           // nodeContentsLch[1],
@@ -338,20 +346,21 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         const animation: HexGridAnimation = {
           // max: addColor(COLORS.nodeBlue, graphics.tint),
           max: interpolateColor({
-            color: graphics.tint,
+            color: baseTint,
             opacity: 0.75,
             background: COLORS.white,
           }),
           // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
           // max: COLORS.nodeBlue,
           // max: graphics.tint,
-          min: graphics.tint,
+          min: baseTint,
           periodSecs: 2,
           mode: 'start-max ease-in-out',
-          phase: 0,
+          phase: data.animation ? data.animation.phase : 0.5,
         };
         data.animation = animation;
       } else {
+        graphics.tint = baseTint;
         data.animation = null;
       }
 
