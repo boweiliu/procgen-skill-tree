@@ -35,7 +35,7 @@ export class LockFactory {
     // TODO(bowei): unhardcode
     // locks occur at this frequency
     // a good non-debug value is 0.47
-    if (p < 0.37) {
+    if (p < 0.47) {
       return lockData;
     }
 

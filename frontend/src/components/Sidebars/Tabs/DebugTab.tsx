@@ -9,6 +9,7 @@ import {
   hexGridPx,
   virtualAreaScaleMultiplier,
 } from '../../GameArea/GameAreaInterface';
+import { PlayerSaveState } from '../../../data/PlayerSaveState';
 
 export function DebugTabContent(props: {
   gameState: GameState; // definitely needs gameState.tick in order that this component updates regularly
@@ -146,6 +147,7 @@ export function DebugTabContent(props: {
   const clearLocalStorage = useCallback(() => {
     PlayerUIState.clear();
     new WorldGenStateFactory({}).clear();
+    PlayerSaveState.clear();
     props.updaters.justDisabledSave.enqueueUpdate(true);
   }, [props.updaters]);
 
