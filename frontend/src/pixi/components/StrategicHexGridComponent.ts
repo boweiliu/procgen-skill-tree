@@ -145,7 +145,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
    * @param props
    */
   protected updateSelf(props: Props) {
-    const { delta } = props;
+    // const { delta } = props;
+    const delta = 1; // ignore lags and freezes because color is not required to be continuous
     for (let data of this.hexGrid.values()) {
       const { node: graphics, animation } = data;
       if (animation) {
@@ -356,7 +357,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           min: baseTint,
           periodSecs: 2,
           mode: 'start-max ease-in-out',
-          phase: data.animation ? data.animation.phase : 0.5,
+          phase: data.animation ? data.animation.phase : 0,
         };
         data.animation = animation;
       } else {
