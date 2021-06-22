@@ -44,8 +44,8 @@ type Props = {
 class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: Const<State>;
-  protected stateUpdaters: UpdaterGeneratorType2<State, State>;
-  protected fireStateUpdaters: () => void;
+  protected stateUpdaters!: UpdaterGeneratorType2<State, State>;
+  protected fireStateUpdaters!: () => void;
 
   /* children */
   // Contains HUD, and other entities that don't move when game camera moves
@@ -65,11 +65,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.container.sortableChildren = true;
 
     // Initialize state, and also set up state updaters & batched fire callback
-    ({
-      state: this.state,
-      stateUpdaters: this.stateUpdaters,
-      fireStateUpdaters: this.fireStateUpdaters,
-    } = this.useState<State, RootComponent2>(this, {
+    this.state = this.useState<State, RootComponent2>(this, {
       pointNodeTexture: new Lazy(() =>
         generatePointNodeTexture(props.args.renderer)
       ),
@@ -83,7 +79,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         position: undefined,
         text: '',
       },
-    }));
+    }).state;
 
     const fixedCameraStagePropsFactory = (
       props: Props,
