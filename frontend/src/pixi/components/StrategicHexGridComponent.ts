@@ -279,9 +279,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.buttonMode = true;
         graphics.removeAllListeners(); // NOTE(bowei): there's a double render which would otherwise attach 2 event handlers.
         graphics.on('pointerdown', () => {
-          // console.log("pointerdown in strategic hex grid pixi" , { nodeLocation });
+          console.log('pointerdown in strategic hex grid pixi', {
+            nodeLocation,
+          });
           props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-            // console.log("enqueue update in pointerdown in strategic hex grid" , { prev, nodeLocation });
+            console.log('enqueue update in pointerdown in strategic hex grid', {
+              prev,
+              nodeLocation,
+            });
             if (prev && prev.equals(nodeLocation)) {
               return null;
             }
@@ -395,9 +400,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
    */
   protected shouldUpdate(
     staleProps: Props,
-    staleState: State,
+    staleState: Const<State>,
     props: Props,
-    state: State
+    state: Const<State>
   ): boolean {
     for (let key of Object.keys(staleProps) as (keyof Props)[]) {
       if (key === 'delta' || key === 'args' || key === 'updaters') {
@@ -425,6 +430,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         console.log(`hexgrid shouldUpdate differed in ${key}, returning true`);
         return true;
       }
+    }
+    for (let key of Object.keys(staleState) as (keyof State)[]) {
+      // check if state changed...?
     }
     return false;
   }

@@ -24,7 +24,7 @@ type State = {
 class TooltippableAreaComponent extends LifecycleHandlerBase<Props, State> {
   public state: State;
   public container: Pixi.Container;
-  private stateUpdaters: UpdaterGeneratorType2<State>;
+  protected stateUpdaters: UpdaterGeneratorType2<State>;
   protected fireStateUpdaters: () => void;
 
   public hitAreaDrawn?: Pixi.Graphics; // debug

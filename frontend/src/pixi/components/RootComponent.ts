@@ -44,7 +44,7 @@ type Props = {
 class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: Const<State>;
-  private stateUpdaters: UpdaterGeneratorType2<State>;
+  protected stateUpdaters: UpdaterGeneratorType2<State, State>;
   protected fireStateUpdaters: () => void;
 
   /* children */
