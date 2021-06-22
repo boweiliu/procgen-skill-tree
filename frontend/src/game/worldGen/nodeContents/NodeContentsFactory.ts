@@ -42,6 +42,7 @@ export enum Modifier {
 }
 
 const WEIGHTS = {
+  // for any single node, what is in it
   DECISION_0: {
     EMPTY: 800,
     NO_SPEND: 100,
@@ -132,6 +133,11 @@ export class NodeContentsFactory {
     });
   }
 
+  /**
+   * Entry point.
+   * @param args
+   * @returns
+   */
   public create(args: { seed: number; location: Vector3 }): NodeContents {
     const { seed, location } = args;
     if (location.equals(Vector3.Zero)) {
