@@ -23,7 +23,7 @@ export const AttributeColorMap: { [k in Attribute | '']: number } = {
   [Attribute.RED0]: 0xff0000,
   [Attribute.RED1]: 0x00ff00,
   [Attribute.RED2]: 0x0000ff,
-  [Attribute.DEL0]: 0x849091,
+  [Attribute.DEL0]: 0x5a8f88,
   [Attribute.DEL1]: 0xffc400,
   [Attribute.DEL2]: 0xffff43,
 };
