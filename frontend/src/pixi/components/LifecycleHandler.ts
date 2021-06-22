@@ -330,6 +330,7 @@ export abstract class LifecycleHandlerBase<
    * Called every tick, regardless of whether shouldUpdate is true or false.
    * Called before children are updated.
    * Called right after state updater batch is fired.
+   * TODO(bowei): consider renaming this to "onTick" or something, and also making sure that it gets called in children even if they are memoized
    * @param nextProps
    */
   protected updateSelf?(nextProps: P): void;

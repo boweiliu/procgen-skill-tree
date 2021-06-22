@@ -140,6 +140,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
+  /**
+   * Progress animation state (which needs to happen even if non-delta props do not change)
+   * @param props
+   */
   protected updateSelf(props: Props) {
     const { delta } = props;
     for (let data of this.hexGrid.values()) {
