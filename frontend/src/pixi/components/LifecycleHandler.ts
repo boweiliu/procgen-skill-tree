@@ -1,6 +1,7 @@
 import * as Pixi from 'pixi.js';
 import { batchifySetState } from '../../lib/util/batchify';
-import { UpdaterFn, updaterGenerator2 } from '../../lib/util/updaterGenerator';
+import { Const } from '../../lib/util/misc';
+import { UpdaterFn2, updaterGenerator2 } from '../../lib/util/updaterGenerator';
 
 type Props = {
   args?: {
@@ -22,7 +23,7 @@ type ChildInstructions<
   instance?: ChildInstanceType;
   propsFactory: (
     parentProps: ParentPropsType,
-    parentState: ParentStateType
+    parentState: Const<ParentStateType>
   ) => ChildPropsType;
 };
 
@@ -102,7 +103,8 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
   // public, only to interface with non lifecycleHandler classes that we have yet to refactor
   public abstract container: Pixi.Container;
   // public, only to allow useState function below to set this.state
-  public abstract state: S;
+  // Immutable state!
+  public abstract state: Const<S>;
 
   protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
   private _children: ChildrenArray<P, S> = new ChildrenArray();
@@ -165,19 +167,23 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
   // cannot be attached to an instance due to typescript
   // if satic, cannot be called "useState" or else react linter complains
-  protected useState<S, T extends { state: S }>(self: T, initialState: S) {
-    const setState: UpdaterFn<S> = (valueOrCallback) => {
+  protected useState<S, T extends { state: Const<S> }>(
+    self: T,
+    initialState: S
+  ) {
+    const setState: UpdaterFn2<S, S> = (valueOrCallback) => {
       if (typeof valueOrCallback === 'function') {
-        self.state = (valueOrCallback as (s: S) => S)(self.state);
+        // self.state = (valueOrCallback as (s: S) => S as any as (s: Const<S>) => Const<S>)(self.state);
+        self.state = (valueOrCallback as (s: Const<S>) => Const<S>)(self.state);
       } else {
-        self.state = valueOrCallback;
+        self.state = valueOrCallback as S as Const<S>;
       }
     };
     const [batchedSetState, fireBatch] = batchifySetState(setState);
     const stateUpdaters = updaterGenerator2<S>(initialState, batchedSetState);
 
     return {
-      state: initialState,
+      state: initialState as Const<S>,
       setState,
       fireStateUpdaters: fireBatch,
       stateUpdaters,
@@ -284,14 +290,25 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
    */
   protected shouldUpdate?(
     staleProps: P,
-    staleState: S,
+    staleState: Const<S>,
     nextProps: P,
-    state: S
+    state: Const<S>
   ): boolean;
+
+  /**
+   *
+   * Should be a pure function.
+   * @param nextProps
+   */
   protected abstract renderSelf(nextProps: P): void;
   protected didUpdate?(): void;
   protected didForceUpdate?(): void;
+
+  /**
+   * Called before a component is removed
+   */
   public willUnmount(): void {} // TODO(bowei): revert this to protected nullable; however it's needed for shim for now
+
   protected didForceUpdateChild?(child: LifecycleHandlerBase<any, any>): void;
 
   public toString(): string {

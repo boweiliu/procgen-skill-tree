@@ -43,7 +43,7 @@ type Props = {
 
 class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  public state: State;
+  public state: Const<State>;
   private stateUpdaters: UpdaterGeneratorType2<State>;
   protected fireStateUpdaters: () => void;
 
@@ -63,6 +63,8 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     super(props);
     this.container = new Pixi.Container();
     this.container.sortableChildren = true;
+
+    // Initialize state, and also set up state updaters & batched fire callback
     ({
       state: this.state,
       stateUpdaters: this.stateUpdaters,
@@ -83,7 +85,10 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       },
     }));
 
-    const fixedCameraStagePropsFactory = (props: Props, state: State) => {
+    const fixedCameraStagePropsFactory = (
+      props: Props,
+      state: Const<State>
+    ) => {
       return {
         args: {
           renderer: props.args.renderer,
@@ -112,7 +117,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
 
     const strategicHexGridPropsFactory = (
       props: Props,
-      state: State
+      state: Const<State>
     ): StrategicHexGridComponentProps => {
       const { gameState } = props;
       return {
@@ -150,7 +155,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
   }
 
   protected updateSelf(props: Props) {
-    this.state.tick++;
+    this.stateUpdaters.tick.enqueueUpdate((prev) => prev + 1);
   }
 
   protected renderSelf(props: Props) {

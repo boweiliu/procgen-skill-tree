@@ -1,3 +1,6 @@
+import { Const } from './misc';
+import { UpdaterFn, UpdaterFn2, UpdaterFnParam2 } from './updaterGenerator';
+
 /**
  *
  * @param fn an arbitrary callback which performs some operation with side effects.
@@ -34,12 +37,12 @@ export function batchify<A extends any[]>(
  * sequentially to get a single state update which we then provide to [fn].
  */
 export function batchifySetState<T>(
-  fn: (arg: T) => void
-): [(arg: T) => void, () => void] {
-  let batch: T[] = [];
+  fn: UpdaterFn<T> | UpdaterFn2<T, T>
+): [UpdaterFn2<T, T>, () => void] {
+  let batch: UpdaterFnParam2<T, T>[] = [];
 
   return [
-    (arg: T) => {
+    (arg: UpdaterFnParam2<T, T>) => {
       batch.push(arg);
       // console.log({ batchSize: batch.length });
     },
@@ -54,7 +57,7 @@ export function batchifySetState<T>(
         let next = prev;
         for (let valueOrCallback of thisBatch) {
           if (typeof valueOrCallback === 'function') {
-            next = valueOrCallback(next);
+            next = (valueOrCallback as (t: Const<T>) => Const<T>)(next);
           } else {
             next = valueOrCallback;
           }
