@@ -90,7 +90,7 @@ const strategicHexGridPx = new Vector2(30, 26);
 
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  public state: State;
+  public state: Const<State>;
   private graphics: Pixi.Sprite;
   private hexGrid: KeyedHashMap<Vector2, HexGridData> = new KeyedHashMap();
 
