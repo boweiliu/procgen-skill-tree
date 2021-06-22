@@ -13,6 +13,12 @@ type Props = {
 
 type State = {};
 
+/**
+ * Bundle used for associating child components with this component.
+ * Contains the childClass class reference,
+ * the constructed instance itself (if already constructed),
+ * and a pure function for computing child props from parent props & parent state.
+ */
 type ChildInstructions<
   ChildInstanceType,
   ChildPropsType extends Props,
@@ -38,12 +44,12 @@ class ChildrenArray<P extends Props, S extends State> {
   public add<CIT extends LifecycleHandlerBase<any, any>, CPT>(
     c: ChildInstructions<CIT, CPT, P, S>
   ) {
-    if (
-      this._values.indexOf(c) === -1 ||
-      (c.instance && this.contains(c.instance))
-    ) {
-      // do nohting - its already in here
-    }
+    // if (
+    //   this._values.indexOf(c) === -1 ||
+    //   (c.instance && this.contains(c.instance))
+    // ) {
+    //   // do nohting - its already in here
+    // }
     this._values.push(c);
   }
 
@@ -108,10 +114,19 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
 
   protected _staleProps: P; // NOTE(bowei): need it for args for now; maybe we can extract out args?
   private _children: ChildrenArray<P, S> = new ChildrenArray();
+
+  /**
+   * Holds references to children which we will soon be constructing and adding to pixi hierarchy
+   */
   private _childrenToConstruct: ChildrenArray<P, S> = new ChildrenArray();
+  /**
+   * Holds references to the children which are marked for deletion but have not been deleted and deconstructed yet
+   */
   private _childrenToDestruct: ChildrenArray<P, S> = new ChildrenArray();
+  /**
+   * Holds children which have requested that they be forcefully updated even if props have not changed
+   */
   private _forceUpdates: ChildrenArray<P, S> = new ChildrenArray();
-  // private _self!: LifecycleHandlerBase<P, S>;
 
   constructor(props: P) {
     this._staleProps = props;
@@ -128,6 +143,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     c: ChildInstructions<CIT, CPT, P, S>
   ) {
     // only add children to updateable, not constructed
+    // Note that this also skips adding them to pixi hierarchy
     this._children.add(c);
   }
 
@@ -137,6 +153,11 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
     childInfo && this._childrenToDestruct.add(childInfo); // queue it for destruction next update tick
   }
 
+  /**
+   * Intended to be called as part of the constructor.
+   * So that subclasses of lifecycleHandler don't have to manually add this line to the constructor each time,
+   * we provide a handy [engageLifecycle] method on the class reference which automatically adds it using a [Proxy<>].
+   */
   private _didConstruct(props: P) {
     // this._self = this;
     this._childrenToConstruct.forEach((child) => {
@@ -149,6 +170,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       // they constructed the instance themselves (in order to e.g. hold a reference); we do that here
       this.container.addChild(child.instance.container);
     });
+    this._childrenToConstruct = new ChildrenArray(); // clear the list so that we don't re-add them in the update loop
     this.renderSelf(props);
     this.didMount?.();
   }
@@ -208,7 +230,7 @@ export abstract class LifecycleHandlerBase<P extends Props, S extends State> {
       // we think we don't need to update; however, we still need to
       // update the chidlren that asked us to forcefully update them
       let forceUpdates = this._forceUpdates.clone();
-      this._forceUpdates = new ChildrenArray<P, S>();
+      this._forceUpdates = new ChildrenArray<P, S>(); // clear the force updates of next tick
       forceUpdates.forEach((childInfo) => {
         let { instance, propsFactory } = childInfo;
         instance?._update(propsFactory(nextProps, this.state)); // why are we even calling props factory here?? theres no point... we should just tell the child to use their own stale props, like this:
