@@ -68,7 +68,9 @@ export const depsStrategicHexGridSubState = extractDeps(
   extractStrategicHexGridSubState
 );
 
-type State = {};
+type State = {
+  phases: { [x: number]: number };
+};
 
 type HexGridAnimation = {
   max: number;
@@ -96,7 +98,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {};
+    this.state = this.useState(this, {
+      phases: {},
+    }).state;
     this.updateSelf(props);
     this.container = new Pixi.Container();
 
@@ -147,11 +151,28 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected updateSelf(props: Props) {
     // const { delta } = props;
     const delta = 1; // ignore lags and freezes because color is not required to be continuous
+
+    if (
+      props.gameState.playerUI.strategicSearch !==
+      this._staleProps.gameState.playerUI.strategicSearch
+    ) {
+      // reset phases
+      this.stateUpdaters!.phases.enqueueUpdate((prev) => {
+        const result = { ...prev };
+        for (let keyString of Object.keys(result)) {
+          let keyNumber = parseInt(keyString);
+          result[keyNumber] = 0;
+        }
+        return result;
+      });
+    }
+
     for (let data of this.hexGrid.values()) {
       const { node: graphics, animation } = data;
       if (animation) {
         // the last frame was rendered at this phase in the animation
-        let phase = animation.phase || 0;
+        let phase =
+          this.state.phases[animation.periodSecs] || animation.phase || 0;
 
         // increment it. phase of 1 == a full period == animation.period secs
         let newPhase =
@@ -185,6 +206,13 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // update phase on animation object
         animation.phase = newPhase;
+
+        // update it in state
+        this.stateUpdaters!.phases.enqueueUpdate((prev) => {
+          const result = { ...prev };
+          result[animation.periodSecs] = newPhase;
+          return result;
+        });
       }
 
       if (data.cursor && data.cursorAnimation) {
@@ -359,6 +387,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           mode: 'start-max ease-in-out',
           phase: data.animation ? data.animation.phase : 0,
         };
+        // TODO(bowei): properly encapsulate this in like a useEffect/useMemo to detect changes and only trigger in that case
+        // if (gameState.playerUI.strategicSearch === this._staleProps.gameState.playerUI.strategicSearch) {
+        //   animation.phase = 0;
+        // }
         data.animation = animation;
       } else {
         graphics.tint = baseTint;
@@ -445,9 +477,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         return true;
       }
     }
-    for (let key of Object.keys(staleState) as (keyof State)[]) {
-      // check if state changed...?
-    }
+    // for (let key of Object.keys(staleState) as (keyof State)[]) {
+    //   // check if state changed...?
+    // }
     return false;
   }
 }

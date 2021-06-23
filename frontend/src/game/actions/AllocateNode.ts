@@ -15,7 +15,7 @@ export interface AllocateNodeInput {
 }
 
 // TODO(bowei): unhardcode
-export const FOG_OF_WAR_DISTANCE = 6;
+export const FOG_OF_WAR_DISTANCE = 5;
 
 /**
  * Stateless action wrapper over updaters.

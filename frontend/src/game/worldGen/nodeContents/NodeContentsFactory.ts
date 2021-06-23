@@ -46,7 +46,7 @@ export enum Modifier {
 const WEIGHTS = {
   // for any single node, what is in it
   DECISION_0: {
-    EMPTY: 200,
+    EMPTY: 150,
     NO_SPEND: 100,
     SPEND: 0,
   },
@@ -161,25 +161,20 @@ export class NodeContentsFactory {
       modulo3.equals(new Vector2(2, 1))
     ) {
       // not close to any cluster centers
-      clusterCenter = null;
+      clusterCenter = location;
     } else {
       clusterCenter = location.divide(3).round().multiply(3);
     }
 
-    // temp debug
-    if (clusterCenter === null) {
+    // hardcode the starting cluster to be empty
+    if (clusterCenter.equals(Vector3.Zero)) {
       return {
         lines: [],
       };
     }
 
     const result = randomSwitch<NodeContents>({
-      randInt: squirrel3(
-        seed +
-          clusterCenter.x +
-          clusterCenter.y +
-          squirrel3(seed + clusterCenter.x + clusterCenter.z)
-      ),
+      randInt: squirrel3(seed + Vector3ToSeed(clusterCenter)),
       weights: WEIGHTS.DECISION_0,
       behaviors: {
         EMPTY: (randInt: number) => {
@@ -219,4 +214,8 @@ export class NodeContentsFactory {
 
     return result;
   }
+}
+
+export function Vector3ToSeed(v: Vector3) {
+  return v.x + v.y + squirrel3(v.x + v.z);
 }
