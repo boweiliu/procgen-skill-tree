@@ -114,6 +114,8 @@ function Component(props: {
       if (!!v) {
         // also open the sidebar
         props.updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+        props.updaters.playerUI.isLeftSidebarOpen.enqueueUpdate(() => true);
+        props.updaters.playerUI.isRightSidebarOpen.enqueueUpdate(() => true);
       }
     },
     [props.updaters]

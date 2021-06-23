@@ -60,8 +60,17 @@ function App() {
     console.log('maybe toggling sidebar');
     if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
       updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
+      updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => !it);
+      updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
     }
   }, [gameState.intent.newIntent.TOGGLE_SIDEBAR, updaters]);
+
+  useEffect(() => {
+    if (gameState.intent.newIntent.TURN_OFF_SIDEBAR) {
+      updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => false);
+      updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => false);
+    }
+  }, [gameState.intent.newIntent.TURN_OFF_SIDEBAR, updaters]);
 
   return (
     <div className={classnames({ App: true })}>
@@ -98,9 +107,11 @@ function App() {
         <button
           onClick={() => {
             updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
+            updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => !it);
+            updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle sidebar (hotkey: i)
+          Toggle sidebars (hotkey: i)
         </button>
       </div>
 
