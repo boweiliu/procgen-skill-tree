@@ -1,10 +1,10 @@
 import { Const } from './misc';
 
-type UpdaterFnParam2<T, W> =
-  | ((prev: Const<T>, prevWhole: W) => T | Const<T>)
+export type UpdaterFnParam2<T, W> =
+  | ((prev: Const<T>, prevWhole: W) => Const<T>)
   | (T extends Function ? never : T); // (T | ((prev: T, prevWhole: W) => T));
 
-type UpdaterFn2<T, W> = (arg: UpdaterFnParam2<T, W>) => void;
+export type UpdaterFn2<T, W> = (arg: UpdaterFnParam2<T, W>) => void;
 
 /**
  * Represent the type which has the same deep object struture as T but instead of values, it has
@@ -104,13 +104,21 @@ function updaterGenerator2Helper<T, W>(
  */
 export function updaterGenerator2<T>(
   dataObject: T,
-  setState: UpdaterFn<T>
+  // setState: UpdaterFn2<T, T> | UpdaterFn<T>,
+  setState: UpdaterFn2<T, T>
+  // setState: UpdaterFn<T>,
 ): UpdaterGeneratorType2<T> {
   const dataUpdater2 = (stateCallbackFunction: UpdaterFnParam2<T, T>) => {
     if (typeof stateCallbackFunction === 'function') {
-      setState((prev: T) => {
+      setState((prev: Const<T>) => {
         // if T is a function type already, typescript correctly notifies us that this will fail
-        const next = (stateCallbackFunction as (prev: T, prevWhole: T) => T)(
+        const next = (
+          stateCallbackFunction as (
+            prev: Const<T>,
+            prevWhole: Const<T>
+          ) => Const<T>
+        )(
+          // const next = (stateCallbackFunction as (prev: T, prevWhole: T) => T)(
           prev,
           prev
         );

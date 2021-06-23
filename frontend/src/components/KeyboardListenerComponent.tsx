@@ -69,7 +69,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    console.log('adding event listeners for keyboard component');
+    // console.log('adding event listeners for keyboard component');
     document.addEventListener('keydown', this.handleKeydown);
     document.addEventListener('keyup', this.handleKeyup);
   }

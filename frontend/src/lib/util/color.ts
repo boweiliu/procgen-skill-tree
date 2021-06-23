@@ -115,6 +115,8 @@ type Hsv = {
   v: number;
 };
 
+const SECTOR_DEGREES = 60; // 6 color sectors that total 360 degrees
+
 // source: https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately/54024653#54024653
 // and https://stackoverflow.com/questions/8022885/rgb-to-hsv-color-in-javascript
 // tested using: https://stackoverflow.com/questions/52193529/is-it-possible-to-import-a-typescript-into-a-running-instance-of-ts-node-repl
@@ -134,7 +136,7 @@ export function hexToHsv(color: number): Hsv {
       : v === g
       ? 2 + (b - r) / range
       : 4 + (r - g) / range);
-  const h = 60 * (hueSector < 0 ? hueSector + 6 : hueSector);
+  const h = SECTOR_DEGREES * (hueSector < 0 ? hueSector + 6 : hueSector);
   return {
     h,
     s: v && range / v,
@@ -153,7 +155,7 @@ export function hsvToHex(hsv: Hsv): number {
 
 function hsvToHexHelper(colorDirection: number, hsv: Hsv) {
   const { h, s, v } = hsv;
-  const k = (colorDirection + h / 60) % 6;
+  const k = (colorDirection + h / SECTOR_DEGREES) % 6;
   const colorPercentUnclamped = Math.min(k, 4 - k);
   const colorPercent = Math.max(0, Math.min(colorPercentUnclamped, 1));
   // console.log({ h, s, v , colorDirection, k, colorPercentUnclamped, colorPercent, })

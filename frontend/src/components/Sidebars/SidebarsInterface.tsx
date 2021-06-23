@@ -29,15 +29,19 @@ export function SidebarsInterface(props: {
 
   const setLeftSidebarHidden = useCallback(() => {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
+    updaters.playerUI.isLeftSidebarOpen.enqueueUpdate(() => false);
   }, [updaters]);
   const setLeftSidebarUnhidden = useCallback(() => {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+    updaters.playerUI.isLeftSidebarOpen.enqueueUpdate(() => true);
   }, [updaters]);
   const setRightSidebarHidden = useCallback(() => {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => false);
+    updaters.playerUI.isRightSidebarOpen.enqueueUpdate(() => false);
   }, [updaters]);
   const setRightSidebarUnhidden = useCallback(() => {
     updaters.playerUI.isSidebarOpen.enqueueUpdate(() => true);
+    updaters.playerUI.isRightSidebarOpen.enqueueUpdate(() => true);
   }, [updaters]);
 
   const tabsState = gameState.playerUI.tabs;
@@ -142,7 +146,7 @@ export function SidebarsInterface(props: {
   return (
     <>
       <Sidebar
-        hidden={!gameState.playerUI.isSidebarOpen}
+        hidden={!gameState.playerUI.isLeftSidebarOpen}
         // hidden={true}
         placement={'left'}
       >
@@ -172,7 +176,10 @@ export function SidebarsInterface(props: {
           actions={actions}
         />
       </Sidebar>
-      <Sidebar hidden={!gameState.playerUI.isSidebarOpen} placement={'right'}>
+      <Sidebar
+        hidden={!gameState.playerUI.isRightSidebarOpen}
+        placement={'right'}
+      >
         <div className="sidebar-header">
           <div className="sidebar-header-button" onClick={onSendTabLeft}>
             ⬅️ Send left

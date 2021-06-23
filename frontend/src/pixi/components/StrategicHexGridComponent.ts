@@ -24,6 +24,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
 import { SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
+import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 
 type Props = {
   delta: number;
@@ -67,7 +68,9 @@ export const depsStrategicHexGridSubState = extractDeps(
   extractStrategicHexGridSubState
 );
 
-type State = {};
+type State = {
+  phases: { [x: number]: number };
+};
 
 type HexGridAnimation = {
   max: number;
@@ -84,18 +87,20 @@ type HexGridData = {
   cursor: Pixi.Sprite | null;
 };
 
+// sqrt(3)/2 approximation - see hexGridPx
+const strategicHexGridPx = new Vector2(30, 26);
+
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
-  public state: State;
+  public state: Const<State>;
   private graphics: Pixi.Sprite;
   private hexGrid: KeyedHashMap<Vector2, HexGridData> = new KeyedHashMap();
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-      numClicks: 0,
-      descriptionText: '',
-    };
+    this.state = this.useState(this, {
+      phases: {},
+    }).state;
     this.updateSelf(props);
     this.container = new Pixi.Container();
 
@@ -119,7 +124,14 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         //   graphics.tint = COLORS.borderBlack;
         // }
         graphics.position = PixiPointFrom(
-          props.appSize.divide(2).add(new Vector2(30 * i - 15 * j, -26 * j))
+          props.appSize
+            .divide(2)
+            .add(
+              new Vector2(
+                strategicHexGridPx.x * i - (strategicHexGridPx.x / 2) * j,
+                -strategicHexGridPx.y * j
+              )
+            )
         );
         this.container.addChild(graphics);
         this.hexGrid.put(new Vector2(i, j), {
@@ -132,17 +144,41 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     }
   }
 
+  /**
+   * Progress animation state (which needs to happen even if non-delta props do not change)
+   * @param props
+   */
   protected updateSelf(props: Props) {
-    const { delta } = props;
+    // const { delta } = props;
+    const delta = 1; // ignore lags and freezes because color is not required to be continuous
+
+    if (
+      props.gameState.playerUI.strategicSearch !==
+      this._staleProps.gameState.playerUI.strategicSearch
+    ) {
+      // reset phases
+      this.stateUpdaters!.phases.enqueueUpdate((prev) => {
+        const result = { ...prev };
+        for (let keyString of Object.keys(result)) {
+          let keyNumber = parseInt(keyString);
+          result[keyNumber] = 0;
+        }
+        return result;
+      });
+    }
+
     for (let data of this.hexGrid.values()) {
       const { node: graphics, animation } = data;
       if (animation) {
         // the last frame was rendered at this phase in the animation
-        let phase = animation.phase || 0;
+        let phase =
+          this.state.phases[animation.periodSecs] || animation.phase || 0;
 
         // increment it. phase of 1 == a full period == animation.period secs
         let newPhase =
-          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+          (phase +
+            (delta * (1 / PIXI_TICKS_PER_SECOND) * 1) / animation.periodSecs) %
+          1;
 
         // animation starts with bezierX == 0, goes up to 1, then back down
         let bezierX = 1 - Math.abs(newPhase * 2 - 1);
@@ -170,6 +206,13 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // update phase on animation object
         animation.phase = newPhase;
+
+        // update it in state
+        this.stateUpdaters!.phases.enqueueUpdate((prev) => {
+          const result = { ...prev };
+          result[animation.periodSecs] = newPhase;
+          return result;
+        });
       }
 
       if (data.cursor && data.cursorAnimation) {
@@ -180,7 +223,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // increment it. phase of 1 == a full period == animation.period secs
         let newPhase =
-          (phase + (delta * (1 / 60) * 1) / animation.periodSecs) % 1;
+          (phase +
+            (delta * (1 / PIXI_TICKS_PER_SECOND) * 1) / animation.periodSecs) %
+          1;
 
         // animation starts with bezierX == 0, goes up to 1, then back down
         let bezierX = 1 - Math.abs(newPhase * 2 - 1);
@@ -208,23 +253,24 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
+    const { gameState } = props;
     this.container.position = PixiPointFrom(props.args.position);
     this.graphics.position = PixiPointFrom(props.appSize.divide(2));
-    const { gameState } = props;
 
     for (let [v, data] of this.hexGrid.entries()) {
       const { node: graphics } = data;
 
       const basePosition = props.appSize
         .divide(2)
-        .add(new Vector2(30 * v.x - 15 * v.y, -26 * v.y)); // 30 x 26 hex units
-      graphics.position = PixiPointFrom(basePosition);
-      // if (v.x <= 1 && v.x >= -1 && v.y <= 1 && v.y >= -1) {
+        .add(
+          new Vector2(
+            strategicHexGridPx.x * v.x - (strategicHexGridPx.x / 2) * v.y,
+            -strategicHexGridPx.y * v.y
+          )
+        );
+      // graphics.position = PixiPointFrom(basePosition);
+      let baseTint: number = 0x000000;
 
-      // } else {
-      //   continue;
-      // }
-      // props.allocationStatusMap.get(props.virtualGridLocation.add(Vector3.FromVector2(v)))
       const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
@@ -242,20 +288,24 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
-        graphics.tint = COLORS.borderBlack;
+        baseTint = COLORS.borderBlack;
+        // graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         // only recolor if it is not locked
         if (!lockData || lockStatus === LockStatus.OPEN) {
           graphics.visible = true;
-          graphics.tint = COLORS.nodeLavender;
+          baseTint = COLORS.nodeLavender;
+          // graphics.tint = COLORS.nodeLavender;
         } else {
           // use the ordinary visible-but-unreachable coloring
           graphics.visible = true;
-          graphics.tint = COLORS.nodePink;
+          baseTint = COLORS.nodePink;
+          // graphics.tint = COLORS.nodePink;
         }
       } else if (nodeVisibleStatus.visible) {
         graphics.visible = true;
-        graphics.tint = COLORS.nodePink;
+        baseTint = COLORS.nodePink;
+        // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
         graphics.visible = false;
@@ -267,15 +317,23 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.buttonMode = true;
         graphics.removeAllListeners(); // NOTE(bowei): there's a double render which would otherwise attach 2 event handlers.
         graphics.on('pointerdown', () => {
-          // console.log("pointerdown in strategic hex grid pixi" , { nodeLocation });
+          console.log('pointerdown in strategic hex grid pixi', {
+            nodeLocation,
+          });
           props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
-            // console.log("enqueue update in pointerdown in strategic hex grid" , { prev, nodeLocation });
+            console.log('enqueue update in pointerdown in strategic hex grid', {
+              prev,
+              nodeLocation,
+            });
             if (prev && prev.equals(nodeLocation)) {
               return null;
             }
             return nodeLocation;
           });
         });
+      } else {
+        graphics.interactive = false;
+        graphics.buttonMode = false;
       }
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
@@ -297,8 +355,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
       const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
-      const originalLch = chroma(graphics.tint).lch();
-      graphics.tint = chroma
+      const originalLch = chroma(baseTint).lch();
+      baseTint = chroma
         .lch(
           originalLch[0],
           // nodeContentsLch[1],
@@ -317,20 +375,25 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         const animation: HexGridAnimation = {
           // max: addColor(COLORS.nodeBlue, graphics.tint),
           max: interpolateColor({
-            color: graphics.tint,
+            color: baseTint,
             opacity: 0.75,
             background: COLORS.white,
           }),
           // max: graphics.tint === COLORS.borderBlack ? COLORS.nodeLavender : COLORS.nodeBlue,
           // max: COLORS.nodeBlue,
           // max: graphics.tint,
-          min: graphics.tint,
+          min: baseTint,
           periodSecs: 2,
           mode: 'start-max ease-in-out',
-          phase: 0,
+          phase: data.animation ? data.animation.phase : 0,
         };
+        // TODO(bowei): properly encapsulate this in like a useEffect/useMemo to detect changes and only trigger in that case
+        // if (gameState.playerUI.strategicSearch === this._staleProps.gameState.playerUI.strategicSearch) {
+        //   animation.phase = 0;
+        // }
         data.animation = animation;
       } else {
+        graphics.tint = baseTint;
         data.animation = null;
       }
 
@@ -366,7 +429,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (data.cursor) {
         data.cursor.position = PixiPointFrom(basePosition);
         // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
-        data.cursor.position.x -= 30 / 2; // - props.args.textures.verticalLine.width / 3;
+        data.cursor.position.x -= strategicHexGridPx.x / 2; // - props.args.textures.verticalLine.width / 3;
         data.cursor.position.x += props.args.textures.verticalLine.width / 3;
         data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }
@@ -383,9 +446,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
    */
   protected shouldUpdate(
     staleProps: Props,
-    staleState: State,
+    staleState: Const<State>,
     props: Props,
-    state: State
+    state: Const<State>
   ): boolean {
     for (let key of Object.keys(staleProps) as (keyof Props)[]) {
       if (key === 'delta' || key === 'args' || key === 'updaters') {
@@ -414,6 +477,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         return true;
       }
     }
+    // for (let key of Object.keys(staleState) as (keyof State)[]) {
+    //   // check if state changed...?
+    // }
     return false;
   }
 }

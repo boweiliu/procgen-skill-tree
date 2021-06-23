@@ -31,6 +31,8 @@ export type PlayerUIState = {
    * state of the sidebar component
    */
   isSidebarOpen: boolean;
+  isLeftSidebarOpen: boolean;
+  isRightSidebarOpen: boolean;
   /**
    * whether or not the cursor is captured by a text entry element. if so, we need to allow default behavior on keyboard events
    */
@@ -89,6 +91,8 @@ export const newPlayerUIState = (): PlayerUIState => {
     virtualGridLocation: Vector3.Zero,
     cursoredNodeLocation: null,
     isSidebarOpen: false,
+    isLeftSidebarOpen: false,
+    isRightSidebarOpen: false,
     isTextBoxFocused: false,
   };
 };
@@ -110,6 +114,8 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
     !obj.hasOwnProperty('virtualGridLocation') ||
     !obj.hasOwnProperty('cursoredNodeLocation') ||
     !obj.hasOwnProperty('isSidebarOpen') ||
+    !obj.hasOwnProperty('isLeftSidebarOpen') ||
+    !obj.hasOwnProperty('isRightSidebarOpen') ||
     !obj.hasOwnProperty('isTextBoxFocused') ||
     !obj.hasOwnProperty('tabs') ||
     !obj.hasOwnProperty('strategicSearch')

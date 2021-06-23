@@ -1,3 +1,5 @@
+import { HashMap } from '../../../lib/util/data_structures/hash';
+import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { squirrel3 } from '../../../lib/util/random';
 import {
@@ -42,8 +44,9 @@ export enum Modifier {
 }
 
 const WEIGHTS = {
+  // for any single node, what is in it
   DECISION_0: {
-    EMPTY: 800,
+    EMPTY: 150,
     NO_SPEND: 100,
     SPEND: 0,
   },
@@ -71,8 +74,11 @@ const WEIGHTS = {
 export class NodeContentsFactory {
   public config: NodeContentsFactoryConfig;
 
+  private clusterCenterData: HashMap<Vector3, any>;
+
   constructor(config: NodeContentsFactoryConfig) {
     this.config = config;
+    this.clusterCenterData = new HashMap();
   }
 
   private createSingle(args: { randInt: number }): NodeContentsLine {
@@ -132,21 +138,43 @@ export class NodeContentsFactory {
     });
   }
 
+  /**
+   * Entry point.
+   * @param args
+   * @returns
+   */
   public create(args: { seed: number; location: Vector3 }): NodeContents {
     const { seed, location } = args;
+
+    // hardcode the starting point to be empty
     if (location.equals(Vector3.Zero)) {
       return {
         lines: [],
       };
     }
 
-    return randomSwitch<NodeContents>({
-      randInt: squirrel3(
-        seed +
-          location.x +
-          location.y +
-          squirrel3(seed + location.x + location.z)
-      ),
+    // find the closest cluster center - a 3x3 hexagonal region
+    let clusterCenter: Vector3 | null;
+    let modulo3 = location.moduloPositive(3).pairXY();
+    if (
+      modulo3.equals(new Vector2(1, 2)) ||
+      modulo3.equals(new Vector2(2, 1))
+    ) {
+      // not close to any cluster centers
+      clusterCenter = location;
+    } else {
+      clusterCenter = location.divide(3).round().multiply(3);
+    }
+
+    // hardcode the starting cluster to be empty
+    if (clusterCenter.equals(Vector3.Zero)) {
+      return {
+        lines: [],
+      };
+    }
+
+    const result = randomSwitch<NodeContents>({
+      randInt: squirrel3(seed + Vector3ToSeed(clusterCenter)),
       weights: WEIGHTS.DECISION_0,
       behaviors: {
         EMPTY: (randInt: number) => {
@@ -183,5 +211,11 @@ export class NodeContentsFactory {
         },
       },
     });
+
+    return result;
   }
+}
+
+export function Vector3ToSeed(v: Vector3) {
+  return v.x + v.y + squirrel3(v.x + v.z);
 }

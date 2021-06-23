@@ -78,12 +78,21 @@ export class Vector3 {
   //   });
   // }
 
-  // round(): Vector3 {
-  //   return new Vector3({
-  //     x: Math.round(this.x),
-  //     y: Math.round(this.y),
-  //   });
-  // }
+  round(): Vector3 {
+    return new Vector3({
+      x: Math.round(this.x),
+      y: Math.round(this.y),
+      z: Math.round(this.z),
+    });
+  }
+
+  moduloPositive(b: number): Vector3 {
+    return new Vector3({
+      x: ((this.x % b) + b) % b,
+      y: ((this.y % b) + b) % b,
+      z: ((this.z % b) + b) % b,
+    });
+  }
 
   // floor(): Vector3 {
   //   return new Vector3({
