@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameState } from '../../../data/GameState';
 import {
   Attribute,
@@ -19,6 +19,8 @@ function StatsTabComponent(props: {
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 }) {
   const { gameState } = props;
+
+  const [isOpen, setOpen] = useState(false);
 
   const attributeInfos = Object.fromEntries(
     enumKeys(Attribute).map((attribute) => {
@@ -61,7 +63,7 @@ function StatsTabComponent(props: {
 
       const attributeInfo = (
         <>
-          <details className="details">
+          <details className="details" open={isOpen}>
             <summary>
               {' '}
               {symbol} ({desc}):
@@ -87,6 +89,23 @@ function StatsTabComponent(props: {
   return (
     <>
       <div>Current stats</div>
+      <br></br>
+      <div>
+        <button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Open all
+        </button>{' '}
+        <button
+          onClick={() => {
+            setOpen(false);
+          }}
+        >
+          Close all
+        </button>
+      </div>
       <br></br>
       <div className="tab-content-body">
         {attributeInfos[Attribute.RED0]}
