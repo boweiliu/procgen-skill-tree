@@ -64,6 +64,9 @@ export type PlayerUIState = {
 };
 
 export type StrategicSearchState = {
+  colors: {
+    enabled: boolean;
+  };
   highlight1: {
     value: string;
   };
@@ -83,6 +86,9 @@ export const newPlayerUIState = (): PlayerUIState => {
       },
     },
     strategicSearch: {
+      colors: {
+        enabled: false,
+      },
       highlight1: {
         value: '',
       },
@@ -119,6 +125,15 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
     !obj.hasOwnProperty('isTextBoxFocused') ||
     !obj.hasOwnProperty('tabs') ||
     !obj.hasOwnProperty('strategicSearch')
+  ) {
+    console.error('Failed deserializing PlayerUIState: ', obj);
+    return null;
+  }
+  const { strategicSearch } = obj;
+  if (
+    !strategicSearch ||
+    !strategicSearch.hasOwnProperty('colors') ||
+    !strategicSearch.hasOwnProperty('highlight1')
   ) {
     console.error('Failed deserializing PlayerUIState: ', obj);
     return null;

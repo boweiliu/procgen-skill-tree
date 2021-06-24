@@ -34,7 +34,7 @@ export class LockFactory {
     }
     // TODO(bowei): unhardcode
     // locks occur at this frequency
-    // a good non-debug value is 0.47
+    // a good non-debug value is 0.47. 0.5 is the site percolation threshold for triangular lattice
     if (p < 0.47) {
       return lockData;
     }

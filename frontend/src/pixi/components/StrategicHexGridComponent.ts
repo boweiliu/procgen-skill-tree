@@ -354,16 +354,18 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
-      const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
-      const originalLch = chroma(baseTint).lch();
-      baseTint = chroma
-        .lch(
-          originalLch[0],
-          // nodeContentsLch[1],
-          0.5 * (originalLch[1] + nodeContentsLch[1]),
-          nodeContentsLch[2]
-        )
-        .num();
+      if (gameState.playerUI.strategicSearch.colors.enabled) {
+        const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
+        const originalLch = chroma(baseTint).lch();
+        baseTint = chroma
+          .lch(
+            originalLch[0],
+            // nodeContentsLch[1],
+            0.5 * (originalLch[1] + nodeContentsLch[1]),
+            nodeContentsLch[2]
+          )
+          .num();
+      }
 
       const matched = matchStrategicSearch({
         nodeContents,

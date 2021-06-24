@@ -51,6 +51,15 @@ function StrategicTabComponent(props: {
     });
   }, [updaters]);
 
+  const onToggleColors = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      updaters.playerUI.strategicSearch.colors.enabled.enqueueUpdate((prev) => {
+        return e.target.checked;
+      });
+    },
+    [updaters]
+  );
+
   if (gameState.playerUI.isPixiHidden) {
     return (
       <>
@@ -65,6 +74,14 @@ function StrategicTabComponent(props: {
       <div>{showAdvancedSearch ? 'Custom' : 'Basic'} search</div>
       <br></br>
       <div className="tab-content-body">
+        <div>
+          <input
+            type={'checkbox'}
+            onChange={onToggleColors}
+            defaultChecked={gameState.playerUI.strategicSearch.colors.enabled}
+          />{' '}
+          Colors enabled?
+        </div>
         <br></br>
         <div>
           Symbols: {/* TODO(bowei): need tooltip text here */}
