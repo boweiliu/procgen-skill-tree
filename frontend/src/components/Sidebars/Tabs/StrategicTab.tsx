@@ -75,7 +75,12 @@ function StrategicTabComponent(props: {
       <br></br>
       <div className="tab-content-body">
         <div>
-          <input type={'checkbox'} onChange={onToggleColors} /> Colors enabled?
+          <input
+            type={'checkbox'}
+            onChange={onToggleColors}
+            defaultChecked={gameState.playerUI.strategicSearch.colors.enabled}
+          />{' '}
+          Colors enabled?
         </div>
         <br></br>
         <div>
