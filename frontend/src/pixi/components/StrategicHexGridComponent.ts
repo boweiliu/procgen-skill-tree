@@ -296,6 +296,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
 
+      let visible: boolean = true;
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
@@ -319,6 +320,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       } else {
         // hidden
         graphics.visible = true;
+        visible = false;
         baseTint = COLORS.nodePink;
       }
 
@@ -370,7 +372,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
-      if (gameState.playerUI.strategicSearch.colors.enabled) {
+      if (gameState.playerUI.strategicSearch.colors.enabled && visible) {
         const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
         const originalLch = chroma(baseTint).lch();
         baseTint = chroma
@@ -389,7 +391,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       });
 
       // If was selected by the highlight search, make it shiny
-      if (matched) {
+      if (matched && visible) {
         const animation: HexGridAnimation = {
           // max: addColor(COLORS.nodeBlue, graphics.tint),
           max: interpolateColor({
