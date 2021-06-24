@@ -13,7 +13,7 @@ export function generateSimpleTextures(
   renderer: Pixi.Renderer
 ): SimpleTextureSet {
   let circle = new Pixi.Graphics();
-  let diameter = 16;
+  let diameter = 12;
   circle.beginFill(COLORS.white);
   circle.drawCircle(0, 0, diameter / 2);
   // circle.drawCircle(0, 0, 6);
@@ -21,8 +21,8 @@ export function generateSimpleTextures(
 
   let rect = new Pixi.Graphics();
   {
-    let height = 18;
-    let width = 5;
+    let height = 14;
+    let width = 4;
     rect.beginFill(COLORS.white);
     // rect.drawRect(-6, -10, 12, 20);
     rect.drawRect(0, 0, width, height);
@@ -31,8 +31,8 @@ export function generateSimpleTextures(
 
   let verticalLine = new Pixi.Graphics();
   {
-    let height = 18;
-    let thickness = 3;
+    let height = 14;
+    let thickness = 2;
     let width = 6;
 
     verticalLine.beginFill(COLORS.white);

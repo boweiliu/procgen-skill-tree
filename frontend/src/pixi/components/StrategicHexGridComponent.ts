@@ -88,12 +88,13 @@ type HexGridData = {
 };
 
 // sqrt(3)/2 approximation - see hexGridPx
-const strategicHexGridPx = new Vector2(30, 26);
-// const strategicHexGridPx = new Vector2(22, 19);
+// const strategicHexGridPx = new Vector2(30, 26);
+const strategicHexGridPx = new Vector2(22, 19);
 // const strategicHexGridPx = new Vector2(15, 13);
 
 // const strategicHexGridDims = new Vector2(35, 20);
-const strategicHexGridDims = new Vector2(6, 12);
+// const strategicHexGridDims = new Vector2(6, 12);
+const strategicHexGridDims = new Vector2(48, 24);
 
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
@@ -448,6 +449,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
         data.cursor.position.x -= strategicHexGridPx.x / 2; // - props.args.textures.verticalLine.width / 3;
         data.cursor.position.x += props.args.textures.verticalLine.width / 3;
+        // data.cursor.position.x += props.args.textures.verticalLine.width / 2;
+        // data.cursor.position.x += props.args.textures.circle.width / 2;
         data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }
     }
