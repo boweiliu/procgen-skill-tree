@@ -61,21 +61,23 @@ function StatsTabComponent(props: {
 
       const attributeInfo = (
         <>
-          <div>
-            {' '}
-            {symbol} ({desc}):
-          </div>
-          <br></br>
-          <div>+: {modifiers[Modifier.FLAT]}</div>
-          <div>%: {modifiers[Modifier.INCREASED]}</div>
-          <div>
-            <span style={{ color: '#ffffff00' }}>&nbsp; &nbsp;</span> Total:{' '}
-            {Math.round(
-              modifiers[Modifier.FLAT] *
-                (1 + 0.01 * modifiers[Modifier.INCREASED])
-            )}
-          </div>
-          <br></br>
+          <details className="details">
+            <summary>
+              {' '}
+              {symbol} ({desc}):
+            </summary>
+            <div className="details-body">
+              <div>+: {modifiers[Modifier.FLAT]}</div>
+              <div>%: {modifiers[Modifier.INCREASED]}</div>
+              <div className="final-total">
+                Total:{' '}
+                {Math.round(
+                  modifiers[Modifier.FLAT] *
+                    (1 + 0.01 * modifiers[Modifier.INCREASED])
+                )}
+              </div>
+            </div>
+          </details>
         </>
       );
       return [attribute, attributeInfo];
