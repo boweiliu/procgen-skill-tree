@@ -89,6 +89,11 @@ type HexGridData = {
 
 // sqrt(3)/2 approximation - see hexGridPx
 const strategicHexGridPx = new Vector2(30, 26);
+// const strategicHexGridPx = new Vector2(22, 19);
+// const strategicHexGridPx = new Vector2(15, 13);
+
+// const strategicHexGridDims = new Vector2(35, 20);
+const strategicHexGridDims = new Vector2(6, 12);
 
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
@@ -113,8 +118,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
     // populate a grid
     // TODO(bowei): unhardcode
-    for (let j = -20; j <= 20; j++) {
-      for (let i = -35 + Math.floor(j / 2); i <= 35 + Math.floor(j / 2); i++) {
+    for (let j = -strategicHexGridDims.y; j <= strategicHexGridDims.y; j++) {
+      for (
+        let i = -strategicHexGridDims.x + Math.floor(j / 2);
+        i <= strategicHexGridDims.x + Math.floor(j / 2);
+        i++
+      ) {
         const graphics = new Pixi.Sprite();
         graphics.texture = props.args.textures.circle;
         graphics.tint = COLORS.nodePink;
@@ -308,7 +317,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
-        graphics.visible = false;
+        graphics.visible = true;
+        baseTint = COLORS.nodePink;
       }
 
       // add onclick so that clicking on the node causes selected node tab to update
@@ -338,7 +348,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
-      if (lockData && lockStatus !== LockStatus.OPEN) {
+      if (!nodeVisibleStatus.visible) {
+        graphics.texture = props.args.textures.dot;
+        graphics.position = PixiPointFrom(basePosition);
+        graphics.position.x -= props.args.textures.dot.width / 2;
+        graphics.position.y -= props.args.textures.dot.height / 2;
+      } else if (lockData && lockStatus !== LockStatus.OPEN) {
         graphics.texture = props.args.textures.rect;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= props.args.textures.rect.width / 2;
