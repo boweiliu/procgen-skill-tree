@@ -84,6 +84,16 @@ function App() {
     }
   }, [gameState.intent.newIntent.TURN_OFF_SIDEBAR, updaters]);
 
+  useEffect(() => {
+    if (gameState.intent.newIntent.EXIT) {
+      updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => false);
+      updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => false);
+      updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
+        return null;
+      });
+    }
+  }, [gameState.intent.newIntent.EXIT, updaters]);
+
   return (
     <div className={classnames({ App: true })}>
       <div className="entire-area">

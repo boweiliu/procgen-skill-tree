@@ -65,7 +65,7 @@ function StrategicTabComponent(props: {
       <>
         <div>Strategic view is not open!</div>
         <br></br>
-        <div>Click [m] to toggle strategic view.</div>
+        <div>Click (hotkey: b) to toggle strategic view.</div>
       </>
     );
   }

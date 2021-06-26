@@ -45,7 +45,7 @@ const defaultKeyIntentConfig = {
   t: IntentName.TOGGLE_LEFT_SIDEBAR,
   y: IntentName.TOGGLE_RIGHT_SIDEBAR,
 
-  Escape: IntentName.TURN_OFF_SIDEBAR,
+  Escape: IntentName.EXIT,
 
   // w: IntentName.MOVE_CURSOR_NORTH,
   // a: IntentName.MOVE_CURSOR_WEST,
