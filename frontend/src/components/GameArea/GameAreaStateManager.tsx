@@ -192,6 +192,16 @@ function Component(props: {
         }
       });
     }
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: 1, y: 2, z: 0 }) || newLocation
+      );
+    }
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHSOUTH) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: -1, y: -2, z: 0 }) || newLocation
+      );
+    }
     if (props.gameState.intent.newIntent.INTERACT_WITH_NODE) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
@@ -204,9 +214,11 @@ function Component(props: {
     props.gameState.intent.newIntent.INTERACT_WITH_NODE,
     props.gameState.intent.newIntent.MOVE_CURSOR_EAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHSOUTH,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_WEST,

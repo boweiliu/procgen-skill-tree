@@ -113,7 +113,7 @@ function App() {
             updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle strategic view (hotkey: m)
+          Toggle big view (hotkey: b)
         </button>
         <span> </span>
         <button
