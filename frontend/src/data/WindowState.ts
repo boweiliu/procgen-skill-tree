@@ -24,7 +24,7 @@ export const newWindowState = (): WindowState => {
  */
 export function appSizeFromWindowSize(window?: Const<Vector2>): Vector2 {
   return new Vector2({
-    x: Math.min(1920, (window?.x || Infinity) - 24),
-    y: Math.min(1080, (window?.y || Infinity) - 24),
+    x: Math.min(2560, (window?.x || Infinity) - 24),
+    y: Math.min(1440, (window?.y || Infinity) - 24),
   });
 }

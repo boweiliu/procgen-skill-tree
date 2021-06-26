@@ -14,7 +14,7 @@ import {
   extractGameGridSubState,
   depsGameGridSubState,
 } from './GameAreaGrid';
-import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
+import { GameAreaSubState } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
   convertLocationToVirtualCoords,
@@ -30,11 +30,12 @@ export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
   gameState: GameAreaSubState;
   virtualGridDims: Vector2;
+  hexGridPx: Vector2;
   appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
-  const { gameState, appSize, virtualGridDims } = props;
+  const { gameState, hexGridPx, appSize, virtualGridDims } = props;
   // console.log('GameArea state manager rerender');
 
   // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
