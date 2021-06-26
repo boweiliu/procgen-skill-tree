@@ -43,6 +43,8 @@ function GameAreaCellComponent({
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
+      // TODO(bowei): debounce this so double-clicks dont double trigger this
+
       e.stopPropagation();
       e.preventDefault();
       // console.log(`clicked`);
@@ -138,6 +140,7 @@ function CellComponent({
           status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : ''
         )}
         onClick={onClickCenter}
+          onDoubleClick={() => { console.log("double clicked")}}
         onPointerEnter={onHover}
         onPointerLeave={onUnhover}
         hidden={status === NodeAllocatedStatus.HIDDEN}
@@ -151,6 +154,7 @@ function CellComponent({
           className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
           onClick={onClickCenter}
+          onDoubleClick={() => { console.log("double clicked")}}
           onPointerEnter={onHover}
           onPointerLeave={onUnhover}
         >
@@ -190,6 +194,11 @@ function CellComponent({
           // hidden={!debugIsCursored}
           hidden={!isCursored}
         ></div>
+      </div>
+    </div>
+  );
+}
+  ></div>
       </div>
     </div>
   );
