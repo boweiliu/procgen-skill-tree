@@ -9,20 +9,23 @@ export interface SimpleTextureSet {
   verticalLine: Pixi.Texture;
 }
 
+export const pixiUiScale: 'small' | 'medium' | 'large' = 'small';
+
 export function generateSimpleTextures(
-  renderer: Pixi.Renderer
+  renderer: Pixi.Renderer,
+  uiScale: 'small' | 'medium' | 'large' = pixiUiScale
 ): SimpleTextureSet {
   let circle = new Pixi.Graphics();
-  let diameter = 12;
+  let diameter = uiScale === 'small' ? 12 : uiScale === 'medium' ? 16 : 24;
   circle.beginFill(COLORS.white);
   circle.drawCircle(0, 0, diameter / 2);
   // circle.drawCircle(0, 0, 6);
   // circle.pivot = PixiPointFrom(Vector2.Zero);
 
   let rect = new Pixi.Graphics();
+  let height = uiScale === 'small' ? 14 : uiScale === 'medium' ? 18 : 30;
   {
-    let height = 14;
-    let width = 4;
+    let width = uiScale === 'small' ? 4 : uiScale === 'medium' ? 5 : 8;
     rect.beginFill(COLORS.white);
     // rect.drawRect(-6, -10, 12, 20);
     rect.drawRect(0, 0, width, height);
@@ -31,9 +34,8 @@ export function generateSimpleTextures(
 
   let verticalLine = new Pixi.Graphics();
   {
-    let height = 14;
-    let thickness = 2;
-    let width = 6;
+    let thickness = uiScale === 'small' ? 2 : uiScale === 'medium' ? 3 : 4;
+    let width = uiScale === 'small' || uiScale === 'medium' ? 6 : 8;
 
     verticalLine.beginFill(COLORS.white);
     verticalLine.drawRect(0, 0, thickness, height);

@@ -22,7 +22,7 @@ import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
-import { SimpleTextureSet } from '../textures/SimpleTextures';
+import { pixiUiScale, SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 
@@ -89,9 +89,15 @@ type HexGridData = {
 
 // sqrt(3)/2 approximation - see hexGridPx
 // const strategicHexGridPx = new Vector2(30, 26);
-const strategicHexGridPx = new Vector2(22, 19);
-// const strategicHexGridPx = new Vector2(15, 13);
+const strategicHexGridPx =
+  pixiUiScale === 'small'
+    ? new Vector2(22, 19)
+    : pixiUiScale === 'medium'
+    ? new Vector2(30, 26)
+    : new Vector2(45, 39);
+// // const strategicHexGridPx = new Vector2(15, 13);
 
+// TODO(bowei): compute this to be big enough
 // const strategicHexGridDims = new Vector2(35, 20);
 // const strategicHexGridDims = new Vector2(6, 12);
 const strategicHexGridDims = new Vector2(48, 24);
