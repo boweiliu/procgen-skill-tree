@@ -3,13 +3,12 @@ import { Vector2 } from '../lib/util/geometry/vector2';
 import { Vector3 } from '../lib/util/geometry/vector3';
 
 export const initialTabLabels: { [k in 'left' | 'right']: TAB_NAME[] } = {
-  left: [],
+  left: [TAB_NAME.HELP],
   right: [
     TAB_NAME.SELECTED_NODE,
     TAB_NAME.STATS,
     TAB_NAME.QUESTS,
     TAB_NAME.DEBUG,
-    TAB_NAME.HELP,
     TAB_NAME.STRATEGIC_VIEW,
   ],
 };
@@ -65,7 +64,7 @@ export type PlayerUIState = {
 
 export type StrategicSearchState = {
   colors: {
-    enabled: boolean;
+    enabled: 'Yes' | 'Only unallocated' | 'No';
   };
   highlight1: {
     value: string;
@@ -87,7 +86,7 @@ export const newPlayerUIState = (): PlayerUIState => {
     },
     strategicSearch: {
       colors: {
-        enabled: false,
+        enabled: 'Only unallocated',
       },
       highlight1: {
         value: '',
@@ -97,7 +96,7 @@ export const newPlayerUIState = (): PlayerUIState => {
     virtualGridLocation: Vector3.Zero,
     cursoredNodeLocation: null,
     isSidebarOpen: false,
-    isLeftSidebarOpen: false,
+    isLeftSidebarOpen: true,
     isRightSidebarOpen: false,
     isTextBoxFocused: false,
   };

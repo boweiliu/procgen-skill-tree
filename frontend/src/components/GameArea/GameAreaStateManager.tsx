@@ -14,7 +14,7 @@ import {
   extractGameGridSubState,
   depsGameGridSubState,
 } from './GameAreaGrid';
-import { GameAreaSubState, hexGridPx } from './GameAreaInterface';
+import { GameAreaSubState } from './GameAreaInterface';
 import { InfiniteScrollManager } from './InfiniteScrollManager';
 import {
   convertLocationToVirtualCoords,
@@ -30,11 +30,12 @@ export const GameAreaStateManager = React.memo(Component);
 function Component(props: {
   gameState: GameAreaSubState;
   virtualGridDims: Vector2;
+  hexGridPx: Vector2;
   appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   actions: { allocateNode: AllocateNodeAction };
 }) {
-  const { gameState, appSize, virtualGridDims } = props;
+  const { gameState, hexGridPx, appSize, virtualGridDims } = props;
   // console.log('GameArea state manager rerender');
 
   // Compute some helpful coordinate to location conversions. These MUST be recomputed every time virtualGridLocation changes
@@ -191,6 +192,16 @@ function Component(props: {
         }
       });
     }
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: 1, y: 2, z: 0 }) || newLocation
+      );
+    }
+    if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHSOUTH) {
+      props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
+        (prev) => prev?.add({ x: -1, y: -2, z: 0 }) || newLocation
+      );
+    }
     if (props.gameState.intent.newIntent.INTERACT_WITH_NODE) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
@@ -203,9 +214,11 @@ function Component(props: {
     props.gameState.intent.newIntent.INTERACT_WITH_NODE,
     props.gameState.intent.newIntent.MOVE_CURSOR_EAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH,
+    props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHSOUTH,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_WEST,

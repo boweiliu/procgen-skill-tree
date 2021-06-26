@@ -117,7 +117,7 @@ function SelectedNodeTabContentComponent(props: {
         </div>
         <br></br>
         <div>
-          <button onClick={onZoom}>Zoom to here (hotkey: z)</button>
+          <button onClick={onZoom}>Recenter on here (hotkey: r, {'\\'})</button>
         </div>
         <br></br>
         <div>Description: {description}</div>

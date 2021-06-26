@@ -5,10 +5,7 @@ import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { PlayerUIState } from '../../../data/PlayerUIState';
 import { WorldGenStateFactory } from '../../../game/worldGen/WorldGenStateFactory';
 import { appSizeFromWindowSize } from '../../../data/WindowState';
-import {
-  hexGridPx,
-  virtualAreaScaleMultiplier,
-} from '../../GameArea/GameAreaInterface';
+import { virtualAreaScaleMultiplier } from '../../GameArea/GameAreaInterface';
 import { PlayerSaveState } from '../../../data/PlayerSaveState';
 
 export function DebugTabContent(props: {
@@ -31,6 +28,19 @@ export function DebugTabContent(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
+  // TODO(bowei): re-factor this from game area interface
+  // TODO(bowei): programmatically determine UI scale based on app size
+  const hexGridPx = useMemo(() => {
+    if (appSize.x > 1920) {
+      return new Vector2(268, 232);
+    } else {
+      return new Vector2(194, 168);
+      // return new Vector2(120, 104);
+      // return new Vector2(97, 84);
+      // return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
+    }
+  }, [appSize]);
+
   const virtualGridDims = useMemo(() => {
     let x = Math.floor(
       (appSize.x * virtualAreaScaleMultiplier) / hexGridPx.x - 0.5
@@ -44,7 +54,7 @@ export function DebugTabContent(props: {
     // y = Math.max(5, y);
 
     return new Vector2(x, y);
-  }, [appSize]);
+  }, [appSize, hexGridPx]);
 
   useEffect(() => {
     const now = new Date();

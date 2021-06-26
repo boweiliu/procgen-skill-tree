@@ -32,29 +32,54 @@ const defaultKeyIntentConfig = {
   a: IntentName.PAN_WEST,
   s: IntentName.PAN_SOUTH,
   d: IntentName.PAN_EAST,
-  k: IntentName.PAN_NORTH,
-  h: IntentName.PAN_WEST,
-  j: IntentName.PAN_SOUTH,
-  l: IntentName.PAN_EAST,
-  m: IntentName.TOGGLE_STRATEGIC_VIEW,
-  i: IntentName.TOGGLE_SIDEBAR,
+
+  // k: IntentName.PAN_NORTH,
+  // h: IntentName.PAN_WEST,
+  // j: IntentName.PAN_SOUTH,
+  // l: IntentName.PAN_EAST,
+
+  // m: IntentName.TOGGLE_STRATEGIC_VIEW,
+  b: IntentName.TOGGLE_STRATEGIC_VIEW,
+
+  // i: IntentName.TOGGLE_SIDEBAR,
+  t: IntentName.TOGGLE_LEFT_SIDEBAR,
+  y: IntentName.TOGGLE_RIGHT_SIDEBAR,
+
+  Escape: IntentName.EXIT,
+
   // w: IntentName.MOVE_CURSOR_NORTH,
   // a: IntentName.MOVE_CURSOR_WEST,
   // s: IntentName.MOVE_CURSOR_SOUTH,
   // d: IntentName.MOVE_CURSOR_EAST,
-  ArrowUp: IntentName.MOVE_CURSOR_NORTH,
-  ArrowLeft: IntentName.MOVE_CURSOR_WEST,
-  ArrowDown: IntentName.MOVE_CURSOR_SOUTH,
-  ArrowRight: IntentName.MOVE_CURSOR_EAST,
   // q: IntentName.MOVE_CURSOR_NORTHWEST,
   // e: IntentName.MOVE_CURSOR_NORTHEAST,
   // z: IntentName.MOVE_CURSOR_SOUTHWEST,
   // x: IntentName.MOVE_CURSOR_SOUTHEAST,
   // c: IntentName.MOVE_CURSOR_SOUTHEAST,
+
+  j: IntentName.MOVE_CURSOR_WEST,
+  l: IntentName.MOVE_CURSOR_EAST,
+  u: IntentName.MOVE_CURSOR_NORTHWEST,
+  i: IntentName.MOVE_CURSOR_NORTHEAST,
+  n: IntentName.MOVE_CURSOR_SOUTHWEST,
+  m: IntentName.MOVE_CURSOR_SOUTHEAST,
+  k: IntentName.MOVE_CURSOR_SOUTHWEST,
+
+  // ArrowUp: IntentName.MOVE_CURSOR_NORTHNORTH,
+  ArrowUp: IntentName.MOVE_CURSOR_NORTHEAST,
+  ArrowLeft: IntentName.MOVE_CURSOR_WEST,
+  ArrowDown: IntentName.MOVE_CURSOR_SOUTHWEST,
+  ArrowRight: IntentName.MOVE_CURSOR_EAST,
+  RightShift: IntentName.MOVE_CURSOR_NORTHWEST,
+  RightControl: IntentName.MOVE_CURSOR_SOUTHEAST,
+
   ' ': IntentName.INTERACT_WITH_NODE,
-  z: IntentName.ZOOM_RECENTER_AT_NODE,
+  // z: IntentName.ZOOM_RECENTER_AT_NODE,
+  r: IntentName.ZOOM_RECENTER_AT_NODE,
+  '\\': IntentName.ZOOM_RECENTER_AT_NODE,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
+  'Ctrl-Shift-R': IntentName.HARD_REFRESH_PAGE,
 };
 
 /**
@@ -77,7 +102,34 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
   // NOTE(bowei): does using e.repeat here break when window loses focus??
   handleKeydown = (e: KeyboardEvent) => {
     const { keyIntentConfig } = this.state;
-    const key: BrowserKeys = e.key;
+    let key: BrowserKeys = e.key;
+    // special case to handle left/right control and alt keys
+    if (
+      // e.ctrlKey || e.altKey || e.metaKey || e.shiftKey
+      key === 'Control' ||
+      key === 'Shift' ||
+      key === 'Meta' ||
+      key === 'Alt'
+    ) {
+      if (e.location === 1) {
+        key = 'Left' + key;
+      } else if (e.location === 2) {
+        key = 'Right' + key;
+      } else if (e.location === 3) {
+        key = 'Extra' + key;
+      }
+    } else {
+      // reversed order of prefixes! 'Ctrl-Alt-Shift' is canonical order
+      if (e.shiftKey) {
+        key = 'Shift-' + key;
+      }
+      if (e.altKey) {
+        key = 'Alt-' + key;
+      }
+      if (e.ctrlKey) {
+        key = 'Ctrl-' + key;
+      }
+    }
     const configuredIntent = keyIntentConfig[key];
     if (configuredIntent) {
       if (this.props.isTextBoxFocused) {
@@ -89,6 +141,8 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
         // console.log("skipping default on keyboard event because text box is not focused");
         e.preventDefault();
       }
+    } else {
+      console.log('Unregistered key ', key, e);
     }
 
     if (
@@ -129,7 +183,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
   };
 
   componentWillUnmount() {
-    console.log('removing event listeners for keyboard component');
+    // console.log('removing event listeners for keyboard component');
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('keyup', this.handleKeyup);
   }

@@ -11,15 +11,20 @@ import { GameAreaStateManager } from './GameAreaStateManager';
 
 /**
  * Approximations for sqrt(3)/2 == ratio of an equilateral triangle's height to its width:
- * 6/7, 13/15, 26/30, 45/52, 58/67, 84/97, 181/209
- * for divisibility -- recommend 26/30, 52/60, 104/120, 168/194, 180/208, 232/268, 336/388
+ * 6/7, 13/15 (*), 26/30, 45/52, 58/67, 84/97 (*), 97/112, 181/209 (*)
+ * for divisibility -- recommend 19/22, 26/30, 52/60, 78/90, 104/120, 168/194, 180/208, 232/268, 336/388
  */
 // export const hexGridPx = new Vector2(268, 232);
-export const hexGridPx = new Vector2(194, 168);
+// export const hexGridPx = new Vector2(194, 168);
+// export const hexGridPx = new Vector2(120, 104);
+// export const hexGridPx = new Vector2(97, 84);
+// export const hexGridPx = new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
 
-export const hexCenterRadius = 44; // Radius of the circles representing allocatable nodes, in px
+// export const hexCenterRadius = 64; // Radius of the circles representing allocatable nodes, in px
+// export const hexCenterRadius = 44; // Radius of the circles representing allocatable nodes, in px
+// export const hexCenterRadius = Math.round(hexGridPx.x / 16 - 0.025) * 4; // Radius of the circles representing allocatable nodes, in px
 
-export const borderWidth = 2; // border of circles, etc. in px
+// export const borderWidth = hexGridPx.x > 100 ? 2 : 1; // border of circles, etc. in px
 
 /**
  * How much bigger the "virtual" (i.e. scrollable) game area is than the visible window.
@@ -85,6 +90,26 @@ export function GameAreaInterface(props: {
     );
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
+  // TODO(bowei): programmatically determine UI scale based on app size
+  const hexGridPx = useMemo(() => {
+    if (appSize.x > 1920) {
+      return new Vector2(268, 232);
+    } else {
+      return new Vector2(194, 168);
+      // return new Vector2(120, 104);
+      // return new Vector2(97, 84);
+      // return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
+    }
+  }, [appSize]);
+
+  const hexCenterRadius = useMemo(() => {
+    return Math.round(hexGridPx.x / 16 - 0.025) * 4; // Radius of the circles representing allocatable nodes, in px
+  }, [hexGridPx]);
+
+  const borderWidth = useMemo(() => {
+    return hexGridPx.x > 100 ? 2 : 1; // border of circles, etc. in px
+  }, [hexGridPx]);
+
   const onDebugRetrigger = gameState.debug.retriggerVirtualGridDims; // triggered from debug tab to check performance
   const virtualGridDims = useMemo(() => {
     onDebugRetrigger();
@@ -101,7 +126,7 @@ export function GameAreaInterface(props: {
     // y = Math.max(5, y);
 
     return new Vector2(x, y);
-  }, [appSize, onDebugRetrigger]);
+  }, [appSize, onDebugRetrigger, hexGridPx]);
 
   const subGameState: GameAreaSubState = useMemo(() => {
     return extractGameAreaSubState(gameState);
@@ -126,6 +151,7 @@ export function GameAreaInterface(props: {
       <GameAreaStateManager
         appSize={appSize}
         virtualGridDims={virtualGridDims}
+        hexGridPx={hexGridPx}
         gameState={subGameState}
         updaters={props.updaters}
         actions={actions}

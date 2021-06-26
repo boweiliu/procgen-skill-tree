@@ -85,6 +85,46 @@ export function computeNodeReactData(args: {
     shortText2 = '-' + AttributeSymbolMap[nodeContents.condition.attribute];
   }
 
+  let tooltipHeader = <> {nodeStatus.toString()}</>;
+  if (lockData) {
+    if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
+      tooltipHeader = (
+        <>
+          <div>{'LOCKED'}</div>
+          <br></br>
+          <div>{'Locks are currently WIP!'}</div>
+        </>
+      );
+    } else if (nodeStatus === NodeAllocatedStatus.UNREACHABLE) {
+      tooltipHeader = (
+        <>
+          <div>
+            {'LOCKED, '}
+            {nodeStatus.toString()}
+          </div>
+          <br></br>
+          <div>{'Locks are currently WIP!'}</div>
+        </>
+      );
+    }
+  } else if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
+    tooltipHeader = (
+      <>
+        <div>{nodeStatus.toString()}</div>
+        <br></br>
+        <div>Click to allocate.</div>
+      </>
+    );
+  } else if (location.equals(Vector3.Zero)) {
+    tooltipHeader = (
+      <>
+        <div>{nodeStatus.toString()}</div>
+        <br></br>
+        <div>{STARTING_NODE_DESCRIPTION}</div>
+      </>
+    );
+  }
+
   const nodeData: NodeReactData = {
     nodeLocation: location,
     shortText: shortText2 ? (
@@ -98,15 +138,7 @@ export function computeNodeReactData(args: {
     ),
     toolTipText: (
       <>
-        <div>{nodeStatus.toString()}</div>
-        {location.equals(Vector3.Zero) ? (
-          <>
-            {' '}
-            <br /> <div>{STARTING_NODE_DESCRIPTION}</div>
-          </>
-        ) : (
-          <> </>
-        )}
+        <div>{tooltipHeader}</div>
         {nodeContents.lines[0] ? <br /> : <></>}
         {nodeContentsToDom(nodeContents)}
       </>

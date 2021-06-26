@@ -7,6 +7,7 @@ import { StrategicTab } from './Tabs/StrategicTab';
 import { SelectedNodeTabContent } from './Tabs/SelectedNodeTab';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { StatsTab } from './Tabs/StatsTab';
+import { HelpTab } from './Tabs/HelpTab';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -50,7 +51,7 @@ export function TabContentInterface(props: {
         hidden={tabName !== TAB_NAME.DEBUG}
       />
     ),
-    [TAB_NAME.HELP]: <>How to play the game</>,
+    [TAB_NAME.HELP]: <HelpTab />,
   };
 
   return <TabContentSelector tabComponents={tabComponents} tabName={tabName} />;

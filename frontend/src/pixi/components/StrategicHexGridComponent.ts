@@ -22,7 +22,7 @@ import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
-import { SimpleTextureSet } from '../textures/SimpleTextures';
+import { pixiUiScale, SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 
@@ -88,7 +88,19 @@ type HexGridData = {
 };
 
 // sqrt(3)/2 approximation - see hexGridPx
-const strategicHexGridPx = new Vector2(30, 26);
+// const strategicHexGridPx = new Vector2(30, 26);
+const strategicHexGridPx =
+  pixiUiScale === 'small'
+    ? new Vector2(22, 19)
+    : pixiUiScale === 'medium'
+    ? new Vector2(30, 26)
+    : new Vector2(45, 39);
+// // const strategicHexGridPx = new Vector2(15, 13);
+
+// TODO(bowei): compute this to be big enough
+// const strategicHexGridDims = new Vector2(35, 20);
+// const strategicHexGridDims = new Vector2(6, 12);
+const strategicHexGridDims = new Vector2(48, 24);
 
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
@@ -113,8 +125,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
     // populate a grid
     // TODO(bowei): unhardcode
-    for (let j = -20; j <= 20; j++) {
-      for (let i = -35 + Math.floor(j / 2); i <= 35 + Math.floor(j / 2); i++) {
+    for (let j = -strategicHexGridDims.y; j <= strategicHexGridDims.y; j++) {
+      for (
+        let i = -strategicHexGridDims.x + Math.floor(j / 2);
+        i <= strategicHexGridDims.x + Math.floor(j / 2);
+        i++
+      ) {
         const graphics = new Pixi.Sprite();
         graphics.texture = props.args.textures.circle;
         graphics.tint = COLORS.nodePink;
@@ -286,6 +302,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
 
+      let visible: boolean = true;
       if (nodeTakenStatus.taken) {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
@@ -308,7 +325,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
-        graphics.visible = false;
+        graphics.visible = true;
+        visible = false;
+        baseTint = COLORS.nodePink;
       }
 
       // add onclick so that clicking on the node causes selected node tab to update
@@ -338,7 +357,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
-      if (lockData && lockStatus !== LockStatus.OPEN) {
+      if (!nodeVisibleStatus.visible) {
+        graphics.texture = props.args.textures.dot;
+        graphics.position = PixiPointFrom(basePosition);
+        graphics.position.x -= props.args.textures.dot.width / 2;
+        graphics.position.y -= props.args.textures.dot.height / 2;
+      } else if (lockData && lockStatus !== LockStatus.OPEN) {
         graphics.texture = props.args.textures.rect;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= props.args.textures.rect.width / 2;
@@ -354,17 +378,26 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
 
       // give color (hue, saturation) to the node according to its contents, but keep the value (grayness) from tint
-      if (gameState.playerUI.strategicSearch.colors.enabled) {
-        const nodeContentsLch = chroma(nodeContentsToColor(nodeContents)).lch();
-        const originalLch = chroma(baseTint).lch();
-        baseTint = chroma
-          .lch(
-            originalLch[0],
-            // nodeContentsLch[1],
-            0.5 * (originalLch[1] + nodeContentsLch[1]),
-            nodeContentsLch[2]
-          )
-          .num();
+      if (visible) {
+        if (
+          gameState.playerUI.strategicSearch.colors.enabled === 'Yes' ||
+          (gameState.playerUI.strategicSearch.colors.enabled ===
+            'Only unallocated' &&
+            !nodeTakenStatus.taken)
+        ) {
+          const nodeContentsLch = chroma(
+            nodeContentsToColor(nodeContents)
+          ).lch();
+          const originalLch = chroma(baseTint).lch();
+          baseTint = chroma
+            .lch(
+              originalLch[0],
+              // nodeContentsLch[1],
+              0.5 * (originalLch[1] + nodeContentsLch[1]),
+              nodeContentsLch[2]
+            )
+            .num();
+        }
       }
 
       const matched = matchStrategicSearch({
@@ -373,7 +406,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       });
 
       // If was selected by the highlight search, make it shiny
-      if (matched) {
+      if (matched && visible) {
         const animation: HexGridAnimation = {
           // max: addColor(COLORS.nodeBlue, graphics.tint),
           max: interpolateColor({
@@ -433,6 +466,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
         data.cursor.position.x -= strategicHexGridPx.x / 2; // - props.args.textures.verticalLine.width / 3;
         data.cursor.position.x += props.args.textures.verticalLine.width / 3;
+        // data.cursor.position.x += props.args.textures.verticalLine.width / 2;
+        // data.cursor.position.x += props.args.textures.circle.width / 2;
         data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
       }
     }
