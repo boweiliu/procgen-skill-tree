@@ -8,30 +8,45 @@ export function HelpTab() {
       <div className="tab-content-body">
         <div>CONTROLS</div>
         <br></br>
-        <div>Use hotkey: t, y to open and close the tabs.</div>
-        <div>Use hotkey: b to toggle strategic view.</div>
-        <div>Move the tabs around using "send left/right" buttons.</div>
-        <div>Open the Stats tab.</div>
-        <div>Open the Quest tab.</div>
+        <CheckboxDiv>Use hotkey: t, y to open and close the tabs.</CheckboxDiv>
+        <CheckboxDiv>Use hotkey: b to toggle strategic view.</CheckboxDiv>
+        <CheckboxDiv>
+          Move the tabs around using "send left/right" buttons.
+        </CheckboxDiv>
+        <CheckboxDiv>Open the Stats tab.</CheckboxDiv>
+        <CheckboxDiv>Open the Quest tab.</CheckboxDiv>
         <br></br>
         <div>GAME</div>
         <br></br>
-        <div>Hover over some nodes.</div>
-        <div>Left click on an available node to allocate it.</div>
-        <div>Left click on any other node to view detailed info.</div>
-        <div>Close the selected node tab.</div>
+        <CheckboxDiv>Hover over some nodes.</CheckboxDiv>
+        <CheckboxDiv>
+          Left click on an available node to allocate it.
+        </CheckboxDiv>
+        <CheckboxDiv>
+          Left click on any other node to view detailed info.
+        </CheckboxDiv>
+        <CheckboxDiv>Close the selected node tab.</CheckboxDiv>
         <br></br>
         <div>STRATEGIC VIEW</div>
         <br></br>
-        <div>Open the strategic view tab while strategic view is open.</div>
-        <div>Toggle colors.</div>
-        <div>
+        <CheckboxDiv>
+          Open the strategic view tab while strategic view is open.
+        </CheckboxDiv>
+        <CheckboxDiv>Toggle colors.</CheckboxDiv>
+        <CheckboxDiv>
           Try adding an attribute to the search bar by clicking a symbol.
-        </div>
-        <div>Click search to highlight those attributes.</div>
-        <div>Click cancel to reset the search.</div>
-        <br></br>
+        </CheckboxDiv>
+        <CheckboxDiv>Click search to highlight those attributes.</CheckboxDiv>
+        <CheckboxDiv>Click cancel to reset the search.</CheckboxDiv>
       </div>
     </>
+  );
+}
+
+function CheckboxDiv(props: { children: any }) {
+  return (
+    <div>
+      <input type="checkbox" /> {props.children}
+    </div>
   );
 }
