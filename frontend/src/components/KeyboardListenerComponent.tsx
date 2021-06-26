@@ -68,11 +68,13 @@ const defaultKeyIntentConfig = {
   ArrowUp: IntentName.MOVE_CURSOR_NORTHNORTH,
   ArrowLeft: IntentName.MOVE_CURSOR_WEST,
   ArrowDown: IntentName.MOVE_CURSOR_SOUTHSOUTH,
-  RightShift: IntentName.MOVE_CURSOR_NORTHEAST,
   ArrowRight: IntentName.MOVE_CURSOR_EAST,
+  RightShift: IntentName.MOVE_CURSOR_NORTHEAST,
+
   ' ': IntentName.INTERACT_WITH_NODE,
   // z: IntentName.ZOOM_RECENTER_AT_NODE,
   r: IntentName.ZOOM_RECENTER_AT_NODE,
+  '\\': IntentName.ZOOM_RECENTER_AT_NODE,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
 };
@@ -99,13 +101,30 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
     const { keyIntentConfig } = this.state;
     let key: BrowserKeys = e.key;
     // special case to handle left/right control and alt keys
-    if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+    if (
+      // e.ctrlKey || e.altKey || e.metaKey || e.shiftKey
+      key === 'Control' ||
+      key === 'Shift' ||
+      key === 'Meta' ||
+      key === 'Alt'
+    ) {
       if (e.location === 1) {
         key = 'Left' + key;
       } else if (e.location === 2) {
         key = 'Right' + key;
       } else if (e.location === 3) {
         key = 'Extra' + key;
+      }
+    } else {
+      // reversed order of prefixes! 'Ctrl-Alt-Shift' is canonical order
+      if (e.shiftKey) {
+        key = 'Shift-' + key;
+      }
+      if (e.altKey) {
+        key = 'Alt-' + key;
+      }
+      if (e.ctrlKey) {
+        key = 'Ctrl-' + key;
       }
     }
     const configuredIntent = keyIntentConfig[key];
@@ -120,7 +139,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
         e.preventDefault();
       }
     } else {
-      console.log('Unregistered key ', key);
+      console.log('Unregistered key ', key, e);
     }
 
     if (

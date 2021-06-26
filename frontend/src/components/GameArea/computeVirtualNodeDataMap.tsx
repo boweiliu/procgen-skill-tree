@@ -86,7 +86,28 @@ export function computeNodeReactData(args: {
   }
 
   let tooltipHeader = <> {nodeStatus.toString()}</>;
-  if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
+  if (lockData) {
+    if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
+      tooltipHeader = (
+        <>
+          <div>{'LOCKED'}</div>
+          <br></br>
+          <div>{'Locks are currently WIP!'}</div>
+        </>
+      );
+    } else if (nodeStatus === NodeAllocatedStatus.UNREACHABLE) {
+      tooltipHeader = (
+        <>
+          <div>
+            {'LOCKED, '}
+            {nodeStatus.toString()}
+          </div>
+          <br></br>
+          <div>{'Locks are currently WIP!'}</div>
+        </>
+      );
+    }
+  } else if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
     tooltipHeader = (
       <>
         <div>{nodeStatus.toString()}</div>

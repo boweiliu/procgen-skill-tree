@@ -150,6 +150,7 @@ function CellComponent({
         <div
           className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
+          onClick={onClickCenter}
           onPointerEnter={onHover}
           onPointerLeave={onUnhover}
         >
