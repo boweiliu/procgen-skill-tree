@@ -37,7 +37,10 @@ const defaultKeyIntentConfig = {
   j: IntentName.PAN_SOUTH,
   l: IntentName.PAN_EAST,
   m: IntentName.TOGGLE_STRATEGIC_VIEW,
-  i: IntentName.TOGGLE_SIDEBAR,
+  // i: IntentName.TOGGLE_SIDEBAR,
+  t: IntentName.TOGGLE_LEFT_SIDEBAR,
+  y: IntentName.TOGGLE_RIGHT_SIDEBAR,
+  Escape: IntentName.TURN_OFF_SIDEBAR,
   // w: IntentName.MOVE_CURSOR_NORTH,
   // a: IntentName.MOVE_CURSOR_WEST,
   // s: IntentName.MOVE_CURSOR_SOUTH,
@@ -89,6 +92,8 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
         // console.log("skipping default on keyboard event because text box is not focused");
         e.preventDefault();
       }
+    } else {
+      console.log('Unregistered key ', key);
     }
 
     if (
@@ -129,7 +134,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
   };
 
   componentWillUnmount() {
-    console.log('removing event listeners for keyboard component');
+    // console.log('removing event listeners for keyboard component');
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('keyup', this.handleKeyup);
   }

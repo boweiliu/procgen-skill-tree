@@ -47,12 +47,16 @@ function GameAreaCellComponent({
       e.preventDefault();
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
-      onUpdateStatus({
-        nodeLocation,
-        newStatus: NodeAllocatedStatus.TAKEN,
-      });
+      if (nodeData.status === NodeAllocatedStatus.AVAILABLE) {
+        onUpdateStatus({
+          nodeLocation,
+          newStatus: NodeAllocatedStatus.TAKEN,
+        });
+      } else {
+        onUpdateCursored(isCursored ? null : nodeLocation);
+      }
     },
-    [onUpdateStatus, nodeLocation]
+    [onUpdateStatus, nodeLocation, nodeData, isCursored, onUpdateCursored]
   );
 
   const handleClickQuestionMark = useCallback(
@@ -130,7 +134,8 @@ function CellComponent({
           status === NodeAllocatedStatus.TAKEN ||
             status === NodeAllocatedStatus.UNREACHABLE
             ? 'border-unimportant'
-            : 'border-important'
+            : 'border-important',
+          status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : ''
         )}
         onClick={onClickCenter}
         onPointerEnter={onHover}

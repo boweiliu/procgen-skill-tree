@@ -56,14 +56,26 @@ function App() {
     }
   }, [gameState.intent.newIntent.TOGGLE_STRATEGIC_VIEW, updaters]);
 
+  // DEPRECATED
   useEffect(() => {
-    console.log('maybe toggling sidebar');
     if (gameState.intent.newIntent.TOGGLE_SIDEBAR) {
       updaters.playerUI.isSidebarOpen.enqueueUpdate((it) => !it);
-      updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => !it);
-      updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
+      //updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => !it);
+      //updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
     }
   }, [gameState.intent.newIntent.TOGGLE_SIDEBAR, updaters]);
+
+  useEffect(() => {
+    if (gameState.intent.newIntent.TOGGLE_LEFT_SIDEBAR) {
+      updaters.playerUI.isLeftSidebarOpen.enqueueUpdate((it) => !it);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_LEFT_SIDEBAR, updaters]);
+
+  useEffect(() => {
+    if (gameState.intent.newIntent.TOGGLE_RIGHT_SIDEBAR) {
+      updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
+    }
+  }, [gameState.intent.newIntent.TOGGLE_RIGHT_SIDEBAR, updaters]);
 
   useEffect(() => {
     if (gameState.intent.newIntent.TURN_OFF_SIDEBAR) {
@@ -111,7 +123,7 @@ function App() {
             updaters.playerUI.isRightSidebarOpen.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle sidebars (hotkey: i)
+          Toggle sidebars (hotkeys: t, y)
         </button>
       </div>
 
