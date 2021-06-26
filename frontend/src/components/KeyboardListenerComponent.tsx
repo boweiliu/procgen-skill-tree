@@ -77,6 +77,7 @@ const defaultKeyIntentConfig = {
   '\\': IntentName.ZOOM_RECENTER_AT_NODE,
   '<': IntentName.TRAVEL_UPSTAIRS,
   '>': IntentName.TRAVEL_DOWNSTAIRS,
+  'Ctrl-Shift-R': IntentName.HARD_REFRESH_PAGE,
 };
 
 /**
