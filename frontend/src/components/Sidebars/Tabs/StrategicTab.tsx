@@ -52,9 +52,9 @@ function StrategicTabComponent(props: {
   }, [updaters]);
 
   const onToggleColors = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (value: 'Yes' | 'Only unallocated' | 'No', e: React.MouseEvent) => {
       updaters.playerUI.strategicSearch.colors.enabled.enqueueUpdate((prev) => {
-        return e.target.checked;
+        return value;
       });
     },
     [updaters]
@@ -75,12 +75,13 @@ function StrategicTabComponent(props: {
       <br></br>
       <div className="tab-content-body">
         <div>
-          <input
-            type={'checkbox'}
-            onChange={onToggleColors}
-            defaultChecked={gameState.playerUI.strategicSearch.colors.enabled}
-          />{' '}
           Colors enabled?
+          <HorizontalButtonRadio
+            labels={['Always', 'Only unallocated', 'No']}
+            values={['Yes', 'Only unallocated', 'No']}
+            defaultValue={gameState.playerUI.strategicSearch.colors.enabled}
+            onChange={onToggleColors}
+          />
         </div>
         <br></br>
         <div>
@@ -262,4 +263,37 @@ function TextInputButton(props: {
       {props.icon}
     </button>
   );
+}
+
+function HorizontalButtonRadio<T>(props: {
+  labels: (string | React.ReactNode)[];
+  values: T[];
+  defaultValue: T | null;
+  onChange: (value: T, e: React.MouseEvent) => void;
+}) {
+  const { labels, values, defaultValue, onChange } = props;
+
+  const defaultIdx = defaultValue ? values.indexOf(defaultValue) : -1;
+  const [currentIdx, setCurrentIdx] = useState(defaultIdx);
+
+  const len = Math.min(labels.length, values.length);
+
+  const body = Array(len)
+    .fill(0)
+    .map((_, idx) => {
+      return (
+        <button
+          key={idx}
+          disabled={idx === currentIdx}
+          onClick={(e: React.MouseEvent) => {
+            setCurrentIdx(idx);
+            onChange(values[idx], e);
+          }}
+        >
+          {labels[idx]}
+        </button>
+      );
+    });
+
+  return <>{body}</>;
 }

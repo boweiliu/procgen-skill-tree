@@ -65,11 +65,13 @@ const defaultKeyIntentConfig = {
   m: IntentName.MOVE_CURSOR_SOUTHEAST,
   k: IntentName.MOVE_CURSOR_SOUTHWEST,
 
-  ArrowUp: IntentName.MOVE_CURSOR_NORTHNORTH,
+  // ArrowUp: IntentName.MOVE_CURSOR_NORTHNORTH,
+  ArrowUp: IntentName.MOVE_CURSOR_NORTHEAST,
   ArrowLeft: IntentName.MOVE_CURSOR_WEST,
-  ArrowDown: IntentName.MOVE_CURSOR_SOUTHSOUTH,
+  ArrowDown: IntentName.MOVE_CURSOR_SOUTHWEST,
   ArrowRight: IntentName.MOVE_CURSOR_EAST,
-  RightShift: IntentName.MOVE_CURSOR_NORTHEAST,
+  RightShift: IntentName.MOVE_CURSOR_NORTHWEST,
+  RightControl: IntentName.MOVE_CURSOR_SOUTHEAST,
 
   ' ': IntentName.INTERACT_WITH_NODE,
   // z: IntentName.ZOOM_RECENTER_AT_NODE,

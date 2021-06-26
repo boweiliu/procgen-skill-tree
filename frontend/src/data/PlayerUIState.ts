@@ -64,7 +64,7 @@ export type PlayerUIState = {
 
 export type StrategicSearchState = {
   colors: {
-    enabled: boolean;
+    enabled: 'Yes' | 'Only unallocated' | 'No';
   };
   highlight1: {
     value: string;
@@ -86,7 +86,7 @@ export const newPlayerUIState = (): PlayerUIState => {
     },
     strategicSearch: {
       colors: {
-        enabled: true,
+        enabled: 'Only unallocated',
       },
       highlight1: {
         value: '',
