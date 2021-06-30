@@ -25,6 +25,9 @@ export function HelpTab() {
         <CheckboxDiv>
           Left click on any other node to view detailed info.
         </CheckboxDiv>
+        <CheckboxDiv>
+          Scroll around to see what other nodes are visible.
+        </CheckboxDiv>
         <CheckboxDiv>Close the selected node tab.</CheckboxDiv>
         <br></br>
         <div>STRATEGIC VIEW</div>
