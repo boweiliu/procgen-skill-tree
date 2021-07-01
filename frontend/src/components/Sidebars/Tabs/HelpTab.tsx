@@ -28,6 +28,10 @@ export function HelpTab() {
         <CheckboxDiv>
           Scroll around to see what other nodes are visible.
         </CheckboxDiv>
+        <CheckboxDiv>
+          Use keyboard controls (hotkeys: ijklmun) to move around the map, and
+          (hotkeys: wasd) to pan around.
+        </CheckboxDiv>
         <CheckboxDiv>Close the selected node tab.</CheckboxDiv>
         <br></br>
         <div>STRATEGIC VIEW</div>
