@@ -32,6 +32,9 @@ export function HelpTab() {
           Use keyboard controls (hotkeys: ijklmun) to move around the map, and
           (hotkeys: wasd) to pan around.
         </CheckboxDiv>
+        <CheckboxDiv>
+          Click (hotkey: r, \) to recenter the view on your selected node.
+        </CheckboxDiv>
         <CheckboxDiv>Close the selected node tab.</CheckboxDiv>
         <br></br>
         <div>STRATEGIC VIEW</div>
