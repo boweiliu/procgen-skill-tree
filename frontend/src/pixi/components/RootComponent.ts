@@ -160,12 +160,32 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
     this.backdrop.height = props.appSize.y;
   }
 
+  private onWheel = (e: WheelEvent) => {
+    // console.log('wheel on pixi', e);
+  };
+  private onScroll = (e: Event) => {
+    // doesnt work
+    // console.log('scroll on pixi', e);
+  };
+
   protected didMount() {
-    // const { updaters } = this._staleProps;
+    const {
+      args: { canvasElement },
+    } = this._staleProps;
+    canvasElement.addEventListener('wheel', this.onWheel);
+    canvasElement.addEventListener('scroll', this.onScroll);
   }
 
   protected didUpdate() {
     // const { updaters } = this._staleProps;
+  }
+
+  public willUnmount() {
+    const {
+      args: { canvasElement },
+    } = this._staleProps;
+    canvasElement.removeEventListener('wheel', this.onWheel);
+    canvasElement.removeEventListener('scroll', this.onScroll);
   }
 }
 
