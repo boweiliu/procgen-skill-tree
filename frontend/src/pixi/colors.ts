@@ -1,6 +1,6 @@
 let COLORS = {
   // good colors
-  backgroundBlue: 0x222222,
+  backgroundBlue: 0x222222, // 444444 or 383838 also work
   // nodePink: 0xeeaaaa,
   // nodeLavender: 0xcc88ee,
   // nodeBlue: 0x99bbff,

@@ -64,7 +64,10 @@ export function computeNodeReactData(args: {
   const lockData = lockMap.get(location);
   const nodeContents = nodeContentsMap.get(location);
   let shortText1 = '';
-  if (nodeContents.lines[0]) {
+  if (location.equals(Vector3.Zero)) {
+    // the origin node
+    shortText1 = '🚩';
+  } else if (nodeContents.lines[0]) {
     shortText1 += ModifierSymbolMap[nodeContents.lines[0].modifier];
     shortText1 += AttributeSymbolMap[nodeContents.lines[0].attribute];
   } else {
