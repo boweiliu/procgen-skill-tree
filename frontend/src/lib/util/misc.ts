@@ -193,6 +193,11 @@ export function assertOnlyCalledOnce(id: string | number) {
 export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
   return Object.keys(enm) as T[];
 }
+export function enumEntries<T extends string, U>(
+  obj: { [key in T]: U }
+): [T, U][] {
+  return Object.entries(obj) as [T, U][];
+}
 
 export function fromEnumEntries<T extends string, U>(
   array: [T, U][]

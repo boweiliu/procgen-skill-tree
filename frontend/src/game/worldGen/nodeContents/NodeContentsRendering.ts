@@ -16,6 +16,16 @@ export const AttributeSymbolMap = {
   [Attribute.DEL2]: '✨',
 };
 
+// TODO(bowei): enforce this is the same length using typescript
+export const AttributesSorted = [
+  Attribute.RED0,
+  Attribute.RED1,
+  Attribute.RED2,
+  Attribute.DEL0,
+  Attribute.DEL1,
+  Attribute.DEL2,
+];
+
 // Use hue and saturation from this map; HSV value is determined by node allocation state
 // Lch is actually better: see https://en.wikipedia.org/wiki/HCL_color_space
 export const AttributeColorMap: { [k in Attribute | '']: number } = {
