@@ -33,6 +33,7 @@ type State = {
 type Props = {
   args: {
     renderer: Pixi.Renderer;
+    canvasElement: HTMLCanvasElement;
     markForceUpdate: (childInstance: any) => void;
   };
   updaters: UpdaterGeneratorType2<GameState>;
