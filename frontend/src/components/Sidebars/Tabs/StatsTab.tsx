@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { GameState } from '../../../data/GameState';
 import {
   Attribute,
@@ -8,14 +8,47 @@ import {
   AttributeDescriptionMap,
   AttributeSymbolMap,
 } from '../../../game/worldGen/nodeContents/NodeContentsRendering';
-import { enumAssociateBy, enumMapValues } from '../../../lib/util/misc';
+import {
+  Const,
+  enumAssociateBy,
+  enumMapValues,
+  extractDeps,
+} from '../../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
 
-export const StatsTab = React.memo(StatsTabComponent);
+export function StatsTab(props: {
+  gameState: GameState;
+  updaters: UpdaterGeneratorType2<GameState, GameState>;
+}) {
+  const gameState = useMemo(() => {
+    return extractStatsSubState(props.gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsStatsSubState(props.gameState));
 
+  return <StatsTabHelper gameState={gameState} updaters={props.updaters} />;
+}
+
+/**
+ * The subset of the game state that is relevant to game area components.
+ */
+export function extractStatsSubState(gameState: Const<GameState>) {
+  return {
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    worldGen: {
+      nodeContentsMap: gameState.worldGen.nodeContentsMap,
+    },
+  };
+}
+export type StatsSubState = ReturnType<typeof extractStatsSubState>;
+export const depsStatsSubState = extractDeps(extractStatsSubState);
+
+const StatsTabHelper = React.memo(StatsTabComponent);
 // TODO(bowei): trim down the game state here
 function StatsTabComponent(props: {
-  gameState: GameState;
+  gameState: StatsSubState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
 }) {
   const { gameState } = props;
@@ -78,7 +111,9 @@ function StatsTabComponent(props: {
   );
 }
 
-export function computeAttributeModifierStats(args: { gameState: GameState }) {
+export function computeAttributeModifierStats(args: {
+  gameState: StatsSubState;
+}) {
   const { gameState } = args;
 
   const attributeInfos = enumAssociateBy(Attribute, (attribute) => {

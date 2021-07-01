@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GameState } from '../../../data/GameState';
 import { Attribute } from '../../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributesSorted,
   AttributeSymbolMap,
 } from '../../../game/worldGen/nodeContents/NodeContentsRendering';
-import { computeAttributeModifierStats } from './StatsTab';
+import {
+  computeAttributeModifierStats,
+  depsStatsSubState,
+  extractStatsSubState,
+  StatsSubState,
+} from './StatsTab';
 
-export const QuestsTab = React.memo(QuestsTabComponent);
+export function QuestsTab(props: { gameState: GameState }) {
+  const gameState = useMemo(() => {
+    return extractStatsSubState(props.gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsStatsSubState(props.gameState));
 
-function QuestsTabComponent(props: { gameState: GameState }) {
+  return <QuestsTabHelper gameState={gameState} />;
+}
+
+const QuestsTabHelper = React.memo(QuestsTabComponent);
+
+function QuestsTabComponent(props: { gameState: StatsSubState }) {
   const attributeStats = computeAttributeModifierStats({
     gameState: props.gameState,
   });
