@@ -8,6 +8,7 @@ import { SelectedNodeTabContent } from './Tabs/SelectedNodeTab';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { StatsTab } from './Tabs/StatsTab';
 import { HelpTab } from './Tabs/HelpTab';
+import { QuestsTab } from './Tabs/QuestsTab';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -40,7 +41,7 @@ export function TabContentInterface(props: {
     [TAB_NAME.STATS]: (
       <StatsTab gameState={props.gameState} updaters={props.updaters} />
     ),
-    [TAB_NAME.QUESTS]: <>quests info???</>,
+    [TAB_NAME.QUESTS]: <QuestsTab gameState={props.gameState} />,
     [TAB_NAME.STRATEGIC_VIEW]: (
       <StrategicTab gameState={props.gameState} updaters={props.updaters} />
     ),

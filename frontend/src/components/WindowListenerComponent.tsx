@@ -40,27 +40,35 @@ export class WindowListenerComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {};
+  }
+
+  componentDidMount() {
     window.addEventListener('resize', this.handleWindowResize);
+    window.addEventListener('orientationchange', this.handleWindowResize);
   }
 
   // NOTE(bowei): does using e.repeat here break when window loses focus??
-  handleWindowResize = (e: any) => {
-    this.props.updaters.enqueueUpdate((old) => {
+  private handleWindowResize = (e: UIEvent | Event) => {
+    const newSize = {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+    };
+    this.props.updaters.enqueueUpdate((prev) => {
       // console.log("executing window state update in window onresize in app");
-      // const result = { ...old };
+      // const result = { ...prev };
       // result.innerWidth = window.innerWidth;
       // result.innerHeight = window.innerHeight;
       // return result;
       return {
-        ...old,
-        innerWidth: window.innerWidth,
-        innerHeight: window.innerHeight,
+        ...prev,
+        ...newSize,
       };
     });
   };
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowResize);
+    window.removeEventListener('orientationchange', this.handleWindowResize);
   }
   render() {
     return <> </>;

@@ -193,6 +193,34 @@ export function assertOnlyCalledOnce(id: string | number) {
 export function enumKeys<T extends string>(enm: { [key in T]: T }): T[] {
   return Object.keys(enm) as T[];
 }
+export function enumEntries<T extends string, U>(
+  obj: { [key in T]: U }
+): [T, U][] {
+  return Object.entries(obj) as [T, U][];
+}
+
+export function fromEnumEntries<T extends string, U>(
+  array: [T, U][]
+): { [key in T]?: U } {
+  return Object.fromEntries(array) as { [key in T]?: U };
+}
+
+export function enumAssociateBy<T extends string, U>(
+  enm: { [key in T]: T },
+  mapper: (t: T) => [T, U]
+): { [key in T]: U } {
+  return fromEnumEntries(enumKeys(enm).map(mapper)) as { [key in T]: U };
+}
+
+export function enumMapValues<T extends string, U, V>(
+  obj: { [key in T]: U },
+  mapper: (_: U, key: T, obj: { [key in T]: U }) => V
+): { [key in T]: V } {
+  let start = Object.entries(obj) as [T, U][];
+  let end = start.map(([k, v]) => [k, mapper(v, k, obj)]) as [T, V][];
+  let result = Object.fromEntries(end) as { [key in T]: V };
+  return result;
+}
 
 // export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
 //   return Object.keys(enm) as T[];

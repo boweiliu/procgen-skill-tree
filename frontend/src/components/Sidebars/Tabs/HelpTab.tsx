@@ -14,7 +14,7 @@ export function HelpTab() {
           Move the tabs around using "send left/right" buttons.
         </CheckboxDiv>
         <CheckboxDiv>Open the Stats tab.</CheckboxDiv>
-        <CheckboxDiv>Open the Quest tab.</CheckboxDiv>
+        <CheckboxDiv>Open the Quests tab.</CheckboxDiv>
         <br></br>
         <div>GAME</div>
         <br></br>
@@ -24,6 +24,16 @@ export function HelpTab() {
         </CheckboxDiv>
         <CheckboxDiv>
           Left click on any other node to view detailed info.
+        </CheckboxDiv>
+        <CheckboxDiv>
+          Scroll around to see what other nodes are visible.
+        </CheckboxDiv>
+        <CheckboxDiv>
+          Use keyboard controls (hotkeys: ijklmun) to move around the map, and
+          (hotkeys: wasd) to pan around.
+        </CheckboxDiv>
+        <CheckboxDiv>
+          Click (hotkey: r, \) to recenter the view on your selected node.
         </CheckboxDiv>
         <CheckboxDiv>Close the selected node tab.</CheckboxDiv>
         <br></br>

@@ -9,11 +9,13 @@ export interface SimpleTextureSet {
   verticalLine: Pixi.Texture;
 }
 
-export const pixiUiScale: 'small' | 'medium' | 'large' = 'small';
+export type UiScale = 'small' | 'medium' | 'large';
+
+export const pixiUiScale: UiScale = 'small';
 
 export function generateSimpleTextures(
   renderer: Pixi.Renderer,
-  uiScale: 'small' | 'medium' | 'large' = pixiUiScale
+  uiScale: UiScale = pixiUiScale
 ): SimpleTextureSet {
   let circle = new Pixi.Graphics();
   let diameter = uiScale === 'small' ? 12 : uiScale === 'medium' ? 16 : 24;

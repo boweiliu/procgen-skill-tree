@@ -6,6 +6,7 @@ import { Vector2 } from '../../lib/util/geometry/vector2';
 import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
+import { UiScale } from '../../pixi/textures/SimpleTextures';
 import { CssVariablesComponent } from './CssVariables';
 import { GameAreaStateManager } from './GameAreaStateManager';
 
@@ -91,16 +92,26 @@ export function GameAreaInterface(props: {
   }, [gameState.windowState.innerWidth, gameState.windowState.innerHeight]);
 
   // TODO(bowei): programmatically determine UI scale based on app size
-  const hexGridPx = useMemo(() => {
+  const uiScale: UiScale = useMemo(() => {
     if (appSize.x > 1920) {
-      return new Vector2(268, 232);
+      return 'large';
+    } else if (appSize.x > 1080) {
+      return 'medium';
     } else {
-      return new Vector2(194, 168);
-      // return new Vector2(120, 104);
-      // return new Vector2(97, 84);
-      // return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
+      return 'small';
     }
   }, [appSize]);
+  const hexGridPx = useMemo(() => {
+    if (uiScale === 'large') {
+      return new Vector2(268, 232);
+      // return new Vector2(194, 168);
+    } else if (uiScale === 'medium') {
+      return new Vector2(120, 104);
+    } else {
+      // return new Vector2(97, 84);
+      return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
+    }
+  }, [uiScale]);
 
   const hexCenterRadius = useMemo(() => {
     return Math.round(hexGridPx.x / 16 - 0.025) * 4; // Radius of the circles representing allocatable nodes, in px

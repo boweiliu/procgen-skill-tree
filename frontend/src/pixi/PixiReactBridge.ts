@@ -43,7 +43,7 @@ export class PixiReactBridge {
   props!: Props;
   private staleProps?: Props;
 
-  rootComponent: RootComponent | undefined;
+  rootComponent: RootComponent | null = null;
   onTick!: (d: number) => void;
 
   /**
@@ -166,6 +166,7 @@ export class PixiReactBridge {
         args: {
           renderer: this.app.renderer,
           markForceUpdate: () => {},
+          canvasElement: this.app.view,
         },
         updaters: this.props.updaters,
         delta: 0,
@@ -211,6 +212,7 @@ export class PixiReactBridge {
       args: {
         renderer: this.app.renderer,
         markForceUpdate: () => {},
+        canvasElement: this.app.view,
       },
       updaters: this.props.updaters,
       delta,

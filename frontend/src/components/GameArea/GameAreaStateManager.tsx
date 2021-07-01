@@ -134,6 +134,47 @@ function Component(props: {
     }
   }, [gameState.playerUI.cursoredNodeLocation, locationToVirtualCoords]);
 
+  // reset cursor to center at different breakpoints depending on detailed or strategic view
+  const cursorHitEdgeCallback = useCallback(() => {
+    props.updaters.playerUI.virtualGridLocation.enqueueUpdate(
+      (prev, prevGameState) => {
+        const cursor = prevGameState.playerUI.cursoredNodeLocation;
+        const virtualCenter = prev;
+        // strategic view
+        if (!prevGameState.playerUI.isPixiHidden) {
+          // TODO(bowei): un-hardcode 16 & 32
+          if (
+            cursor &&
+            (Math.abs(cursor.y - virtualCenter.y) >= 16 ||
+              Math.abs(
+                cursor.x -
+                  cursor.y / 2 -
+                  (virtualCenter.x - virtualCenter.y / 2)
+              ) >= 32)
+          ) {
+            return cursor;
+          }
+          return prev;
+        } else {
+          // detailed view
+          // TODO(bowei): un-hardcode 2 & 4
+          if (
+            cursor &&
+            (Math.abs(cursor.y - virtualCenter.y) >= 2 ||
+              Math.abs(
+                cursor.x -
+                  cursor.y / 2 -
+                  (virtualCenter.x - virtualCenter.y / 2)
+              ) >= 4)
+          ) {
+            return cursor;
+          }
+          return prev;
+        }
+      }
+    );
+  }, [props.updaters]);
+
   // manage keyboard wasdezx cusored node navigation
   useEffect(() => {
     // const newIntent = props.gameState.intent.newIntent;
@@ -144,31 +185,37 @@ function Component(props: {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addX(1) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_WEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addX(-1) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHEAST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: 1, y: 1, z: 0 }) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHWEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addY(1) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.addY(-1) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: -1, y: -1, z: 0 }) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
@@ -180,6 +227,7 @@ function Component(props: {
           return newLocation;
         }
       });
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate((prev) => {
@@ -191,16 +239,19 @@ function Component(props: {
           return newLocation;
         }
       });
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: 1, y: 2, z: 0 }) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHSOUTH) {
       props.updaters.playerUI.cursoredNodeLocation.enqueueUpdate(
         (prev) => prev?.add({ x: -1, y: -2, z: 0 }) || newLocation
       );
+      cursorHitEdgeCallback();
     }
     if (props.gameState.intent.newIntent.INTERACT_WITH_NODE) {
       if (cursoredVirtualNodeCoords) {
@@ -227,6 +278,7 @@ function Component(props: {
     virtualGridDims,
     cursoredVirtualNodeCoords,
     handleUpdateNodeStatus,
+    cursorHitEdgeCallback,
   ]);
 
   useEffect(() => {
