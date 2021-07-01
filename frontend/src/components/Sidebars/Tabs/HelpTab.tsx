@@ -14,7 +14,7 @@ export function HelpTab() {
           Move the tabs around using "send left/right" buttons.
         </CheckboxDiv>
         <CheckboxDiv>Open the Stats tab.</CheckboxDiv>
-        <CheckboxDiv>Open the Quest tab.</CheckboxDiv>
+        <CheckboxDiv>Open the Quests tab.</CheckboxDiv>
         <br></br>
         <div>GAME</div>
         <br></br>
