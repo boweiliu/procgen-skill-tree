@@ -9,7 +9,7 @@ type LockFactoryConfig = {};
 // a good non-debug value is 0.47. 0.5 is the site percolation threshold for triangular lattice
 const LOCK_FREQUENCY = 0.47;
 const LOCK_FREQUENCY_STARTER_AREA = 0.2;
-const LOCK_STARTER_AREA_RADIUS = 7;
+export const STARTER_AREA_RADIUS = 7;
 
 export class LockFactory {
   public config: LockFactoryConfig;
@@ -38,9 +38,7 @@ export class LockFactory {
       return undefined;
     }
     // special case for starting area -- should have lower lock frequency
-    if (
-      taxicabDistance(args.location.toVector2()) <= LOCK_STARTER_AREA_RADIUS
-    ) {
+    if (taxicabDistance(args.location.toVector2()) <= STARTER_AREA_RADIUS) {
       if (p < LOCK_FREQUENCY_STARTER_AREA) {
         return lockData;
       } else {
