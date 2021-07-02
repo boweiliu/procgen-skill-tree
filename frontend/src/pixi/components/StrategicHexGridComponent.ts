@@ -22,15 +22,17 @@ import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
-import { pixiUiScale, SimpleTextureSet } from '../textures/SimpleTextures';
+import { SimpleTextureSet } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
+import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
+import { Lazy } from '../../lib/util/lazy';
 
 type Props = {
   delta: number;
   args: {
     position: Vector2;
-    textures: SimpleTextureSet;
+    textures: Const<Lazy<SimpleTextureSet>>;
   };
   updaters: UpdaterGeneratorType2<GameState, GameState>;
   appSize: Vector2;
@@ -87,16 +89,6 @@ type HexGridData = {
   cursor: Pixi.Sprite | null;
 };
 
-// sqrt(3)/2 approximation - see hexGridPx
-// const strategicHexGridPx = new Vector2(30, 26);
-const strategicHexGridPx =
-  pixiUiScale === 'small'
-    ? new Vector2(22, 19)
-    : pixiUiScale === 'medium'
-    ? new Vector2(30, 26)
-    : new Vector2(45, 39);
-// // const strategicHexGridPx = new Vector2(15, 13);
-
 // TODO(bowei): compute this to be big enough
 // const strategicHexGridDims = new Vector2(35, 20);
 // const strategicHexGridDims = new Vector2(6, 12);
@@ -105,7 +97,7 @@ const strategicHexGridDims = new Vector2(48, 24);
 class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   public container: Pixi.Container;
   public state: Const<State>;
-  private graphics: Pixi.Sprite;
+  // private graphics: Pixi.Sprite;
   private hexGrid: KeyedHashMap<Vector2, HexGridData> = new KeyedHashMap();
 
   constructor(props: Props) {
@@ -117,11 +109,27 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.container = new Pixi.Container();
 
     // test graphics
-    this.graphics = new Pixi.Sprite();
-    this.graphics.texture = props.args.textures.circle;
-    this.graphics.tint = COLORS.borderBlack;
-    this.graphics.visible = false;
-    this.container.addChild(this.graphics);
+    // this.graphics = new Pixi.Sprite();
+    // this.graphics.texture = props.args.textures.circle;
+    // this.graphics.tint = COLORS.borderBlack;
+    // this.graphics.visible = false;
+    // this.container.addChild(this.graphics);
+
+    const pixiUiScale = uiScaleFromAppSize(props.appSize);
+    // sqrt(3)/2 approximation - see hexGridPx
+    const strategicHexGridPx =
+      pixiUiScale === 'x-small'
+        ? new Vector2(15, 13)
+        : pixiUiScale === 'small'
+        ? new Vector2(22, 19)
+        : pixiUiScale === 'medium'
+        ? new Vector2(30, 26)
+        : new Vector2(45, 39);
+
+    console.log('Initializing strategic hex grid', {
+      strategicHexGridPx,
+      pixiUiScale,
+    });
 
     // populate a grid
     // TODO(bowei): unhardcode
@@ -132,7 +140,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         i++
       ) {
         const graphics = new Pixi.Sprite();
-        graphics.texture = props.args.textures.circle;
+        // graphics.texture = props.args.textures.get().circle;
         graphics.tint = COLORS.nodePink;
         // graphics.visible = false;
         // if ((i == 0 && j == 0) || (i == 5 && j == 5)) {
@@ -271,7 +279,18 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   protected renderSelf(props: Props) {
     const { gameState } = props;
     this.container.position = PixiPointFrom(props.args.position);
-    this.graphics.position = PixiPointFrom(props.appSize.divide(2));
+    // this.graphics.position = PixiPointFrom(props.appSize.divide(2));
+
+    const pixiUiScale = uiScaleFromAppSize(props.appSize);
+    // sqrt(3)/2 approximation - see hexGridPx
+    const strategicHexGridPx =
+      pixiUiScale === 'x-small'
+        ? new Vector2(15, 13)
+        : pixiUiScale === 'small'
+        ? new Vector2(22, 19)
+        : pixiUiScale === 'medium'
+        ? new Vector2(30, 26)
+        : new Vector2(45, 39);
 
     for (let [v, data] of this.hexGrid.entries()) {
       const { node: graphics } = data;
@@ -357,22 +376,23 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
+      const textures = props.args.textures.get();
       if (!nodeVisibleStatus.visible) {
-        graphics.texture = props.args.textures.dot;
+        graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
-        graphics.position.x -= props.args.textures.dot.width / 2;
-        graphics.position.y -= props.args.textures.dot.height / 2;
+        graphics.position.x -= textures.dot.width / 2;
+        graphics.position.y -= textures.dot.height / 2;
       } else if (lockData && lockStatus !== LockStatus.OPEN) {
-        graphics.texture = props.args.textures.rect;
+        graphics.texture = textures.rect;
         graphics.position = PixiPointFrom(basePosition);
-        graphics.position.x -= props.args.textures.rect.width / 2;
-        graphics.position.y -= props.args.textures.rect.height / 2;
+        graphics.position.x -= textures.rect.width / 2;
+        graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
       } else {
-        graphics.texture = props.args.textures.circle;
+        graphics.texture = textures.circle;
         graphics.position = PixiPointFrom(basePosition);
-        graphics.position.x -= props.args.textures.circle.width / 2;
-        graphics.position.y -= props.args.textures.circle.height / 2;
+        graphics.position.x -= textures.circle.width / 2;
+        graphics.position.y -= textures.circle.height / 2;
       }
 
       const nodeContents = gameState.worldGen.nodeContentsMap.get(nodeLocation);
@@ -436,7 +456,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
         if (!data.cursor) {
           const cursor = new Pixi.Sprite();
-          cursor.texture = props.args.textures.verticalLine;
+          cursor.texture = textures.verticalLine;
           // cursor.tint = graphics.tint;
           // cursor.tint = addColor(COLORS.nodeBlue, graphics.tint);
           cursor.tint = COLORS.borderWhite;
@@ -465,10 +485,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         data.cursor.position = PixiPointFrom(basePosition);
         // data.cursor.position.x -= props.args.textures.verticalLine.width / 2;
         data.cursor.position.x -= strategicHexGridPx.x / 2; // - props.args.textures.verticalLine.width / 3;
-        data.cursor.position.x += props.args.textures.verticalLine.width / 3;
+        data.cursor.position.x += textures.verticalLine.width / 3;
         // data.cursor.position.x += props.args.textures.verticalLine.width / 2;
         // data.cursor.position.x += props.args.textures.circle.width / 2;
-        data.cursor.position.y -= props.args.textures.verticalLine.height / 2;
+        data.cursor.position.y -= textures.verticalLine.height / 2;
       }
     }
   }

@@ -10,10 +10,10 @@ const initialApplication = new Lazy(() => new PixiReactBridge());
  * and send rerender props updates to pixi application when react causes state to be updated.
  */
 export function PixiWrapperComponent(props: { hidden: boolean }) {
-  const [application] = useState(initialApplication.get());
-  const container = useRef<HTMLDivElement>(null);
   const [gameState, gameStateUpdaters, fireBatchedSetGameState] =
     useContext(UseGameStateContext);
+  const [application] = useState(initialApplication.get());
+  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // remove old application if it exists

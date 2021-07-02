@@ -55,6 +55,24 @@ export function extractGameAreaSubState(gameState: GameState) {
 export type GameAreaSubState = ReturnType<typeof extractGameAreaSubState>;
 export const depsGameAreaSubState = extractDeps(extractGameAreaSubState);
 
+export function uiScaleFromAppSize(appSize: Vector2): UiScale {
+  let maxDim = Math.max(appSize.x, appSize.y);
+  let uiScale: UiScale;
+  if (maxDim > 2160) {
+    uiScale = 'x-large';
+  } else if (maxDim > 1536) {
+    uiScale = 'large';
+  } else if (maxDim > 1080) {
+    uiScale = 'medium';
+  } else if (maxDim > 800) {
+    uiScale = 'small';
+  } else {
+    uiScale = 'x-small';
+  }
+  // console.log('computed ui scale from app size ', { appSize, uiScale });
+  return uiScale;
+}
+
 /**
  * Handles managing constants (settings) as well as pruning down game state and updaters to what is actually relevant.
  * Helps with memoization as well.
@@ -76,18 +94,7 @@ export function GameAreaInterface(props: {
 
   // TODO(bowei): programmatically determine UI scale based on app size
   let uiScale: UiScale = useMemo(() => {
-    let maxDim = Math.max(appSize.x, appSize.y);
-    if (maxDim > 2160) {
-      return 'x-large';
-    } else if (maxDim > 1536) {
-      return 'large';
-    } else if (maxDim > 1080) {
-      return 'medium';
-    } else if (maxDim > 800) {
-      return 'small';
-    } else {
-      return 'x-small';
-    }
+    return uiScaleFromAppSize(appSize);
   }, [appSize]);
 
   /**

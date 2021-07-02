@@ -91,12 +91,22 @@ export class PixiReactBridge {
     });
   }
 
+  public willMount() {
+    // we forgot to set app size properly when pixi first loaded, so do it now
+    this.state.appSize = appSizeFromWindowSize(
+      new Vector2(
+        this.props.gameState.windowState.innerWidth,
+        this.props.gameState.windowState.innerHeight
+      )
+    );
+  }
+
   public didMount() {
     this.onTick = (delta) => this.baseGameLoop(delta);
     this.onTick = this.onTick.bind(this);
     this.app.ticker.add(this.onTick);
 
-    // we forgot to set app size properly when pixi first loaded, so do it now
+    // we forgot to set app size properly when pixi first loaded, so do it now (????? TODO bowei remove)
     this.state.appSize = appSizeFromWindowSize(
       new Vector2(
         this.props.gameState.windowState.innerWidth,
@@ -162,6 +172,7 @@ export class PixiReactBridge {
     // If we're not done initializing yet (note that constructor does not set props!), finish it now
     if (!this.rootComponent) {
       // finish initialization
+      this.willMount();
       this.rootComponent = new RootComponent({
         args: {
           renderer: this.app.renderer,

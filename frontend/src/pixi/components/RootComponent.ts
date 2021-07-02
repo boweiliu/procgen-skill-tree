@@ -21,6 +21,7 @@ import {
   generateSimpleTextures,
   SimpleTextureSet,
 } from '../textures/SimpleTextures';
+import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
 
 type State = {
   pointNodeTexture: Lazy<PointNodeTextureSet>;
@@ -70,8 +71,12 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
       pointNodeTexture: new Lazy(() =>
         generatePointNodeTexture(props.args.renderer)
       ),
-      simpleTexture: new Lazy(() =>
-        generateSimpleTextures(props.args.renderer)
+      simpleTexture: new Lazy(
+        () =>
+          generateSimpleTextures(
+            props.args.renderer,
+            uiScaleFromAppSize(this._staleProps.appSize)
+          ) // TODO(bowei): update uiScale when app size changes !!!
       ),
       tick: 0,
       playerCurrentZ: 0,
@@ -121,7 +126,7 @@ class RootComponent2 extends LifecycleHandlerBase<Props, State> {
         delta: props.delta,
         args: {
           position: Vector2.Zero,
-          textures: state.simpleTexture.get(),
+          textures: state.simpleTexture,
         },
         updaters: props.updaters,
         appSize: props.appSize,

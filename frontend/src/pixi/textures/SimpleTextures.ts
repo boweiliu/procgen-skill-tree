@@ -11,33 +11,71 @@ export interface SimpleTextureSet {
 
 export type UiScale = 'x-small' | 'small' | 'medium' | 'large' | 'x-large';
 
-export const pixiUiScale: UiScale = 'small';
+// export const pixiUiScale: UiScale = 'large';
 
 export function generateSimpleTextures(
   renderer: Pixi.Renderer,
-  uiScale: UiScale = pixiUiScale
+  uiScale: UiScale
 ): SimpleTextureSet {
+  console.log('generating textures...', { uiScale });
+
   let circle = new Pixi.Graphics();
-  let diameter = uiScale === 'small' ? 12 : uiScale === 'medium' ? 16 : 24;
+  let diameter =
+    uiScale === 'x-small'
+      ? 8
+      : uiScale === 'small'
+      ? 12
+      : uiScale === 'medium'
+      ? 16
+      : 24;
   circle.beginFill(COLORS.white);
   circle.drawCircle(0, 0, diameter / 2);
   // circle.drawCircle(0, 0, 6);
   // circle.pivot = PixiPointFrom(Vector2.Zero);
 
   let rect = new Pixi.Graphics();
-  let height = uiScale === 'small' ? 14 : uiScale === 'medium' ? 18 : 30;
+  let height =
+    uiScale === 'x-small'
+      ? 10
+      : uiScale === 'small'
+      ? 14
+      : uiScale === 'medium'
+      ? 18
+      : 30;
+
   {
-    let width = uiScale === 'small' ? 4 : uiScale === 'medium' ? 5 : 8;
+    let width =
+      uiScale === 'x-small'
+        ? 3
+        : uiScale === 'small'
+        ? 4
+        : uiScale === 'medium'
+        ? 5
+        : 8;
     rect.beginFill(COLORS.white);
     // rect.drawRect(-6, -10, 12, 20);
     rect.drawRect(0, 0, width, height);
     // rect.pivot = PixiPointFrom(Vector2.Zero);
   }
 
+  // the cursor icon
   let verticalLine = new Pixi.Graphics();
   {
-    let thickness = uiScale === 'small' ? 2 : uiScale === 'medium' ? 3 : 4;
-    let width = uiScale === 'small' || uiScale === 'medium' ? 6 : 8;
+    let thickness =
+      uiScale === 'x-small'
+        ? 1
+        : uiScale === 'small'
+        ? 2
+        : uiScale === 'medium'
+        ? 3
+        : 4;
+
+    let width =
+      uiScale === 'x-small'
+        ? 3
+        : uiScale === 'small' || uiScale === 'medium'
+        ? 6
+        : 8;
 
     verticalLine.beginFill(COLORS.white);
     verticalLine.drawRect(0, 0, thickness, height);
