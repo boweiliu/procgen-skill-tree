@@ -55,6 +55,19 @@ function SelectedNodeTabContentComponent(props: {
     [props.actions.deallocateNode, location]
   );
 
+  const onForceAllocate = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.allocateNode.enqueueAction({
+          nodeLocation: location,
+          newStatus: { taken: false, previouslyTaken: true },
+        });
+      }
+    },
+    [props.actions.allocateNode, location]
+  );
+
   const onZoom = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -128,7 +141,7 @@ function SelectedNodeTabContentComponent(props: {
     ? nodeContentsToDom(nodeContents)
     : 'empty';
 
-  const canBeDeallocated = false;
+  const canBeDeallocated = true;
 
   return (
     <>
@@ -159,6 +172,9 @@ function SelectedNodeTabContentComponent(props: {
             </button>
             <button disabled={!canBeDeallocated} onClick={onDeallocate}>
               Deallocate
+            </button>
+            <button disabled={false} onClick={onForceAllocate}>
+              [DEBUG] Force allocate
             </button>
           </>
         ) : (
