@@ -130,6 +130,24 @@ function StrategicTabComponent(props: {
               '[' + ModifierDescriptionMap[Modifier.INCREASED] + '] '
             }
           />
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            id={'!taken'}
+            icon={'Unallocated'}
+            insertedText={'![taken] '}
+          />
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            id={'!locked'}
+            icon={'Unlocked'}
+            insertedText={'![locked] '}
+          />
+          <TextInputButton
+            updateTextInputValue={setHighlightInputValue}
+            id={'locked'}
+            icon={'Locked'}
+            insertedText={'[locked] '}
+          />
         </div>
         <br></br>
         <div>
