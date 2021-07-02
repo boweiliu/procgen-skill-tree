@@ -106,18 +106,21 @@ export class AllocateNodeAction {
             return false;
           },
         };
-        getWithinDistance(
-          nodeLocation,
-          FOG_OF_WAR_DISTANCE,
-          0,
-          validLocks
-        ).forEach((n) => {
-          if (!prevMap.get(n)?.visible) {
-            // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            prevGameState.worldGen.lockMap.precompute(n);
-            prevMap.put(n, NodeVisibleStatus.true);
-          }
-        });
+        if (newStatus.previouslyTaken && !newStatus.taken) {
+          // temporairly disable fog of war revealing except for debug allocation
+          getWithinDistance(
+            nodeLocation,
+            FOG_OF_WAR_DISTANCE,
+            0,
+            validLocks
+          ).forEach((n) => {
+            if (!prevMap.get(n)?.visible) {
+              // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+              prevGameState.worldGen.lockMap.precompute(n);
+              prevMap.put(n, NodeVisibleStatus.true);
+            }
+          });
+        }
 
         return prevMap.clone();
       }
