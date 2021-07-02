@@ -4,6 +4,7 @@ import { GameState } from '../../data/GameState';
 import {
   LockStatus,
   NodeReachableStatus,
+  NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
@@ -316,7 +317,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         NodeReachableStatus.false;
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
-      const isLocked = lockData && lockStatus !== LockStatus.OPEN;
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
       let visible: boolean = true;
       if (nodeTakenStatus.taken) {
@@ -419,6 +420,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       const matched = matchStrategicSearch({
         nodeContents,
+        nodeTakenStatus,
+        isLocked,
         query: gameState.playerUI.strategicSearch,
       });
 
@@ -546,9 +549,11 @@ export type { Props as StrategicHexGridComponentProps };
 
 export function matchStrategicSearch(args: {
   nodeContents: NodeContents;
+  nodeTakenStatus: NodeTakenStatus;
+  isLocked: boolean;
   query: StrategicSearchState;
 }): boolean {
-  const { nodeContents, query } = args;
+  const { nodeContents, nodeTakenStatus, isLocked, query } = args;
 
   // missing query! return no matches
   if (!query) {
@@ -560,7 +565,17 @@ export function matchStrategicSearch(args: {
   const terms = highlight1
     .split(' ')
     .filter((it) => !!it)
-    .map((wrappedTerm) => wrappedTerm.slice(1, wrappedTerm.length - 1));
+    .map((wrappedTerm) => {
+      // transform "[SOME_STRING]" to "SOME_STRING"
+      if (
+        wrappedTerm[0] === '[' &&
+        wrappedTerm[wrappedTerm.length - 1] === ']'
+      ) {
+        return wrappedTerm.slice(1, wrappedTerm.length - 1);
+      } else {
+        return wrappedTerm;
+      }
+    });
 
   // missing query! return no matches
   if (terms.length === 0) {
@@ -600,6 +615,30 @@ export function matchStrategicSearch(args: {
         nodeContents.lines?.[1]?.attribute
       ) {
         // console.log("matched by wild card attribute");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '![taken]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (!nodeTakenStatus.taken) {
+        // console.log("matched by !taken");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '[taken]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (nodeTakenStatus.taken) {
+        // console.log("matched by taken");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '![locked]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (!isLocked) {
+        // console.log("matched by !isLocked");
       } else {
         unmatchedTerm = term;
         break;
