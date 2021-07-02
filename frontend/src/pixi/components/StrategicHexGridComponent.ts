@@ -22,7 +22,7 @@ import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
 import { interpolateColor } from '../../lib/util/color';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../colors';
-import { SimpleTextureSet } from '../textures/SimpleTextures';
+import { SimpleTextureSet, UiScale } from '../textures/SimpleTextures';
 import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
@@ -89,6 +89,17 @@ type HexGridData = {
   cursor: Pixi.Sprite | null;
 };
 
+// sqrt(3)/2 approximation - see hexGridPx
+function strategicHexGridPxFromUiScale(pixiUiScale: UiScale) {
+  return pixiUiScale === 'x-small'
+    ? new Vector2(15, 13)
+    : pixiUiScale === 'small'
+    ? new Vector2(22, 19)
+    : pixiUiScale === 'medium' || pixiUiScale === 'large'
+    ? new Vector2(30, 26)
+    : new Vector2(45, 39);
+}
+
 // TODO(bowei): compute this to be big enough
 // const strategicHexGridDims = new Vector2(35, 20);
 // const strategicHexGridDims = new Vector2(6, 12);
@@ -115,21 +126,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     // this.graphics.visible = false;
     // this.container.addChild(this.graphics);
 
-    const pixiUiScale = uiScaleFromAppSize(props.appSize);
     // sqrt(3)/2 approximation - see hexGridPx
-    const strategicHexGridPx =
-      pixiUiScale === 'x-small'
-        ? new Vector2(15, 13)
-        : pixiUiScale === 'small'
-        ? new Vector2(22, 19)
-        : pixiUiScale === 'medium'
-        ? new Vector2(30, 26)
-        : new Vector2(45, 39);
-
-    console.log('Initializing strategic hex grid', {
-      strategicHexGridPx,
-      pixiUiScale,
-    });
+    const strategicHexGridPx = strategicHexGridPxFromUiScale(
+      uiScaleFromAppSize(props.appSize)
+    );
 
     // populate a grid
     // TODO(bowei): unhardcode
@@ -281,16 +281,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     this.container.position = PixiPointFrom(props.args.position);
     // this.graphics.position = PixiPointFrom(props.appSize.divide(2));
 
-    const pixiUiScale = uiScaleFromAppSize(props.appSize);
     // sqrt(3)/2 approximation - see hexGridPx
-    const strategicHexGridPx =
-      pixiUiScale === 'x-small'
-        ? new Vector2(15, 13)
-        : pixiUiScale === 'small'
-        ? new Vector2(22, 19)
-        : pixiUiScale === 'medium'
-        ? new Vector2(30, 26)
-        : new Vector2(45, 39);
+    const strategicHexGridPx = strategicHexGridPxFromUiScale(
+      uiScaleFromAppSize(props.appSize)
+    );
 
     for (let [v, data] of this.hexGrid.entries()) {
       const { node: graphics } = data;

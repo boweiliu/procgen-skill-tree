@@ -25,7 +25,7 @@ export function generateSimpleTextures(
       ? 8
       : uiScale === 'small'
       ? 12
-      : uiScale === 'medium'
+      : uiScale === 'medium' || uiScale === 'large'
       ? 16
       : 24;
   circle.beginFill(COLORS.white);
@@ -39,7 +39,7 @@ export function generateSimpleTextures(
       ? 10
       : uiScale === 'small'
       ? 14
-      : uiScale === 'medium'
+      : uiScale === 'medium' || uiScale === 'large'
       ? 18
       : 30;
 
@@ -49,7 +49,7 @@ export function generateSimpleTextures(
         ? 3
         : uiScale === 'small'
         ? 4
-        : uiScale === 'medium'
+        : uiScale === 'medium' || uiScale === 'large'
         ? 5
         : 8;
     rect.beginFill(COLORS.white);
@@ -66,14 +66,14 @@ export function generateSimpleTextures(
         ? 1
         : uiScale === 'small'
         ? 2
-        : uiScale === 'medium'
+        : uiScale === 'medium' || uiScale === 'large'
         ? 3
         : 4;
 
     let width =
       uiScale === 'x-small'
         ? 3
-        : uiScale === 'small' || uiScale === 'medium'
+        : uiScale === 'small' || uiScale === 'medium' || uiScale === 'large'
         ? 6
         : 8;
 
