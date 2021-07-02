@@ -28,6 +28,8 @@ export class AllocateNodeAction {
     this.updaters = updaters;
   }
 
+  // unchecked
+  // newStatus should almost always be { taken: true, previouslyTaken: true }
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation, newStatus } = input;
 
@@ -41,26 +43,27 @@ export class AllocateNodeAction {
     });
 
     // before updating Fog of war, first unlock any locks
-    this.updaters.computed.lockStatusMap?.enqueueUpdate(
-      (prevMap, prevGameState) => {
-        if (!prevMap) {
-          return prevMap;
-        }
+    // NOTE(bowei): not sure how locks work yet, disabling this for now
+    // this.updaters.computed.lockStatusMap?.enqueueUpdate(
+    //   (prevMap, prevGameState) => {
+    //     if (!prevMap) {
+    //       return prevMap;
+    //     }
 
-        for (let [
-          location,
-          lockData,
-        ] of prevGameState.worldGen.lockMap.entries()) {
-          if (lockData) {
-            // TODO: compute lock status
-            const newStatus = LockStatus.TICKING;
-            prevMap.put(location, newStatus);
-          }
-        }
+    //     for (let [
+    //       location,
+    //       lockData,
+    //     ] of prevGameState.worldGen.lockMap.entries()) {
+    //       if (lockData) {
+    //         // TODO: compute lock status
+    //         const newStatus = LockStatus.TICKING;
+    //         prevMap.put(location, newStatus);
+    //       }
+    //     }
 
-        return prevMap.clone();
-      }
-    );
+    //     return prevMap.clone();
+    //   }
+    // );
 
     this.updaters.computed.reachableStatusMap?.enqueueUpdate((prevMap) => {
       if (!prevMap) {

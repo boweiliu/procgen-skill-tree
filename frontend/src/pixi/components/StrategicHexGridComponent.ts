@@ -4,7 +4,6 @@ import { GameState } from '../../data/GameState';
 import {
   LockStatus,
   NodeReachableStatus,
-  NodeTakenStatus,
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
@@ -306,9 +305,12 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeVisibleStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeVisibleStatus.false;
-      const nodeTakenStatus =
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
-        NodeTakenStatus.false;
+      const nodeTakenStatus = gameState.playerSave.allocationStatusMap.get(
+        nodeLocation
+      ) || {
+        taken: false,
+        previouslyTaken: false,
+      };
       const nodeReachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;

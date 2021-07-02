@@ -3,7 +3,6 @@ import { GameState } from '../../data/GameState';
 import {
   NodeAllocatedStatus,
   NodeReachableStatus,
-  NodeTakenStatus,
 } from '../../data/NodeStatus';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
@@ -83,7 +82,7 @@ function Component(props: {
       if (!gameState.playerSave.allocationStatusMap.get(nodeLocation)?.taken) {
         props.actions.allocateNode.enqueueAction({
           nodeLocation,
-          newStatus: NodeTakenStatus.true,
+          newStatus: { taken: true, previouslyTaken: true },
         });
       }
     },

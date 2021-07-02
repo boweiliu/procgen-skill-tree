@@ -21,7 +21,13 @@ export const newPlayerSaveState = (): PlayerSaveState => {
   return {
     // make sure to allocate the beginning node
     allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
-      [Vector3.Zero, NodeTakenStatus.true],
+      [
+        Vector3.Zero,
+        {
+          taken: true,
+          previouslyTaken: true,
+        },
+      ],
     ]),
   };
 };
