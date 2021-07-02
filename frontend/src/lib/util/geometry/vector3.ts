@@ -314,6 +314,10 @@ export class Vector3 {
     });
   }
 
+  toVector2(): Vector2 {
+    return this.pairXY();
+  }
+
   withX(newX: number): Vector3 {
     return new Vector3({
       x: newX,

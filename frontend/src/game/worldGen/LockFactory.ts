@@ -1,9 +1,16 @@
 import { LockStatus } from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
+import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { INTMAX32, squirrel3 } from '../../lib/util/random';
 
 type LockFactoryConfig = {};
+
+// locks occur at this frequency
+// a good non-debug value is 0.47. 0.5 is the site percolation threshold for triangular lattice
+const LOCK_FREQUENCY = 0.47;
+const LOCK_FREQUENCY_STARTER_AREA = 0.2;
+const LOCK_STARTER_AREA_RADIUS = 7;
 
 export class LockFactory {
   public config: LockFactoryConfig;
@@ -32,13 +39,44 @@ export class LockFactory {
     if (args.location.equals(Vector3.Zero)) {
       return undefined;
     }
-    // TODO(bowei): unhardcode
-    // locks occur at this frequency
-    // a good non-debug value is 0.47. 0.5 is the site percolation threshold for triangular lattice
-    if (p < 0.47) {
-      return lockData;
+    // special case for starting area -- should have lower lock frequency
+    if (
+      taxicabDistance(args.location.toVector2()) <= LOCK_STARTER_AREA_RADIUS
+    ) {
+      if (p < LOCK_FREQUENCY_STARTER_AREA) {
+        return lockData;
+      } else {
+        return undefined;
+      }
+    } else {
+      if (p < LOCK_FREQUENCY) {
+        return lockData;
+      } else {
+        return undefined;
+      }
     }
-
-    return undefined;
   }
+}
+
+export function taxicabDistance(v: Vector2, w: Vector2 = Vector2.Zero): number {
+  if (!w.equals(Vector2.Zero)) {
+    return taxicabDistance(v.subtract(w));
+  }
+  let a = v.x;
+  let b = v.y;
+  let c = 0;
+
+  // find the most negative coordinate and add it to all of them to coerce them positive
+  let min = Math.min(a, b, c);
+  a -= min;
+  b -= min;
+  c -= min;
+
+  // now they're all nonnegative and one of them is zero, so WLOG we can work in the first 120-degree trident.
+  return Math.max(a, b, c);
+}
+
+// not square rooted
+export function l2Norm(a: Vector2, b: Vector2 = Vector2.Zero): number {
+  return 0;
 }
