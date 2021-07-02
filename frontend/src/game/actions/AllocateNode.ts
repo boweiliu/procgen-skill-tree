@@ -66,6 +66,10 @@ export class AllocateNodeAction {
       if (!prevMap) {
         return prevMap;
       }
+      // if we are only marking this node as previouslyTaken not taken (i.e. if we are fog-of-war revealing not actually allocating)
+      if (!newStatus.taken) {
+        return prevMap;
+      }
 
       getWithinDistance(nodeLocation, 1).forEach((n) => {
         prevMap.put(n, NodeReachableStatus.true);
@@ -90,9 +94,10 @@ export class AllocateNodeAction {
         const validLocks: IReadonlySet<Vector3> = {
           // TODO(bowei): optimize this?
           contains: (v: Vector3) => {
-            // const maybeLock = prevGameState.worldGen.lockMap.get(v);
-            const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
-            if (maybeLock && maybeLock !== LockStatus.OPEN) {
+            const lockData = prevGameState.worldGen.lockMap.get(v);
+            const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+            const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+            if (isLocked) {
               return true;
             }
             return false;

@@ -77,6 +77,7 @@ export function loadComputed(gameState: GameState): GameState {
     gameState.worldGen.lockMap.precompute(n);
   });
   // fill in lock statuses with computed statuses
+  // TODO(bowei): fix this?? it doesnt actually do anything???
   {
     let prevMap = gameState.computed.lockStatusMap;
     // let nodeLocation = Vector3.Zero;
@@ -104,11 +105,22 @@ export function loadComputed(gameState: GameState): GameState {
       })
       .map((it) => it[0])
       .forEach((nodeLocation) => {
+        getWithinDistance(nodeLocation, 1).forEach((n) => {
+          prevReachableStatusMap.put(n, NodeReachableStatus.true);
+        });
+      });
+
+    gameState.playerSave.allocationStatusMap
+      .entries()
+      .filter(([loc, status]) => {
+        return status.taken === true;
+      })
+      .map((it) => it[0])
+      .forEach((nodeLocation) => {
         prevMap.put(nodeLocation, NodeVisibleStatus.true);
 
         getWithinDistance(nodeLocation, 1).forEach((n) => {
           prevMap.put(n, NodeVisibleStatus.true);
-          prevReachableStatusMap.put(n, NodeReachableStatus.true);
         });
 
         // make sure we make use of lock state
@@ -117,9 +129,10 @@ export function loadComputed(gameState: GameState): GameState {
         const validLocks: IReadonlySet<Vector3> = {
           // TODO(bowei): optimize this?
           contains: (v: Vector3) => {
-            // const maybeLock = prevGameState.worldGen.lockMap.get(v);
-            const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
-            if (maybeLock && maybeLock !== LockStatus.OPEN) {
+            const lockData = prevGameState.worldGen.lockMap.get(v);
+            const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+            const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+            if (isLocked) {
               return true;
             }
             return false;

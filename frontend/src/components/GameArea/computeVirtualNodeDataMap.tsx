@@ -61,7 +61,11 @@ export function computeNodeReactData(args: {
     ? NodeAllocatedStatus.UNREACHABLE
     : NodeAllocatedStatus.HIDDEN;
   const id = location.hash();
+
   const lockData = lockMap.get(location);
+  const lockStatus = args.gameState.computed.lockStatusMap?.get(location);
+  const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+
   const nodeContents = nodeContentsMap.get(location);
   let shortText1 = '';
   if (location.equals(Vector3.Zero)) {
@@ -89,7 +93,7 @@ export function computeNodeReactData(args: {
   }
 
   let tooltipHeader = <> {nodeStatus.toString()}</>;
-  if (lockData) {
+  if (isLocked) {
     if (nodeStatus === NodeAllocatedStatus.AVAILABLE) {
       tooltipHeader = (
         <>

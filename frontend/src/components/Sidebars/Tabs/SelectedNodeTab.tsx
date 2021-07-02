@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { GameState } from '../../../data/GameState';
-import { NodeTakenStatus } from '../../../data/NodeStatus';
+import { LockStatus, NodeTakenStatus } from '../../../data/NodeStatus';
 import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
@@ -87,16 +87,17 @@ function SelectedNodeTabContentComponent(props: {
   const lockData = visibleStatus
     ? gameState.worldGen.lockMap?.get(location) || null
     : null;
-  // const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
+  const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
+  const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
-  const canBeAllocated = reachableStatus && !lockData && !takenStatus;
+  const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
 
   let description = '';
   if (location.equals(Vector3.Zero)) {
     description = STARTING_NODE_DESCRIPTION;
   } else if (!visibleStatus) {
     description = 'Unknown.';
-  } else if (gameState.worldGen.lockMap?.get(location) !== undefined) {
+  } else if (isLocked) {
     description = 'A locked node.';
   } else {
     description = 'An allocatable node.';
@@ -127,7 +128,7 @@ function SelectedNodeTabContentComponent(props: {
         <div>Visible?: {visibleStatus.toString()}</div>
         {visibleStatus ? (
           <>
-            <div>Locked?: {(!!lockData).toString()}</div>
+            <div>Locked?: {isLocked.toString()}</div>
             <div>Can be allocated?: {canBeAllocated.toString()}</div>
             <br></br>
             <div>Contents: {nodeContentsDom}</div>
