@@ -69,7 +69,7 @@ export class PixiReactBridge {
       antialias: true, // both about the same FPS, i get around 30 fps on 1600 x 900
       transparent: true, // true -> better fps?? https://github.com/pixijs/pixi.js/issues/5580
       resolution: window.devicePixelRatio || 1, // lower -> more FPS but uglier
-      // resolution: 0.5,
+      // resolution: 0.5, // DO NOT use this, this is fuzzy as heck
       // resolution: 2,
       autoDensity: true,
       powerPreference: 'low-power', // the only valid one for webgl
