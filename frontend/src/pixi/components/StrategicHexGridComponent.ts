@@ -316,6 +316,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         NodeReachableStatus.false;
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
+      const isLocked = lockData && lockStatus !== LockStatus.OPEN;
 
       let visible: boolean = true;
       if (nodeTakenStatus.taken) {
@@ -324,7 +325,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         // only recolor if it is not locked
-        if (!lockData || lockStatus === LockStatus.OPEN) {
+        if (isLocked) {
           graphics.visible = true;
           baseTint = COLORS.nodeLavender;
           // graphics.tint = COLORS.nodeLavender;
@@ -378,7 +379,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.dot.width / 2;
         graphics.position.y -= textures.dot.height / 2;
-      } else if (lockData && lockStatus !== LockStatus.OPEN) {
+      } else if (isLocked) {
         graphics.texture = textures.rect;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.rect.width / 2;
