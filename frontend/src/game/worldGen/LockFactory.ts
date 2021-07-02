@@ -77,6 +77,11 @@ export function taxicabDistance(v: Vector2, w: Vector2 = Vector2.Zero): number {
 }
 
 // not square rooted
-export function l2Norm(a: Vector2, b: Vector2 = Vector2.Zero): number {
-  return 0;
+export function l2Norm(v: Vector2, w: Vector2 = Vector2.Zero): number {
+  if (!w.equals(Vector2.Zero)) {
+    return taxicabDistance(v.subtract(w));
+  }
+
+  // computed by doing \| a + b \omega \|^2 = ( a + b \omega ) * ( a + b \omega^2 )
+  return v.x * v.x + v.y * v.y - v.x * v.y;
 }

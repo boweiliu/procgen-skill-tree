@@ -66,8 +66,8 @@ const WEIGHTS = {
   },
   // if we are doing a single attribute, what modifier is it going to be
   SINGLE_MODIFIERS: {
-    [Modifier.FLAT]: 100,
-    [Modifier.INCREASED]: 75,
+    [Modifier.FLAT]: 150,
+    [Modifier.INCREASED]: 100,
   },
 };
 
