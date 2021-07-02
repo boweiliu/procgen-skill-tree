@@ -9,7 +9,7 @@ export interface SimpleTextureSet {
   verticalLine: Pixi.Texture;
 }
 
-export type UiScale = 'small' | 'medium' | 'large';
+export type UiScale = 'x-small' | 'small' | 'medium' | 'large' | 'x-large';
 
 export const pixiUiScale: UiScale = 'small';
 
