@@ -13,6 +13,11 @@
   z-index: 5;
 }
 
+.hex-center-small {
+  width: calc(0.5 * var(--hex-center-radius));
+  height: calc(0.5 * var(--hex-center-radius));
+}
+
 .node-allocated {
   background-color: var(--deemphasized-black);
 }

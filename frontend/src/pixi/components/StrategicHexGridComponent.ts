@@ -375,6 +375,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       const textures = props.args.textures.get();
+      graphics.pivot.x = 0; // WIP
+      graphics.pivot.y = 0;
       if (!nodeVisibleStatus.visible) {
         graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
@@ -383,8 +385,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       } else if (isLocked) {
         graphics.texture = textures.rect;
         graphics.position = PixiPointFrom(basePosition);
-        graphics.position.x -= textures.rect.width / 2;
-        graphics.position.y -= textures.rect.height / 2;
+        graphics.pivot.x = textures.rect.width / 2;
+        graphics.pivot.y = textures.rect.height / 2;
+        // graphics.angle = 60; // WIP
+        // graphics.position.x -= textures.rect.width / 2;
+        // graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
       } else {
         graphics.texture = textures.circle;

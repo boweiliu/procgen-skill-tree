@@ -1,4 +1,6 @@
 import * as Pixi from 'pixi.js';
+import { PixiPointFrom } from '../../lib/pixi/pixify';
+import { Vector2 } from '../../lib/util/geometry/vector2';
 import COLORS from '../colors';
 
 export interface SimpleTextureSet {
@@ -55,6 +57,39 @@ export function generateSimpleTextures(
     rect.beginFill(COLORS.white);
     // rect.drawRect(-6, -10, 12, 20);
     rect.drawRect(0, 0, width, height);
+    // rect.drawRect(height/2 - width/2, 0, width, height);
+    // rect.drawRect(0, height/2 - width/2, height, width);
+    // rect.drawPolygon([(height / 2 - width / 2), 0, height / 2 + width / 2, 0, height / 2 + width / 2, height, height / 2 - width / 2, height]);
+    // rect.drawPolygon([(height / 2 - width / 2), -height / 2, height / 2 + width / 2, -height / 2,
+    //   height / 2 + width / 2, height / 2, height / 2 - width / 2, height / 2]);
+
+    // // horizontal full rectangle
+    // rect.drawPolygon([
+    //   height/2, width/2,
+    //   height/2, -width/2,
+    //   -height/2, -width/2,
+    //   -height/2, width/2,
+    // ]);
+    // const v = Math.sqrt(3) / 2;
+    // // rotate 60 degrees
+    // rect.drawPolygon([
+    //   ((.5 * height) - (v * width))/2, ((v * height) + (.5 * width))/2,
+    //   ((.5 * height) - (v * -width))/2, ((v * height) + (.5 * -width))/2,
+    //   ((.5 * -height) - (v * -width))/2, ((v * -height) + (.5 * -width))/2,
+    //   ((.5 * -height) - (v * width))/2, ((v * -height) + (.5 * width))/2,
+    // ]);
+    // // rotate 60 degrees the other way
+    // rect.drawPolygon([
+    //   ((.5 * height) + (v * width))/2, (-(v * height) + (.5 * width))/2,
+    //   ((.5 * height) + (v * -width))/2, (-(v * height) + (.5 * -width))/2,
+    //   ((.5 * -height) + (v * -width))/2, (-(v * -height) + (.5 * -width))/2,
+    //   ((.5 * -height) + (v * width))/2, (-(v * -height) + (.5 * width))/2,
+    // ]);
+
+    // rect.drawRect(0, 0, height *2, width);
+    // rect.drawRect(0, 0, height, width);
+    // rect.pivot = PixiPointFrom(new Vector2(0, -1));
+    // rect.angle = 15;
     // rect.pivot = PixiPointFrom(Vector2.Zero);
   }
 

@@ -138,6 +138,7 @@ function CellComponent({
             ? 'border-unimportant'
             : 'border-important',
           status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : ''
+          // status === NodeAllocatedStatus.HIDDEN ? 'hex-center-small' : '',
         )}
         onClick={onClickCenter}
         onDoubleClick={() => {
