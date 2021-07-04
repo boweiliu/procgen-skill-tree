@@ -8,9 +8,9 @@ type LockFactoryConfig = {};
 
 // locks occur at this frequency
 // a good non-debug value is 0.47. 0.5 is the site percolation threshold for triangular lattice
-const LOCK_FREQUENCY = 0.47;
-const LOCK_FREQUENCY_STARTER_AREA = 0.2;
-export const STARTER_AREA_RADIUS = 7;
+const LOCK_FREQUENCY = 0.485;
+const LOCK_FREQUENCY_STARTER_AREA = 0.3;
+export const STARTER_AREA_RADIUS = 5;
 
 export class LockFactory {
   public config: LockFactoryConfig;
