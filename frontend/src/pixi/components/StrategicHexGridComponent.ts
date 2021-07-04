@@ -48,9 +48,18 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
       strategicSearch: gameState.playerUI.strategicSearch,
+      isPixiHidden: gameState.playerUI.isPixiHidden,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    intent: {
+      newIntent: {
+        PAN_EAST: gameState.intent.newIntent.PAN_EAST,
+        PAN_NORTH: gameState.intent.newIntent.PAN_NORTH,
+        PAN_SOUTH: gameState.intent.newIntent.PAN_SOUTH,
+        PAN_WEST: gameState.intent.newIntent.PAN_WEST,
+      },
     },
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
@@ -272,6 +281,31 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
         // update phase on animation object
         animation.phase = newPhase;
+      }
+    }
+
+    if (props.gameState.intent !== this._staleProps.gameState.intent) {
+      if (!props.gameState.playerUI.isPixiHidden) {
+        if (props.gameState.intent.newIntent.PAN_EAST) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_WEST) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(-4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_NORTH) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(2).addY(4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_SOUTH) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(-2).addY(-4);
+          });
+        }
       }
     }
   }
