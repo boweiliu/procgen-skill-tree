@@ -224,10 +224,20 @@ export class AllocateNodeAction {
     }
 
     if (
+      CURRENT_ERA.type === 'A' &&
+      gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
+        ?.bookmarked === true
+    ) {
+      console.log("can't do that, already bookmarked", input);
+      return false;
+    }
+    if (
       (CURRENT_ERA.type === 'B' &&
         gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) ||
       (CURRENT_ERA.type === 'A' &&
-        gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT)
+        gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT &&
+        gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
+          ?.bookmarked !== true)
     ) {
       console.log("can't do that, no available SP right now");
       return false;
