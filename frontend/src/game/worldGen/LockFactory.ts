@@ -1,4 +1,3 @@
-import { LockStatus } from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
@@ -34,7 +33,6 @@ export class LockFactory {
     let lockData: LockData = {
       shortTextTarget: '🔒',
       shortTextTimer: '',
-      lockStatus: LockStatus.TICKING,
     };
     if (args.location.equals(Vector3.Zero)) {
       return undefined;

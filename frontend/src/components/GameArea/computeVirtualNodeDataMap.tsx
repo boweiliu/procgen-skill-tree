@@ -1,5 +1,6 @@
 import React from 'react';
 import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
+import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeSymbolMap,
@@ -18,11 +19,7 @@ export type NodeReactData = {
   toolTipText: React.ReactElement;
   // Extended description that shows up in sidebar
   fullText: React.ReactElement;
-  lockData?: {
-    shortTextTarget: string;
-    shortTextTimer: string;
-    lockStatus: LockStatus;
-  };
+  lockData?: (LockData | undefined) & { status: LockStatus | undefined };
   nodeContents: NodeContents;
   status: NodeAllocatedStatus;
   nodeLocation: Vector3;
@@ -153,7 +150,12 @@ export function computeNodeReactData(args: {
     nodeContents,
     fullText: <> </>,
     status: nodeStatus,
-    lockData,
+    lockData: lockData
+      ? {
+          ...lockData,
+          status: lockStatus,
+        }
+      : undefined,
     id,
   };
   return nodeData;

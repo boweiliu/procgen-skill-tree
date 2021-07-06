@@ -1,4 +1,4 @@
-import { LockStatus, NodeTakenStatus } from './NodeStatus';
+import { NodeTakenStatus } from './NodeStatus';
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { DeserializationError } from '../lib/util/misc';
@@ -14,7 +14,6 @@ export type PlayerSaveState = {
 export type LockData = {
   shortTextTarget: string;
   shortTextTimer: string;
-  lockStatus: LockStatus;
 };
 
 export const newPlayerSaveState = (): PlayerSaveState => {
