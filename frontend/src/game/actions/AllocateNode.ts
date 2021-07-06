@@ -3,13 +3,12 @@ import {
   LockStatus,
   NodeReachableStatus,
   NodeTakenStatus,
-  NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { flowFogOfWarFromNode } from '../GameStateFactory';
-import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';
+import { getWithinDistance } from '../lib/HexGrid';
 
 export interface AllocateNodeInput {
   nodeLocation: Vector3;
