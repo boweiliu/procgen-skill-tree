@@ -94,8 +94,6 @@ export class AllocateNodeAction {
         });
 
         // make sure we make use of lock state
-        // getWithinDistance(nodeLocation, 3).forEach((n) => {
-        // const validLocks = prevGameState.worldGen.lockMap
         const validLocks: IReadonlySet<Vector3> = {
           // TODO(bowei): optimize this?
           contains: (v: Vector3) => {

@@ -1,6 +1,7 @@
 import { GameState } from '../data/GameState';
 import {
   LockStatus,
+  NodeAccessibleStatus,
   NodeReachableStatus,
   NodeVisibleStatus,
 } from '../data/NodeStatus';
@@ -15,6 +16,7 @@ import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
 import { PlayerUIState } from '../data/PlayerUIState';
 import { loadOrCreate } from '../components/PersistenceComponent';
+import { Const } from '../lib/util/misc';
 
 export type GameStateConfig = any;
 
@@ -153,4 +155,40 @@ export function loadComputed(gameState: GameState): GameState {
       });
   }
   return gameState;
+}
+
+// TODO(bowei): unhardcode once we implement >2 eras
+export const ACCESSIBLE_DISTANCE = 40;
+
+export function markAccessibleNodes(
+  prev: HashMap<Vector3, NodeAccessibleStatus> | undefined,
+  prevGameState: Const<GameState>
+): HashMap<Vector3, NodeAccessibleStatus> | undefined {
+  if (!prev) {
+    return prev;
+  }
+
+  const result = prev.clone();
+
+  // make sure we make use of lock state
+  const validLocks: IReadonlySet<Vector3> = {
+    // TODO(bowei): optimize this?
+    contains: (v: Vector3) => {
+      const lockData = prevGameState.worldGen.lockMap.get(v);
+      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+      if (isLocked) {
+        return true;
+      }
+      return false;
+    },
+  };
+
+  getWithinDistance(Vector3.Zero, ACCESSIBLE_DISTANCE, 0, validLocks).forEach(
+    (n) => {
+      result.put(n, { accessible: true });
+    }
+  );
+
+  return result;
 }
