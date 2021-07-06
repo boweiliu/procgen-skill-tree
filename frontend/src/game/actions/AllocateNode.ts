@@ -28,6 +28,11 @@ export class AllocateNodeAction {
     this.updaters = updaters;
   }
 
+  /**
+   * Unchecked
+   * Allocates the node (updates save status) and recomputes related fog of war statuses.
+   * @param input
+   */
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation, newStatus } = input;
 
@@ -119,5 +124,31 @@ export class AllocateNodeAction {
         return prevMap.clone();
       }
     );
+  }
+
+  /**
+   * Stateless function to provide a pre-flight check before actually performing the action.
+   *
+   * @param input
+   * @param gameState
+   * @returns true if the action can be taken based on the game state, false otherwise
+   */
+  static checkAction(input: AllocateNodeInput, gameState: GameState): boolean {
+    return true;
+  }
+
+  /**
+   * First checks to see if the action can be performed, then performs it and returns true if successful or false otherwise.
+   *
+   * @param input
+   * @param gameState
+   * @returns
+   */
+  run(input: AllocateNodeInput, gameState: GameState): boolean {
+    const check = AllocateNodeAction.checkAction(input, gameState);
+    if (check) {
+      this.enqueueAction(input);
+    }
+    return check;
   }
 }
