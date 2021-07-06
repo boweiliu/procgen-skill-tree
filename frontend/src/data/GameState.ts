@@ -53,7 +53,7 @@ export type ComputedState = {
   /**
    * WIP - not really used. intended to store lock open/close status
    */
-  lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
+  lockStatusMap: HashMap<Vector3, LockStatus | undefined> | null;
 
   /**
    * Stores the accessibility (whether it's within the game universe of revealable nodes for the current era).

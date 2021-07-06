@@ -66,6 +66,7 @@ export function loadOrCreate(
     playerSave: PlayerSaveState.tryLoad(),
     playerUI: PlayerUIState.tryLoad(),
     computed: {
+      lockStatusMap: null,
       fogOfWarStatusMap: null,
       reachableStatusMap: null,
       accessibleStatusMap: null,
