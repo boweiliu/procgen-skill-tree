@@ -94,6 +94,11 @@ function SelectedNodeTabContentComponent(props: {
 
   const takenStatus =
     gameState.playerSave.allocationStatusMap?.get(location)?.taken || false;
+  const bookmarkedStatus =
+    gameState.playerSave.bookmarkedStatusMap?.get(location)?.bookmarked ||
+    false;
+  const exploredStatus =
+    gameState.playerSave.exploredStatusMap?.get(location)?.explored || false;
   const reachableStatus =
     gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
   const visibleStatus =
@@ -144,6 +149,8 @@ function SelectedNodeTabContentComponent(props: {
         <div>Taken?: {takenStatus.toString()}</div>
         <div>Reachable?: {reachableStatus.toString()}</div>
         <div>Visible?: {visibleStatus.toString()}</div>
+        <div>Bookmarked?: {bookmarkedStatus.toString()}</div>
+        <div>Explored?: {exploredStatus.toString()}</div>
         {visibleStatus ? (
           <>
             <div>Locked?: {isLocked.toString()}</div>

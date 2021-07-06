@@ -18,9 +18,12 @@ function _extractAllocateNodeCheckState(gameState: GameState) {
   return {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
     },
     computed: {
       reachableStatusMap: gameState.computed.reachableStatusMap,
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
     },
     worldGen: {
       lockMap: gameState.worldGen.lockMap,
@@ -65,33 +68,38 @@ export class AllocateNodeAction {
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation } = input;
 
-    let newStatus: NodeTakenStatus;
-    if (CURRENT_ERA.type === 'A') {
-      throw new Error('NOT YET SUPPORTED');
-      // newStatus = {
-      //   saved: true,
-      //   explored: true,
-      // };
-    } else {
-      newStatus = {
+    // let newStatus: NodeTakenStatus;
+    // if (CURRENT_ERA.type === 'A') {
+    //   throw new Error('NOT YET SUPPORTED');
+    //   // newStatus = {
+    //   //   saved: true,
+    //   //   explored: true,
+    //   // };
+    // } else {
+    //   newStatus = {
+    //     taken: true,
+    //   };
+    // }
+
+    if (CURRENT_ERA.type === 'B') {
+      const newStatus = {
         taken: true,
       };
-    }
 
-    this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prev) => {
-      prev.put(nodeLocation, newStatus);
-      return prev.clone();
-    });
+      // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+      this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prev) => {
+        prev.put(nodeLocation, newStatus);
+        return prev.clone();
+      });
 
-    // before updating Fog of war, first unlock any lock whose statuses have changed
-    this.updaters.computed.lockStatusMap?.enqueueUpdate(
-      (prev, prevGameState) => {
-        return markLockStatus(prev, prevGameState);
-      }
-    );
+      // before updating Fog of war, first unlock any lock whose statuses have changed
+      this.updaters.computed.lockStatusMap?.enqueueUpdate(
+        (prev, prevGameState) => {
+          return markLockStatus(prev, prevGameState);
+        }
+      );
 
-    // only bother to flow reachable status if we are in era B
-    if (CURRENT_ERA.type === 'B') {
+      // only bother to flow reachable status if we are in era B
       this.updaters.computed.reachableStatusMap?.enqueueUpdate(
         (prev, prevGameState) => {
           if (!prev) {
@@ -108,6 +116,17 @@ export class AllocateNodeAction {
           );
         }
       );
+    } else if (CURRENT_ERA.type === 'A') {
+      // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+      this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate((prev) => {
+        prev.put(nodeLocation, { bookmarked: true });
+        return prev.clone();
+      });
+
+      this.updaters.playerSave.exploredStatusMap.enqueueUpdate((prev) => {
+        prev.put(nodeLocation, { explored: true });
+        return prev.clone();
+      });
     }
 
     this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
@@ -123,7 +142,7 @@ export class AllocateNodeAction {
             prev,
             prevGameState,
             nodeLocation,
-          }) || null
+          }) || prev
         );
       }
     );
@@ -150,6 +169,7 @@ export class AllocateNodeAction {
     }
 
     if (
+      CURRENT_ERA.type === 'B' &&
       gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
         ?.taken === true
     ) {
@@ -157,8 +177,33 @@ export class AllocateNodeAction {
       return false;
     }
 
+    if (
+      CURRENT_ERA.type === 'A' &&
+      gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
+        ?.bookmarked === true
+    ) {
+      console.log("can't do that, already bookmarked", input);
+      return false;
+    }
+
     if (!!gameState.worldGen.lockMap.get(input.nodeLocation)) {
       console.log("can't do that, is locked", input);
+      return false;
+    }
+
+    if (
+      gameState.computed.fogOfWarStatusMap?.get(input.nodeLocation)?.visible !==
+      true
+    ) {
+      console.log("can't do that, is not visible", input);
+      return false;
+    }
+
+    if (
+      gameState.computed.accessibleStatusMap?.get(input.nodeLocation)
+        ?.accessible !== true
+    ) {
+      console.log("can't do that, is not accessible", input);
       return false;
     }
 
@@ -173,7 +218,12 @@ export class AllocateNodeAction {
       }
     }
 
-    if (gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) {
+    if (
+      (CURRENT_ERA.type === 'B' &&
+        gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) ||
+      (CURRENT_ERA.type === 'A' &&
+        gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT)
+    ) {
       console.log("can't do that, no available SP right now");
       return false;
     }

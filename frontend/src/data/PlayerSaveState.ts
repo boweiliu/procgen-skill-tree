@@ -1,4 +1,8 @@
-import { NodeTakenStatus } from './NodeStatus';
+import {
+  NodeBookmarkedStatus,
+  NodeExploredStatus,
+  NodeTakenStatus,
+} from './NodeStatus';
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { DeserializationError } from '../lib/util/misc';
@@ -8,6 +12,12 @@ export type PlayerSaveState = {
    * Indicated which nodes are allocated or not. NOTE: does not contain fog of war information
    */
   allocationStatusMap: KeyedHashMap<Vector3, NodeTakenStatus>;
+
+  /**
+   * Similar but for era A
+   */
+  bookmarkedStatusMap: KeyedHashMap<Vector3, NodeBookmarkedStatus>;
+  exploredStatusMap: KeyedHashMap<Vector3, NodeExploredStatus>;
 };
 
 // NOT DEPRECATED
@@ -19,9 +29,13 @@ export type LockData = {
 export const newPlayerSaveState = (): PlayerSaveState => {
   return {
     // make sure to allocate the beginning node
-    allocationStatusMap: new KeyedHashMap<Vector3, NodeTakenStatus>([
+    allocationStatusMap: new KeyedHashMap([
       [Vector3.Zero, NodeTakenStatus.true],
     ]),
+    bookmarkedStatusMap: new KeyedHashMap([
+      [Vector3.Zero, { bookmarked: true }],
+    ]),
+    exploredStatusMap: new KeyedHashMap([[Vector3.Zero, { explored: true }]]),
   };
 };
 
@@ -32,6 +46,14 @@ const serializeToObject = (s: PlayerSaveState): object => {
       Vector3,
       NodeTakenStatus
     >(s.allocationStatusMap, Vector3.SerializeToObject),
+    bookmarkedStatusMap: KeyedHashMap.SerializeToObject<
+      Vector3,
+      NodeBookmarkedStatus
+    >(s.bookmarkedStatusMap, Vector3.SerializeToObject),
+    exploredStatusMap: KeyedHashMap.SerializeToObject<
+      Vector3,
+      NodeExploredStatus
+    >(s.exploredStatusMap, Vector3.SerializeToObject),
   };
 };
 
@@ -56,13 +78,58 @@ const deserializeFromObject = (obj: any): PlayerSaveState | null => {
     return result;
   });
   if (!allocationStatusMap) {
-    console.error('Failed deserializing PlayerSaveState: ', obj);
+    console.error(
+      'Failed deserializing PlayerSaveState.allocationStatusMap: ',
+      obj
+    );
+    return null;
+  }
+
+  const bookmarkedStatusMap = KeyedHashMap.Deserialize<
+    Vector3,
+    NodeBookmarkedStatus
+  >(obj.bookmarkedStatusMap, (it) => {
+    const result = Vector3.Deserialize(it);
+    if (!result) {
+      throw new DeserializationError(
+        `Failed deserializing vector3 ${JSON.stringify(it)}`
+      );
+    }
+    return result;
+  });
+  if (!bookmarkedStatusMap) {
+    console.error(
+      'Failed deserializing PlayerSaveState.bookmarkedStatusMap: ',
+      obj
+    );
+    return null;
+  }
+
+  const exploredStatusMap = KeyedHashMap.Deserialize<
+    Vector3,
+    NodeExploredStatus
+  >(obj.exploredStatusMap, (it) => {
+    const result = Vector3.Deserialize(it);
+    if (!result) {
+      throw new DeserializationError(
+        `Failed deserializing vector3 ${JSON.stringify(it)}`
+      );
+    }
+    return result;
+  });
+  if (!exploredStatusMap) {
+    console.error(
+      'Failed deserializing PlayerSaveState.exploredStatusMap: ',
+      obj
+    );
     return null;
   }
 
   return {
     ...(obj as PlayerSaveState),
     allocationStatusMap,
+    bookmarkedStatusMap,
+    exploredStatusMap,
   };
 };
 

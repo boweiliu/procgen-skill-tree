@@ -28,9 +28,10 @@ export type NodeAccessibleStatus = {
 export type NodeExploredStatus = {
   explored: boolean;
 };
-// whether or not the node was allocated at the end of the exploration era. player can save or unsave nodes and they will be marked for convenience in the optimization era.
-export type NodeSavedStatus = {
-  saved: boolean;
+// whether or not the node was allocated at the end of the exploration era. player can bookmark or unbookmark nodes during the exploration era,
+// and they will be show up as useful convenience markers in the optimization era.
+export type NodeBookmarkedStatus = {
+  bookmarked: boolean;
 };
 
 /**

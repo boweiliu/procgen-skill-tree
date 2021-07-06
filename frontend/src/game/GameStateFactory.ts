@@ -255,20 +255,30 @@ export function markVisibleNodes(
 
   let result: typeof prev | null = null;
 
-  prevGameState.playerSave.allocationStatusMap
+  let nodes = prevGameState.playerSave.allocationStatusMap
     .entries()
     .filter(([location, status]) => {
       return status.taken === true;
     })
-    .map((it) => it[0])
-    .forEach((nodeLocation) => {
-      result = flowFogOfWarFromNode({
-        result,
-        prev,
-        prevGameState,
-        nodeLocation,
-      });
+    .map((it) => it[0]);
+
+  nodes = nodes.concat(
+    prevGameState.playerSave.exploredStatusMap
+      .entries()
+      .filter(([location, status]) => {
+        return status.explored === true;
+      })
+      .map((it) => it[0])
+  );
+
+  nodes.forEach((nodeLocation) => {
+    result = flowFogOfWarFromNode({
+      result,
+      prev,
+      prevGameState,
+      nodeLocation,
     });
+  });
 
   return result || prev;
 }

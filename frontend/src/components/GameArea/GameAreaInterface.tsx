@@ -31,6 +31,7 @@ export function extractGameAreaSubState(gameState: GameState) {
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -40,6 +41,7 @@ export function extractGameAreaSubState(gameState: GameState) {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
     },
     intent: gameState.intent,
     debug: {
