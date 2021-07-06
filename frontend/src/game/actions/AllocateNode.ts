@@ -82,14 +82,14 @@ export class AllocateNodeAction {
     // }
 
     if (CURRENT_ERA.type === 'B') {
-      const newStatus = {
-        taken: true,
-      };
-
       // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
       this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prev) => {
-        prev.put(nodeLocation, newStatus);
-        return prev.clone();
+        if (prev.get(nodeLocation)?.taken !== true) {
+          const result = prev.clone();
+          result.put(nodeLocation, { taken: true });
+          return result;
+        }
+        return prev;
       });
 
       // before updating Fog of war, first unlock any lock whose statuses have changed
@@ -119,13 +119,18 @@ export class AllocateNodeAction {
     } else if (CURRENT_ERA.type === 'A') {
       // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
       this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate((prev) => {
-        prev.put(nodeLocation, { bookmarked: true });
+        const prevBookmarked = !!prev.get(nodeLocation)?.bookmarked;
+        prev.put(nodeLocation, { bookmarked: !prevBookmarked });
         return prev.clone();
       });
 
       this.updaters.playerSave.exploredStatusMap.enqueueUpdate((prev) => {
-        prev.put(nodeLocation, { explored: true });
-        return prev.clone();
+        if (prev.get(nodeLocation)?.explored !== true) {
+          const result = prev.clone();
+          result.put(nodeLocation, { explored: true });
+          return result;
+        }
+        return prev;
       });
     }
 
@@ -177,14 +182,14 @@ export class AllocateNodeAction {
       return false;
     }
 
-    if (
-      CURRENT_ERA.type === 'A' &&
-      gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
-        ?.bookmarked === true
-    ) {
-      console.log("can't do that, already bookmarked", input);
-      return false;
-    }
+    // if (
+    //   CURRENT_ERA.type === 'A' &&
+    //   gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
+    //     ?.bookmarked === true
+    // ) {
+    //   console.log("can't do that, already bookmarked", input);
+    //   return false;
+    // }
 
     if (!!gameState.worldGen.lockMap.get(input.nodeLocation)) {
       console.log("can't do that, is locked", input);
