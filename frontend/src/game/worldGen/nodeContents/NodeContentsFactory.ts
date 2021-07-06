@@ -8,6 +8,7 @@ import {
   randomUniform,
   randomValue,
 } from '../../../lib/util/randomHelpers';
+import { STARTER_AREA_RADIUS, taxicabDistance } from '../LockFactory';
 
 type NodeContentsFactoryConfig = {};
 
@@ -69,6 +70,11 @@ const WEIGHTS = {
     [Modifier.FLAT]: 150,
     [Modifier.INCREASED]: 100,
   },
+  // same as above but in the starting region
+  STARTER_AREA_SINGLE_MODIFIERS: {
+    [Modifier.FLAT]: 400,
+    [Modifier.INCREASED]: 100,
+  },
 };
 
 export class NodeContentsFactory {
@@ -81,7 +87,10 @@ export class NodeContentsFactory {
     this.clusterCenterData = new HashMap();
   }
 
-  private createSingle(args: { randInt: number }): NodeContentsLine {
+  private createSingle(args: {
+    randInt: number;
+    location: Vector3;
+  }): NodeContentsLine {
     const attribute = randomValue<typeof Attribute>({
       randInt: args.randInt,
       weights: WEIGHTS.SINGLE_COLORS,
@@ -89,7 +98,10 @@ export class NodeContentsFactory {
 
     const modifier = randomValue<typeof Modifier>({
       randInt: squirrel3(args.randInt),
-      weights: WEIGHTS.SINGLE_MODIFIERS,
+      weights:
+        taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
+          ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
+          : WEIGHTS.SINGLE_MODIFIERS,
     });
 
     let amount = 0;
@@ -116,21 +128,26 @@ export class NodeContentsFactory {
     };
   }
 
-  private createNoSpend(args: { randInt: number }): NodeContents {
+  private createNoSpend(args: {
+    randInt: number;
+    location: Vector3;
+  }): NodeContents {
+    const { location } = args;
+
     return randomSwitch<NodeContents>({
       randInt: args.randInt,
       weights: WEIGHTS.DECISION_1,
       behaviors: {
         SINGLE: (randInt) => {
           return {
-            lines: [this.createSingle({ randInt })],
+            lines: [this.createSingle({ randInt, location })],
           };
         },
         DOUBLE: (randInt) => {
           return {
             lines: [
-              this.createSingle({ randInt }),
-              this.createSingle({ randInt: squirrel3(randInt) }),
+              this.createSingle({ randInt, location }),
+              this.createSingle({ randInt: squirrel3(randInt), location }),
             ],
           };
         },
@@ -154,7 +171,7 @@ export class NodeContentsFactory {
     }
 
     // find the closest cluster center - a 3x3 hexagonal region
-    let clusterCenter: Vector3 | null;
+    let clusterCenter: Vector3;
     let modulo3 = location.moduloPositive(3).pairXY();
     if (
       modulo3.equals(new Vector2(1, 2)) ||
@@ -183,10 +200,10 @@ export class NodeContentsFactory {
           };
         },
         NO_SPEND: (randInt: number) => {
-          return this.createNoSpend({ randInt });
+          return this.createNoSpend({ randInt, location: clusterCenter });
         },
         SPEND: (randInt: number) => {
-          const base = this.createNoSpend({ randInt });
+          const base = this.createNoSpend({ randInt, location: clusterCenter });
 
           const attribute = randomValue<typeof Attribute>({
             randInt,

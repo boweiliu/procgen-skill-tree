@@ -48,9 +48,18 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
       strategicSearch: gameState.playerUI.strategicSearch,
+      isPixiHidden: gameState.playerUI.isPixiHidden,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    intent: {
+      newIntent: {
+        PAN_EAST: gameState.intent.newIntent.PAN_EAST,
+        PAN_NORTH: gameState.intent.newIntent.PAN_NORTH,
+        PAN_SOUTH: gameState.intent.newIntent.PAN_SOUTH,
+        PAN_WEST: gameState.intent.newIntent.PAN_WEST,
+      },
     },
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
@@ -274,6 +283,31 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         animation.phase = newPhase;
       }
     }
+
+    if (props.gameState.intent !== this._staleProps.gameState.intent) {
+      if (!props.gameState.playerUI.isPixiHidden) {
+        if (props.gameState.intent.newIntent.PAN_EAST) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_WEST) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(-4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_NORTH) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(2).addY(4);
+          });
+        }
+        if (props.gameState.intent.newIntent.PAN_SOUTH) {
+          props.updaters.playerUI.virtualGridLocation.enqueueUpdate((prev) => {
+            return prev.addX(-2).addY(-4);
+          });
+        }
+      }
+    }
   }
 
   protected renderSelf(props: Props) {
@@ -306,14 +340,18 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeVisibleStatus =
         gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
         NodeVisibleStatus.false;
-      const nodeTakenStatus =
-        gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
-        NodeTakenStatus.false;
+      const nodeTakenStatus = gameState.playerSave.allocationStatusMap.get(
+        nodeLocation
+      ) || {
+        taken: false,
+        previouslyTaken: false,
+      };
       const nodeReachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
       let visible: boolean = true;
       if (nodeTakenStatus.taken) {
@@ -322,7 +360,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         // graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         // only recolor if it is not locked
-        if (!lockData || lockStatus === LockStatus.OPEN) {
+        if (isLocked) {
           graphics.visible = true;
           baseTint = COLORS.nodeLavender;
           // graphics.tint = COLORS.nodeLavender;
@@ -371,16 +409,21 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       const textures = props.args.textures.get();
+      graphics.pivot.x = 0; // WIP
+      graphics.pivot.y = 0;
       if (!nodeVisibleStatus.visible) {
         graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.dot.width / 2;
         graphics.position.y -= textures.dot.height / 2;
-      } else if (lockData && lockStatus !== LockStatus.OPEN) {
+      } else if (isLocked) {
         graphics.texture = textures.rect;
         graphics.position = PixiPointFrom(basePosition);
-        graphics.position.x -= textures.rect.width / 2;
-        graphics.position.y -= textures.rect.height / 2;
+        graphics.pivot.x = textures.rect.width / 2;
+        graphics.pivot.y = textures.rect.height / 2;
+        // graphics.angle = 60; // WIP
+        // graphics.position.x -= textures.rect.width / 2;
+        // graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
       } else {
         graphics.texture = textures.circle;
@@ -416,6 +459,8 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       const matched = matchStrategicSearch({
         nodeContents,
+        nodeTakenStatus,
+        isLocked,
         query: gameState.playerUI.strategicSearch,
       });
 
@@ -543,9 +588,11 @@ export type { Props as StrategicHexGridComponentProps };
 
 export function matchStrategicSearch(args: {
   nodeContents: NodeContents;
+  nodeTakenStatus: NodeTakenStatus;
+  isLocked: boolean;
   query: StrategicSearchState;
 }): boolean {
-  const { nodeContents, query } = args;
+  const { nodeContents, nodeTakenStatus, isLocked, query } = args;
 
   // missing query! return no matches
   if (!query) {
@@ -557,7 +604,17 @@ export function matchStrategicSearch(args: {
   const terms = highlight1
     .split(' ')
     .filter((it) => !!it)
-    .map((wrappedTerm) => wrappedTerm.slice(1, wrappedTerm.length - 1));
+    .map((wrappedTerm) => {
+      // transform "[SOME_STRING]" to "SOME_STRING"
+      if (
+        wrappedTerm[0] === '[' &&
+        wrappedTerm[wrappedTerm.length - 1] === ']'
+      ) {
+        return wrappedTerm.slice(1, wrappedTerm.length - 1);
+      } else {
+        return wrappedTerm;
+      }
+    });
 
   // missing query! return no matches
   if (terms.length === 0) {
@@ -597,6 +654,30 @@ export function matchStrategicSearch(args: {
         nodeContents.lines?.[1]?.attribute
       ) {
         // console.log("matched by wild card attribute");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '![taken]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (!nodeTakenStatus.taken) {
+        // console.log("matched by !taken");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '[taken]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (nodeTakenStatus.taken) {
+        // console.log("matched by taken");
+      } else {
+        unmatchedTerm = term;
+        break;
+      }
+    } else if (term === '![locked]') {
+      // TODO(bowei): actually process booleans. just special case this for now
+      if (!isLocked) {
+        // console.log("matched by !isLocked");
       } else {
         unmatchedTerm = term;
         break;

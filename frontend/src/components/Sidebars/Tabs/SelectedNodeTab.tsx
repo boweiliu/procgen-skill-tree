@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { GameState } from '../../../data/GameState';
-import { NodeTakenStatus } from '../../../data/NodeStatus';
+import { LockStatus } from '../../../data/NodeStatus';
 import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
+import { DeallocateNodeAction } from '../../../game/actions/DeallocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
@@ -18,7 +19,10 @@ export const SelectedNodeTabContent = React.memo(
 function SelectedNodeTabContentComponent(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
+  actions: {
+    allocateNode: AllocateNodeAction;
+    deallocateNode: DeallocateNodeAction;
+  };
 }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
@@ -29,7 +33,36 @@ function SelectedNodeTabContentComponent(props: {
       if (location) {
         props.actions.allocateNode.enqueueAction({
           nodeLocation: location,
-          newStatus: NodeTakenStatus.true,
+          newStatus: { taken: true, previouslyTaken: true },
+        });
+      }
+    },
+    [props.actions.allocateNode, location]
+  );
+
+  const onDeallocate = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.deallocateNode.enqueueAction({
+          nodeLocation: location,
+          newStatus: {
+            taken: false,
+            previouslyTaken: true,
+          },
+        });
+      }
+    },
+    [props.actions.deallocateNode, location]
+  );
+
+  const onForceAllocate = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.allocateNode.enqueueAction({
+          nodeLocation: location,
+          newStatus: { taken: false, previouslyTaken: true },
         });
       }
     },
@@ -87,16 +120,17 @@ function SelectedNodeTabContentComponent(props: {
   const lockData = visibleStatus
     ? gameState.worldGen.lockMap?.get(location) || null
     : null;
-  // const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
+  const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
+  const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
-  const canBeAllocated = reachableStatus && !lockData && !takenStatus;
+  const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
 
   let description = '';
   if (location.equals(Vector3.Zero)) {
     description = STARTING_NODE_DESCRIPTION;
   } else if (!visibleStatus) {
     description = 'Unknown.';
-  } else if (gameState.worldGen.lockMap?.get(location) !== undefined) {
+  } else if (isLocked) {
     description = 'A locked node.';
   } else {
     description = 'An allocatable node.';
@@ -108,6 +142,8 @@ function SelectedNodeTabContentComponent(props: {
   const nodeContentsDom = nodeContents?.lines[0]
     ? nodeContentsToDom(nodeContents)
     : 'empty';
+
+  const canBeDeallocated = true;
 
   return (
     <>
@@ -127,13 +163,20 @@ function SelectedNodeTabContentComponent(props: {
         <div>Visible?: {visibleStatus.toString()}</div>
         {visibleStatus ? (
           <>
-            <div>Locked?: {(!!lockData).toString()}</div>
+            <div>Locked?: {isLocked.toString()}</div>
             <div>Can be allocated?: {canBeAllocated.toString()}</div>
+            <div>Can be deallocated?: {'?? TODO ??'}</div>
             <br></br>
             <div>Contents: {nodeContentsDom}</div>
             <br></br>
             <button disabled={!canBeAllocated} onClick={onAllocate}>
               Allocate (hotkey: spacebar)
+            </button>
+            <button disabled={!canBeDeallocated} onClick={onDeallocate}>
+              Deallocate
+            </button>
+            <button disabled={false} onClick={onForceAllocate}>
+              [DEBUG] Force allocate
             </button>
           </>
         ) : (

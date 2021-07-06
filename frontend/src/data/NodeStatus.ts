@@ -10,6 +10,7 @@ export enum NodeAllocatedStatus {
 
 export type NodeTakenStatus = {
   taken: boolean;
+  previouslyTaken: boolean; // if it was once allocated but since has been deallocated
 };
 export type NodeVisibleStatus = {
   visible: boolean;
@@ -24,13 +25,13 @@ export enum BoolEnum {
   true = 'true',
   false = 'false',
 }
-// eslint-disable-next-line
-export const NodeTakenStatus: {
-  [k in BoolEnum]: NodeTakenStatus;
-} = {
-  true: { taken: true },
-  false: { taken: false },
-};
+// // eslint-disable-next-line
+// export const NodeTakenStatus: {
+//   [k in BoolEnum]: NodeTakenStatus;
+// } = {
+//   true: { taken: true },
+//   false: { taken: false },
+// };
 // eslint-disable-next-line
 export const NodeVisibleStatus: {
   [k in BoolEnum]: NodeVisibleStatus;

@@ -15,7 +15,7 @@ export interface AllocateNodeInput {
 }
 
 // TODO(bowei): unhardcode
-export const FOG_OF_WAR_DISTANCE = 5;
+export const FOG_OF_WAR_DISTANCE = 40;
 
 /**
  * Stateless action wrapper over updaters.
@@ -28,6 +28,8 @@ export class AllocateNodeAction {
     this.updaters = updaters;
   }
 
+  // unchecked
+  // newStatus should almost always be { taken: true, previouslyTaken: true }
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation, newStatus } = input;
 
@@ -41,29 +43,34 @@ export class AllocateNodeAction {
     });
 
     // before updating Fog of war, first unlock any locks
-    this.updaters.computed.lockStatusMap?.enqueueUpdate(
-      (prevMap, prevGameState) => {
-        if (!prevMap) {
-          return prevMap;
-        }
+    // NOTE(bowei): not sure how locks work yet, disabling this for now
+    // this.updaters.computed.lockStatusMap?.enqueueUpdate(
+    //   (prevMap, prevGameState) => {
+    //     if (!prevMap) {
+    //       return prevMap;
+    //     }
 
-        for (let [
-          location,
-          lockData,
-        ] of prevGameState.worldGen.lockMap.entries()) {
-          if (lockData) {
-            // TODO: compute lock status
-            const newStatus = LockStatus.TICKING;
-            prevMap.put(location, newStatus);
-          }
-        }
+    //     for (let [
+    //       location,
+    //       lockData,
+    //     ] of prevGameState.worldGen.lockMap.entries()) {
+    //       if (lockData) {
+    //         // TODO: compute lock status
+    //         const newStatus = LockStatus.TICKING;
+    //         prevMap.put(location, newStatus);
+    //       }
+    //     }
 
-        return prevMap.clone();
-      }
-    );
+    //     return prevMap.clone();
+    //   }
+    // );
 
     this.updaters.computed.reachableStatusMap?.enqueueUpdate((prevMap) => {
       if (!prevMap) {
+        return prevMap;
+      }
+      // if we are only marking this node as previouslyTaken not taken (i.e. if we are fog-of-war revealing not actually allocating)
+      if (!newStatus.taken) {
         return prevMap;
       }
 
@@ -90,26 +97,30 @@ export class AllocateNodeAction {
         const validLocks: IReadonlySet<Vector3> = {
           // TODO(bowei): optimize this?
           contains: (v: Vector3) => {
-            // const maybeLock = prevGameState.worldGen.lockMap.get(v);
-            const maybeLock = prevGameState.computed.lockStatusMap?.get(v);
-            if (maybeLock && maybeLock !== LockStatus.OPEN) {
+            const lockData = prevGameState.worldGen.lockMap.get(v);
+            const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+            const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+            if (isLocked) {
               return true;
             }
             return false;
           },
         };
-        getWithinDistance(
-          nodeLocation,
-          FOG_OF_WAR_DISTANCE,
-          0,
-          validLocks
-        ).forEach((n) => {
-          if (!prevMap.get(n)?.visible) {
-            // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            prevGameState.worldGen.lockMap.precompute(n);
-            prevMap.put(n, NodeVisibleStatus.true);
-          }
-        });
+        if (newStatus.previouslyTaken && !newStatus.taken) {
+          // temporairly disable fog of war revealing except for debug allocation
+          getWithinDistance(
+            nodeLocation,
+            FOG_OF_WAR_DISTANCE,
+            0,
+            validLocks
+          ).forEach((n) => {
+            if (!prevMap.get(n)?.visible) {
+              // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+              prevGameState.worldGen.lockMap.precompute(n);
+              prevMap.put(n, NodeVisibleStatus.true);
+            }
+          });
+        }
 
         return prevMap.clone();
       }
