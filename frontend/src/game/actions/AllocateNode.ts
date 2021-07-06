@@ -240,6 +240,11 @@ export class AllocateNodeAction {
       return false;
     }
 
+    if (gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) {
+      console.log("can't do that, no available SP right now");
+      return false;
+    }
+
     return true;
   }
 
@@ -261,3 +266,7 @@ export class AllocateNodeAction {
     return check;
   }
 }
+
+// TODO(bowei): unhardcode once we implement >2 eras
+export const ERA_1_SP_LIMIT = 20;
+export const ERA_1_ACCESSIBLE_RADIUS = 10;

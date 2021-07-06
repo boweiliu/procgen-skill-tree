@@ -12,7 +12,10 @@ import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
-import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
+import {
+  ERA_1_ACCESSIBLE_RADIUS,
+  FOG_OF_WAR_DISTANCE,
+} from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
 import { PlayerUIState } from '../data/PlayerUIState';
 import { loadOrCreate } from '../components/PersistenceComponent';
@@ -167,9 +170,6 @@ export function loadComputed(gameState: GameState): GameState {
   return gameState;
 }
 
-// TODO(bowei): unhardcode once we implement >2 eras
-export const ACCESSIBLE_DISTANCE = 10;
-
 /**
  * Updates accessible computed map based on distance from the starting node.
  * @param prev
@@ -200,14 +200,17 @@ export function markAccessibleNodes(
     },
   };
 
-  getWithinDistance(Vector3.Zero, ACCESSIBLE_DISTANCE, 0, validLocks).forEach(
-    (n) => {
-      if (prev.get(n)?.accessible !== true) {
-        result = result || prev.clone();
-        result.put(n, { accessible: true });
-      }
+  getWithinDistance(
+    Vector3.Zero,
+    ERA_1_ACCESSIBLE_RADIUS,
+    0,
+    validLocks
+  ).forEach((n) => {
+    if (prev.get(n)?.accessible !== true) {
+      result = result || prev.clone();
+      result.put(n, { accessible: true });
     }
-  );
+  });
 
   return result || prev;
 }
