@@ -50,6 +50,7 @@ export class GameStateFactory {
       playerUI: PlayerUIState.new(),
       computed: {
         reachableStatusMap: null,
+        accessibleStatusMap: null,
       },
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
@@ -71,6 +72,7 @@ export function loadComputed(gameState: GameState): GameState {
   gameState.computed.lockStatusMap = new HashMap();
   gameState.computed.fogOfWarStatusMap = new HashMap();
   gameState.computed.reachableStatusMap = new HashMap();
+  gameState.computed.accessibleStatusMap = new HashMap();
 
   /**
    * Initialize fog of war and visible locks
@@ -156,16 +158,28 @@ export function loadComputed(gameState: GameState): GameState {
         });
       });
   }
+
+  gameState.computed.accessibleStatusMap = markAccessibleNodes(
+    gameState.computed.accessibleStatusMap,
+    gameState
+  );
+
   return gameState;
 }
 
 // TODO(bowei): unhardcode once we implement >2 eras
-export const ACCESSIBLE_DISTANCE = 40;
+export const ACCESSIBLE_DISTANCE = 10;
 
+/**
+ * Updates accessible computed map based on distance from the starting node.
+ * @param prev
+ * @param prevGameState
+ * @returns
+ */
 export function markAccessibleNodes(
-  prev: HashMap<Vector3, NodeAccessibleStatus> | undefined,
+  prev: HashMap<Vector3, NodeAccessibleStatus> | null,
   prevGameState: Const<GameState>
-): HashMap<Vector3, NodeAccessibleStatus> | undefined {
+): HashMap<Vector3, NodeAccessibleStatus> | null {
   if (!prev) {
     return prev;
   }

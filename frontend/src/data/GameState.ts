@@ -5,6 +5,7 @@ import {
   NodeVisibleStatus,
   NodeReachableStatus,
   LockStatus,
+  NodeAccessibleStatus,
 } from './NodeStatus';
 import { PlayerIntentState } from './PlayerIntentState';
 import { PlayerSaveState } from './PlayerSaveState';
@@ -53,4 +54,9 @@ export type ComputedState = {
    * WIP - not really used. intended to store lock open/close status
    */
   lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
+
+  /**
+   * Stores the accessibility (whether it's within the game universe of revealable nodes for the current era).
+   */
+  accessibleStatusMap: HashMap<Vector3, NodeAccessibleStatus> | null;
 };

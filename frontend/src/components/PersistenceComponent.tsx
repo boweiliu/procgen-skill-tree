@@ -67,6 +67,7 @@ export function loadOrCreate(
     playerUI: PlayerUIState.tryLoad(),
     computed: {
       reachableStatusMap: null,
+      accessibleStatusMap: null,
     },
     intent: newPlayerIntentState(),
     windowState: newWindowState(),

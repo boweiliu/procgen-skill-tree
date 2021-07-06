@@ -97,30 +97,61 @@ export class AllocateNodeAction {
       }
     );
 
-    this.updaters.computed.reachableStatusMap?.enqueueUpdate((prevMap) => {
-      if (!prevMap) {
-        return prevMap;
-      }
-      // if we are only marking this node as previouslyTaken not taken (i.e. if we are fog-of-war revealing not actually allocating)
-      if (!newStatus.taken) {
-        return prevMap;
-      }
-
-      getWithinDistance(nodeLocation, 1).forEach((n) => {
-        prevMap.put(n, NodeReachableStatus.true);
-      });
-      return prevMap.clone();
-    });
-
-    this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
-      (prevMap, prevGameState) => {
-        if (!prevMap) {
-          return prevMap;
+    this.updaters.computed.reachableStatusMap?.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (!prev) {
+          return prev;
         }
-        prevMap.put(nodeLocation, NodeVisibleStatus.true);
+
+        // if we are only marking this node as previouslyTaken not taken (i.e. if we are fog-of-war revealing not actually allocating)
+        if (!newStatus.taken) {
+          return prev;
+        }
+
+        let result: typeof prev | null = null;
 
         getWithinDistance(nodeLocation, 1).forEach((n) => {
-          prevMap.put(n, NodeVisibleStatus.true);
+          if (
+            prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
+            true
+          ) {
+            return;
+          }
+          if (prev.get(n)?.reachable !== true) {
+            result = result || prev.clone();
+            result.put(n, NodeReachableStatus.true);
+          }
+        });
+
+        return result || prev;
+      }
+    );
+
+    this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (!prev) {
+          return prev;
+        }
+
+        let result: typeof prev | null = null; // optimization: don't clone immediately here, but clone if any changes need to be made
+
+        if (prev.get(nodeLocation)?.visible !== true) {
+          result = result || prev.clone(); // clone if we haven't already
+          result.put(nodeLocation, NodeVisibleStatus.true);
+        }
+
+        // make sure locks within distance 1 are set to visible
+        getWithinDistance(nodeLocation, 1).forEach((n) => {
+          if (
+            prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
+            true
+          ) {
+            return;
+          }
+          if (prev.get(n)?.visible !== true) {
+            result = result || prev.clone();
+            result.put(n, NodeVisibleStatus.true);
+          }
         });
 
         // make sure we make use of lock state
@@ -130,7 +161,9 @@ export class AllocateNodeAction {
             const lockData = prevGameState.worldGen.lockMap.get(v);
             const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
             const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-            if (isLocked) {
+            const isAccessible =
+              !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
+            if (isLocked || !isAccessible) {
               return true;
             }
             return false;
@@ -142,14 +175,23 @@ export class AllocateNodeAction {
           0,
           validLocks
         ).forEach((n) => {
-          if (!prevMap.get(n)?.visible) {
-            // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            prevGameState.worldGen.lockMap.precompute(n);
-            prevMap.put(n, NodeVisibleStatus.true);
+          if (
+            prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
+            true
+          ) {
+            return;
+          }
+
+          // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+          prevGameState.worldGen.lockMap.precompute(n);
+
+          if (prev.get(n)?.visible !== true) {
+            result = result || prev.clone();
+            result.put(n, NodeVisibleStatus.true);
           }
         });
 
-        return prevMap.clone();
+        return result || prev;
       }
     );
   }
