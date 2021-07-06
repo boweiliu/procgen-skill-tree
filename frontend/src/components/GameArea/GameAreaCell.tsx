@@ -4,8 +4,9 @@ import './GameArea.css';
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { NodeAllocatedStatus } from '../../data/NodeStatus';
+import { NodeAllocatedStatus, NodeTakenStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
@@ -30,8 +31,8 @@ function GameAreaCellComponent({
   id: string;
   onUpdateStatus: (args: {
     nodeLocation: Vector3;
-    newStatus: NodeAllocatedStatus;
-  }) => void;
+    newStatus: NodeTakenStatus;
+  }) => AllocateNodeResult;
   nodeData: NodeReactData;
   isCursored: boolean;
   onUpdateCursored: (v: Vector3 | null) => void;
@@ -49,16 +50,15 @@ function GameAreaCellComponent({
       e.preventDefault();
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
-      if (nodeData.status === NodeAllocatedStatus.AVAILABLE) {
-        onUpdateStatus({
-          nodeLocation,
-          newStatus: NodeAllocatedStatus.TAKEN,
-        });
-      } else {
+      const updateStatusResult = onUpdateStatus({
+        nodeLocation,
+        newStatus: { taken: true },
+      });
+      if (!updateStatusResult) {
         onUpdateCursored(isCursored ? null : nodeLocation);
       }
     },
-    [onUpdateStatus, nodeLocation, nodeData, isCursored, onUpdateCursored]
+    [onUpdateStatus, nodeLocation, isCursored, onUpdateCursored]
   );
 
   const handleClickQuestionMark = useCallback(

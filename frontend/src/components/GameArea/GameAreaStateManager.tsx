@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { GameState } from '../../data/GameState';
-import { NodeAllocatedStatus } from '../../data/NodeStatus';
+import { NodeTakenStatus } from '../../data/NodeStatus';
 import {
   AllocateNodeAction,
   depsAllocateNodeCheckState,
@@ -61,14 +61,8 @@ function Component(props: {
 
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatusByLocation = useCallback(
-    (args: { nodeLocation: Vector3; newStatus: NodeAllocatedStatus }) => {
-      props.actions.allocateNode.run(
-        {
-          nodeLocation: args.nodeLocation,
-          newStatus: { taken: true },
-        },
-        gameState
-      );
+    (args: { nodeLocation: Vector3; newStatus: NodeTakenStatus }) => {
+      return props.actions.allocateNode.run(args, gameState);
     },
     // TODO(bowei): use custom hook here so react doesnt complain so much
     // eslint-disable-next-line
@@ -81,7 +75,7 @@ function Component(props: {
   );
 
   const handleUpdateNodeStatus = useCallback(
-    (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
+    (args: { virtualCoords: Vector2; newStatus: NodeTakenStatus }) => {
       const { virtualCoords, newStatus } = args;
 
       // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
@@ -242,7 +236,7 @@ function Component(props: {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
           virtualCoords: cursoredVirtualNodeCoords,
-          newStatus: NodeAllocatedStatus.TAKEN,
+          newStatus: { taken: true },
         });
       }
     }

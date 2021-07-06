@@ -42,6 +42,8 @@ export const depsAllocateNodeCheckState = extractDeps(
   extractAllocateNodeCheckState
 );
 
+export type AllocateNodeResult = boolean;
+
 // TODO(bowei): unhardcode
 export const FOG_OF_WAR_DISTANCE = 5;
 
@@ -162,7 +164,7 @@ export class AllocateNodeAction {
   static checkAction(
     input: AllocateNodeInput,
     gameState: AllocateNodeCheckState
-  ): boolean {
+  ): AllocateNodeResult {
     if (!input.newStatus.taken) {
       console.log('unsupported action: ', input);
       return false;
@@ -181,13 +183,13 @@ export class AllocateNodeAction {
       return false;
     }
 
-    if (
-      gameState.computed.reachableStatusMap?.get(input.nodeLocation)
-        ?.reachable !== true
-    ) {
-      console.log("can't do that, is not reachable", input);
-      return false;
-    }
+    // if (
+    //   gameState.computed.reachableStatusMap?.get(input.nodeLocation)
+    //     ?.reachable !== true
+    // ) {
+    //   console.log("can't do that, is not reachable", input);
+    //   return false;
+    // }
 
     return true;
   }
@@ -199,7 +201,10 @@ export class AllocateNodeAction {
    * @param gameState
    * @returns
    */
-  run(input: AllocateNodeInput, gameState: AllocateNodeCheckState): boolean {
+  run(
+    input: AllocateNodeInput,
+    gameState: AllocateNodeCheckState
+  ): AllocateNodeResult {
     const check = AllocateNodeAction.checkAction(input, gameState);
     if (check) {
       this.enqueueAction(input);

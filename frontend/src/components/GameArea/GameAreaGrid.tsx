@@ -9,10 +9,11 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { NodeAllocatedStatus } from '../../data/NodeStatus';
+import { NodeTakenStatus } from '../../data/NodeStatus';
 import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
+import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -58,8 +59,8 @@ function Component(props: {
   virtualCoordsToLocation: (v: Vector2) => Vector3;
   updateNodeStatusByLocationCb: (args: {
     nodeLocation: Vector3;
-    newStatus: NodeAllocatedStatus;
-  }) => void;
+    newStatus: NodeTakenStatus;
+  }) => AllocateNodeResult;
   cursoredVirtualNode: Vector2 | null;
   setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
