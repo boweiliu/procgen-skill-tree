@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { GameState } from '../../data/GameState';
+import { NodeAllocatedStatus } from '../../data/NodeStatus';
 import {
-  NodeAllocatedStatus,
-  NodeReachableStatus,
-  NodeTakenStatus,
-} from '../../data/NodeStatus';
-import { AllocateNodeAction } from '../../game/actions/AllocateNode';
+  AllocateNodeAction,
+  depsAllocateNodeCheckState,
+} from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -63,38 +62,24 @@ function Component(props: {
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatusByLocation = useCallback(
     (args: { nodeLocation: Vector3; newStatus: NodeAllocatedStatus }) => {
-      const { nodeLocation, newStatus } = args;
-
-      const reachableStatus =
-        gameState.computed.reachableStatusMap?.get(nodeLocation) ||
-        NodeReachableStatus.false;
-      if (newStatus === NodeAllocatedStatus.TAKEN) {
-        if (reachableStatus !== NodeReachableStatus.true) {
-          console.log('cant do that, not reachable:', reachableStatus);
-          return;
-        }
-        const maybeLock = gameState.worldGen.lockMap.get(nodeLocation);
-        if (!!maybeLock) {
-          console.log('is locked', maybeLock);
-          return;
-        }
-      }
-
-      if (!gameState.playerSave.allocationStatusMap.get(nodeLocation)?.taken) {
-        props.actions.allocateNode.enqueueAction({
-          nodeLocation,
-          newStatus: NodeTakenStatus.true,
-        });
-      }
+      props.actions.allocateNode.run(
+        {
+          nodeLocation: args.nodeLocation,
+          newStatus: { taken: true },
+        },
+        gameState
+      );
     },
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
     [
-      // props.updaters,
       props.actions,
-      gameState.playerSave.allocationStatusMap,
-      gameState.computed.reachableStatusMap,
-      gameState.worldGen.lockMap,
+      // TODO(bowei): use custom hook here so react doesnt complain so much
+      // eslint-disable-next-line
+      ...depsAllocateNodeCheckState(gameState),
     ]
   );
+
   const handleUpdateNodeStatus = useCallback(
     (args: { virtualCoords: Vector2; newStatus: NodeAllocatedStatus }) => {
       const { virtualCoords, newStatus } = args;

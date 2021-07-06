@@ -1,7 +1,10 @@
 import React, { useCallback } from 'react';
 import { GameState } from '../../../data/GameState';
 import { LockStatus, NodeTakenStatus } from '../../../data/NodeStatus';
-import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
+import {
+  AllocateNodeAction,
+  depsAllocateNodeCheckState,
+} from '../../../game/actions/AllocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
@@ -27,13 +30,24 @@ function SelectedNodeTabContentComponent(props: {
     (e: React.MouseEvent) => {
       e.preventDefault();
       if (location) {
-        props.actions.allocateNode.enqueueAction({
-          nodeLocation: location,
-          newStatus: NodeTakenStatus.true,
-        });
+        props.actions.allocateNode.run(
+          {
+            nodeLocation: location,
+            newStatus: NodeTakenStatus.true,
+          },
+          gameState
+        );
       }
     },
-    [props.actions.allocateNode, location]
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+    [
+      props.actions.allocateNode,
+      location,
+      // TODO(bowei): use custom hook here so react doesnt complain so much
+      // eslint-disable-next-line
+      ...depsAllocateNodeCheckState(gameState),
+    ]
   );
 
   const onZoom = useCallback(
@@ -90,7 +104,11 @@ function SelectedNodeTabContentComponent(props: {
   const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
   const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
-  const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
+  // const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
+  const canBeAllocated = AllocateNodeAction.checkAction(
+    { nodeLocation: location, newStatus: { taken: true } },
+    gameState
+  );
 
   let description = '';
   if (location.equals(Vector3.Zero)) {

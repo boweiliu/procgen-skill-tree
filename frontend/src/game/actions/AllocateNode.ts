@@ -6,6 +6,7 @@ import {
   NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';
 
@@ -13,6 +14,33 @@ export interface AllocateNodeInput {
   nodeLocation: Vector3;
   newStatus: NodeTakenStatus;
 }
+
+function _extractAllocateNodeCheckState(gameState: GameState) {
+  return {
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+    },
+    computed: {
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+    },
+    worldGen: {
+      lockMap: gameState.worldGen.lockMap,
+    },
+  };
+}
+
+export function extractAllocateNodeCheckState<T extends AllocateNodeCheckState>(
+  g: T
+) {
+  return _extractAllocateNodeCheckState(g as any as GameState);
+}
+
+export type AllocateNodeCheckState = ReturnType<
+  typeof _extractAllocateNodeCheckState
+>;
+export const depsAllocateNodeCheckState = extractDeps(
+  extractAllocateNodeCheckState
+);
 
 // TODO(bowei): unhardcode
 export const FOG_OF_WAR_DISTANCE = 5;
@@ -131,7 +159,36 @@ export class AllocateNodeAction {
    * @param gameState
    * @returns true if the action can be taken based on the game state, false otherwise
    */
-  static checkAction(input: AllocateNodeInput, gameState: GameState): boolean {
+  static checkAction(
+    input: AllocateNodeInput,
+    gameState: AllocateNodeCheckState
+  ): boolean {
+    if (!input.newStatus.taken) {
+      console.log('unsupported action: ', input);
+      return false;
+    }
+
+    if (
+      gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
+        ?.taken === true
+    ) {
+      console.log("can't do that, already taken", input);
+      return false;
+    }
+
+    if (!!gameState.worldGen.lockMap.get(input.nodeLocation)) {
+      console.log("can't do that, is locked", input);
+      return false;
+    }
+
+    if (
+      gameState.computed.reachableStatusMap?.get(input.nodeLocation)
+        ?.reachable !== true
+    ) {
+      console.log("can't do that, is not reachable", input);
+      return false;
+    }
+
     return true;
   }
 
@@ -142,7 +199,7 @@ export class AllocateNodeAction {
    * @param gameState
    * @returns
    */
-  run(input: AllocateNodeInput, gameState: GameState): boolean {
+  run(input: AllocateNodeInput, gameState: AllocateNodeCheckState): boolean {
     const check = AllocateNodeAction.checkAction(input, gameState);
     if (check) {
       this.enqueueAction(input);

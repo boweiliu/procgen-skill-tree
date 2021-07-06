@@ -48,7 +48,9 @@ export class GameStateFactory {
       worldGen: worldGenStateFactory.create({ seed: mySeed }),
       playerSave: newPlayerSaveState(),
       playerUI: PlayerUIState.new(),
-      computed: {},
+      computed: {
+        reachableStatusMap: null,
+      },
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
       debug: newDebugState(),

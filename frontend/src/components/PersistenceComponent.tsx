@@ -65,7 +65,9 @@ export function loadOrCreate(
     worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
     playerSave: PlayerSaveState.tryLoad(),
     playerUI: PlayerUIState.tryLoad(),
-    computed: {},
+    computed: {
+      reachableStatusMap: null,
+    },
     intent: newPlayerIntentState(),
     windowState: newWindowState(),
     debug: newDebugState(),

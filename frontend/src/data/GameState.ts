@@ -48,7 +48,7 @@ export type ComputedState = {
   /**
    * Stores the allocatability (whether it's connected to the existing tree).
    */
-  reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
+  reachableStatusMap: HashMap<Vector3, NodeReachableStatus> | null;
   /**
    * WIP - not really used. intended to store lock open/close status
    */
