@@ -25,6 +25,7 @@ export function extractGameGridSubState(gameState: GameAreaSubState) {
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,

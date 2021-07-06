@@ -1,5 +1,5 @@
 export enum NodeAllocatedStatus {
-  TAKEN = 'TAKEN',
+  TAKEN_OR_MARKED = 'TAKEN_OR_MARKED',
   AVAILABLE = 'AVAILABLE',
   UNREACHABLE = 'UNREACHABLE',
   HIDDEN = 'HIDDEN',

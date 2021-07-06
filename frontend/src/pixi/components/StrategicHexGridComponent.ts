@@ -27,6 +27,7 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
 import { Lazy } from '../../lib/util/lazy';
+import { CURRENT_ERA } from '../../game/actions/AllocateNode';
 
 type Props = {
   delta: number;
@@ -52,6 +53,7 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
     },
     intent: {
       newIntent: {
@@ -343,6 +345,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeTakenStatus =
         gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeTakenStatus.false;
+      const nodeBookmarkedStatus = gameState.playerSave.bookmarkedStatusMap.get(
+        nodeLocation
+      ) || { bookmarked: false };
       const nodeReachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
@@ -352,6 +357,15 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
       let visible: boolean = true;
       if (nodeTakenStatus.taken) {
+        graphics.visible = true;
+        baseTint = COLORS.borderBlack;
+        // graphics.tint = COLORS.borderBlack;
+      } else if (CURRENT_ERA.type === 'A' && nodeBookmarkedStatus.bookmarked) {
+        graphics.visible = true;
+        baseTint = COLORS.borderBlack;
+        // graphics.tint = COLORS.borderBlack;
+      } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+        // TODO(bowei): what to show here??
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;

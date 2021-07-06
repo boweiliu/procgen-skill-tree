@@ -130,10 +130,10 @@ function CellComponent({
       <div
         className={classnames(
           'hex-center',
-          status === NodeAllocatedStatus.TAKEN
+          status === NodeAllocatedStatus.TAKEN_OR_MARKED
             ? 'node-allocated'
             : 'node-unallocated',
-          status === NodeAllocatedStatus.TAKEN ||
+          status === NodeAllocatedStatus.TAKEN_OR_MARKED ||
             status === NodeAllocatedStatus.UNREACHABLE
             ? 'border-unimportant'
             : 'border-important',

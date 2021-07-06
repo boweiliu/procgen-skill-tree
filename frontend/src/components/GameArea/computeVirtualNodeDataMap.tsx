@@ -1,6 +1,7 @@
 import React from 'react';
 import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
+import { CURRENT_ERA } from '../../game/actions/AllocateNode';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
   AttributeSymbolMap,
@@ -44,15 +45,20 @@ export function computeNodeReactData(args: {
     reachableStatusMap,
     // lockStatusMap,
   } = args.gameState.computed;
-  const { allocationStatusMap } = args.gameState.playerSave;
+  const { allocationStatusMap, bookmarkedStatusMap } =
+    args.gameState.playerSave;
   const { lockMap, nodeContentsMap } = args.gameState.worldGen;
 
   const fogOfWarStatus = fogOfWarStatusMap?.get(location);
   const reachableStatus = reachableStatusMap?.get(location);
   const takenStatus = allocationStatusMap.get(location);
+  const bookmarkedStatus = bookmarkedStatusMap.get(location);
   const nodeStatus = takenStatus?.taken
-    ? NodeAllocatedStatus.TAKEN
-    : reachableStatus?.reachable
+    ? NodeAllocatedStatus.TAKEN_OR_MARKED
+    : CURRENT_ERA.type === 'A' && bookmarkedStatus?.bookmarked
+    ? NodeAllocatedStatus.TAKEN_OR_MARKED
+    : // TODO(bowei): what to show here if bookmarked in B era?
+    reachableStatus?.reachable
     ? NodeAllocatedStatus.AVAILABLE
     : fogOfWarStatus?.visible
     ? NodeAllocatedStatus.UNREACHABLE

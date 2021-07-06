@@ -36,6 +36,7 @@ export function extractStatsSubState(gameState: Const<GameState>) {
   return {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -119,15 +120,25 @@ export function computeAttributeModifierStats(args: {
   const attributeInfos = enumAssociateBy(Attribute, (attribute) => {
     // const modifiers: {[k in keyof typeof Modifier]: number} = fromEnumEntries(
     const modifiers = enumAssociateBy(Modifier, (modifier) => {
-      const amount = gameState.playerSave.allocationStatusMap
+      // find all allocated && bookmarked nodes
+      let nodes = gameState.playerSave.allocationStatusMap
         .entries()
-        .map((pair) => {
-          const [location, status] = pair;
-          if (!status.taken) {
-            // skip nodes that are not taken === true
-            return 0;
-          }
+        .filter(([location, status]) => {
+          return status.taken === true;
+        })
+        .map((it) => it[0]);
 
+      nodes = nodes.concat(
+        gameState.playerSave.bookmarkedStatusMap
+          .entries()
+          .filter(([location, status]) => {
+            return status.bookmarked === true;
+          })
+          .map((it) => it[0])
+      );
+
+      const amount = nodes
+        .map((location) => {
           // look for nodes with attribute
           const nodeContents = gameState.worldGen.nodeContentsMap.get(location);
           if (
