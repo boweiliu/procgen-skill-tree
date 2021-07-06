@@ -120,8 +120,14 @@ export class AllocateNodeAction {
       // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
       this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate((prev) => {
         const prevBookmarked = !!prev.get(nodeLocation)?.bookmarked;
-        prev.put(nodeLocation, { bookmarked: !prevBookmarked });
-        return prev.clone();
+        const result = prev.clone();
+        if (prevBookmarked) {
+          result.remove(nodeLocation);
+          return result;
+        } else {
+          result.put(nodeLocation, { bookmarked: true });
+          return result;
+        }
       });
 
       this.updaters.playerSave.exploredStatusMap.enqueueUpdate((prev) => {
@@ -227,9 +233,7 @@ export class AllocateNodeAction {
       (CURRENT_ERA.type === 'B' &&
         gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) ||
       (CURRENT_ERA.type === 'A' &&
-        gameState.playerSave.bookmarkedStatusMap
-          .values()
-          .filter((it) => it.bookmarked).length >= ERA_1_SP_LIMIT &&
+        gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT &&
         gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
           ?.bookmarked !== true)
     ) {
