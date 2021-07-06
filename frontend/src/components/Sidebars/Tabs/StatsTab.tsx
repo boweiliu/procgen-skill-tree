@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { GameState } from '../../../data/GameState';
+import { CURRENT_ERA } from '../../../game/actions/AllocateNode';
 import {
   Attribute,
   Modifier,
@@ -128,14 +129,16 @@ export function computeAttributeModifierStats(args: {
         })
         .map((it) => it[0]);
 
-      nodes = nodes.concat(
-        gameState.playerSave.bookmarkedStatusMap
-          .entries()
-          .filter(([location, status]) => {
-            return status.bookmarked === true;
-          })
-          .map((it) => it[0])
-      );
+      if (CURRENT_ERA.type === 'A') {
+        nodes = nodes.concat(
+          gameState.playerSave.bookmarkedStatusMap
+            .entries()
+            .filter(([location, status]) => {
+              return status.bookmarked === true;
+            })
+            .map((it) => it[0])
+        );
+      }
 
       const amount = nodes
         .map((location) => {

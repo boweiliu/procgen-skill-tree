@@ -364,11 +364,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
-      } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
-        // TODO(bowei): what to show here if bookmarked in B era?
-        graphics.visible = true;
-        baseTint = COLORS.borderBlack;
-        // graphics.tint = COLORS.borderBlack;
+        // } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+        //   // TODO(bowei): what to show here if bookmarked in B era?
+        //   graphics.visible = true;
+        //   baseTint = COLORS.nodePink;
+        //   // graphics.tint = COLORS.borderBlack;
       } else if (nodeReachableStatus.reachable) {
         // only recolor if it is not locked
         if (isLocked) {
@@ -431,6 +431,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.x -= textures.rect.width / 2;
         graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
+      } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+        graphics.texture = textures.square;
+        graphics.position = PixiPointFrom(basePosition);
+        graphics.position.x -= textures.square.width / 2;
+        graphics.position.y -= textures.square.height / 2;
       } else {
         graphics.texture = textures.circle;
         graphics.position = PixiPointFrom(basePosition);

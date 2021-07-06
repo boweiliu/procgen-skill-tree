@@ -6,7 +6,10 @@ import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { NodeAllocatedStatus, NodeTakenStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { AllocateNodeResult } from '../../game/actions/AllocateNode';
+import {
+  AllocateNodeResult,
+  CURRENT_ERA,
+} from '../../game/actions/AllocateNode';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
@@ -137,7 +140,11 @@ function CellComponent({
             status === NodeAllocatedStatus.UNREACHABLE
             ? 'border-unimportant'
             : 'border-important',
-          status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : ''
+          status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : '',
+          CURRENT_ERA.type === 'B' &&
+            nodeData.statuses.bookmarkedStatus.bookmarked
+            ? 'marked-square'
+            : ''
         )}
         onClick={onClickCenter}
         onDoubleClick={() => {

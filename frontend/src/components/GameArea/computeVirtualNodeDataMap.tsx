@@ -1,5 +1,9 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
+import {
+  LockStatus,
+  NodeAllocatedStatus,
+  NodeBookmarkedStatus,
+} from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
 import { CURRENT_ERA } from '../../game/actions/AllocateNode';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
@@ -23,6 +27,9 @@ export type NodeReactData = {
   lockData?: (LockData | undefined) & { status: LockStatus | undefined };
   nodeContents: NodeContents;
   status: NodeAllocatedStatus;
+  statuses: {
+    bookmarkedStatus: NodeBookmarkedStatus;
+  };
   nodeLocation: Vector3;
   id: string;
 };
@@ -52,7 +59,9 @@ export function computeNodeReactData(args: {
   const fogOfWarStatus = fogOfWarStatusMap?.get(location);
   const reachableStatus = reachableStatusMap?.get(location);
   const takenStatus = allocationStatusMap.get(location);
-  const bookmarkedStatus = bookmarkedStatusMap.get(location);
+  const bookmarkedStatus = bookmarkedStatusMap.get(location) || {
+    bookmarked: false,
+  };
   const nodeStatus = takenStatus?.taken
     ? NodeAllocatedStatus.TAKEN_OR_MARKED
     : CURRENT_ERA.type === 'A' && bookmarkedStatus?.bookmarked
@@ -163,6 +172,7 @@ export function computeNodeReactData(args: {
         }
       : undefined,
     id,
+    statuses: { bookmarkedStatus },
   };
   return nodeData;
 }
