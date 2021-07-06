@@ -8,6 +8,7 @@ import {
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
+import { flowFogOfWarFromNode } from '../GameStateFactory';
 import { getWithinDistance, IReadonlySet } from '../lib/HexGrid';
 
 export interface AllocateNodeInput {
@@ -135,61 +136,68 @@ export class AllocateNodeAction {
 
         let result: typeof prev | null = null; // optimization: don't clone immediately here, but clone if any changes need to be made
 
-        if (prev.get(nodeLocation)?.visible !== true) {
-          result = result || prev.clone(); // clone if we haven't already
-          result.put(nodeLocation, NodeVisibleStatus.true);
-        }
-
-        // make sure locks within distance 1 are set to visible
-        getWithinDistance(nodeLocation, 1).forEach((n) => {
-          if (
-            prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
-            true
-          ) {
-            return;
-          }
-          if (prev.get(n)?.visible !== true) {
-            result = result || prev.clone();
-            result.put(n, NodeVisibleStatus.true);
-          }
-        });
-
-        // make sure we make use of lock state
-        const validLocks: IReadonlySet<Vector3> = {
-          // TODO(bowei): optimize this?
-          contains: (v: Vector3) => {
-            const lockData = prevGameState.worldGen.lockMap.get(v);
-            const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
-            const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-            const isAccessible =
-              !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
-            if (isLocked || !isAccessible) {
-              return true;
-            }
-            return false;
-          },
-        };
-        getWithinDistance(
+        result = flowFogOfWarFromNode({
+          result,
+          prev,
+          prevGameState,
           nodeLocation,
-          FOG_OF_WAR_DISTANCE,
-          0,
-          validLocks
-        ).forEach((n) => {
-          if (
-            prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
-            true
-          ) {
-            return;
-          }
-
-          // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-          prevGameState.worldGen.lockMap.precompute(n);
-
-          if (prev.get(n)?.visible !== true) {
-            result = result || prev.clone();
-            result.put(n, NodeVisibleStatus.true);
-          }
         });
+
+        // if (prev.get(nodeLocation)?.visible !== true) {
+        //   result = result || prev.clone(); // clone if we haven't already
+        //   result.put(nodeLocation, NodeVisibleStatus.true);
+        // }
+
+        // // make sure locks within distance 1 are set to visible
+        // getWithinDistance(nodeLocation, 1).forEach((n) => {
+        //   if (
+        //     prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
+        //     true
+        //   ) {
+        //     return;
+        //   }
+        //   if (prev.get(n)?.visible !== true) {
+        //     result = result || prev.clone();
+        //     result.put(n, NodeVisibleStatus.true);
+        //   }
+        // });
+
+        // // make sure we make use of lock state
+        // const validLocks: IReadonlySet<Vector3> = {
+        //   // TODO(bowei): optimize this?
+        //   contains: (v: Vector3) => {
+        //     const lockData = prevGameState.worldGen.lockMap.get(v);
+        //     const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+        //     const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+        //     const isAccessible =
+        //       !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
+        //     if (isLocked || !isAccessible) {
+        //       return true;
+        //     }
+        //     return false;
+        //   },
+        // };
+        // getWithinDistance(
+        //   nodeLocation,
+        //   FOG_OF_WAR_DISTANCE,
+        //   0,
+        //   validLocks
+        // ).forEach((n) => {
+        //   if (
+        //     prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !==
+        //     true
+        //   ) {
+        //     return;
+        //   }
+
+        //   // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
+        //   prevGameState.worldGen.lockMap.precompute(n);
+
+        //   if (prev.get(n)?.visible !== true) {
+        //     result = result || prev.clone();
+        //     result.put(n, NodeVisibleStatus.true);
+        //   }
+        // });
 
         return result || prev;
       }
