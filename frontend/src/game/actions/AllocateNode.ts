@@ -64,7 +64,20 @@ export class AllocateNodeAction {
    * @param input
    */
   enqueueAction(input: AllocateNodeInput) {
-    const { nodeLocation, newStatus } = input;
+    const { nodeLocation } = input;
+
+    let newStatus: NodeTakenStatus;
+    if (CURRENT_ERA.type === 'A') {
+      throw new Error('NOT YET SUPPORTED');
+      // newStatus = {
+      //   saved: true,
+      //   explored: true,
+      // };
+    } else {
+      newStatus = {
+        taken: true,
+      };
+    }
 
     this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prevMap) => {
       // console.log('prev was', prevMap.get(nodeLocation), 'now', newStatus);
@@ -214,9 +227,13 @@ export class AllocateNodeAction {
     input: AllocateNodeInput,
     gameState: AllocateNodeCheckState
   ): AllocateNodeResult {
-    if (!input.newStatus.taken) {
-      console.log('unsupported action: ', input);
-      return false;
+    if (CURRENT_ERA.type === 'B') {
+      if (!input.newStatus.taken) {
+        console.log('unsupported action: ', input);
+        return false;
+      }
+    } else if (CURRENT_ERA.type === 'A') {
+      // TODO(bowei): saved & explored?
     }
 
     if (
@@ -232,12 +249,15 @@ export class AllocateNodeAction {
       return false;
     }
 
-    if (
-      gameState.computed.reachableStatusMap?.get(input.nodeLocation)
-        ?.reachable !== true
-    ) {
-      console.log("can't do that, is not reachable", input);
-      return false;
+    // only check for reachability in era *B
+    if (CURRENT_ERA.type === 'B') {
+      if (
+        gameState.computed.reachableStatusMap?.get(input.nodeLocation)
+          ?.reachable !== true
+      ) {
+        console.log("can't do that, is not reachable", input);
+        return false;
+      }
     }
 
     if (gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) {
@@ -270,3 +290,8 @@ export class AllocateNodeAction {
 // TODO(bowei): unhardcode once we implement >2 eras
 export const ERA_1_SP_LIMIT = 20;
 export const ERA_1_ACCESSIBLE_RADIUS = 10;
+
+export const CURRENT_ERA: { era: number; type: 'A' | 'B' } = {
+  era: 0,
+  type: 'A',
+};
