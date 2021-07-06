@@ -183,13 +183,13 @@ export class AllocateNodeAction {
       return false;
     }
 
-    // if (
-    //   gameState.computed.reachableStatusMap?.get(input.nodeLocation)
-    //     ?.reachable !== true
-    // ) {
-    //   console.log("can't do that, is not reachable", input);
-    //   return false;
-    // }
+    if (
+      gameState.computed.reachableStatusMap?.get(input.nodeLocation)
+        ?.reachable !== true
+    ) {
+      console.log("can't do that, is not reachable", input);
+      return false;
+    }
 
     return true;
   }
