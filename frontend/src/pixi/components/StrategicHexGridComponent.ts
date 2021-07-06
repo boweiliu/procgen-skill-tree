@@ -365,7 +365,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
       } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
-        // TODO(bowei): what to show here??
+        // TODO(bowei): what to show here if bookmarked in B era?
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
