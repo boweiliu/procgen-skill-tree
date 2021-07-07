@@ -269,5 +269,5 @@ export const ERA_1_ACCESSIBLE_RADIUS = 10;
 
 export const CURRENT_ERA: { era: number; type: 'A' | 'B' } = {
   era: 0,
-  type: 'B',
+  type: 'A',
 };

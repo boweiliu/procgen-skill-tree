@@ -136,11 +136,12 @@ function CellComponent({
           status === NodeAllocatedStatus.TAKEN_OR_MARKED
             ? 'node-allocated'
             : 'node-unallocated',
-          status === NodeAllocatedStatus.TAKEN_OR_MARKED ||
-            status === NodeAllocatedStatus.UNREACHABLE
-            ? 'border-unimportant'
-            : 'border-important',
-          status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : '',
+          status === NodeAllocatedStatus.AVAILABLE && CURRENT_ERA.type === 'B'
+            ? 'border-important'
+            : 'border-unimportant',
+          status === NodeAllocatedStatus.AVAILABLE && CURRENT_ERA.type === 'B'
+            ? 'node-available'
+            : '',
           CURRENT_ERA.type === 'B' &&
             nodeData.statuses.bookmarkedStatus.bookmarked
             ? 'marked-square'

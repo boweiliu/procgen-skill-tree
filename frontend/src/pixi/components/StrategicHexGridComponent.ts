@@ -369,18 +369,15 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         //   graphics.visible = true;
         //   baseTint = COLORS.nodePink;
         //   // graphics.tint = COLORS.borderBlack;
-      } else if (nodeReachableStatus.reachable) {
+      } else if (
+        nodeReachableStatus.reachable &&
+        !isLocked &&
+        CURRENT_ERA.type === 'B'
+      ) {
         // only recolor if it is not locked
-        if (isLocked) {
-          graphics.visible = true;
-          baseTint = COLORS.nodeLavender;
-          // graphics.tint = COLORS.nodeLavender;
-        } else {
-          // use the ordinary visible-but-unreachable coloring
-          graphics.visible = true;
-          baseTint = COLORS.nodePink;
-          // graphics.tint = COLORS.nodePink;
-        }
+        graphics.visible = true;
+        baseTint = COLORS.nodeLavender;
+        // graphics.tint = COLORS.nodeLavender;
       } else if (nodeVisibleStatus.visible) {
         graphics.visible = true;
         baseTint = COLORS.nodePink;
