@@ -75,7 +75,13 @@ const serializeToObject = (s: PlayerSaveState): object => {
 const serialize = (s: PlayerSaveState) => JSON.stringify(serializeToObject(s));
 
 const deserializeFromObject = (obj: any): PlayerSaveState | null => {
-  if (!obj || !obj.hasOwnProperty('allocationStatusMap')) {
+  if (
+    !obj ||
+    !obj.hasOwnProperty('allocationStatusMap') ||
+    !obj.hasOwnProperty('bookmarkedStatusMap') ||
+    !obj.hasOwnProperty('exploredStatusMap') ||
+    !obj.hasOwnProperty('currentEra')
+  ) {
     console.error('Failed deserializing PlayerSaveState: ', obj);
     return null;
   }
