@@ -265,7 +265,6 @@ function Component(props: {
           newStatus: { taken: true },
           action: 'deallocate',
         });
-        throw new NotImplementedError();
       }
     }
   }, [
