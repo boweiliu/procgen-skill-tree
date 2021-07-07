@@ -246,6 +246,10 @@ export class Vector3 {
     );
   }
 
+  notEquals(other: IVector3 | undefined | null): boolean {
+    return !this.equals(other);
+  }
+
   multiply(other: IVector3 | number): Vector3 {
     if (typeof other === 'number') {
       return new Vector3({

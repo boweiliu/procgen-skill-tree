@@ -167,7 +167,7 @@ export class DeallocateNodeAction {
           .filter((n) => {
             return (
               gameState.playerSave.allocationStatusMap.get(n)?.taken === true &&
-              n.equals(nodeLocation)
+              n.notEquals(nodeLocation)
             );
           })
           .forEach((it) => processing.push(it));
