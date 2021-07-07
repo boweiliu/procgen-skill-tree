@@ -125,25 +125,25 @@ export class AllocateNodeAction {
         }
         return prev;
       });
-    }
 
-    this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
-      (prev, prevGameState) => {
-        if (!prev) {
-          return prev;
+      this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
+        (prev, prevGameState) => {
+          if (!prev) {
+            return prev;
+          }
+
+          // optimization: don't clone [prev] immediately, only clone if any changes need to be made
+          return (
+            flowFogOfWarFromNode({
+              result: null,
+              prev,
+              prevGameState,
+              nodeLocation,
+            }) || prev
+          );
         }
-
-        // optimization: don't clone [prev] immediately, only clone if any changes need to be made
-        return (
-          flowFogOfWarFromNode({
-            result: null,
-            prev,
-            prevGameState,
-            nodeLocation,
-          }) || prev
-        );
-      }
-    );
+      );
+    }
   }
 
   /**

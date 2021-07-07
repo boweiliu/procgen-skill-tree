@@ -8,7 +8,6 @@ import {
 import { DeallocateNodeAction } from '../../game/actions/DeallocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { NotImplementedError } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
   GameAreaGrid,

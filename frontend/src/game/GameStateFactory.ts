@@ -94,18 +94,20 @@ export function loadComputed(gameState: GameState): GameState {
     gameState
   );
 
+  // accessible and visible computation makes use of lock information
   gameState.computed.accessibleStatusMap = markAccessibleNodes(
     gameState.computed.accessibleStatusMap,
     gameState
   );
 
-  gameState.computed.reachableStatusMap = markReachableNodes(
-    gameState.computed.reachableStatusMap,
+  gameState.computed.fogOfWarStatusMap = markVisibleNodes(
+    gameState.computed.fogOfWarStatusMap,
     gameState
   );
 
-  gameState.computed.fogOfWarStatusMap = markVisibleNodes(
-    gameState.computed.fogOfWarStatusMap,
+  // reachable depends on visible
+  gameState.computed.reachableStatusMap = markReachableNodes(
+    gameState.computed.reachableStatusMap,
     gameState
   );
 
@@ -232,7 +234,8 @@ export function flowReachableFromNode(args: {
 
   getWithinDistance(nodeLocation, 1).forEach((n) => {
     if (
-      prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+      // prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+      prevGameState.computed.fogOfWarStatusMap?.get(n)?.visible !== true
     ) {
       return;
     }
