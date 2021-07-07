@@ -10,15 +10,19 @@ import {
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
 import { NodeTakenStatus } from '../../data/NodeStatus';
-import { GameAreaSubState } from './GameAreaInterface';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
+import { GameState } from '../../data/GameState';
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractGameGridSubState(gameState: GameAreaSubState) {
+export function extractGameGridSubState(g: GameGridSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: GameState) {
   return {
     playerUI: {
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
@@ -38,7 +42,7 @@ export function extractGameGridSubState(gameState: GameAreaSubState) {
     },
   };
 }
-export type GameGridSubState = ReturnType<typeof extractGameGridSubState>;
+export type GameGridSubState = ReturnType<typeof _extract>;
 export const depsGameGridSubState = extractDeps(extractGameGridSubState);
 
 export const GameAreaGrid = React.memo(Component);

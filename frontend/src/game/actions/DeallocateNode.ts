@@ -1,7 +1,7 @@
 import { GameState } from '../../data/GameState';
 import { HashSet } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { EnumInvalidError, NotImplementedError } from '../../lib/util/misc';
+import { EnumInvalidError } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { getCoordNeighbors } from '../lib/HexGrid';
 import { AllocateNodeCheckState, CURRENT_ERA } from './AllocateNode';

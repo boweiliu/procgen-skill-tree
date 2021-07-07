@@ -10,7 +10,6 @@ import {
   AttributeSymbolMap,
 } from '../../../game/worldGen/nodeContents/NodeContentsRendering';
 import {
-  Const,
   enumAssociateBy,
   enumMapValues,
   extractDeps,
@@ -33,7 +32,11 @@ export function StatsTab(props: {
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractStatsSubState(gameState: Const<GameState>) {
+export function extractStatsSubState(g: StatsSubState) {
+  return _extract(g as GameState);
+}
+
+export function _extract(gameState: GameState) {
   return {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -44,7 +47,7 @@ export function extractStatsSubState(gameState: Const<GameState>) {
     },
   };
 }
-export type StatsSubState = ReturnType<typeof extractStatsSubState>;
+export type StatsSubState = ReturnType<typeof _extract>;
 export const depsStatsSubState = extractDeps(extractStatsSubState);
 
 const StatsTabHelper = React.memo(StatsTabComponent);

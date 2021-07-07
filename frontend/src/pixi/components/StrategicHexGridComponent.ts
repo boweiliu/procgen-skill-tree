@@ -43,7 +43,11 @@ type Props = {
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
+export function extractStrategicHexGridSubState(g: StrategicHexGridSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: Const<GameState>) {
   return {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -74,9 +78,7 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     },
   };
 }
-export type StrategicHexGridSubState = ReturnType<
-  typeof extractStrategicHexGridSubState
->;
+export type StrategicHexGridSubState = ReturnType<typeof _extract>;
 export const depsStrategicHexGridSubState = extractDeps(
   extractStrategicHexGridSubState
 );

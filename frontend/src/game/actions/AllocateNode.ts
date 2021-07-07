@@ -14,7 +14,7 @@ export interface AllocateNodeInput {
   newStatus: NodeTakenStatus;
 }
 
-function _extractAllocateNodeCheckState(gameState: GameState) {
+function _extract(gameState: GameState) {
   return {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -31,15 +31,11 @@ function _extractAllocateNodeCheckState(gameState: GameState) {
   };
 }
 
-export function extractAllocateNodeCheckState<T extends AllocateNodeCheckState>(
-  g: T
-) {
-  return _extractAllocateNodeCheckState(g as unknown as GameState);
+export function extractAllocateNodeCheckState(g: AllocateNodeCheckState) {
+  return _extract(g as GameState);
 }
 
-export type AllocateNodeCheckState = ReturnType<
-  typeof _extractAllocateNodeCheckState
->;
+export type AllocateNodeCheckState = ReturnType<typeof _extract>;
 export const depsAllocateNodeCheckState = extractDeps(
   extractAllocateNodeCheckState
 );

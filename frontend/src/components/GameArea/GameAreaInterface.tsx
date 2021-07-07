@@ -22,7 +22,11 @@ export const virtualAreaScaleMultiplier = 2.0;
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractGameAreaSubState(gameState: GameState) {
+export function extractGameAreaSubState(g: GameAreaSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: GameState) {
   return {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -55,7 +59,8 @@ export function extractGameAreaSubState(gameState: GameState) {
     },
   };
 }
-export type GameAreaSubState = ReturnType<typeof extractGameAreaSubState>;
+
+export type GameAreaSubState = ReturnType<typeof _extract>;
 export const depsGameAreaSubState = extractDeps(extractGameAreaSubState);
 
 export function uiScaleFromAppSize(appSize: Vector2): UiScale {
