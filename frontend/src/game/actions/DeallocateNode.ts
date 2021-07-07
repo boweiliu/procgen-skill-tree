@@ -50,6 +50,46 @@ export class DeallocateNodeAction {
         }
         return prev;
       });
+
+      // also need to un-flow reachable
+      this.updaters.computed.reachableStatusMap.enqueueUpdate(
+        (prev, prevGameState) => {
+          if (!prev) return prev;
+          // first look at all previously reachable neighbors which are not allocated
+          let result: typeof prev | null = null;
+          const reachableNeighbors = Object.values(
+            getCoordNeighbors(nodeLocation)
+          ).filter((it) => {
+            return (
+              prevGameState.computed.reachableStatusMap?.get(it)?.reachable ===
+                true &&
+              prevGameState.playerSave.allocationStatusMap?.get(it)?.taken !==
+                true
+            );
+          });
+          reachableNeighbors.forEach((n) => {
+            // find out if they have any neighbors which are still allocated
+            const nsAllocatedNeighbors = Object.values(
+              getCoordNeighbors(n)
+            ).filter((it) => {
+              return (
+                prevGameState.playerSave.allocationStatusMap.get(it)?.taken ===
+                true
+              );
+            });
+
+            // if no allocated neighbors, try to remove it
+            if (nsAllocatedNeighbors.length === 0) {
+              if (prev.get(n)) {
+                result = result || prev.clone();
+                result.remove(n);
+              }
+            }
+          });
+
+          return result || prev;
+        }
+      );
     } else {
       throw new EnumInvalidError();
     }
