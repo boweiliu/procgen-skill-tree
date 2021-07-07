@@ -27,7 +27,6 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
 import { Lazy } from '../../lib/util/lazy';
-import { CURRENT_ERA } from '../../game/actions/AllocateNode';
 
 type Props = {
   delta: number;
@@ -317,6 +316,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
   protected renderSelf(props: Props) {
     const { gameState } = props;
+    const {
+      playerSave: { currentEra },
+    } = gameState;
+
     this.container.position = PixiPointFrom(props.args.position);
     // this.graphics.position = PixiPointFrom(props.appSize.divide(2));
 
@@ -363,11 +366,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
-      } else if (CURRENT_ERA.type === 'A' && nodeBookmarkedStatus.bookmarked) {
+      } else if (currentEra.type === 'A' && nodeBookmarkedStatus.bookmarked) {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
-        // } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+        // } else if (currentEra.type === 'B' && nodeBookmarkedStatus.bookmarked) {
         //   // TODO(bowei): what to show here if bookmarked in B era?
         //   graphics.visible = true;
         //   baseTint = COLORS.nodePink;
@@ -375,7 +378,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       } else if (
         nodeReachableStatus.reachable &&
         !isLocked &&
-        CURRENT_ERA.type === 'B'
+        currentEra.type === 'B'
       ) {
         // only recolor if it is not locked
         graphics.visible = true;
@@ -431,7 +434,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.x -= textures.rect.width / 2;
         graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
-      } else if (CURRENT_ERA.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+      } else if (currentEra.type === 'B' && nodeBookmarkedStatus.bookmarked) {
         graphics.texture = textures.square;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.square.width / 2;

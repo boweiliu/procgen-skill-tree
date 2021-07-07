@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { GameState } from '../../../data/GameState';
-import { CURRENT_ERA } from '../../../game/actions/AllocateNode';
 import {
   Attribute,
   Modifier,
@@ -41,6 +40,7 @@ export function _extract(gameState: GameState) {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -132,7 +132,7 @@ export function computeAttributeModifierStats(args: {
         })
         .map((it) => it[0]);
 
-      if (CURRENT_ERA.type === 'A') {
+      if (gameState.playerSave.currentEra.type === 'A') {
         nodes = nodes.concat(
           gameState.playerSave.bookmarkedStatusMap
             .entries()

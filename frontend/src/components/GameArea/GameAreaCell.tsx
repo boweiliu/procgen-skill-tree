@@ -6,10 +6,7 @@ import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
 import { NodeAllocatedStatus, NodeTakenStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import {
-  AllocateNodeResult,
-  CURRENT_ERA,
-} from '../../game/actions/AllocateNode';
+import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { EraType } from '../../data/PlayerSaveState';
 
 /**
@@ -104,6 +101,7 @@ function GameAreaCellComponent({
 const Cell = React.memo(CellComponent);
 function CellComponent({
   id,
+  currentEra,
   onClickCenter,
   onClickQuestionMark,
   nodeData,
@@ -143,13 +141,13 @@ function CellComponent({
           status === NodeAllocatedStatus.TAKEN_OR_MARKED
             ? 'node-allocated'
             : 'node-unallocated',
-          status === NodeAllocatedStatus.AVAILABLE && CURRENT_ERA.type === 'B'
+          status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
             ? 'border-important'
             : 'border-unimportant',
-          status === NodeAllocatedStatus.AVAILABLE && CURRENT_ERA.type === 'B'
+          status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
             ? 'node-available'
             : '',
-          CURRENT_ERA.type === 'B' &&
+          currentEra.type === 'B' &&
             nodeData.statuses.bookmarkedStatus.bookmarked
             ? 'marked-square'
             : ''
