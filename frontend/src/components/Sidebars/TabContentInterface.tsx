@@ -9,6 +9,7 @@ import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { StatsTab } from './Tabs/StatsTab';
 import { HelpTab } from './Tabs/HelpTab';
 import { QuestsTab } from './Tabs/QuestsTab';
+import { DeallocateNodeAction } from '../../game/actions/DeallocateNode';
 
 export enum TAB_NAME {
   EMPTY = 'EMPTY',
@@ -25,7 +26,10 @@ export function TabContentInterface(props: {
   tabName: TAB_NAME;
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
+  actions: {
+    allocateNode: AllocateNodeAction;
+    deallocateNode: DeallocateNodeAction;
+  };
 }) {
   const { tabName } = props;
 

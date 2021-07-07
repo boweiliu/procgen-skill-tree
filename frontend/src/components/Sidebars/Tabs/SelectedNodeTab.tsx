@@ -1,10 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GameState } from '../../../data/GameState';
 import { LockStatus, NodeTakenStatus } from '../../../data/NodeStatus';
 import {
   AllocateNodeAction,
   depsAllocateNodeCheckState,
+  extractAllocateNodeCheckState,
 } from '../../../game/actions/AllocateNode';
+import { DeallocateNodeAction } from '../../../game/actions/DeallocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
@@ -21,10 +23,19 @@ export const SelectedNodeTabContent = React.memo(
 function SelectedNodeTabContentComponent(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
+  actions: {
+    allocateNode: AllocateNodeAction;
+    deallocateNode: DeallocateNodeAction;
+  };
 }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
+
+  const allocateNodeCheckState = useMemo(() => {
+    return extractAllocateNodeCheckState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsAllocateNodeCheckState(gameState));
 
   const onAllocate = useCallback(
     (e: React.MouseEvent) => {
@@ -35,20 +46,43 @@ function SelectedNodeTabContentComponent(props: {
             nodeLocation: location,
             newStatus: NodeTakenStatus.true,
           },
-          gameState
+          allocateNodeCheckState
         );
       }
     },
-    // TODO(bowei): use custom hook here so react doesnt complain so much
-    // eslint-disable-next-line
-    [
-      props.actions.allocateNode,
-      location,
-      // TODO(bowei): use custom hook here so react doesnt complain so much
-      // eslint-disable-next-line
-      ...depsAllocateNodeCheckState(gameState),
-    ]
+    [props.actions.allocateNode, location, allocateNodeCheckState]
   );
+
+  const canBeAllocated = useMemo(() => {
+    if (location) {
+      return AllocateNodeAction.checkAction(
+        { nodeLocation: location, newStatus: { taken: true } },
+        allocateNodeCheckState
+      );
+    }
+  }, [location, allocateNodeCheckState]);
+
+  const onDeallocate = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.deallocateNode.run(
+          { nodeLocation: location },
+          allocateNodeCheckState
+        );
+      }
+    },
+    [props.actions.deallocateNode, location, allocateNodeCheckState]
+  );
+
+  const canBeDeallocated = useMemo(() => {
+    if (location) {
+      return DeallocateNodeAction.checkAction(
+        { nodeLocation: location },
+        allocateNodeCheckState
+      );
+    }
+  }, [location, allocateNodeCheckState]);
 
   const onZoom = useCallback(
     (e: React.MouseEvent) => {
@@ -109,12 +143,6 @@ function SelectedNodeTabContentComponent(props: {
   const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
   const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
 
-  // const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
-  const canBeAllocated = AllocateNodeAction.checkAction(
-    { nodeLocation: location, newStatus: { taken: true } },
-    gameState
-  );
-
   let description = '';
   if (location.equals(Vector3.Zero)) {
     description = STARTING_NODE_DESCRIPTION;
@@ -154,12 +182,15 @@ function SelectedNodeTabContentComponent(props: {
         {visibleStatus ? (
           <>
             <div>Locked?: {isLocked.toString()}</div>
-            <div>Can be allocated?: {canBeAllocated.toString()}</div>
+            <div>Can be allocated?: {(!!canBeAllocated).toString()}</div>
             <br></br>
             <div>Contents: {nodeContentsDom}</div>
             <br></br>
             <button disabled={!canBeAllocated} onClick={onAllocate}>
               Allocate (hotkey: spacebar)
+            </button>
+            <button disabled={!canBeDeallocated} onClick={onDeallocate}>
+              Deallocate (hotkey: backspace)
             </button>
           </>
         ) : (
