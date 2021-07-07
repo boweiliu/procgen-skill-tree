@@ -5,8 +5,10 @@ import {
   AllocateNodeAction,
   depsAllocateNodeCheckState,
 } from '../../game/actions/AllocateNode';
+import { DeallocateNodeAction } from '../../game/actions/DeallocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { NotImplementedError } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
   GameAreaGrid,
@@ -32,7 +34,10 @@ function Component(props: {
   hexGridPx: Vector2;
   appSize: Vector2;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
+  actions: {
+    allocateNode: AllocateNodeAction;
+    deallocateNode: DeallocateNodeAction;
+  };
 }) {
   const { gameState, hexGridPx, appSize, virtualGridDims } = props;
   // console.log('GameArea state manager rerender');
@@ -61,8 +66,16 @@ function Component(props: {
 
   // If a node is attempted to be clicked, take its virtual dims and see if that's a valid allocation action
   const handleUpdateNodeStatusByLocation = useCallback(
-    (args: { nodeLocation: Vector3; newStatus: NodeTakenStatus }) => {
-      return props.actions.allocateNode.run(args, gameState);
+    (args: {
+      nodeLocation: Vector3;
+      newStatus: NodeTakenStatus;
+      action: 'allocate' | 'deallocate';
+    }) => {
+      if (args.action === 'allocate') {
+        return props.actions.allocateNode.run(args, gameState);
+      } else {
+        return props.actions.deallocateNode.run(args, gameState);
+      }
     },
     // TODO(bowei): use custom hook here so react doesnt complain so much
     // eslint-disable-next-line
@@ -75,12 +88,16 @@ function Component(props: {
   );
 
   const handleUpdateNodeStatus = useCallback(
-    (args: { virtualCoords: Vector2; newStatus: NodeTakenStatus }) => {
-      const { virtualCoords, newStatus } = args;
+    (args: {
+      virtualCoords: Vector2;
+      newStatus: NodeTakenStatus;
+      action: 'allocate' | 'deallocate';
+    }) => {
+      const { virtualCoords } = args;
 
       // console.log({ got: 'here handleUpdateNodeStatus', virtualCoords, newStatus });
       const nodeLocation: Vector3 = virtualCoordsToLocation(virtualCoords);
-      handleUpdateNodeStatusByLocation({ nodeLocation, newStatus });
+      handleUpdateNodeStatusByLocation({ nodeLocation, ...args });
     },
     [virtualCoordsToLocation, handleUpdateNodeStatusByLocation]
   );
@@ -237,7 +254,18 @@ function Component(props: {
         handleUpdateNodeStatus({
           virtualCoords: cursoredVirtualNodeCoords,
           newStatus: { taken: true },
+          action: 'allocate',
         });
+      }
+    }
+    if (props.gameState.intent.newIntent.DEALLOCATE_NODE) {
+      if (cursoredVirtualNodeCoords) {
+        handleUpdateNodeStatus({
+          virtualCoords: cursoredVirtualNodeCoords,
+          newStatus: { taken: true },
+          action: 'deallocate',
+        });
+        throw new NotImplementedError();
       }
     }
   }, [
@@ -252,6 +280,7 @@ function Component(props: {
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHEAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_SOUTHWEST,
     props.gameState.intent.newIntent.MOVE_CURSOR_WEST,
+    props.gameState.intent.newIntent.DEALLOCATE_NODE,
     props.updaters,
     virtualCoordsToLocation,
     virtualGridDims,

@@ -35,6 +35,7 @@ function GameAreaCellComponent({
   onUpdateStatus: (args: {
     nodeLocation: Vector3;
     newStatus: NodeTakenStatus;
+    action: 'allocate' | 'deallocate';
   }) => AllocateNodeResult;
   nodeData: NodeReactData;
   isCursored: boolean;
@@ -56,6 +57,7 @@ function GameAreaCellComponent({
       const updateStatusResult = onUpdateStatus({
         nodeLocation,
         newStatus: { taken: true },
+        action: 'allocate',
       });
       if (!updateStatusResult) {
         onUpdateCursored(isCursored ? null : nodeLocation);

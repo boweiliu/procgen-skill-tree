@@ -74,6 +74,7 @@ const defaultKeyIntentConfig = {
   RightControl: IntentName.MOVE_CURSOR_SOUTHEAST,
 
   ' ': IntentName.INTERACT_WITH_NODE,
+  Backspace: IntentName.DEALLOCATE_NODE,
   // z: IntentName.ZOOM_RECENTER_AT_NODE,
   r: IntentName.ZOOM_RECENTER_AT_NODE,
   '\\': IntentName.ZOOM_RECENTER_AT_NODE,

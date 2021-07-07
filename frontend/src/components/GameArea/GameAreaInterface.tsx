@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { GameState } from '../../data/GameState';
 import { appSizeFromWindowSize } from '../../data/WindowState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
+import { DeallocateNodeAction } from '../../game/actions/DeallocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { EnumInvalidError, extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
@@ -180,7 +181,10 @@ export function GameAreaInterface(props: {
 
   // TODO(bowei): improve this abstraction??
   const actions = useMemo(() => {
-    return { allocateNode: new AllocateNodeAction(props.updaters) };
+    return {
+      allocateNode: new AllocateNodeAction(props.updaters),
+      deallocateNode: new DeallocateNodeAction(props.updaters),
+    };
   }, [props.updaters]);
 
   return (

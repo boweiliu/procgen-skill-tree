@@ -61,6 +61,7 @@ function Component(props: {
   updateNodeStatusByLocationCb: (args: {
     nodeLocation: Vector3;
     newStatus: NodeTakenStatus;
+    action: 'allocate' | 'deallocate';
   }) => AllocateNodeResult;
   cursoredVirtualNode: Vector2 | null;
   setCursoredLocation: (v: Vector3 | null) => void;
