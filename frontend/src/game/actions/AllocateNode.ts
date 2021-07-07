@@ -19,6 +19,7 @@ function _extract(gameState: GameState) {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     computed: {
       reachableStatusMap: gameState.computed.reachableStatusMap,

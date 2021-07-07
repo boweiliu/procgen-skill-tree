@@ -10,6 +10,7 @@ import {
   AllocateNodeResult,
   CURRENT_ERA,
 } from '../../game/actions/AllocateNode';
+import { EraType } from '../../data/PlayerSaveState';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
@@ -25,6 +26,7 @@ import {
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
   id,
+  currentEra,
   onUpdateStatus,
   nodeData,
   isCursored,
@@ -32,6 +34,7 @@ function GameAreaCellComponent({
   debugIsCursored,
 }: {
   id: string;
+  currentEra: EraType;
   onUpdateStatus: (args: {
     nodeLocation: Vector3;
     newStatus: NodeTakenStatus;
@@ -79,6 +82,7 @@ function GameAreaCellComponent({
   return (
     <Cell
       key={id}
+      currentEra={currentEra}
       id={id}
       onClickCenter={handleClick}
       nodeData={nodeData}
@@ -107,6 +111,7 @@ function CellComponent({
   debugIsCursored,
 }: {
   id: string;
+  currentEra: EraType;
   onClickCenter: React.MouseEventHandler;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;

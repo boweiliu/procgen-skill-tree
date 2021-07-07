@@ -17,7 +17,18 @@ export type PlayerSaveState = {
    * Similar but for era A
    */
   bookmarkedStatusMap: KeyedHashMap<Vector3, NodeBookmarkedStatus>;
+
+  /**
+   * WIP
+   */
   exploredStatusMap: KeyedHashMap<Vector3, NodeExploredStatus>;
+
+  currentEra: EraType;
+};
+
+export type EraType = {
+  type: 'A' | 'B';
+  index: number;
 };
 
 // NOT DEPRECATED
@@ -36,6 +47,10 @@ export const newPlayerSaveState = (): PlayerSaveState => {
       [Vector3.Zero, { bookmarked: true }],
     ]),
     exploredStatusMap: new KeyedHashMap([[Vector3.Zero, { explored: true }]]),
+    currentEra: {
+      type: 'A',
+      index: 0,
+    },
   };
 };
 

@@ -30,6 +30,7 @@ function _extract(gameState: GameState) {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -137,6 +138,7 @@ function Component(props: {
                       // key={nodeData.id}
                       key={key}
                       id={key}
+                      currentEra={gameState.playerSave.currentEra}
                       // key={x.toString() + "," + y.toString()} // stupid debug??
                       // key={x} // debug??
                       nodeData={nodeData}

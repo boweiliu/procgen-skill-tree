@@ -58,6 +58,7 @@ function _extract(gameState: Const<GameState>) {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     intent: {
       newIntent: {
