@@ -34,7 +34,7 @@ function _extractAllocateNodeCheckState(gameState: GameState) {
 export function extractAllocateNodeCheckState<T extends AllocateNodeCheckState>(
   g: T
 ) {
-  return _extractAllocateNodeCheckState(g as any as GameState);
+  return _extractAllocateNodeCheckState(g as unknown as GameState);
 }
 
 export type AllocateNodeCheckState = ReturnType<
@@ -67,19 +67,6 @@ export class AllocateNodeAction {
    */
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation } = input;
-
-    // let newStatus: NodeTakenStatus;
-    // if (CURRENT_ERA.type === 'A') {
-    //   throw new Error('NOT YET SUPPORTED');
-    //   // newStatus = {
-    //   //   saved: true,
-    //   //   explored: true,
-    //   // };
-    // } else {
-    //   newStatus = {
-    //     taken: true,
-    //   };
-    // }
 
     if (CURRENT_ERA.type === 'B') {
       // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
@@ -269,5 +256,5 @@ export const ERA_1_ACCESSIBLE_RADIUS = 10;
 
 export const CURRENT_ERA: { era: number; type: 'A' | 'B' } = {
   era: 0,
-  type: 'A',
+  type: 'B',
 };

@@ -3,7 +3,7 @@ import { GameState } from '../../data/GameState';
 import { appSizeFromWindowSize } from '../../data/WindowState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { extractDeps } from '../../lib/util/misc';
+import { EnumInvalidError, extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
 import { UiScale } from '../../pixi/textures/SimpleTextures';
@@ -116,7 +116,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 
@@ -133,7 +133,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return 20;
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 
@@ -150,7 +150,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return 1;
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 

@@ -58,7 +58,7 @@ export type IReadonlySet<K> = {
 };
 
 /**
- *
+ * BFS.
  * @param base
  * @param maxDistance
  * @param minDistance
