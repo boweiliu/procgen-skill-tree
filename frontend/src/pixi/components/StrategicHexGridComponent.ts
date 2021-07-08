@@ -70,6 +70,7 @@ function _extract(gameState: Const<GameState>) {
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
     },
     worldGen: {
@@ -357,6 +358,9 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       const nodeReachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
+      const nodeAccessibleStatus = gameState.computed.accessibleStatusMap?.get(
+        nodeLocation
+      ) || { accessible: false };
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
       const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
@@ -380,17 +384,28 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         !isLocked &&
         currentEra.type === 'B'
       ) {
-        // only recolor if it is not locked
+        // only recolor if it is not locked and era is in allocation era
         graphics.visible = true;
         baseTint = COLORS.nodeLavender;
         // graphics.tint = COLORS.nodeLavender;
       } else if (nodeVisibleStatus.visible) {
+        // default - visible but nothing else special
         graphics.visible = true;
+        visible = true;
+        baseTint = COLORS.nodePink;
+        // graphics.tint = COLORS.nodePink;
+      } else if (
+        !nodeVisibleStatus.visible &&
+        nodeAccessibleStatus.accessible
+      ) {
+        // default - visible but nothing else special
+        graphics.visible = true;
+        visible = false;
         baseTint = COLORS.nodePink;
         // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
-        graphics.visible = true;
+        graphics.visible = false;
         visible = false;
         baseTint = COLORS.nodePink;
       }
