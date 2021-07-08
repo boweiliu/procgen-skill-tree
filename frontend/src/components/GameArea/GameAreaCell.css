@@ -13,6 +13,11 @@
   z-index: 5;
 }
 
+.hex-center-small {
+  width: calc(1 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+}
+
 .marked-square {
   border-radius: 0%;
 }

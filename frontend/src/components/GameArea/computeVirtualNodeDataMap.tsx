@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   LockStatus,
+  NodeAccessibleStatus,
   NodeAllocatedStatus,
   NodeBookmarkedStatus,
 } from '../../data/NodeStatus';
@@ -28,6 +29,7 @@ export type NodeReactData = {
   status: NodeAllocatedStatus;
   statuses: {
     bookmarkedStatus: NodeBookmarkedStatus;
+    accessibleStatus: NodeAccessibleStatus;
   };
   nodeLocation: Vector3;
   id: string;
@@ -49,6 +51,7 @@ export function computeNodeReactData(args: {
   const {
     fogOfWarStatusMap,
     reachableStatusMap,
+    accessibleStatusMap,
     // lockStatusMap,
   } = args.gameState.computed;
   const { allocationStatusMap, bookmarkedStatusMap, currentEra } =
@@ -61,6 +64,11 @@ export function computeNodeReactData(args: {
   const bookmarkedStatus = bookmarkedStatusMap.get(location) || {
     bookmarked: false,
   };
+
+  const accessibleStatus = accessibleStatusMap?.get(location) || {
+    accessible: false,
+  };
+
   const nodeStatus = takenStatus?.taken
     ? NodeAllocatedStatus.TAKEN_OR_MARKED
     : currentEra.type === 'A' && bookmarkedStatus?.bookmarked
@@ -143,6 +151,17 @@ export function computeNodeReactData(args: {
     );
   }
 
+  let toolTipText = <div>{tooltipHeader}</div>;
+  if (nodeContents.lines.length && accessibleStatus.accessible) {
+    toolTipText = (
+      <>
+        <div>{tooltipHeader}</div>
+        <br />
+        {nodeContentsToDom(nodeContents)}
+      </>
+    );
+  }
+
   const nodeData: NodeReactData = {
     nodeLocation: location,
     shortText: shortText2 ? (
@@ -154,13 +173,7 @@ export function computeNodeReactData(args: {
     ) : (
       <>{shortText1}</>
     ),
-    toolTipText: (
-      <>
-        <div>{tooltipHeader}</div>
-        {nodeContents.lines[0] ? <br /> : <></>}
-        {nodeContentsToDom(nodeContents)}
-      </>
-    ),
+    toolTipText,
     nodeContents,
     fullText: <> </>,
     status: nodeStatus,
@@ -171,7 +184,10 @@ export function computeNodeReactData(args: {
         }
       : undefined,
     id,
-    statuses: { bookmarkedStatus },
+    statuses: {
+      bookmarkedStatus,
+      accessibleStatus,
+    },
   };
   return nodeData;
 }

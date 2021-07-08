@@ -40,6 +40,7 @@ function _extract(gameState: GameState) {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
     },
   };
 }

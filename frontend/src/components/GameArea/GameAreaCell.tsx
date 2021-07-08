@@ -121,6 +121,11 @@ function CellComponent({
 
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
+  const completelyHidden =
+    status === NodeAllocatedStatus.HIDDEN &&
+    !nodeData.statuses.accessibleStatus.accessible;
+  const accessibleButHidden =
+    nodeData.statuses.accessibleStatus.accessible && status === 'HIDDEN';
 
   const [hovered, setHovered] = useState(false);
 
@@ -150,7 +155,8 @@ function CellComponent({
           currentEra.type === 'B' &&
             nodeData.statuses.bookmarkedStatus.bookmarked
             ? 'marked-square'
-            : ''
+            : '',
+          accessibleButHidden ? 'hex-center-small' : ''
         )}
         onClick={onClickCenter}
         onDoubleClick={() => {
@@ -158,10 +164,12 @@ function CellComponent({
         }}
         onPointerEnter={onHover}
         onPointerLeave={onUnhover}
-        hidden={status === NodeAllocatedStatus.HIDDEN}
+        hidden={completelyHidden}
       >
         <div className="hex-center-text-wrapper">
-          <div className="tiny-text">{nodeData.shortText}</div>
+          <div className="tiny-text" hidden={accessibleButHidden}>
+            {nodeData.shortText}
+          </div>
         </div>
       </div>
       {isLocked ? (
@@ -198,7 +206,7 @@ function CellComponent({
         <div className="hover-only-2 absolute-positioned">
           <div
             className="question"
-            hidden={status === NodeAllocatedStatus.HIDDEN}
+            hidden={completelyHidden}
             onClick={onClickQuestionMark}
           >
             ?
