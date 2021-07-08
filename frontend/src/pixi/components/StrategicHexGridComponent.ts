@@ -340,7 +340,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           )
         );
       // graphics.position = PixiPointFrom(basePosition);
-      let baseTint: number = 0x000000;
+      let baseTint: number;
 
       const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
