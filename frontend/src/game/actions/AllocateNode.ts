@@ -65,27 +65,37 @@ export class AllocateNodeAction {
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation } = input;
 
-    if (CURRENT_ERA.type === 'B') {
-      // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
-      this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prev) => {
-        if (prev.get(nodeLocation)?.taken !== true) {
-          const result = prev.clone();
-          result.put(nodeLocation, { taken: true });
-          return result;
+    // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+    this.updaters.playerSave.allocationStatusMap.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'B') {
+          if (prev.get(nodeLocation)?.taken !== true) {
+            const result = prev.clone();
+            result.put(nodeLocation, { taken: true });
+            return result;
+          }
+          return prev;
+        } else {
+          return prev;
         }
-        return prev;
-      });
+      }
+    );
 
-      // before updating Fog of war, first unlock any lock whose statuses have changed
-      this.updaters.computed.lockStatusMap?.enqueueUpdate(
-        (prev, prevGameState) => {
+    // before updating Fog of war, first unlock any lock whose statuses have changed
+    this.updaters.computed.lockStatusMap?.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'B') {
           return markLockStatus(prev, prevGameState);
+        } else {
+          return prev;
         }
-      );
+      }
+    );
 
-      // only bother to flow reachable status if we are in era B
-      this.updaters.computed.reachableStatusMap?.enqueueUpdate(
-        (prev, prevGameState) => {
+    // only bother to flow reachable status if we are in era B
+    this.updaters.computed.reachableStatusMap?.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'B') {
           if (!prev) {
             return prev;
           }
@@ -98,33 +108,49 @@ export class AllocateNodeAction {
               nodeLocation,
             }) || prev
           );
-        }
-      );
-    } else if (CURRENT_ERA.type === 'A') {
-      // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
-      this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate((prev) => {
-        const prevBookmarked = !!prev.get(nodeLocation)?.bookmarked;
-        const result = prev.clone();
-        if (prevBookmarked) {
-          result.remove(nodeLocation);
-          return result;
         } else {
-          result.put(nodeLocation, { bookmarked: true });
-          return result;
+          return prev;
         }
-      });
+      }
+    );
 
-      this.updaters.playerSave.exploredStatusMap.enqueueUpdate((prev) => {
-        if (prev.get(nodeLocation)?.explored !== true) {
+    // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+    this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'A') {
+          const prevBookmarked = !!prev.get(nodeLocation)?.bookmarked;
           const result = prev.clone();
-          result.put(nodeLocation, { explored: true });
-          return result;
+          if (prevBookmarked) {
+            result.remove(nodeLocation);
+            return result;
+          } else {
+            result.put(nodeLocation, { bookmarked: true });
+            return result;
+          }
+        } else {
+          return prev;
         }
-        return prev;
-      });
+      }
+    );
 
-      this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
-        (prev, prevGameState) => {
+    this.updaters.playerSave.exploredStatusMap.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'A') {
+          if (prev.get(nodeLocation)?.explored !== true) {
+            const result = prev.clone();
+            result.put(nodeLocation, { explored: true });
+            return result;
+          }
+          return prev;
+        } else {
+          return prev;
+        }
+      }
+    );
+
+    this.updaters.computed.fogOfWarStatusMap?.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (prevGameState.playerSave.currentEra.type === 'A') {
           if (!prev) {
             return prev;
           }
@@ -138,9 +164,11 @@ export class AllocateNodeAction {
               nodeLocation,
             }) || prev
           );
+        } else {
+          return prev;
         }
-      );
-    }
+      }
+    );
   }
 
   /**
@@ -250,8 +278,3 @@ export class AllocateNodeAction {
 // TODO(bowei): unhardcode once we implement >2 eras
 export const ERA_1_SP_LIMIT = 20;
 export const ERA_1_ACCESSIBLE_RADIUS = 10;
-
-export const CURRENT_ERA: { era: number; type: 'A' | 'B' } = {
-  era: 0,
-  type: 'B',
-};
