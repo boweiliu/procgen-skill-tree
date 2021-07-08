@@ -1,4 +1,4 @@
-const doInvertColors = false;
+const doInvertColors = true;
 
 export const COLORS = Object.fromEntries(
   Object.entries({
