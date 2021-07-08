@@ -152,10 +152,7 @@ function CellComponent({
           status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
             ? 'node-available'
             : '',
-          currentEra.type === 'B' &&
-            nodeData.statuses.bookmarkedStatus.bookmarked
-            ? 'marked-square'
-            : '',
+          nodeData.statuses.bookmarkedStatus.bookmarked ? 'marked-square' : '',
           accessibleButHidden ? 'hex-center-small' : ''
         )}
         onClick={onClickCenter}

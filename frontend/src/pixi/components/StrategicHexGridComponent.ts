@@ -449,7 +449,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.x -= textures.rect.width / 2;
         graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
-      } else if (currentEra.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+      } else if (nodeBookmarkedStatus.bookmarked) {
         graphics.texture = textures.square;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.square.width / 2;
