@@ -4,7 +4,7 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 import { EnumInvalidError } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { getCoordNeighbors } from '../lib/HexGrid';
-import { AllocateNodeCheckState, CURRENT_ERA } from './AllocateNode';
+import { AllocateNodeCheckState } from './AllocateNode';
 
 export interface DeallocateNodeInput {
   nodeLocation: Vector3;
@@ -32,67 +32,80 @@ export class DeallocateNodeAction {
   enqueueAction(input: DeallocateNodeInput) {
     const { nodeLocation } = input;
 
-    if (CURRENT_ERA.type === 'A') {
-      this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate((prev) => {
-        if (prev.get(nodeLocation)?.bookmarked === true) {
-          const result = prev.clone();
-          result.remove(nodeLocation);
-          return result;
+    this.updaters.enqueueUpdate((prev, prevGameState) => {
+      if (prevGameState.playerSave.currentEra.type === 'A') {
+        if (
+          prev.playerSave.bookmarkedStatusMap.get(nodeLocation)?.bookmarked ===
+          true
+        ) {
+          const bookmarkedStatusMap =
+            prev.playerSave.bookmarkedStatusMap.clone();
+          bookmarkedStatusMap.remove(nodeLocation);
+          const playerSave = { ...prev.playerSave, bookmarkedStatusMap };
+          return { ...prev, playerSave };
         }
         return prev;
-      });
-    } else if (CURRENT_ERA.type === 'B') {
-      this.updaters.playerSave.allocationStatusMap.enqueueUpdate((prev) => {
-        if (prev.get(nodeLocation)?.taken === true) {
-          const result = prev.clone();
-          result.remove(nodeLocation);
-          return result;
-        }
-        return prev;
-      });
+      } else if (prevGameState.playerSave.currentEra.type === 'B') {
+        let result: typeof prev | null = null;
 
-      // also need to un-flow reachable
-      this.updaters.computed.reachableStatusMap.enqueueUpdate(
-        (prev, prevGameState) => {
-          if (!prev) return prev;
-          // first look at all previously reachable neighbors which are not allocated
-          let result: typeof prev | null = null;
-          const reachableNeighbors = Object.values(
-            getCoordNeighbors(nodeLocation)
+        if (
+          prev.playerSave.allocationStatusMap.get(nodeLocation)?.taken === true
+        ) {
+          const allocationStatusMap =
+            prev.playerSave.allocationStatusMap.clone();
+          allocationStatusMap.remove(nodeLocation);
+          const playerSave = { ...prev.playerSave, allocationStatusMap };
+          result = result || { ...prev };
+          result = { ...result, playerSave };
+        }
+
+        // also need to un-flow reachable
+        let reachableStatusMap: typeof prev.computed.reachableStatusMap | null =
+          null;
+        // first look at all previously reachable neighbors which are not allocated
+        const reachableNeighbors = Object.values(
+          getCoordNeighbors(nodeLocation)
+        ).filter((it) => {
+          return (
+            prevGameState.computed.reachableStatusMap?.get(it)?.reachable ===
+              true &&
+            prevGameState.playerSave.allocationStatusMap?.get(it)?.taken !==
+              true
+          );
+        });
+
+        reachableNeighbors.forEach((n) => {
+          // find out if they have any neighbors which are still allocated and are not the freshly deallocated node
+          const nsAllocatedNeighbors = Object.values(
+            getCoordNeighbors(n)
           ).filter((it) => {
             return (
-              prevGameState.computed.reachableStatusMap?.get(it)?.reachable ===
-                true &&
-              prevGameState.playerSave.allocationStatusMap?.get(it)?.taken !==
-                true
+              prevGameState.playerSave.allocationStatusMap.get(it)?.taken ===
+                true && it.notEquals(nodeLocation)
             );
           });
-          reachableNeighbors.forEach((n) => {
-            // find out if they have any neighbors which are still allocated
-            const nsAllocatedNeighbors = Object.values(
-              getCoordNeighbors(n)
-            ).filter((it) => {
-              return (
-                prevGameState.playerSave.allocationStatusMap.get(it)?.taken ===
-                true
-              );
-            });
 
-            // if no allocated neighbors, try to remove it
-            if (nsAllocatedNeighbors.length === 0) {
-              if (prev.get(n)) {
-                result = result || prev.clone();
-                result.remove(n);
-              }
+          // if no allocated neighbors, try to remove it
+          if (nsAllocatedNeighbors.length === 0) {
+            if (prev.computed.reachableStatusMap?.get(n)?.reachable === true) {
+              reachableStatusMap =
+                reachableStatusMap || prev.computed.reachableStatusMap.clone();
+              reachableStatusMap.remove(n);
             }
-          });
+          }
+        });
 
-          return result || prev;
+        if (reachableStatusMap) {
+          const computed = { ...prev.computed, reachableStatusMap };
+          result = result || { ...prev };
+          result = { ...result, computed };
         }
-      );
-    } else {
-      throw new EnumInvalidError();
-    }
+
+        return result || prev;
+      } else {
+        throw new EnumInvalidError();
+      }
+    });
   }
 
   /**
@@ -107,7 +120,7 @@ export class DeallocateNodeAction {
     gameState: DeallocateNodeCheckState
   ): DeallocateNodeResult {
     const { nodeLocation } = input;
-    if (CURRENT_ERA.type === 'A') {
+    if (gameState.playerSave.currentEra.type === 'A') {
       // we can only unmark an already marked node
       const bookmarkedStatus =
         gameState.playerSave.bookmarkedStatusMap.get(nodeLocation);
@@ -116,7 +129,7 @@ export class DeallocateNodeAction {
       } else {
         return false;
       }
-    } else if (CURRENT_ERA.type === 'B') {
+    } else if (gameState.playerSave.currentEra.type === 'B') {
       // TODO(bowei): check against the # of respecs we have in inventory
 
       // we can only deallocate if it's already allocated

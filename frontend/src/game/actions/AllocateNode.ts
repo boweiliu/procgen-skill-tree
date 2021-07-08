@@ -154,17 +154,17 @@ export class AllocateNodeAction {
     input: AllocateNodeInput,
     gameState: AllocateNodeCheckState
   ): AllocateNodeResult {
-    if (CURRENT_ERA.type === 'B') {
+    if (gameState.playerSave.currentEra.type === 'B') {
       if (!input.newStatus.taken) {
         console.log('unsupported action: ', input);
         return false;
       }
-    } else if (CURRENT_ERA.type === 'A') {
+    } else if (gameState.playerSave.currentEra.type === 'A') {
       // TODO(bowei): saved & explored?
     }
 
     if (
-      CURRENT_ERA.type === 'B' &&
+      gameState.playerSave.currentEra.type === 'B' &&
       gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
         ?.taken === true
     ) {
@@ -173,7 +173,7 @@ export class AllocateNodeAction {
     }
 
     // if (
-    //   CURRENT_ERA.type === 'A' &&
+    //   gameState.playerSave.currentEra.type === 'A' &&
     //   gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
     //     ?.bookmarked === true
     // ) {
@@ -203,7 +203,7 @@ export class AllocateNodeAction {
     }
 
     // only check for reachability in era *B
-    if (CURRENT_ERA.type === 'B') {
+    if (gameState.playerSave.currentEra.type === 'B') {
       if (
         gameState.computed.reachableStatusMap?.get(input.nodeLocation)
           ?.reachable !== true
@@ -214,9 +214,9 @@ export class AllocateNodeAction {
     }
 
     if (
-      (CURRENT_ERA.type === 'B' &&
+      (gameState.playerSave.currentEra.type === 'B' &&
         gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) ||
-      (CURRENT_ERA.type === 'A' &&
+      (gameState.playerSave.currentEra.type === 'A' &&
         gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT &&
         gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
           ?.bookmarked !== true)
