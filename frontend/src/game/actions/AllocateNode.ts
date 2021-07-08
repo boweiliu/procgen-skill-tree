@@ -278,3 +278,14 @@ export class AllocateNodeAction {
 // TODO(bowei): unhardcode once we implement >2 eras
 export const ERA_1_SP_LIMIT = 20;
 export const ERA_1_ACCESSIBLE_RADIUS = 10;
+
+// sp limits for each additional era; net SP ends up being cumulative
+export const ERA_SP_LIMITS = {
+  0: 10,
+  1: 30,
+};
+
+export const ERA_ACCESSIBLE_RADII = {
+  0: 10,
+  1: 25,
+};
