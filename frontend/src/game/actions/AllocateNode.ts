@@ -44,7 +44,8 @@ export const depsAllocateNodeCheckState = extractDeps(
 export type AllocateNodeResult = boolean;
 
 // TODO(bowei): unhardcode
-export const FOG_OF_WAR_DISTANCE = 5;
+// The sight radius
+export const FOG_OF_WAR_DISTANCE = 4;
 
 /**
  * Stateless action wrapper over updaters.
