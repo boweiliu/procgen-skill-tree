@@ -277,14 +277,14 @@ export class AllocateNodeAction {
   }
 }
 
-// sp limits for each additional era; net SP ends up being cumulative
+// sp limits for each additional era; cumulative and includes the first initial node
 export const ERA_SP_LIMITS: { [x: number]: number } = {
-  0: 10,
-  1: 30,
+  0: 11,
+  1: 31,
 };
 
 // era radius at each era; not cumulative
 export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
-  0: 10,
-  1: 25,
+  0: 7,
+  1: 15,
 };
