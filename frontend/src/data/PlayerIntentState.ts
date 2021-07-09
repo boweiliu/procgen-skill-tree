@@ -50,15 +50,20 @@ export enum IntentName {
   ZOOM_RECENTER_AT_NODE = 'ZOOM_RECENTER_AT_NODE',
 
   // TODO(bowei): implement these
+  // if in era A, removes all bookmarks. also should be undoable
   MAYBE_RESET_BOOKMARKS_THIS_ERA = 'MAYBE_RESET_BOOKMARKS_THIS_ERA',
+  // pop the most recent action stack, perform the reverse action, and push to the most recent undo stack
   UNDO = 'UNDO',
+  // pop the most recent undo stack, perform the original action, and push to the most recent action stack
   REDO = 'REDO',
+  // capslock - causes cursor selection "[" to also show cursors on the shortest path from selection to origin (going through .taken nodes costs 0.01), on both strategic and detailed
   TOGGLE_SHOW_PATHS = 'TOGGLE_SHOW_PATHS',
+  // temporarily causes cursor selection "[" to also show cursors on the shortest path from selection to origin (going through .taken nodes costs 0.01), on both strategic and detailed
   TEMP_SHOW_PATHS = 'TEMP_SHOW_PATHS',
 }
 
 export const defaultKeyIntentConfig = {
-  'Ctrl-n': IntentName.MAYBE_RESET_BOOKMARKS_THIS_ERA,
+  'Ctrl-Backspace': IntentName.MAYBE_RESET_BOOKMARKS_THIS_ERA,
   'Ctrl-z': IntentName.UNDO,
   'Ctrl-y': IntentName.REDO,
   'Ctrl-r': IntentName.REDO,
