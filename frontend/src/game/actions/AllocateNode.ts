@@ -243,9 +243,11 @@ export class AllocateNodeAction {
 
     if (
       (gameState.playerSave.currentEra.type === 'B' &&
-        gameState.playerSave.allocationStatusMap.size() >= ERA_1_SP_LIMIT) ||
+        gameState.playerSave.allocationStatusMap.size() >=
+          ERA_SP_LIMITS[gameState.playerSave.currentEra.index]) ||
       (gameState.playerSave.currentEra.type === 'A' &&
-        gameState.playerSave.bookmarkedStatusMap.size() >= ERA_1_SP_LIMIT &&
+        gameState.playerSave.bookmarkedStatusMap.size() >=
+          ERA_SP_LIMITS[gameState.playerSave.currentEra.index] &&
         gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
           ?.bookmarked !== true)
     ) {
@@ -275,17 +277,14 @@ export class AllocateNodeAction {
   }
 }
 
-// TODO(bowei): unhardcode once we implement >2 eras
-export const ERA_1_SP_LIMIT = 20;
-export const ERA_1_ACCESSIBLE_RADIUS = 10;
-
 // sp limits for each additional era; net SP ends up being cumulative
-export const ERA_SP_LIMITS = {
+export const ERA_SP_LIMITS: { [x: number]: number } = {
   0: 10,
   1: 30,
 };
 
-export const ERA_ACCESSIBLE_RADII = {
+// era radius at each era; not cumulative
+export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
   0: 10,
   1: 25,
 };

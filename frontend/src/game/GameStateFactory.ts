@@ -13,7 +13,7 @@ import { Vector3 } from '../lib/util/geometry/vector3';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
 import {
-  ERA_1_ACCESSIBLE_RADIUS,
+  ERA_ACCESSIBLE_RADII,
   FOG_OF_WAR_DISTANCE,
 } from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
@@ -171,7 +171,7 @@ export function markAccessibleNodes(
 
   getWithinDistance(
     Vector3.Zero,
-    ERA_1_ACCESSIBLE_RADIUS,
+    ERA_ACCESSIBLE_RADII[prevGameState.playerSave.currentEra.index],
     0,
     validLocks
   ).forEach((n) => {
