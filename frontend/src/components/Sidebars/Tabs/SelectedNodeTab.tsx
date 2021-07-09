@@ -136,7 +136,7 @@ function SelectedNodeTabContentComponent(props: {
   const reachableStatus =
     gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
   const visibleStatus =
-    gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false;
+    gameState.computed.fogOfWarStatusMap?.get(location) || 'obscured';
   const lockData = visibleStatus
     ? gameState.worldGen.lockMap?.get(location) || null
     : null;
@@ -154,9 +154,10 @@ function SelectedNodeTabContentComponent(props: {
     description = 'An allocatable node.';
   }
 
-  const nodeContents = visibleStatus
-    ? gameState.worldGen.nodeContentsMap.get(location) || null
-    : null;
+  const nodeContents =
+    visibleStatus === 'revealed'
+      ? gameState.worldGen.nodeContentsMap.get(location) || null
+      : null;
   const nodeContentsDom = nodeContents?.lines[0]
     ? nodeContentsToDom(nodeContents)
     : 'empty';

@@ -215,8 +215,8 @@ export class AllocateNodeAction {
     }
 
     if (
-      gameState.computed.fogOfWarStatusMap?.get(input.nodeLocation)?.visible !==
-      true
+      gameState.computed.fogOfWarStatusMap?.get(input.nodeLocation) !==
+      'revealed'
     ) {
       console.log("can't do that, is not visible", input);
       return false;

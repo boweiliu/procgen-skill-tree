@@ -121,11 +121,11 @@ function CellComponent({
 
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
-  const completelyHidden =
-    status === NodeAllocatedStatus.HIDDEN &&
-    !nodeData.statuses.accessibleStatus.accessible;
   const accessibleButHidden =
-    nodeData.statuses.accessibleStatus.accessible && status === 'HIDDEN';
+    nodeData.statuses.accessibleStatus.accessible &&
+    nodeData.statuses.fogOfWarStatus === 'hinted';
+  const completelyHidden =
+    status === NodeAllocatedStatus.HIDDEN && !accessibleButHidden;
 
   const [hovered, setHovered] = useState(false);
 

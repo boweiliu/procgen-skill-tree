@@ -17,9 +17,7 @@ export type NodeReachableStatus = {
   reachable: boolean;
 };
 // whether or not the node is revealed in fog of war. implies accessible
-export type NodeVisibleStatus = {
-  visible: boolean;
-};
+export type NodeVisibleStatus = 'revealed' | 'hinted' | 'obscured';
 // whether or not the node exists in the current era of the game and can be accessed at all.
 export type NodeAccessibleStatus = {
   accessible: boolean;
@@ -47,13 +45,6 @@ export const NodeTakenStatus: {
 } = {
   true: { taken: true },
   false: { taken: false },
-};
-// eslint-disable-next-line
-export const NodeVisibleStatus: {
-  [k in BoolEnum]: NodeVisibleStatus;
-} = {
-  true: { visible: true },
-  false: { visible: false },
 };
 // eslint-disable-next-line
 export const NodeReachableStatus: {

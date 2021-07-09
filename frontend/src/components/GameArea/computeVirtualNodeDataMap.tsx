@@ -4,6 +4,7 @@ import {
   NodeAccessibleStatus,
   NodeAllocatedStatus,
   NodeBookmarkedStatus,
+  NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
@@ -30,6 +31,7 @@ export type NodeReactData = {
   statuses: {
     bookmarkedStatus: NodeBookmarkedStatus;
     accessibleStatus: NodeAccessibleStatus;
+    fogOfWarStatus: NodeVisibleStatus;
   };
   nodeLocation: Vector3;
   id: string;
@@ -58,7 +60,7 @@ export function computeNodeReactData(args: {
     args.gameState.playerSave;
   const { lockMap, nodeContentsMap } = args.gameState.worldGen;
 
-  const fogOfWarStatus = fogOfWarStatusMap?.get(location);
+  const fogOfWarStatus = fogOfWarStatusMap?.get(location) || 'obscured';
   const reachableStatus = reachableStatusMap?.get(location);
   const takenStatus = allocationStatusMap.get(location);
   const bookmarkedStatus = bookmarkedStatusMap.get(location) || {
@@ -76,7 +78,7 @@ export function computeNodeReactData(args: {
     : // TODO(bowei): what to show here if bookmarked in B era?
     reachableStatus?.reachable
     ? NodeAllocatedStatus.AVAILABLE
-    : fogOfWarStatus?.visible
+    : fogOfWarStatus === 'revealed'
     ? NodeAllocatedStatus.UNREACHABLE
     : NodeAllocatedStatus.HIDDEN;
   const id = location.hash();
@@ -187,6 +189,7 @@ export function computeNodeReactData(args: {
     statuses: {
       bookmarkedStatus,
       accessibleStatus,
+      fogOfWarStatus,
     },
   };
   return nodeData;

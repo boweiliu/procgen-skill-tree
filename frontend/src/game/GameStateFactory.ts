@@ -235,7 +235,7 @@ export function flowReachableFromNode(args: {
   getWithinDistance(nodeLocation, 1).forEach((n) => {
     if (
       // prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
-      prevGameState.computed.fogOfWarStatusMap?.get(n)?.visible !== true
+      prevGameState.computed.fogOfWarStatusMap?.get(n) !== 'revealed'
     ) {
       return;
     }
@@ -306,9 +306,9 @@ export function flowFogOfWarFromNode(args: {
   const { prev, prevGameState, nodeLocation } = args;
   let { result } = args;
 
-  if (prev.get(nodeLocation)?.visible !== true) {
+  if (prev.get(nodeLocation) !== 'revealed') {
     result = result || prev.clone(); // clone if we haven't already
-    result.put(nodeLocation, NodeVisibleStatus.true);
+    result.put(nodeLocation, 'revealed');
   }
 
   // make sure locks within distance 1 are set to visible
@@ -318,9 +318,9 @@ export function flowFogOfWarFromNode(args: {
     ) {
       return;
     }
-    if (prev.get(n)?.visible !== true) {
+    if (prev.get(n) !== 'revealed') {
       result = result || prev.clone();
-      result.put(n, NodeVisibleStatus.true);
+      result.put(n, 'revealed');
     }
   });
 
@@ -339,6 +339,8 @@ export function flowFogOfWarFromNode(args: {
       return false;
     },
   };
+
+  // flow fog of war, keeping in mind validLocks and accessibility restrictions
   getWithinDistance(nodeLocation, FOG_OF_WAR_DISTANCE, 0, validLocks).forEach(
     (n) => {
       if (
@@ -350,12 +352,28 @@ export function flowFogOfWarFromNode(args: {
       // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
       prevGameState.worldGen.lockMap.precompute(n);
 
-      if (prev.get(n)?.visible !== true) {
+      if (prev.get(n) !== 'revealed') {
         result = result || prev.clone();
-        result.put(n, NodeVisibleStatus.true);
+        result.put(n, 'revealed');
       }
     }
   );
+
+  // convert obscured nodes just outside fog of war to hinted, iff they are accessible
+  getWithinDistance(
+    nodeLocation,
+    FOG_OF_WAR_DISTANCE,
+    FOG_OF_WAR_DISTANCE,
+    validLocks
+  ).forEach((n) => {
+    if (validLocks.contains(n)) {
+      return;
+    }
+    if ((prev.get(n) || 'obscured') === 'obscured') {
+      result = result || prev.clone();
+      result.put(n, 'hinted');
+    }
+  });
 
   return result;
 }

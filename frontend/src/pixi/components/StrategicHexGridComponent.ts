@@ -5,7 +5,6 @@ import {
   LockStatus,
   NodeReachableStatus,
   NodeTakenStatus,
-  NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
@@ -347,8 +346,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
-        NodeVisibleStatus.false;
+        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) || 'obscured';
       const nodeTakenStatus =
         gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeTakenStatus.false;
@@ -388,17 +386,17 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = true;
         baseTint = COLORS.nodeLavender;
         // graphics.tint = COLORS.nodeLavender;
-      } else if (nodeVisibleStatus.visible) {
+      } else if (nodeVisibleStatus === 'revealed') {
         // default - visible but nothing else special
         graphics.visible = true;
         visible = true;
         baseTint = COLORS.nodePink;
         // graphics.tint = COLORS.nodePink;
       } else if (
-        !nodeVisibleStatus.visible &&
+        nodeVisibleStatus === 'hinted' &&
         nodeAccessibleStatus.accessible
       ) {
-        // default - visible but nothing else special
+        // hinted - smaller circle and empty contents
         graphics.visible = true;
         visible = false;
         baseTint = COLORS.nodePink;
@@ -438,7 +436,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       const textures = props.args.textures.get();
-      if (!nodeVisibleStatus.visible) {
+      if (nodeVisibleStatus === 'hinted') {
         graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.dot.width / 2;
