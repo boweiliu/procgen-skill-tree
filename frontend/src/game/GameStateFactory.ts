@@ -277,7 +277,7 @@ export function markVisibleNodes(
   nodes.forEach((nodeLocation) => {
     result = flowFogOfWarFromNode({
       result,
-      prev,
+      prev: result || prev,
       prevGameState,
       nodeLocation,
     });
@@ -352,7 +352,7 @@ export function flowFogOfWarFromNode(args: {
       // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
       prevGameState.worldGen.lockMap.precompute(n);
 
-      if (prev.get(n) !== 'revealed') {
+      if ((prev.get(n) || 'obscured') !== 'revealed') {
         result = result || prev.clone();
         result.put(n, 'revealed');
       }
@@ -362,8 +362,8 @@ export function flowFogOfWarFromNode(args: {
   // convert obscured nodes just outside fog of war to hinted, iff they are accessible
   getWithinDistance(
     nodeLocation,
-    FOG_OF_WAR_DISTANCE,
-    FOG_OF_WAR_DISTANCE,
+    FOG_OF_WAR_DISTANCE + 1,
+    FOG_OF_WAR_DISTANCE + 1,
     validLocks
   ).forEach((n) => {
     if (validLocks.contains(n)) {

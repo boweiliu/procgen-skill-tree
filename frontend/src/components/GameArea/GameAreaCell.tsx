@@ -153,7 +153,9 @@ function CellComponent({
             ? 'node-available'
             : '',
           nodeData.statuses.bookmarkedStatus.bookmarked ? 'marked-square' : '',
-          accessibleButHidden ? 'hex-center-small' : ''
+          accessibleButHidden
+            ? 'hex-center-size-small'
+            : 'hex-center-size-medium'
         )}
         onClick={onClickCenter}
         onDoubleClick={() => {
@@ -163,7 +165,14 @@ function CellComponent({
         onPointerLeave={onUnhover}
         hidden={completelyHidden}
       >
-        <div className="hex-center-text-wrapper">
+        <div
+          className={classnames(
+            'hex-center-text-wrapper',
+            accessibleButHidden
+              ? 'hex-center-size-small'
+              : 'hex-center-size-medium'
+          )}
+        >
           <div className="tiny-text" hidden={accessibleButHidden}>
             {nodeData.shortText}
           </div>

@@ -8,16 +8,8 @@
   border-width: var(--border-width);
   /* circle */
   border-radius: 50%;
-  width: calc(2 * var(--hex-center-radius));
-  height: calc(2 * var(--hex-center-radius));
   z-index: 5;
 }
-
-.hex-center-small {
-  width: calc(1 * var(--hex-center-radius));
-  height: calc(1 * var(--hex-center-radius));
-}
-
 .marked-square {
   border-radius: 0%;
 }
@@ -47,6 +39,13 @@
   /* otherwise the border width screws up centering here */
   margin-top: calc(-1 * var(--border-width));
   margin-left: calc(-1 * var(--border-width));
+}
+
+.hex-center-size-small {
+  width: calc(1 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+}
+.hex-center-size-medium {
   width: calc(2 * var(--hex-center-radius));
   height: calc(2 * var(--hex-center-radius));
 }
