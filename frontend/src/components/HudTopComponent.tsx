@@ -48,7 +48,7 @@ export function HudTopComponent(props: {
     (e?: React.MouseEvent) => {
       setLocked(true);
 
-      actions.progressNextEra.enqueueAction({});
+      actions.progressNextEra.run({}, {});
     },
     [actions]
   );

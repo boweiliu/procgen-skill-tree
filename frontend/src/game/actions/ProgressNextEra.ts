@@ -3,7 +3,7 @@ import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { markAccessibleNodes } from '../GameStateFactory';
 
 type ProgressNextEraInput = {};
-type ProgressNextEraCheckState = GameState;
+type ProgressNextEraCheckState = {};
 type ProgressNextEraResult = boolean;
 
 /**
