@@ -43,9 +43,7 @@ export const newPlayerSaveState = (): PlayerSaveState => {
     allocationStatusMap: new KeyedHashMap([
       [Vector3.Zero, NodeTakenStatus.true],
     ]),
-    bookmarkedStatusMap: new KeyedHashMap([
-      [Vector3.Zero, { bookmarked: true }],
-    ]),
+    bookmarkedStatusMap: new KeyedHashMap(),
     exploredStatusMap: new KeyedHashMap([[Vector3.Zero, { explored: true }]]),
     currentEra: {
       type: 'A',

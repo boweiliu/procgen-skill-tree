@@ -55,7 +55,7 @@ export function HudTopComponent(props: {
         }
       });
 
-      // if we just transitioned from B to A, mark all allocated nodes as bookmarked
+      // if we just transitioned from B to A, mark all allocated nodes as unbookmarked
       updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
         let bookmarkedStatusMap: typeof prev.bookmarkedStatusMap | null = null;
 
@@ -65,12 +65,12 @@ export function HudTopComponent(props: {
             .forEach(([nodeLocation, takenStatus]) => {
               if (takenStatus.taken === true) {
                 if (
-                  prev.bookmarkedStatusMap.get(nodeLocation)?.bookmarked !==
+                  prev.bookmarkedStatusMap.get(nodeLocation)?.bookmarked ===
                   true
                 ) {
                   bookmarkedStatusMap =
                     bookmarkedStatusMap || prev.bookmarkedStatusMap.clone();
-                  bookmarkedStatusMap.put(nodeLocation, { bookmarked: true });
+                  bookmarkedStatusMap.remove(nodeLocation);
                 }
               }
             });
@@ -111,8 +111,7 @@ export function HudTopComponent(props: {
   const remainingAllocationPoints =
     maxAllocationPoints -
     (gameState.playerSave.currentEra.type === 'A'
-      ? gameState.playerSave.bookmarkedStatusMap.size() -
-        gameState.playerSave.allocationStatusMap.size()
+      ? gameState.playerSave.bookmarkedStatusMap.size()
       : gameState.playerSave.allocationStatusMap.size() -
         ERA_SP_LIMITS[gameState.playerSave.currentEra.index - 1]);
 

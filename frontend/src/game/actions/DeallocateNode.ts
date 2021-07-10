@@ -121,12 +121,22 @@ export class DeallocateNodeAction {
   ): DeallocateNodeResult {
     const { nodeLocation } = input;
     if (gameState.playerSave.currentEra.type === 'A') {
+      if (
+        gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
+          ?.taken === true
+      ) {
+        console.log("can't do that, can't unbookmark a taken node", input);
+        return false;
+      }
       // we can only unmark an already marked node
       const bookmarkedStatus =
         gameState.playerSave.bookmarkedStatusMap.get(nodeLocation);
       if (bookmarkedStatus?.bookmarked === true) {
         return true;
       } else {
+        console.log(
+          "can't do that, can't unbookmark something if it's not bookmarked"
+        );
         return false;
       }
     } else if (gameState.playerSave.currentEra.type === 'B') {
@@ -136,6 +146,9 @@ export class DeallocateNodeAction {
       const takenStatus =
         gameState.playerSave.allocationStatusMap.get(nodeLocation);
       if (takenStatus?.taken !== true) {
+        console.log(
+          "can't do that, can't deallocate something if it's not allocated"
+        );
         return false;
       }
 
@@ -187,6 +200,7 @@ export class DeallocateNodeAction {
       }
 
       if (targets.size() > 0) {
+        console.log("can't do that, tree would be disconnected");
         return false;
       }
       return true;

@@ -190,6 +190,10 @@ export class AllocateNodeAction {
       }
     } else if (gameState.playerSave.currentEra.type === 'A') {
       // TODO(bowei): saved & explored?
+      if (!input.newStatus.taken) {
+        console.log('unsupported action: ', input);
+        return false;
+      }
     }
 
     if (
@@ -201,14 +205,17 @@ export class AllocateNodeAction {
       return false;
     }
 
-    // if (
-    //   gameState.playerSave.currentEra.type === 'A' &&
-    //   gameState.playerSave.bookmarkedStatusMap.get(input.nodeLocation)
-    //     ?.bookmarked === true
-    // ) {
-    //   console.log("can't do that, already bookmarked", input);
-    //   return false;
-    // }
+    if (
+      gameState.playerSave.currentEra.type === 'A' &&
+      gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
+        ?.taken === true
+    ) {
+      console.log(
+        "can't do that, can't bookmark or unbookmark a taken node",
+        input
+      );
+      return false;
+    }
 
     if (!!gameState.worldGen.lockMap.get(input.nodeLocation)) {
       console.log("can't do that, is locked", input);
