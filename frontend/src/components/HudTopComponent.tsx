@@ -43,7 +43,14 @@ export function HudTopComponent(props: { gameState: GameState }) {
           </div>
         </div>
       </div>
-      <button className="hud-top-button button-1" disabled={isLocked}>
+      <button
+        className="hud-top-button button-1"
+        disabled={isLocked}
+        onClick={(e: React.MouseEvent) => {
+          setLocked(true);
+          // TODO(bowei): other stuff
+        }}
+      >
         Next era
       </button>
       <button
