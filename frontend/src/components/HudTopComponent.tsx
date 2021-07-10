@@ -42,6 +42,7 @@ export function HudTopComponent(props: {
       setLocked(true);
 
       // TODO(bowei): other stuff
+      // increment index & type
       updaters.playerSave.currentEra.enqueueUpdate((prev) => {
         if (prev.type === 'A') {
           return { ...prev, type: 'B' };
@@ -53,6 +54,37 @@ export function HudTopComponent(props: {
           };
         }
       });
+
+      // if we just transitioned from B to A, mark all allocated nodes as bookmarked
+      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
+        let bookmarkedStatusMap: typeof prev.bookmarkedStatusMap | null = null;
+
+        if (prev.currentEra.type === 'A') {
+          prev.allocationStatusMap
+            .entries()
+            .forEach(([nodeLocation, takenStatus]) => {
+              if (takenStatus.taken === true) {
+                if (
+                  prev.bookmarkedStatusMap.get(nodeLocation)?.bookmarked !==
+                  true
+                ) {
+                  bookmarkedStatusMap =
+                    bookmarkedStatusMap || prev.bookmarkedStatusMap.clone();
+                  bookmarkedStatusMap.put(nodeLocation, { bookmarked: true });
+                }
+              }
+            });
+        }
+
+        if (bookmarkedStatusMap) {
+          return { ...prev, bookmarkedStatusMap };
+        } else {
+          return prev;
+        }
+      });
+
+      // TODO(bowei): recompute accessible
+      // TODO(bowei): flow fog of war from newly bookmarked nodes;
     },
     [updaters]
   );
@@ -112,13 +144,16 @@ export function HudTopComponent(props: {
       ? 'Exploit'
       : 'Expand';
 
+  const pointTypeName =
+    gameState.playerSave.currentEra.type === 'A' ? 'Exploration' : 'Allocation';
+
   return (
     <div className="hud-top-zone">
       <div className="hud-text-box">
-        AP: {remainingAllocationPoints}/{maxAllocationPoints}
+        {pointTypeName[0]}P: {remainingAllocationPoints}/{maxAllocationPoints}
         <div className="hover-only empty-positioned">
           <div className="absolute-positioned hud-text-box-tooltip">
-            <div>Allocation points</div>
+            <div>{pointTypeName} points</div>
             <div>(remaining/total).</div>
           </div>
         </div>
