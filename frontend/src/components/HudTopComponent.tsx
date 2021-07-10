@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameState } from '../data/GameState';
 import { ERA_SP_LIMITS } from '../game/actions/AllocateNode';
+import { ProgressNextEraAction } from '../game/actions/ProgressNextEra';
 import { Const } from '../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import './HudTopComponent.css';
@@ -37,56 +38,19 @@ export function HudTopComponent(props: {
     return () => clearTimeout(timer);
   }, [isLocked]);
 
+  const actions = useMemo(() => {
+    return {
+      progressNextEra: new ProgressNextEraAction(updaters),
+    };
+  }, [updaters]);
+
   const progressNextEra = useCallback(
     (e?: React.MouseEvent) => {
       setLocked(true);
 
-      // TODO(bowei): other stuff
-      // increment index & type
-      updaters.playerSave.currentEra.enqueueUpdate((prev) => {
-        if (prev.type === 'A') {
-          return { ...prev, type: 'B' };
-        } else {
-          return {
-            ...prev,
-            type: 'A',
-            index: prev.index + 1,
-          };
-        }
-      });
-
-      // if we just transitioned from B to A, mark all allocated nodes as unbookmarked
-      updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
-        let bookmarkedStatusMap: typeof prev.bookmarkedStatusMap | null = null;
-
-        if (prev.currentEra.type === 'A') {
-          prev.allocationStatusMap
-            .entries()
-            .forEach(([nodeLocation, takenStatus]) => {
-              if (takenStatus.taken === true) {
-                if (
-                  prev.bookmarkedStatusMap.get(nodeLocation)?.bookmarked ===
-                  true
-                ) {
-                  bookmarkedStatusMap =
-                    bookmarkedStatusMap || prev.bookmarkedStatusMap.clone();
-                  bookmarkedStatusMap.remove(nodeLocation);
-                }
-              }
-            });
-        }
-
-        if (bookmarkedStatusMap) {
-          return { ...prev, bookmarkedStatusMap };
-        } else {
-          return prev;
-        }
-      });
-
-      // TODO(bowei): recompute accessible
-      // TODO(bowei): flow fog of war from newly bookmarked nodes;
+      actions.progressNextEra.enqueueAction({});
     },
-    [updaters]
+    [actions]
   );
 
   useEffect(() => {

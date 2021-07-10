@@ -141,19 +141,26 @@ export function markLockStatus(
 
 /**
  * Updates accessible computed map based on distance from the starting node.
- * @param prev
- * @param prevGameState
- * @returns
+ * @param result mutable temporary storage. null if the state is intended to be the same as prev
+ * @param prev the initial state. immutable
+ * @param prevGameState immutable
+ * @returns the same object reference as result;
+ * will be null iff null was passed in as [result], AND no further changes were necessary for the update
+ * (i.e. we want to return prev)
+ * if null was passed in as [result], but we DID want to make changes, this function returns a clone of [prev] with changes added on top.
  */
-export function markAccessibleNodes(
-  prev: HashMap<Vector3, NodeAccessibleStatus> | null,
-  prevGameState: Const<GameState>
-): HashMap<Vector3, NodeAccessibleStatus> | null {
-  if (!prev) {
-    return prev;
-  }
+export function markAccessibleNodes(args: {
+  result: HashMap<Vector3, NodeAccessibleStatus> | null;
+  prev: Const<HashMap<Vector3, NodeAccessibleStatus>>;
+  prevGameState: Const<GameState>;
+}): HashMap<Vector3, NodeAccessibleStatus> | null {
+  const { prev, prevGameState } = args;
+  let { result } = args;
+  // if (!prev) {
+  //   return prev;
+  // }
 
-  let result: typeof prev | null = null;
+  // let result: typeof prev | null = null;
 
   // make sure we make use of lock state
   const validLocks: IReadonlySet<Vector3> = {
@@ -181,7 +188,7 @@ export function markAccessibleNodes(
     }
   });
 
-  return result || prev;
+  return result;
 }
 
 export function markReachableNodes(

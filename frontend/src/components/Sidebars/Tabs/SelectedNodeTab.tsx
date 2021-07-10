@@ -35,6 +35,8 @@ function SelectedNodeTabContentComponent(props: {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
 
+  // TODO(bowei): use custom hooks for onAllocate/canAllocate paradigm
+
   const allocateNodeCheckState = useMemo(() => {
     return extractAllocateNodeCheckState(gameState);
     // TODO(bowei): use custom hook here so react doesnt complain so much
@@ -147,6 +149,8 @@ function SelectedNodeTabContentComponent(props: {
     gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
   const visibleStatus =
     gameState.computed.fogOfWarStatusMap?.get(location) || 'obscured';
+  const accessibleStatus =
+    gameState.computed.accessibleStatusMap?.get(location)?.accessible || false;
   const lockData = visibleStatus
     ? gameState.worldGen.lockMap?.get(location) || null
     : null;
@@ -190,6 +194,7 @@ function SelectedNodeTabContentComponent(props: {
         <div>Visible?: {visibleStatus.toString()}</div>
         <div>Bookmarked?: {bookmarkedStatus.toString()}</div>
         <div>Explored?: {exploredStatus.toString()}</div>
+        <div>Accessible?: {accessibleStatus.toString()}</div>
         {visibleStatus ? (
           <>
             <div>Locked?: {isLocked.toString()}</div>
