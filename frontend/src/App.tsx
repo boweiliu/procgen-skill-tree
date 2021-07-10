@@ -116,7 +116,7 @@ function App() {
           windowState={gameState.windowState}
         />
       </div>
-      <HudTopComponent gameState={gameState} />
+      <HudTopComponent gameState={gameState} updaters={updaters} />
       <div className="button-zone">
         <button
           className="button-pixi-toggle"

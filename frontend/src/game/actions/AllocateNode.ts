@@ -280,6 +280,7 @@ export class AllocateNodeAction {
 
 // sp limits for each additional era; cumulative and includes the first initial node
 export const ERA_SP_LIMITS: { [x: number]: number } = {
+  [-1]: 1,
   0: 11,
   1: 31,
 };

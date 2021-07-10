@@ -52,6 +52,8 @@ export enum IntentName {
   // TODO(bowei): implement these
   // if in era A, removes all bookmarks. also should be undoable
   MAYBE_RESET_BOOKMARKS_THIS_ERA = 'MAYBE_RESET_BOOKMARKS_THIS_ERA',
+  // goes to next era; must be clicked twice to work
+  MAYBE_PROGRESS_NEXT_ERA = 'MAYBE_PROGRESS_NEXT_ERA',
   // pop the most recent action stack, perform the reverse action, and push to the most recent undo stack. Only allocate/deallocates are reversible, not cursor select changes or era progression.
   UNDO = 'UNDO',
   // pop the most recent undo stack, perform the original action, and push to the most recent action stack
@@ -67,6 +69,7 @@ export const defaultKeyIntentConfig = {
   'Ctrl-z': IntentName.UNDO,
   'Ctrl-y': IntentName.REDO,
   'Ctrl-r': IntentName.REDO,
+  g: IntentName.MAYBE_PROGRESS_NEXT_ERA,
   CapsLock: IntentName.TOGGLE_SHOW_PATHS,
   LeftShift: IntentName.TEMP_SHOW_PATHS,
 
