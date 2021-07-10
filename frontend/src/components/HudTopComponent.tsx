@@ -158,7 +158,12 @@ export function HudTopComponent(props: {
         </div>
       </div>
       <div className="hud-text-box">
-        DP: {gameState.playerSave.currentEra.type === 'B' ? '10/10' : '--'}
+        DP:{' '}
+        {gameState.playerSave.currentEra.type === 'B'
+          ? gameState.playerSave.deallocationPoints.remaining +
+            '/' +
+            gameState.playerSave.deallocationPoints.provided
+          : '--'}
         <div className="hover-only empty-positioned">
           <div className="absolute-positioned hud-text-box-tooltip">
             <div>Deallocation points</div>

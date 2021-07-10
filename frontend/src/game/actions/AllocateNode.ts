@@ -297,3 +297,9 @@ export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
   0: 7,
   1: 15,
 };
+
+// how many deallocation actions. cumulative
+export const ERA_DEALLOCATION_POINTS: { [x: number]: number } = {
+  0: 10,
+  1: 12,
+};

@@ -1,17 +1,43 @@
 import { GameState } from '../../data/GameState';
 import { HashSet } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
-import { EnumInvalidError } from '../../lib/util/misc';
+import { EnumInvalidError, extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import { getCoordNeighbors } from '../lib/HexGrid';
-import { AllocateNodeCheckState } from './AllocateNode';
 
 export interface DeallocateNodeInput {
   nodeLocation: Vector3;
 }
 
 export type DeallocateNodeResult = boolean;
-export type DeallocateNodeCheckState = AllocateNodeCheckState;
+
+function _extract(gameState: GameState) {
+  return {
+    playerSave: {
+      allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
+      deallocationPoints: gameState.playerSave.deallocationPoints,
+    },
+    computed: {
+      reachableStatusMap: gameState.computed.reachableStatusMap,
+      fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
+    },
+    worldGen: {
+      lockMap: gameState.worldGen.lockMap,
+    },
+  };
+}
+
+export function extractDeallocateNodeCheckState(g: DeallocateNodeCheckState) {
+  return _extract(g as GameState);
+}
+
+export type DeallocateNodeCheckState = ReturnType<typeof _extract>;
+export const depsDeallocateNodeCheckState = extractDeps(
+  extractDeallocateNodeCheckState
+);
 
 /**
  * Stateless action wrapper over updaters.
@@ -48,13 +74,25 @@ export class DeallocateNodeAction {
       } else if (prevGameState.playerSave.currentEra.type === 'B') {
         let result: typeof prev | null = null;
 
+        // update allocation map to despect the node
         if (
           prev.playerSave.allocationStatusMap.get(nodeLocation)?.taken === true
         ) {
           const allocationStatusMap =
             prev.playerSave.allocationStatusMap.clone();
           allocationStatusMap.remove(nodeLocation);
-          const playerSave = { ...prev.playerSave, allocationStatusMap };
+
+          // decrement remaining dealloc points
+          const deallocationPoints = {
+            ...prev.playerSave.deallocationPoints,
+          };
+          deallocationPoints.remaining -= 1;
+
+          const playerSave = {
+            ...prev.playerSave,
+            allocationStatusMap,
+            deallocationPoints,
+          };
           result = result || { ...prev };
           result = { ...result, playerSave };
         }
@@ -74,6 +112,7 @@ export class DeallocateNodeAction {
           );
         });
 
+        // unset reachable on nodes 2 away from the current one, if needed
         reachableNeighbors.forEach((n) => {
           // find out if they have any neighbors which are still allocated and are not the freshly deallocated node
           const nsAllocatedNeighbors = Object.values(
@@ -140,7 +179,11 @@ export class DeallocateNodeAction {
         return false;
       }
     } else if (gameState.playerSave.currentEra.type === 'B') {
-      // TODO(bowei): check against the # of respecs we have in inventory
+      // check against the # of respecs we have in inventory
+      if (gameState.playerSave.deallocationPoints.remaining <= 0) {
+        console.log("can't do that, out of deallocation points");
+        return false;
+      }
 
       // we can only deallocate if it's already allocated
       const takenStatus =

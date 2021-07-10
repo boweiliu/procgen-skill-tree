@@ -6,7 +6,11 @@ import {
   depsAllocateNodeCheckState,
   extractAllocateNodeCheckState,
 } from '../../../game/actions/AllocateNode';
-import { DeallocateNodeAction } from '../../../game/actions/DeallocateNode';
+import {
+  DeallocateNodeAction,
+  depsDeallocateNodeCheckState,
+  extractDeallocateNodeCheckState,
+} from '../../../game/actions/DeallocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
@@ -36,6 +40,12 @@ function SelectedNodeTabContentComponent(props: {
     // TODO(bowei): use custom hook here so react doesnt complain so much
     // eslint-disable-next-line
   }, depsAllocateNodeCheckState(gameState));
+
+  const deallocateNodeCheckState = useMemo(() => {
+    return extractDeallocateNodeCheckState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsDeallocateNodeCheckState(gameState));
 
   const onAllocate = useCallback(
     (e: React.MouseEvent) => {
@@ -68,21 +78,21 @@ function SelectedNodeTabContentComponent(props: {
       if (location) {
         props.actions.deallocateNode.run(
           { nodeLocation: location },
-          allocateNodeCheckState
+          deallocateNodeCheckState
         );
       }
     },
-    [props.actions.deallocateNode, location, allocateNodeCheckState]
+    [props.actions.deallocateNode, location, deallocateNodeCheckState]
   );
 
   const canBeDeallocated = useMemo(() => {
     if (location) {
       return DeallocateNodeAction.checkAction(
         { nodeLocation: location },
-        allocateNodeCheckState
+        deallocateNodeCheckState
       );
     }
-  }, [location, allocateNodeCheckState]);
+  }, [location, deallocateNodeCheckState]);
 
   const onZoom = useCallback(
     (e: React.MouseEvent) => {

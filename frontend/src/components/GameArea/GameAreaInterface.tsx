@@ -38,6 +38,7 @@ function _extract(gameState: GameState) {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
       bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
       currentEra: gameState.playerSave.currentEra,
+      deallocationPoints: gameState.playerSave.deallocationPoints,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,

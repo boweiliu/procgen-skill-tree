@@ -6,6 +6,7 @@ import {
 import { KeyedHashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { DeserializationError } from '../lib/util/misc';
+import { ERA_DEALLOCATION_POINTS } from '../game/actions/AllocateNode';
 
 export type PlayerSaveState = {
   /**
@@ -19,11 +20,22 @@ export type PlayerSaveState = {
   bookmarkedStatusMap: KeyedHashMap<Vector3, NodeBookmarkedStatus>;
 
   /**
-   * WIP
+   * Saves a map of all the nodes we bookmarked and then unbookmarked -- doing that preserves fog of war
    */
   exploredStatusMap: KeyedHashMap<Vector3, NodeExploredStatus>;
 
+  /**
+   * Which phase of the game we are in
+   */
   currentEra: EraType;
+
+  /**
+   *
+   */
+  deallocationPoints: {
+    remaining: number;
+    provided: number;
+  };
 };
 
 export type EraType = {
@@ -48,6 +60,10 @@ export const newPlayerSaveState = (): PlayerSaveState => {
     currentEra: {
       type: 'A',
       index: 0,
+    },
+    deallocationPoints: {
+      provided: ERA_DEALLOCATION_POINTS[0],
+      remaining: ERA_DEALLOCATION_POINTS[0],
     },
   };
 };
@@ -78,6 +94,7 @@ const deserializeFromObject = (obj: any): PlayerSaveState | null => {
     !obj.hasOwnProperty('allocationStatusMap') ||
     !obj.hasOwnProperty('bookmarkedStatusMap') ||
     !obj.hasOwnProperty('exploredStatusMap') ||
+    !obj.hasOwnProperty('deallocationPoints') ||
     !obj.hasOwnProperty('currentEra')
   ) {
     console.error('Failed deserializing PlayerSaveState: ', obj);
