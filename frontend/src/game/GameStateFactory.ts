@@ -95,10 +95,11 @@ export function loadComputed(gameState: GameState): GameState {
   );
 
   // accessible and visible computation makes use of lock information
-  gameState.computed.accessibleStatusMap = markAccessibleNodes(
-    gameState.computed.accessibleStatusMap,
-    gameState
-  );
+  gameState.computed.accessibleStatusMap = markAccessibleNodes({
+    result: gameState.computed.accessibleStatusMap,
+    prev: gameState.computed.accessibleStatusMap,
+    prevGameState: gameState,
+  });
 
   gameState.computed.fogOfWarStatusMap = markVisibleNodes(
     gameState.computed.fogOfWarStatusMap,
