@@ -2,9 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameState } from '../data/GameState';
 import { ERA_SP_LIMITS } from '../game/actions/AllocateNode';
 import { ProgressNextEraAction } from '../game/actions/ProgressNextEra';
-import { Const } from '../lib/util/misc';
+import { Const, extractDeps } from '../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import './HudTopComponent.css';
+
+export function extractHudTopSubState(g: HudTopSubState) {
+  return _extract(g as GameState);
+}
 
 function _extract(gameState: Const<GameState>) {
   return {
@@ -21,6 +25,8 @@ function _extract(gameState: Const<GameState>) {
     },
   };
 }
+export type HudTopSubState = ReturnType<typeof _extract>;
+export const depsGameGridSubState = extractDeps(extractHudTopSubState);
 
 export function HudTopComponent(props: {
   gameState: GameState;
