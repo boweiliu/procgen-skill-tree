@@ -104,8 +104,9 @@
 .hex-center-lock {
   z-index: 10;
   margin-left: calc(-2 * var(--hex-center-radius));
+  top: var(--hex-center-radius);
   width: calc(2 * var(--hex-center-radius));
-  height: calc(5 * var(--hex-center-radius));
+  height: calc(3 * var(--hex-center-radius));
 }
 
 .hex-center-lock-left {
@@ -115,7 +116,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: var(--hex-center-radius);
+  /* margin-top: var(--hex-center-radius); */
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
   background-color: var(--active-purple);
