@@ -1,9 +1,5 @@
 import { GameState } from '../../data/GameState';
-import {
-  NodeBookmarkedStatus,
-  NodeReachableStatus,
-  NodeVisibleStatus,
-} from '../../data/NodeStatus';
+import { NodeReachableStatus, NodeVisibleStatus } from '../../data/NodeStatus';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
