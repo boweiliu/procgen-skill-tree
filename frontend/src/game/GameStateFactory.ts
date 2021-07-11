@@ -266,12 +266,18 @@ export function markVisibleNodes(
 
   let result: typeof prev | null = null;
 
-  let nodes = prevGameState.playerSave.allocationStatusMap
-    .entries()
-    .filter(([location, status]) => {
-      return status.taken === true;
-    })
-    .map((it) => it[0]);
+  let nodes: Vector3[] = [];
+
+  if (prevGameState.playerSave.currentEra.type === 'A') {
+    nodes = nodes.concat(
+      prevGameState.playerSave.allocationStatusMap
+        .entries()
+        .filter(([location, status]) => {
+          return status.taken === true;
+        })
+        .map((it) => it[0])
+    );
+  }
 
   nodes = nodes.concat(
     prevGameState.playerSave.exploredStatusMap
@@ -314,7 +320,7 @@ export function flowFogOfWarFromNode(args: {
   const { prev, prevGameState, nodeLocation } = args;
   let { result } = args;
 
-  if (prev.get(nodeLocation) !== 'revealed') {
+  if ((result || prev).get(nodeLocation) !== 'revealed') {
     result = result || prev.clone(); // clone if we haven't already
     result.put(nodeLocation, 'revealed');
   }
@@ -326,7 +332,7 @@ export function flowFogOfWarFromNode(args: {
     ) {
       return;
     }
-    if (prev.get(n) !== 'revealed') {
+    if ((result || prev).get(n) !== 'revealed') {
       result = result || prev.clone();
       result.put(n, 'revealed');
     }
@@ -357,10 +363,7 @@ export function flowFogOfWarFromNode(args: {
         return;
       }
 
-      // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-      prevGameState.worldGen.lockMap.precompute(n);
-
-      if ((prev.get(n) || 'obscured') !== 'revealed') {
+      if (((result || prev).get(n) || 'obscured') !== 'revealed') {
         result = result || prev.clone();
         result.put(n, 'revealed');
       }
@@ -374,10 +377,13 @@ export function flowFogOfWarFromNode(args: {
     FOG_OF_WAR_DISTANCE + 1,
     validLocks
   ).forEach((n) => {
-    if (validLocks.contains(n)) {
+    if (
+      prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+    ) {
       return;
     }
-    if ((prev.get(n) || 'obscured') === 'obscured') {
+
+    if (((result || prev).get(n) || 'obscured') === 'obscured') {
       result = result || prev.clone();
       result.put(n, 'hinted');
     }

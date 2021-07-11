@@ -62,7 +62,8 @@ export type IReadonlySet<K> = {
  * @param base
  * @param maxDistance
  * @param minDistance
- * @returns all vector3 coords that are <= maxDistance and >= minDistance.
+ * @param disallowedSet we are not allowed to BFS through these
+ * @returns all vector3 coords that are <= maxDistance and >= minDistance where we cannot pass through the disallowed set, but we can arrive at them.
  */
 export function getWithinDistance(
   base: Vector3,

@@ -1,9 +1,13 @@
 import { GameState } from '../../data/GameState';
-import { NodeVisibleStatus } from '../../data/NodeStatus';
+import { NodeReachableStatus, NodeVisibleStatus } from '../../data/NodeStatus';
 import { HashMap } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
-import { flowFogOfWarFromNode, markAccessibleNodes } from '../GameStateFactory';
+import {
+  flowFogOfWarFromNode,
+  flowReachableFromNode,
+  markAccessibleNodes,
+} from '../GameStateFactory';
 
 type ProgressNextEraInput = {};
 type ProgressNextEraCheckState = {};
@@ -94,6 +98,31 @@ export class ProgressNextEraAction {
           .map((it) => it[0])
           .forEach((nodeLocation) => {
             result = flowFogOfWarFromNode({
+              result,
+              prev,
+              prevGameState,
+              nodeLocation,
+            });
+          });
+
+        return result || prev;
+      }
+    );
+
+    // also flow reachable (shows adjacent locks)
+    this.updaters.computed.reachableStatusMap.enqueueUpdate(
+      (prev, prevGameState) => {
+        if (!prev) return prev;
+
+        let result: HashMap<Vector3, NodeReachableStatus> | null = null;
+        prevGameState.playerSave.allocationStatusMap
+          .entries()
+          .filter(([n, status]) => {
+            return status.taken === true;
+          })
+          .map((it) => it[0])
+          .forEach((nodeLocation) => {
+            result = flowReachableFromNode({
               result,
               prev,
               prevGameState,
