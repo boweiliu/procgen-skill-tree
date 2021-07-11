@@ -1,6 +1,10 @@
 import { GameState } from '../../data/GameState';
-import { NodeReachableStatus, NodeVisibleStatus } from '../../data/NodeStatus';
-import { HashMap } from '../../lib/util/data_structures/hash';
+import {
+  NodeBookmarkedStatus,
+  NodeReachableStatus,
+  NodeVisibleStatus,
+} from '../../data/NodeStatus';
+import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
@@ -57,32 +61,12 @@ export class ProgressNextEraAction {
       }
     );
 
-    // if we just transitioned from B to A, mark all allocated nodes as unbookmarked
-    this.updaters.playerSave.enqueueUpdate((prev, prevGameState) => {
-      let bookmarkedStatusMap: typeof prev.bookmarkedStatusMap | null = null;
-
-      if (prev.currentEra.type === 'A') {
-        prev.allocationStatusMap
-          .entries()
-          .forEach(([nodeLocation, takenStatus]) => {
-            if (takenStatus.taken === true) {
-              if (
-                prev.bookmarkedStatusMap.get(nodeLocation)?.bookmarked === true
-              ) {
-                bookmarkedStatusMap =
-                  bookmarkedStatusMap || prev.bookmarkedStatusMap.clone();
-                bookmarkedStatusMap.remove(nodeLocation);
-              }
-            }
-          });
+    // if we just transitioned from B to A, clear all bookmarks
+    this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate(
+      (prev, prevGameState) => {
+        return new KeyedHashMap();
       }
-
-      if (bookmarkedStatusMap) {
-        return { ...prev, bookmarkedStatusMap };
-      } else {
-        return prev;
-      }
-    });
+    );
 
     // flow fog of war from ossified taken nodes, and also make sure to distinguish obscured/hinted/revealed
     this.updaters.computed.fogOfWarStatusMap.enqueueUpdate(
@@ -90,20 +74,30 @@ export class ProgressNextEraAction {
         if (!prev) return prev;
 
         let result: HashMap<Vector3, NodeVisibleStatus> | null = null;
-        prevGameState.playerSave.allocationStatusMap
+        let nodes = prevGameState.playerSave.allocationStatusMap
           .entries()
           .filter(([n, status]) => {
             return status.taken === true;
           })
-          .map((it) => it[0])
-          .forEach((nodeLocation) => {
-            result = flowFogOfWarFromNode({
-              result,
-              prev,
-              prevGameState,
-              nodeLocation,
-            });
+          .map((it) => it[0]);
+
+        nodes = nodes.concat(
+          prevGameState.playerSave.exploredStatusMap
+            .entries()
+            .filter(([n, status]) => {
+              return status.explored === true;
+            })
+            .map((it) => it[0])
+        );
+
+        nodes.forEach((nodeLocation) => {
+          result = flowFogOfWarFromNode({
+            result,
+            prev,
+            prevGameState,
+            nodeLocation,
           });
+        });
 
         return result || prev;
       }

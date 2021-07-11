@@ -370,7 +370,8 @@ export function flowFogOfWarFromNode(args: {
     }
   );
 
-  // convert obscured nodes just outside fog of war to hinted, iff they are accessible
+  // convert obscured nodes just outside fog of war to hinted, but only if they are accessible
+  // if they are locked, instead convert them to revealed -- feels bad if hinted things get revealed to be locks
   getWithinDistance(
     nodeLocation,
     FOG_OF_WAR_DISTANCE + 1,
@@ -380,6 +381,14 @@ export function flowFogOfWarFromNode(args: {
     if (
       prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
     ) {
+      return;
+    }
+
+    if (validLocks.contains(n)) {
+      if (((result || prev).get(n) || 'obscured') !== 'revealed') {
+        result = result || prev.clone();
+        result.put(n, 'revealed');
+      }
       return;
     }
 

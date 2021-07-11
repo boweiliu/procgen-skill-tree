@@ -122,6 +122,7 @@ function CellComponent({
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
   const accessibleButHidden =
+    currentEra.type === 'A' &&
     nodeData.statuses.accessibleStatus.accessible &&
     nodeData.statuses.fogOfWarStatus === 'hinted';
   const completelyHidden =

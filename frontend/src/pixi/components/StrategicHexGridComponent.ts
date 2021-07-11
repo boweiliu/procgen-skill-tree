@@ -393,6 +393,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         baseTint = COLORS.nodePink;
         // graphics.tint = COLORS.nodePink;
       } else if (
+        currentEra.type === 'A' &&
         nodeVisibleStatus === 'hinted' &&
         nodeAccessibleStatus.accessible
       ) {
@@ -436,7 +437,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       const textures = props.args.textures.get();
-      if (nodeVisibleStatus === 'hinted') {
+      if (
+        currentEra.type === 'A' &&
+        nodeVisibleStatus === 'hinted' &&
+        nodeAccessibleStatus.accessible
+      ) {
         graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.dot.width / 2;
