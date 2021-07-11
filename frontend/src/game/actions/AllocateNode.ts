@@ -294,7 +294,7 @@ export const ERA_SP_LIMITS: { [x: number]: number } = {
 
 // era radius at each era; not cumulative
 export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
-  0: 7,
+  0: 6,
   1: 15,
 };
 
