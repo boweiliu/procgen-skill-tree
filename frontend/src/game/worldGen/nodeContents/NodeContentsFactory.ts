@@ -189,11 +189,9 @@ export class NodeContentsFactory {
       clusterCenter = location.divide(3).round().multiply(3);
     }
 
-    // hardcode the starting cluster to be empty
+    // don't use the cluster for the starting cluster
     if (clusterCenter.equals(Vector3.Zero)) {
-      return {
-        lines: [],
-      };
+      clusterCenter = location;
     }
 
     const result = randomSwitch<NodeContents>({
