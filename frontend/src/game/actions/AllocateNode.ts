@@ -291,6 +291,7 @@ export const ERA_SP_LIMITS: { [x: number]: number } = {
   0: 11,
   1: 31,
   2: 61,
+  3: 91,
 };
 
 // era radius at each era; not cumulative
@@ -298,6 +299,7 @@ export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
   0: 4,
   1: 15,
   2: 35,
+  3: 50,
 };
 
 // how many deallocation actions. cumulative
@@ -305,4 +307,5 @@ export const ERA_DEALLOCATION_POINTS: { [x: number]: number } = {
   0: 10,
   1: 12,
   2: 18,
+  3: 28,
 };
