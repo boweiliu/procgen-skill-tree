@@ -60,7 +60,11 @@ export class ProgressNextEraAction {
     // if we just transitioned from B to A, clear all bookmarks
     this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate(
       (prev, prevGameState) => {
-        return new KeyedHashMap();
+        if (prevGameState.playerSave.currentEra.type === 'A') {
+          return new KeyedHashMap();
+        } else {
+          return prev;
+        }
       }
     );
 

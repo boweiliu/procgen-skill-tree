@@ -45,7 +45,7 @@ export type AllocateNodeResult = boolean;
 
 // TODO(bowei): unhardcode
 // The sight radius
-export const FOG_OF_WAR_DISTANCE = 4;
+export const FOG_OF_WAR_DISTANCE = 5;
 
 /**
  * Stateless action wrapper over updaters.
@@ -290,16 +290,19 @@ export const ERA_SP_LIMITS: { [x: number]: number } = {
   [-1]: 1,
   0: 11,
   1: 31,
+  2: 61,
 };
 
 // era radius at each era; not cumulative
 export const ERA_ACCESSIBLE_RADII: { [x: number]: number } = {
-  0: 6,
+  0: 4,
   1: 15,
+  2: 35,
 };
 
 // how many deallocation actions. cumulative
 export const ERA_DEALLOCATION_POINTS: { [x: number]: number } = {
   0: 10,
   1: 12,
+  2: 18,
 };

@@ -46,8 +46,14 @@ export enum Modifier {
 
 const WEIGHTS = {
   // for any single node, what is in it
-  DECISION_0: {
+  ROOT: {
     EMPTY: 150,
+    NO_SPEND: 100,
+    SPEND: 0,
+  },
+
+  STARTER_AREA_ROOT: {
+    EMPTY: 30,
     NO_SPEND: 100,
     SPEND: 0,
   },
@@ -192,7 +198,10 @@ export class NodeContentsFactory {
 
     const result = randomSwitch<NodeContents>({
       randInt: squirrel3(seed + Vector3ToSeed(clusterCenter)),
-      weights: WEIGHTS.DECISION_0,
+      weights:
+        taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
+          ? WEIGHTS.STARTER_AREA_ROOT
+          : WEIGHTS.ROOT,
       behaviors: {
         EMPTY: (randInt: number) => {
           return {
