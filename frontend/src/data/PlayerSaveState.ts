@@ -58,7 +58,7 @@ export const newPlayerSaveState = (): PlayerSaveState => {
     bookmarkedStatusMap: new KeyedHashMap(),
     exploredStatusMap: new KeyedHashMap([[Vector3.Zero, { explored: true }]]),
     currentEra: {
-      type: 'A',
+      type: 'B',
       index: 0,
     },
     deallocationPoints: {

@@ -50,27 +50,32 @@ export class ProgressNextEraAction {
   enqueueAction(input: ProgressNextEraInput) {
     // increment index & type
     this.updaters.playerSave.currentEra.enqueueUpdate((prev) => {
-      if (prev.type === 'A') {
-        return { ...prev, type: 'B' };
-      } else {
-        return {
-          ...prev,
-          type: 'A',
-          index: prev.index + 1,
-        };
-      }
+      // if (prev.type === 'A') {
+      //   return { ...prev, type: 'B' };
+      // } else {
+      //   return {
+      //     ...prev,
+      //     type: 'A',
+      //     index: prev.index + 1,
+      //   };
+      // }
+      return {
+        ...prev,
+        type: 'B',
+        index: prev.index + 1,
+      };
     });
 
     // flow accessible
     this.updaters.computed.accessibleStatusMap.enqueueUpdate(
       (prev, prevGameState) => {
         if (!prev) return prev;
-        if (prevGameState.playerSave.currentEra.type === 'A') {
-          let result: typeof prev | null = null;
-          result = markAccessibleNodes({ result, prev, prevGameState });
-          return result || prev;
-        }
-        return prev;
+        // if (prevGameState.playerSave.currentEra.type === 'A') {
+        let result: typeof prev | null = null;
+        result = markAccessibleNodes({ result, prev, prevGameState });
+        return result || prev;
+        // }
+        // return prev;
       }
     );
 
