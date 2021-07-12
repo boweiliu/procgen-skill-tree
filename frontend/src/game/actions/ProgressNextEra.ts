@@ -2,15 +2,32 @@ import { GameState } from '../../data/GameState';
 import { NodeReachableStatus, NodeVisibleStatus } from '../../data/NodeStatus';
 import { HashMap, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { Const, extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
   flowFogOfWarFromNode,
   flowReachableFromNode,
   markAccessibleNodes,
 } from '../GameStateFactory';
+import { ERA_ACCESSIBLE_RADII } from './AllocateNode';
+
+function _extract(gameState: Const<GameState>) {
+  return {
+    playerSave: {
+      currentEra: gameState.playerSave.currentEra,
+    },
+  };
+}
+export function extractProgressNextEraCheckState(g: ProgressNextEraCheckState) {
+  return _extract(g as GameState);
+}
+
+export type ProgressNextEraCheckState = ReturnType<typeof _extract>;
+export const depsProgressNextEraCheckState = extractDeps(
+  extractProgressNextEraCheckState
+);
 
 type ProgressNextEraInput = {};
-type ProgressNextEraCheckState = {};
 type ProgressNextEraResult = boolean;
 
 /**
@@ -140,6 +157,13 @@ export class ProgressNextEraAction {
     input: ProgressNextEraInput,
     gameState: ProgressNextEraCheckState
   ): ProgressNextEraResult {
+    if (gameState.playerSave.currentEra.type === 'B') {
+      const index = gameState.playerSave.currentEra.index;
+      if (!ERA_ACCESSIBLE_RADII[index + 1]) {
+        // no data for the next era
+        return false;
+      }
+    }
     return true;
   }
 

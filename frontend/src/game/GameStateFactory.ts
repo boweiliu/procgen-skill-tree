@@ -83,10 +83,10 @@ export function loadComputed(gameState: GameState): GameState {
    * Initialize fog of war and visible locks
    */
 
-  // first precompute the nearby lock worldgen parameters
-  getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
-    gameState.worldGen.lockMap.precompute(n);
-  });
+  // optionally, first precompute the nearby lock worldgen parameters
+  // getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
+  //   gameState.worldGen.lockMap.precompute(n);
+  // });
 
   // fill in lock statuses with computed statuses
   gameState.computed.lockStatusMap = markLockStatus(

@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameState } from '../data/GameState';
 import { ERA_SP_LIMITS } from '../game/actions/AllocateNode';
-import { ProgressNextEraAction } from '../game/actions/ProgressNextEra';
+import {
+  depsProgressNextEraCheckState,
+  extractProgressNextEraCheckState,
+  ProgressNextEraAction,
+} from '../game/actions/ProgressNextEra';
 import { Const, extractDeps } from '../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../lib/util/updaterGenerator';
 import './HudTopComponent.css';
@@ -50,13 +54,23 @@ export function HudTopComponent(props: {
     };
   }, [updaters]);
 
+  const progressNextEraCheckState = useMemo(() => {
+    return extractProgressNextEraCheckState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsProgressNextEraCheckState(gameState));
+
+  const canProgressNextEra = useMemo(() => {
+    return ProgressNextEraAction.checkAction({}, progressNextEraCheckState);
+  }, [progressNextEraCheckState]);
+
   const progressNextEra = useCallback(
     (e?: React.MouseEvent) => {
       setLocked(true);
 
-      actions.progressNextEra.run({}, {});
+      actions.progressNextEra.run({}, progressNextEraCheckState);
     },
-    [actions]
+    [actions, progressNextEraCheckState]
   );
 
   useEffect(() => {
@@ -153,7 +167,7 @@ export function HudTopComponent(props: {
       </div>
       <button
         className="hud-top-button button-1"
-        disabled={isLocked}
+        disabled={isLocked || !canProgressNextEra}
         onClick={progressNextEra}
       >
         Next era (hotkey: g)

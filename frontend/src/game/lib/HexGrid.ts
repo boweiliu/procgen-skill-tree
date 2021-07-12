@@ -66,28 +66,40 @@ export type IReadonlySet<K> = {
  * @returns all vector3 coords that are <= maxDistance and >= minDistance where we cannot pass through the disallowed set, but we can arrive at them.
  */
 export function getWithinDistance(
-  base: Vector3,
-  maxDistance: number,
+  baseOrBases: Vector3 | Vector3[],
+  maxDistance: number = Infinity,
   minDistance?: number,
   disallowedSet?: IReadonlySet<Vector3>
 ): Vector3[] {
+  let bases: Vector3[];
+  if (Array.isArray(baseOrBases)) {
+    bases = baseOrBases;
+  } else {
+    bases = [baseOrBases];
+  }
+
   let touched: HashSet<Vector3> = new HashSet();
   let disallowedButTouched: HashSet<Vector3> = new HashSet();
-  touched.put(base);
-  const byDist: Vector3[][] = [[base]];
+  bases.forEach((it) => touched.put(it));
+  const byDist: Vector3[][] = [bases];
 
   for (let d = 1; d <= maxDistance; d++) {
+    if (byDist[d - 1].length === 0) {
+      break;
+    }
+
     byDist.push([]);
+
     for (let vec of byDist[d - 1]) {
       const considering = Object.values(getCoordNeighbors(vec));
       for (const n of considering) {
         if (!n) continue;
         if (touched.get(n)) continue;
+        touched.put(n);
 
         if (disallowedSet?.contains(n)) {
           disallowedButTouched.put(n);
         } else {
-          touched.put(n);
           byDist[d].push(n);
         }
       }
@@ -95,8 +107,14 @@ export function getWithinDistance(
   }
 
   let result: Vector3[] = [];
-  for (let dd = minDistance || 0; dd <= maxDistance; dd++) {
-    result = result.concat(byDist[dd]);
+  for (
+    let dd = minDistance || 0;
+    dd <= maxDistance && dd <= byDist.length;
+    dd++
+  ) {
+    if (byDist[dd] && byDist[dd].length > 0) {
+      result = result.concat(byDist[dd]);
+    }
   }
   result = result.concat(disallowedButTouched.values());
   return result;

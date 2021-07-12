@@ -45,7 +45,7 @@ export type AllocateNodeResult = boolean;
 
 // TODO(bowei): unhardcode
 // The sight radius
-export const FOG_OF_WAR_DISTANCE = 5;
+export const FOG_OF_WAR_DISTANCE = Infinity;
 
 /**
  * Stateless action wrapper over updaters.
