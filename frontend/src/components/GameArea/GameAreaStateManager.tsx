@@ -103,12 +103,14 @@ function Component(props: {
 
   const setHoverPathTarget = useCallback(
     (v: Vector3 | null) => {
-      props.updaters.playerUI.hoverPathTarget.enqueueUpdate((prev) => {
-        if (prev === v || prev?.equals(v)) {
-          return prev;
+      props.updaters.playerUI.hoverPathTarget.enqueueUpdate(
+        (prev, prevGameState) => {
+          if (prev === v || prev?.equals(v)) {
+            return prev;
+          }
+          return v;
         }
-        return v;
-      });
+      );
     },
     [props.updaters]
   );

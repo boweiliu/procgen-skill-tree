@@ -14,11 +14,7 @@ import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { GameState } from '../../data/GameState';
-import {
-  DefaultHashMap,
-  HashMap,
-  HashSet,
-} from '../../lib/util/data_structures/hash';
+import { HashMap, HashSet } from '../../lib/util/data_structures/hash';
 import { getCoordNeighbors, IReadonlySet } from '../../game/lib/HexGrid';
 
 /**
@@ -42,6 +38,11 @@ function _extract(gameState: GameState) {
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
+    },
+    intent: {
+      activeIntent: {
+        TEMP_SHOW_PATHS: gameState.intent.activeIntent.TEMP_SHOW_PATHS,
+      },
     },
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
@@ -107,6 +108,10 @@ function Component(props: {
   const nodesInHoverPathMap = useMemo(() => {
     const result = new HashSet<Vector3>();
 
+    if (!gameState.intent.activeIntent.TEMP_SHOW_PATHS) {
+      return result;
+    }
+
     const target = gameState.playerUI.hoverPathTarget;
 
     if (!target) {
@@ -154,7 +159,7 @@ function Component(props: {
         // let currentPath = queue.shift()!;
         // let currentNode = currentPath[currentPath.length - 1];
         let currentNode = queue.shift()!;
-        let [currentDist, _] = touched.get(currentNode)!; // state: we have already examined currentNode and now need to process its neighbors
+        let [currentDist] = touched.get(currentNode)!; // state: we have already examined currentNode and now need to process its neighbors
         // if (touched.contains(currentNode)) { continue; }
 
         if (currentDist >= shortestPathDist) {
