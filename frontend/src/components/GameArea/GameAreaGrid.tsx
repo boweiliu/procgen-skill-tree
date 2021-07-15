@@ -9,17 +9,13 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { LockStatus, NodeTakenStatus } from '../../data/NodeStatus';
+import { NodeTakenStatus } from '../../data/NodeStatus';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { GameState } from '../../data/GameState';
-import { HashMap, HashSet } from '../../lib/util/data_structures/hash';
-import {
-  bfsAllPaths,
-  getCoordNeighbors,
-  IReadonlySet,
-} from '../../game/lib/HexGrid';
+import { HashSet } from '../../lib/util/data_structures/hash';
+import { bfsAllPaths } from '../../game/lib/HexGrid';
 import { getValidLocks } from '../../game/GameStateFactory';
 
 /**
