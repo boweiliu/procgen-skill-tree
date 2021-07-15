@@ -27,6 +27,11 @@ export type PlayerUIState = {
    */
   cursoredNodeLocation: Vector3 | null;
   /**
+   * Which, if any, node is currently the one we are planning a path to
+   * NOTE: not persisted to save
+   */
+  hoverPathTarget: Vector3 | null;
+  /**
    * state of the sidebar component
    */
   isSidebarOpen: boolean;
@@ -95,6 +100,7 @@ export const newPlayerUIState = (): PlayerUIState => {
     isPixiHidden: true,
     virtualGridLocation: Vector3.Zero,
     cursoredNodeLocation: null,
+    hoverPathTarget: null,
     isSidebarOpen: false,
     isLeftSidebarOpen: true,
     isRightSidebarOpen: false,
@@ -147,6 +153,7 @@ const deserializeFromObject = (obj: any): PlayerUIState | null => {
 
   return {
     ...(obj as PlayerUIState),
+    hoverPathTarget: null,
     virtualGridLocation,
     cursoredNodeLocation,
     triggerScrollRecenterCb: () => {},

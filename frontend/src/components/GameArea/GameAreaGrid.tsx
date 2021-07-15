@@ -9,11 +9,17 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { NodeTakenStatus } from '../../data/NodeStatus';
+import { LockStatus, NodeTakenStatus } from '../../data/NodeStatus';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { GameState } from '../../data/GameState';
+import {
+  DefaultHashMap,
+  HashMap,
+  HashSet,
+} from '../../lib/util/data_structures/hash';
+import { getCoordNeighbors, IReadonlySet } from '../../game/lib/HexGrid';
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -26,6 +32,7 @@ function _extract(gameState: GameState) {
   return {
     playerUI: {
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      hoverPathTarget: gameState.playerUI.hoverPathTarget,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -72,6 +79,7 @@ function Component(props: {
   cursoredVirtualNode: Vector2 | null;
   setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
+  setHoverPathTarget: (v: Vector3 | null) => void;
 }) {
   const {
     gameState,
@@ -81,6 +89,7 @@ function Component(props: {
     cursoredVirtualNode,
     setCursoredLocation,
     debug,
+    setHoverPathTarget,
   } = props;
   const startTime = +new Date();
 
@@ -89,13 +98,124 @@ function Component(props: {
   const flipCursored = debug?.isFlipCursored?.() || false;
   // console.log('Game area grid rerender');
 
-  const nodeReactDataMap = useMemo(
-    () =>
-      new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
-        computeNodeReactData({ location, gameState })
-      ),
-    [gameState]
-  );
+  const nodeReactDataMap = useMemo(() => {
+    return new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
+      computeNodeReactData({ location, gameState })
+    );
+  }, [gameState]);
+
+  const nodesInHoverPathMap = useMemo(() => {
+    const result = new HashSet<Vector3>();
+
+    const target = gameState.playerUI.hoverPathTarget;
+
+    if (!target) {
+      return result;
+    }
+
+    // TODO(bowei): compute shortest path from node hover/selection to allocated sector (DFS)
+    // TODO(bowei); replace this boilerplate
+    // make sure we make use of lock state
+    const validLocks: IReadonlySet<Vector3> = {
+      // TODO(bowei): optimize this?
+      contains: (v: Vector3) => {
+        const lockData = gameState.worldGen.lockMap.get(v);
+        const lockStatus = gameState.computed.lockStatusMap?.get(v);
+        const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+        const isAccessible =
+          !!gameState.computed.accessibleStatusMap?.get(v)?.accessible;
+        if (isLocked || !isAccessible) {
+          return true;
+        }
+        return false;
+      },
+    };
+    {
+      let source = target;
+      let destinations = new HashSet<Vector3>(
+        gameState.playerSave.allocationStatusMap
+          .entries()
+          .filter(([v, status]) => {
+            return status.taken === true;
+          })
+          .map((it) => it[0])
+      );
+      let shortestPathDist = Infinity;
+
+      if (destinations.contains(source)) {
+        result.put(source);
+        return result;
+      }
+
+      let touched = new HashMap<Vector3, [number, HashSet<Vector3>]>();
+      touched.put(source, [0, new HashSet()]);
+      let queue = [source];
+      while (queue.length) {
+        // let currentPath = queue.shift()!;
+        // let currentNode = currentPath[currentPath.length - 1];
+        let currentNode = queue.shift()!;
+        let [currentDist, _] = touched.get(currentNode)!; // state: we have already examined currentNode and now need to process its neighbors
+        // if (touched.contains(currentNode)) { continue; }
+
+        if (currentDist >= shortestPathDist) {
+          // we found everything; now just need to extract data
+
+          // first iterate through destinations that are in the touched set
+          let considering = destinations
+            .values()
+            .filter((it) => touched.contains(it));
+          while (considering.length) {
+            considering.forEach((it) => result.put(it));
+            let newConsidering = new HashSet<Vector3>();
+            considering.forEach((it) =>
+              touched
+                .get(it)?.[1]
+                .values()
+                .forEach((predecessor) => newConsidering.put(predecessor))
+            );
+            considering = newConsidering.values();
+          }
+
+          return result;
+        }
+
+        const nbors = Object.values(getCoordNeighbors(currentNode));
+        for (let nbor of nbors) {
+          const maybeGotThereAlready = touched.get(nbor);
+          if (maybeGotThereAlready) {
+            // we got there already. still need to determine if we got there just as quickly through this route, and if so, record predecessors
+            if (maybeGotThereAlready[0] === currentDist + 1) {
+              // we are tied; append to the predecessors
+              maybeGotThereAlready[1].put(currentNode);
+            }
+            continue;
+          }
+
+          touched.put(nbor, [currentDist + 1, new HashSet([currentNode])]);
+
+          if (validLocks.contains(nbor)) {
+            continue;
+          }
+
+          // const newPath = [...currentPath, nbor];
+          if (destinations.contains(nbor)) {
+            // we have found a shortest path, now to find the rest
+            // shortestPathDist = newPath.length;
+            shortestPathDist = currentDist + 1;
+            // record it
+            // newPath.forEach(it => result.put(it));
+            // return result;
+          }
+
+          queue.push(nbor);
+        }
+        // touched.put(currentNode);
+      }
+      console.log('did not find a valid path!');
+    }
+
+    return result;
+  }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -126,6 +246,7 @@ function Component(props: {
                   const virtualCoords = new Vector2(x, y);
                   const location = virtualCoordsToLocation(virtualCoords);
                   const nodeData = nodeReactDataMap.get(location);
+                  const isNodeInHoverPath = nodesInHoverPathMap.get(location);
                   let isCursored =
                     !!cursoredVirtualNode &&
                     cursoredVirtualNode.equals(virtualCoords);
@@ -147,6 +268,8 @@ function Component(props: {
                       isCursored={isCursored}
                       debugIsCursored={flipCursored ? !isCursored : isCursored}
                       onUpdateCursored={setCursoredLocation}
+                      isNodeInHoverPath={isNodeInHoverPath}
+                      setHoverPathTarget={setHoverPathTarget}
                     />
                   );
                 })

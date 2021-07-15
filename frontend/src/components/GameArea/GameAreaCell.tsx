@@ -29,6 +29,8 @@ function GameAreaCellComponent({
   isCursored,
   onUpdateCursored,
   debugIsCursored,
+  isNodeInHoverPath,
+  setHoverPathTarget,
 }: {
   id: string;
   currentEra: EraType;
@@ -41,6 +43,8 @@ function GameAreaCellComponent({
   isCursored: boolean;
   onUpdateCursored: (v: Vector3 | null) => void;
   debugIsCursored: boolean;
+  isNodeInHoverPath: boolean;
+  setHoverPathTarget: (v: Vector3 | null) => void;
 }) {
   // const startTime = +new Date();
   // console.log(`GameAreaCell key ${id} rerendered at ${startTime}`);
@@ -76,6 +80,17 @@ function GameAreaCellComponent({
     [isCursored, onUpdateCursored, nodeLocation]
   );
 
+  const setNodeHoverPathTarget = useCallback(
+    (nowIsHovered: boolean) => {
+      if (nowIsHovered) {
+        setHoverPathTarget(nodeLocation);
+      } else {
+        setHoverPathTarget(null);
+      }
+    },
+    [setHoverPathTarget, nodeLocation]
+  );
+
   return (
     <Cell
       key={id}
@@ -85,6 +100,8 @@ function GameAreaCellComponent({
       nodeData={nodeData}
       onClickQuestionMark={handleClickQuestionMark}
       isCursored={isCursored}
+      isNodeInHoverPath={isNodeInHoverPath}
+      setNodeHoverPathTarget={setNodeHoverPathTarget}
       // debugIsCursored={debugIsCursored}
     ></Cell>
   );
@@ -107,6 +124,8 @@ function CellComponent({
   nodeData,
   isCursored,
   debugIsCursored,
+  setNodeHoverPathTarget,
+  isNodeInHoverPath,
 }: {
   id: string;
   currentEra: EraType;
@@ -115,6 +134,8 @@ function CellComponent({
   nodeData: NodeReactData;
   isCursored: boolean;
   debugIsCursored?: boolean;
+  setNodeHoverPathTarget: (isHovered: boolean) => void;
+  isNodeInHoverPath: boolean;
 }) {
   // const startTime = +new Date();
   // console.log(`GameAreaCellComponent key: ${id} rerendered at ${startTime}`);
@@ -131,12 +152,14 @@ function CellComponent({
   const [hovered, setHovered] = useState(false);
 
   const onHover = (e: React.PointerEvent) => {
-    console.log(`got pointer enter on ${id}`);
+    // console.log(`got pointer enter on ${id}`);
     setHovered(true);
+    setNodeHoverPathTarget(true);
   };
   const onUnhover = (e: React.PointerEvent) => {
-    console.log(`got pointer leave on ${id}`);
+    // console.log(`got pointer leave on ${id}`);
     setHovered(false);
+    setNodeHoverPathTarget(false);
   };
 
   return (
@@ -148,11 +171,11 @@ function CellComponent({
             ? 'node-allocated'
             : 'node-unallocated',
           status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
-            ? 'border-important'
+            ? ['border-important', 'node-available']
             : 'border-unimportant',
-          status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
-            ? 'node-available'
-            : '',
+          isNodeInHoverPath
+            ? ['border-hoverpathed', 'node-available']
+            : 'border-unimportant',
           nodeData.statuses.bookmarkedStatus.bookmarked ? 'marked-square' : '',
           accessibleButHidden
             ? 'hex-center-size-small'

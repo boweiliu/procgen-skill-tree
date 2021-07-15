@@ -32,6 +32,7 @@ function _extract(gameState: GameState) {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
       isPixiHidden: gameState.playerUI.isPixiHidden,
+      hoverPathTarget: gameState.playerUI.hoverPathTarget,
       triggerScrollRecenterCb: gameState.playerUI.triggerScrollRecenterCb,
     },
     playerSave: {

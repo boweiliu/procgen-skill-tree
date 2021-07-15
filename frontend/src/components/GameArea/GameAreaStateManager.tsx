@@ -101,6 +101,18 @@ function Component(props: {
     [virtualCoordsToLocation, handleUpdateNodeStatusByLocation]
   );
 
+  const setHoverPathTarget = useCallback(
+    (v: Vector3 | null) => {
+      props.updaters.playerUI.hoverPathTarget.enqueueUpdate((prev) => {
+        if (prev === v || prev?.equals(v)) {
+          return prev;
+        }
+        return v;
+      });
+    },
+    [props.updaters]
+  );
+
   // Manage cursor "node selected" state
   const setCursoredLocation = useCallback(
     (v: Vector3 | null) => {
@@ -383,6 +395,7 @@ function Component(props: {
           updateNodeStatusByLocationCb={handleUpdateNodeStatusByLocation}
           cursoredVirtualNode={cursoredVirtualNodeCoords}
           setCursoredLocation={setCursoredLocation}
+          setHoverPathTarget={setHoverPathTarget}
           debug={gameAreaGridDebug}
         />
       </InfiniteScrollManager>
