@@ -1,5 +1,5 @@
 import { HashSet } from '../lib/util/data_structures/hash';
-import { enumKeys } from '../lib/util/misc';
+import { enumKeys, NotImplementedError } from '../lib/util/misc';
 import { Vector2 } from '../lib/util/geometry/vector2';
 import { PointNodeRef } from '../data/PointNodeRef';
 import { WorldGenState, ChunkGenConstants } from '../data/WorldGenState';
@@ -36,7 +36,7 @@ export function getNeighborsMap(
   selfPointNodeRef: PointNodeRef,
   worldGen: WorldGenState
 ): NeighborsMap {
-  throw new Error('not implemented');
+  throw new NotImplementedError();
   // let neighbors: NeighborsMap = {};
 
   // let zLevel = worldGen.zLevels[selfPointNodeRef.z]!;

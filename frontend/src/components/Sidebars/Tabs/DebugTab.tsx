@@ -169,6 +169,16 @@ export function DebugTabContent(props: {
     props.updaters.justDisabledSave.enqueueUpdate(true);
   }, [props.updaters]);
 
+  const toggleEra = useCallback(() => {
+    props.updaters.playerSave.currentEra.type.enqueueUpdate((prev) => {
+      if (prev === 'A') {
+        return 'B';
+      } else {
+        return 'A';
+      }
+    });
+  }, [props.updaters]);
+
   if (props.hidden) {
     return <> </>;
   }
@@ -256,6 +266,9 @@ export function DebugTabContent(props: {
         </div>
         <div>
           <button onClick={clearSave}>clear save</button>
+        </div>
+        <div>
+          <button onClick={toggleEra}>toggle era</button>
         </div>
       </div>
     </>

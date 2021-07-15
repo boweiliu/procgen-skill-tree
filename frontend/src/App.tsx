@@ -6,6 +6,7 @@ import { DebugOverlayComponent } from './components/DebugOverlayComponent';
 import { KeyboardListenerComponent } from './components/KeyboardListenerComponent';
 import { PixiWrapperComponent } from './components/PixiWrapperComponent';
 import { WindowListenerComponent } from './components/WindowListenerComponent';
+import { HudTopComponent } from './components/HudTopComponent';
 import { UseGameStateContext } from './contexts';
 import { GameState } from './data/GameState';
 import { GameStateFactory } from './game/GameStateFactory';
@@ -115,6 +116,7 @@ function App() {
           windowState={gameState.windowState}
         />
       </div>
+      <HudTopComponent gameState={gameState} updaters={updaters} />
       <div className="button-zone">
         <button
           className="button-pixi-toggle"
@@ -123,7 +125,7 @@ function App() {
             updaters.playerUI.isPixiHidden.enqueueUpdate((it) => !it);
           }}
         >
-          Toggle big view (hotkey: b)
+          Toggle detailed view (hotkey: b)
         </button>
         <span> </span>
         <button

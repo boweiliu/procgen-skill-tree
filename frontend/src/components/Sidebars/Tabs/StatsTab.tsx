@@ -9,7 +9,6 @@ import {
   AttributeSymbolMap,
 } from '../../../game/worldGen/nodeContents/NodeContentsRendering';
 import {
-  Const,
   enumAssociateBy,
   enumMapValues,
   extractDeps,
@@ -32,17 +31,23 @@ export function StatsTab(props: {
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractStatsSubState(gameState: Const<GameState>) {
+export function extractStatsSubState(g: StatsSubState) {
+  return _extract(g as GameState);
+}
+
+export function _extract(gameState: GameState) {
   return {
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
     },
   };
 }
-export type StatsSubState = ReturnType<typeof extractStatsSubState>;
+export type StatsSubState = ReturnType<typeof _extract>;
 export const depsStatsSubState = extractDeps(extractStatsSubState);
 
 const StatsTabHelper = React.memo(StatsTabComponent);
@@ -119,15 +124,27 @@ export function computeAttributeModifierStats(args: {
   const attributeInfos = enumAssociateBy(Attribute, (attribute) => {
     // const modifiers: {[k in keyof typeof Modifier]: number} = fromEnumEntries(
     const modifiers = enumAssociateBy(Modifier, (modifier) => {
-      const amount = gameState.playerSave.allocationStatusMap
+      // find all allocated && bookmarked nodes
+      let nodes = gameState.playerSave.allocationStatusMap
         .entries()
-        .map((pair) => {
-          const [location, status] = pair;
-          if (!status.taken) {
-            // skip nodes that are not taken === true
-            return 0;
-          }
+        .filter(([location, status]) => {
+          return status.taken === true;
+        })
+        .map((it) => it[0]);
 
+      if (gameState.playerSave.currentEra.type === 'A') {
+        nodes = nodes.concat(
+          gameState.playerSave.bookmarkedStatusMap
+            .entries()
+            .filter(([location, status]) => {
+              return status.bookmarked === true;
+            })
+            .map((it) => it[0])
+        );
+      }
+
+      const amount = nodes
+        .map((location) => {
           // look for nodes with attribute
           const nodeContents = gameState.worldGen.nodeContentsMap.get(location);
           if (

@@ -4,8 +4,10 @@ import './GameArea.css';
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { NodeReactData } from './computeVirtualNodeDataMap';
-import { NodeAllocatedStatus } from '../../data/NodeStatus';
+import { NodeAllocatedStatus, NodeTakenStatus } from '../../data/NodeStatus';
 import { Vector3 } from '../../lib/util/geometry/vector3';
+import { AllocateNodeResult } from '../../game/actions/AllocateNode';
+import { EraType } from '../../data/PlayerSaveState';
 
 /**
  * Smart wrapper for the Cell (rectangular component of a hex grid).
@@ -21,6 +23,7 @@ import { Vector3 } from '../../lib/util/geometry/vector3';
 export const GameAreaCell = React.memo(GameAreaCellComponent);
 function GameAreaCellComponent({
   id,
+  currentEra,
   onUpdateStatus,
   nodeData,
   isCursored,
@@ -28,10 +31,12 @@ function GameAreaCellComponent({
   debugIsCursored,
 }: {
   id: string;
+  currentEra: EraType;
   onUpdateStatus: (args: {
     nodeLocation: Vector3;
-    newStatus: NodeAllocatedStatus;
-  }) => void;
+    newStatus: NodeTakenStatus;
+    action: 'allocate' | 'deallocate';
+  }) => AllocateNodeResult;
   nodeData: NodeReactData;
   isCursored: boolean;
   onUpdateCursored: (v: Vector3 | null) => void;
@@ -49,16 +54,16 @@ function GameAreaCellComponent({
       e.preventDefault();
       // console.log(`clicked`);
       // console.log({ idx, rowIdx, status: nodeData.status });
-      if (nodeData.status === NodeAllocatedStatus.AVAILABLE) {
-        onUpdateStatus({
-          nodeLocation,
-          newStatus: NodeAllocatedStatus.TAKEN,
-        });
-      } else {
+      const updateStatusResult = onUpdateStatus({
+        nodeLocation,
+        newStatus: { taken: true },
+        action: 'allocate',
+      });
+      if (!updateStatusResult) {
         onUpdateCursored(isCursored ? null : nodeLocation);
       }
     },
-    [onUpdateStatus, nodeLocation, nodeData, isCursored, onUpdateCursored]
+    [onUpdateStatus, nodeLocation, isCursored, onUpdateCursored]
   );
 
   const handleClickQuestionMark = useCallback(
@@ -74,6 +79,7 @@ function GameAreaCellComponent({
   return (
     <Cell
       key={id}
+      currentEra={currentEra}
       id={id}
       onClickCenter={handleClick}
       nodeData={nodeData}
@@ -95,6 +101,7 @@ function GameAreaCellComponent({
 const Cell = React.memo(CellComponent);
 function CellComponent({
   id,
+  currentEra,
   onClickCenter,
   onClickQuestionMark,
   nodeData,
@@ -102,6 +109,7 @@ function CellComponent({
   debugIsCursored,
 }: {
   id: string;
+  currentEra: EraType;
   onClickCenter: React.MouseEventHandler;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
@@ -113,6 +121,12 @@ function CellComponent({
 
   const status = nodeData.status;
   const isLocked = !!nodeData.lockData;
+  const accessibleButHidden =
+    currentEra.type === 'A' &&
+    nodeData.statuses.accessibleStatus.accessible &&
+    nodeData.statuses.fogOfWarStatus === 'hinted';
+  const completelyHidden =
+    status === NodeAllocatedStatus.HIDDEN && !accessibleButHidden;
 
   const [hovered, setHovered] = useState(false);
 
@@ -130,14 +144,19 @@ function CellComponent({
       <div
         className={classnames(
           'hex-center',
-          status === NodeAllocatedStatus.TAKEN
+          status === NodeAllocatedStatus.TAKEN_OR_MARKED
             ? 'node-allocated'
             : 'node-unallocated',
-          status === NodeAllocatedStatus.TAKEN ||
-            status === NodeAllocatedStatus.UNREACHABLE
-            ? 'border-unimportant'
-            : 'border-important',
-          status === NodeAllocatedStatus.AVAILABLE ? 'node-available' : ''
+          status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
+            ? 'border-important'
+            : 'border-unimportant',
+          status === NodeAllocatedStatus.AVAILABLE && currentEra.type === 'B'
+            ? 'node-available'
+            : '',
+          nodeData.statuses.bookmarkedStatus.bookmarked ? 'marked-square' : '',
+          accessibleButHidden
+            ? 'hex-center-size-small'
+            : 'hex-center-size-medium'
         )}
         onClick={onClickCenter}
         onDoubleClick={() => {
@@ -145,10 +164,19 @@ function CellComponent({
         }}
         onPointerEnter={onHover}
         onPointerLeave={onUnhover}
-        hidden={status === NodeAllocatedStatus.HIDDEN}
+        hidden={completelyHidden}
       >
-        <div className="hex-center-text-wrapper">
-          <div className="tiny-text">{nodeData.shortText}</div>
+        <div
+          className={classnames(
+            'hex-center-text-wrapper',
+            accessibleButHidden
+              ? 'hex-center-size-small'
+              : 'hex-center-size-medium'
+          )}
+        >
+          <div className="tiny-text" hidden={accessibleButHidden}>
+            {nodeData.shortText}
+          </div>
         </div>
       </div>
       {isLocked ? (
@@ -185,7 +213,7 @@ function CellComponent({
         <div className="hover-only-2 absolute-positioned">
           <div
             className="question"
-            hidden={status === NodeAllocatedStatus.HIDDEN}
+            hidden={completelyHidden}
             onClick={onClickQuestionMark}
           >
             ?

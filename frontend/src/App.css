@@ -6,6 +6,7 @@
 /* Defaults from reacct */
 .App {
   text-align: center;
+  /* font-size:x-small !important; */
 }
 
 .App-logo {
@@ -51,7 +52,6 @@
   width: 100%;
   z-index: 300;
 }
-
 .debug-overlay {
   position: relative;
   top: 1px;

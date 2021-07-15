@@ -5,6 +5,7 @@ import {
   NodeVisibleStatus,
   NodeReachableStatus,
   LockStatus,
+  NodeAccessibleStatus,
 } from './NodeStatus';
 import { PlayerIntentState } from './PlayerIntentState';
 import { PlayerSaveState } from './PlayerSaveState';
@@ -44,13 +45,18 @@ export type ComputedState = {
   /**
    * Indicates the visibility states of all the nodes. Can be recomputed from saveState.allocationStatusMap and lock info
    */
-  fogOfWarStatusMap?: HashMap<Vector3, NodeVisibleStatus>;
+  fogOfWarStatusMap: HashMap<Vector3, NodeVisibleStatus> | null;
   /**
    * Stores the allocatability (whether it's connected to the existing tree).
    */
-  reachableStatusMap?: HashMap<Vector3, NodeReachableStatus>;
+  reachableStatusMap: HashMap<Vector3, NodeReachableStatus> | null;
   /**
    * WIP - not really used. intended to store lock open/close status
    */
-  lockStatusMap?: HashMap<Vector3, LockStatus | undefined>;
+  lockStatusMap: HashMap<Vector3, LockStatus | undefined> | null;
+
+  /**
+   * Stores the accessibility (whether it's within the game universe of revealable nodes for the current era).
+   */
+  accessibleStatusMap: HashMap<Vector3, NodeAccessibleStatus> | null;
 };

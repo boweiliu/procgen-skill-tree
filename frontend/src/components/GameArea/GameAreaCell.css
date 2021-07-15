@@ -8,9 +8,10 @@
   border-width: var(--border-width);
   /* circle */
   border-radius: 50%;
-  width: calc(2 * var(--hex-center-radius));
-  height: calc(2 * var(--hex-center-radius));
   z-index: 5;
+}
+.marked-square {
+  border-radius: 0%;
 }
 
 .node-allocated {
@@ -38,6 +39,13 @@
   /* otherwise the border width screws up centering here */
   margin-top: calc(-1 * var(--border-width));
   margin-left: calc(-1 * var(--border-width));
+}
+
+.hex-center-size-small {
+  width: calc(1 * var(--hex-center-radius));
+  height: calc(1 * var(--hex-center-radius));
+}
+.hex-center-size-medium {
   width: calc(2 * var(--hex-center-radius));
   height: calc(2 * var(--hex-center-radius));
 }
@@ -96,8 +104,9 @@
 .hex-center-lock {
   z-index: 10;
   margin-left: calc(-2 * var(--hex-center-radius));
+  top: var(--hex-center-radius);
   width: calc(2 * var(--hex-center-radius));
-  height: calc(5 * var(--hex-center-radius));
+  height: calc(3 * var(--hex-center-radius));
 }
 
 .hex-center-lock-left {
@@ -107,7 +116,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: var(--hex-center-radius);
+  /* margin-top: var(--hex-center-radius); */
   width: calc(2 * var(--hex-center-radius));
   height: calc(1 * var(--hex-center-radius));
   background-color: var(--active-purple);

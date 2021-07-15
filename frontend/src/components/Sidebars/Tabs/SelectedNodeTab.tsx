@@ -1,7 +1,16 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GameState } from '../../../data/GameState';
 import { LockStatus, NodeTakenStatus } from '../../../data/NodeStatus';
-import { AllocateNodeAction } from '../../../game/actions/AllocateNode';
+import {
+  AllocateNodeAction,
+  depsAllocateNodeCheckState,
+  extractAllocateNodeCheckState,
+} from '../../../game/actions/AllocateNode';
+import {
+  DeallocateNodeAction,
+  depsDeallocateNodeCheckState,
+  extractDeallocateNodeCheckState,
+} from '../../../game/actions/DeallocateNode';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { UpdaterGeneratorType2 } from '../../../lib/util/updaterGenerator';
@@ -18,23 +27,74 @@ export const SelectedNodeTabContent = React.memo(
 function SelectedNodeTabContentComponent(props: {
   gameState: GameState;
   updaters: UpdaterGeneratorType2<GameState, GameState>;
-  actions: { allocateNode: AllocateNodeAction };
+  actions: {
+    allocateNode: AllocateNodeAction;
+    deallocateNode: DeallocateNodeAction;
+  };
 }) {
   const { gameState } = props;
   const location = gameState.playerUI.cursoredNodeLocation;
+
+  // TODO(bowei): use custom hooks for onAllocate/canAllocate paradigm
+
+  const allocateNodeCheckState = useMemo(() => {
+    return extractAllocateNodeCheckState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsAllocateNodeCheckState(gameState));
+
+  const deallocateNodeCheckState = useMemo(() => {
+    return extractDeallocateNodeCheckState(gameState);
+    // TODO(bowei): use custom hook here so react doesnt complain so much
+    // eslint-disable-next-line
+  }, depsDeallocateNodeCheckState(gameState));
 
   const onAllocate = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       if (location) {
-        props.actions.allocateNode.enqueueAction({
-          nodeLocation: location,
-          newStatus: NodeTakenStatus.true,
-        });
+        props.actions.allocateNode.run(
+          {
+            nodeLocation: location,
+            newStatus: NodeTakenStatus.true,
+          },
+          allocateNodeCheckState
+        );
       }
     },
-    [props.actions.allocateNode, location]
+    [props.actions.allocateNode, location, allocateNodeCheckState]
   );
+
+  const canBeAllocated = useMemo(() => {
+    if (location) {
+      return AllocateNodeAction.checkAction(
+        { nodeLocation: location, newStatus: { taken: true } },
+        allocateNodeCheckState
+      );
+    }
+  }, [location, allocateNodeCheckState]);
+
+  const onDeallocate = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.deallocateNode.run(
+          { nodeLocation: location },
+          deallocateNodeCheckState
+        );
+      }
+    },
+    [props.actions.deallocateNode, location, deallocateNodeCheckState]
+  );
+
+  const canBeDeallocated = useMemo(() => {
+    if (location) {
+      return DeallocateNodeAction.checkAction(
+        { nodeLocation: location },
+        deallocateNodeCheckState
+      );
+    }
+  }, [location, deallocateNodeCheckState]);
 
   const onZoom = useCallback(
     (e: React.MouseEvent) => {
@@ -80,17 +140,22 @@ function SelectedNodeTabContentComponent(props: {
 
   const takenStatus =
     gameState.playerSave.allocationStatusMap?.get(location)?.taken || false;
+  const bookmarkedStatus =
+    gameState.playerSave.bookmarkedStatusMap?.get(location)?.bookmarked ||
+    false;
+  const exploredStatus =
+    gameState.playerSave.exploredStatusMap?.get(location)?.explored || false;
   const reachableStatus =
     gameState.computed.reachableStatusMap?.get(location)?.reachable || false;
   const visibleStatus =
-    gameState.computed.fogOfWarStatusMap?.get(location)?.visible || false;
+    gameState.computed.fogOfWarStatusMap?.get(location) || 'obscured';
+  const accessibleStatus =
+    gameState.computed.accessibleStatusMap?.get(location)?.accessible || false;
   const lockData = visibleStatus
     ? gameState.worldGen.lockMap?.get(location) || null
     : null;
   const lockStatus = gameState.computed.lockStatusMap?.get(location) || null;
   const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-
-  const canBeAllocated = reachableStatus && !isLocked && !takenStatus;
 
   let description = '';
   if (location.equals(Vector3.Zero)) {
@@ -103,9 +168,10 @@ function SelectedNodeTabContentComponent(props: {
     description = 'An allocatable node.';
   }
 
-  const nodeContents = visibleStatus
-    ? gameState.worldGen.nodeContentsMap.get(location) || null
-    : null;
+  const nodeContents =
+    visibleStatus === 'revealed'
+      ? gameState.worldGen.nodeContentsMap.get(location) || null
+      : null;
   const nodeContentsDom = nodeContents?.lines[0]
     ? nodeContentsToDom(nodeContents)
     : 'empty';
@@ -126,15 +192,21 @@ function SelectedNodeTabContentComponent(props: {
         <div>Taken?: {takenStatus.toString()}</div>
         <div>Reachable?: {reachableStatus.toString()}</div>
         <div>Visible?: {visibleStatus.toString()}</div>
+        <div>Bookmarked?: {bookmarkedStatus.toString()}</div>
+        <div>Explored?: {exploredStatus.toString()}</div>
+        <div>Accessible?: {accessibleStatus.toString()}</div>
         {visibleStatus ? (
           <>
             <div>Locked?: {isLocked.toString()}</div>
-            <div>Can be allocated?: {canBeAllocated.toString()}</div>
+            <div>Can be allocated?: {(!!canBeAllocated).toString()}</div>
             <br></br>
             <div>Contents: {nodeContentsDom}</div>
             <br></br>
             <button disabled={!canBeAllocated} onClick={onAllocate}>
               Allocate (hotkey: spacebar)
+            </button>
+            <button disabled={!canBeDeallocated} onClick={onDeallocate}>
+              Deallocate (hotkey: backspace)
             </button>
           </>
         ) : (

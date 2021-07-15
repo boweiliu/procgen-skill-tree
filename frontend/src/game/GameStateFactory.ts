@@ -1,6 +1,7 @@
 import { GameState } from '../data/GameState';
 import {
   LockStatus,
+  NodeAccessibleStatus,
   NodeReachableStatus,
   NodeVisibleStatus,
 } from '../data/NodeStatus';
@@ -11,10 +12,14 @@ import { HashMap } from '../lib/util/data_structures/hash';
 import { Vector3 } from '../lib/util/geometry/vector3';
 import { getWithinDistance, IReadonlySet } from './lib/HexGrid';
 import { WorldGenStateFactory } from './worldGen/WorldGenStateFactory';
-import { FOG_OF_WAR_DISTANCE } from './actions/AllocateNode';
+import {
+  ERA_ACCESSIBLE_RADII,
+  FOG_OF_WAR_DISTANCE,
+} from './actions/AllocateNode';
 import { newDebugState } from '../data/DebugState';
 import { PlayerUIState } from '../data/PlayerUIState';
 import { loadOrCreate } from '../components/PersistenceComponent';
+import { Const } from '../lib/util/misc';
 
 export type GameStateConfig = any;
 
@@ -46,7 +51,12 @@ export class GameStateFactory {
       worldGen: worldGenStateFactory.create({ seed: mySeed }),
       playerSave: newPlayerSaveState(),
       playerUI: PlayerUIState.new(),
-      computed: {},
+      computed: {
+        lockStatusMap: null,
+        fogOfWarStatusMap: null,
+        reachableStatusMap: null,
+        accessibleStatusMap: null,
+      },
       intent: newPlayerIntentState(),
       windowState: newWindowState(),
       debug: newDebugState(),
@@ -67,90 +77,326 @@ export function loadComputed(gameState: GameState): GameState {
   gameState.computed.lockStatusMap = new HashMap();
   gameState.computed.fogOfWarStatusMap = new HashMap();
   gameState.computed.reachableStatusMap = new HashMap();
+  gameState.computed.accessibleStatusMap = new HashMap();
 
   /**
    * Initialize fog of war and visible locks
    */
-  // let prevMap = gameState.playerSave.allocationStatusMap;
-  // first precompute the nearby lock states
-  getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
-    gameState.worldGen.lockMap.precompute(n);
-  });
-  // fill in lock statuses with computed statuses
-  // TODO(bowei): fix this?? it doesnt actually do anything???
-  {
-    let prevMap = gameState.computed.lockStatusMap;
-    // let nodeLocation = Vector3.Zero;
-    const prevGameState = gameState;
 
-    for (let [location, lockData] of prevGameState.worldGen.lockMap.entries()) {
-      if (lockData) {
-        // compute lock status
-        const newStatus = LockStatus.TICKING;
-        prevMap.put(location, newStatus);
+  // optionally, first precompute the nearby lock worldgen parameters
+  // getWithinDistance(Vector3.Zero, FOG_OF_WAR_DISTANCE).forEach((n) => {
+  //   gameState.worldGen.lockMap.precompute(n);
+  // });
+
+  // fill in lock statuses with computed statuses
+  gameState.computed.lockStatusMap = markLockStatus(
+    gameState.computed.lockStatusMap,
+    gameState
+  );
+
+  // accessible and visible computation makes use of lock information
+  gameState.computed.accessibleStatusMap = markAccessibleNodes({
+    result: gameState.computed.accessibleStatusMap,
+    prev: gameState.computed.accessibleStatusMap,
+    prevGameState: gameState,
+  });
+
+  gameState.computed.fogOfWarStatusMap = markVisibleNodes(
+    gameState.computed.fogOfWarStatusMap,
+    gameState
+  );
+
+  // reachable depends on visible
+  gameState.computed.reachableStatusMap = markReachableNodes(
+    gameState.computed.reachableStatusMap,
+    gameState
+  );
+
+  return gameState;
+}
+
+export function markLockStatus(
+  prev: Const<HashMap<Vector3, LockStatus | undefined>> | null,
+  prevGameState: Const<GameState>
+): HashMap<Vector3, LockStatus | undefined> | null {
+  if (!prev) {
+    return prev;
+  }
+
+  let result: HashMap<Vector3, LockStatus | undefined> | null = null;
+
+  for (let [location, lockData] of prevGameState.worldGen.lockMap.entries()) {
+    if (lockData) {
+      // TODO(bowei): compute lock status
+      const newStatus = LockStatus.TICKING;
+
+      if (prev.get(location) !== newStatus) {
+        result = result || prev.clone();
+        result.put(location, newStatus);
       }
     }
   }
-  // now fog of war flow vision based on computed lock statuses
-  {
-    let prevMap = gameState.computed.fogOfWarStatusMap;
-    let prevReachableStatusMap = gameState.computed.reachableStatusMap;
-    // let newStatus = NodeAllocatedStatus.TAKEN;
-    const prevGameState = gameState;
 
-    gameState.playerSave.allocationStatusMap
-      .entries()
-      .filter(([loc, status]) => {
-        return status.taken === true;
-      })
-      .map((it) => it[0])
-      .forEach((nodeLocation) => {
-        getWithinDistance(nodeLocation, 1).forEach((n) => {
-          prevReachableStatusMap.put(n, NodeReachableStatus.true);
-        });
-      });
+  return result || (prev as unknown as typeof result);
+}
 
-    gameState.playerSave.allocationStatusMap
-      .entries()
-      .filter(([loc, status]) => {
-        return status.taken === true;
-      })
-      .map((it) => it[0])
-      .forEach((nodeLocation) => {
-        prevMap.put(nodeLocation, NodeVisibleStatus.true);
+/**
+ * Updates accessible computed map based on distance from the starting node.
+ * @param result mutable temporary storage. null if the state is intended to be the same as prev
+ * @param prev the initial state. immutable
+ * @param prevGameState immutable
+ * @returns the same object reference as result;
+ * will be null iff null was passed in as [result], AND no further changes were necessary for the update
+ * (i.e. we want to return prev)
+ * if null was passed in as [result], but we DID want to make changes, this function returns a clone of [prev] with changes added on top.
+ */
+export function markAccessibleNodes(args: {
+  result: HashMap<Vector3, NodeAccessibleStatus> | null;
+  prev: Const<HashMap<Vector3, NodeAccessibleStatus>>;
+  prevGameState: Const<GameState>;
+}): HashMap<Vector3, NodeAccessibleStatus> | null {
+  const { prev, prevGameState } = args;
+  let { result } = args;
+  // if (!prev) {
+  //   return prev;
+  // }
 
-        getWithinDistance(nodeLocation, 1).forEach((n) => {
-          prevMap.put(n, NodeVisibleStatus.true);
-        });
+  // let result: typeof prev | null = null;
 
-        // make sure we make use of lock state
-        // getWithinDistance(nodeLocation, 3).forEach((n) => {
-        // const validLocks = prevGameState.worldGen.lockMap
-        const validLocks: IReadonlySet<Vector3> = {
-          // TODO(bowei): optimize this?
-          contains: (v: Vector3) => {
-            const lockData = prevGameState.worldGen.lockMap.get(v);
-            const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
-            const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-            if (isLocked) {
-              return true;
-            }
-            return false;
-          },
-        };
-        getWithinDistance(
-          nodeLocation,
-          FOG_OF_WAR_DISTANCE,
-          0,
-          validLocks
-        ).forEach((n) => {
-          if (!prevMap.get(n)?.visible) {
-            // NOTE(bowei): fuck, this doesnt cause a update to be propagated... i guess it's fine though
-            prevGameState.worldGen.lockMap.precompute(n);
-            prevMap.put(n, NodeVisibleStatus.true);
-          }
-        });
-      });
+  // make sure we make use of lock state
+  const validLocks: IReadonlySet<Vector3> = {
+    // TODO(bowei): optimize this?
+    contains: (v: Vector3) => {
+      const lockData = prevGameState.worldGen.lockMap.get(v);
+      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+      if (isLocked) {
+        return true;
+      }
+      return false;
+    },
+  };
+
+  getWithinDistance(
+    Vector3.Zero,
+    ERA_ACCESSIBLE_RADII[prevGameState.playerSave.currentEra.index],
+    0,
+    validLocks
+  ).forEach((n) => {
+    if (prev.get(n)?.accessible !== true) {
+      result = result || prev.clone();
+      result.put(n, { accessible: true });
+    }
+  });
+
+  return result;
+}
+
+export function markReachableNodes(
+  prev: HashMap<Vector3, NodeReachableStatus> | null,
+  prevGameState: Const<GameState>
+): HashMap<Vector3, NodeReachableStatus> | null {
+  if (!prev) {
+    return prev;
   }
-  return gameState;
+
+  let result: typeof prev | null = null;
+
+  prevGameState.playerSave.allocationStatusMap
+    .entries()
+    .filter(([location, status]) => {
+      return status.taken === true;
+    })
+    .map((it) => it[0])
+    .forEach((nodeLocation) => {
+      result = flowReachableFromNode({
+        result,
+        prev,
+        prevGameState,
+        nodeLocation,
+      });
+    });
+
+  return result || prev;
+}
+
+/**
+ *
+ * @param result mutable temporary storage. null if the state is intended to be the same as prev
+ * @param prev the initial state of reachable status map at the beginning of the update process. immutable
+ * @param prevGameState
+ * @param nodeLocation which node to flow reachability from
+ * @returns the same object reference as result;
+ * will be null iff null was passed in as [result], AND no further changes were necessary for the update
+ * (i.e. we want to return prev)
+ * if null was passed in as [result], but we DID want to make changes, this function returns a clone of [prev] with changes added on top.
+ */
+export function flowReachableFromNode(args: {
+  result: HashMap<Vector3, NodeReachableStatus> | null;
+  prev: Const<HashMap<Vector3, NodeReachableStatus>>;
+  prevGameState: Const<GameState>;
+  nodeLocation: Vector3;
+}): HashMap<Vector3, NodeReachableStatus> | null {
+  const { prev, prevGameState, nodeLocation } = args;
+  let { result } = args;
+
+  getWithinDistance(nodeLocation, 1).forEach((n) => {
+    if (
+      // prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+      prevGameState.computed.fogOfWarStatusMap?.get(n) !== 'revealed'
+    ) {
+      return;
+    }
+    if (prev.get(n)?.reachable !== true) {
+      result = result || prev.clone();
+      result.put(n, NodeReachableStatus.true);
+    }
+  });
+
+  return result;
+}
+
+export function markVisibleNodes(
+  prev: HashMap<Vector3, NodeVisibleStatus> | null,
+  prevGameState: Const<GameState>
+): HashMap<Vector3, NodeVisibleStatus> | null {
+  if (!prev) {
+    return prev;
+  }
+
+  let result: typeof prev | null = null;
+
+  let nodes: Vector3[] = [];
+
+  if (prevGameState.playerSave.currentEra.type === 'A') {
+    nodes = nodes.concat(
+      prevGameState.playerSave.allocationStatusMap
+        .entries()
+        .filter(([location, status]) => {
+          return status.taken === true;
+        })
+        .map((it) => it[0])
+    );
+  }
+
+  nodes = nodes.concat(
+    prevGameState.playerSave.exploredStatusMap
+      .entries()
+      .filter(([location, status]) => {
+        return status.explored === true;
+      })
+      .map((it) => it[0])
+  );
+
+  nodes.forEach((nodeLocation) => {
+    result = flowFogOfWarFromNode({
+      result,
+      prev: result || prev,
+      prevGameState,
+      nodeLocation,
+    });
+  });
+
+  return result || prev;
+}
+
+/**
+ *
+ * @param result mutable temporary storage. null if the state is intended to be the same as prev
+ * @param prev the initial state of fog of war status map at the beginning of the update process. immutable
+ * @param prevGameState
+ * @param nodeLocation which node to flow fog of war from
+ * @returns the same object reference as result;
+ * will be null iff null was passed in as [result], AND no further changes were necessary for the update
+ * (i.e. we want to return prev)
+ * if null was passed in as [result], but we DID want to make changes, this function returns a clone of [prev] with changes added on top.
+ */
+export function flowFogOfWarFromNode(args: {
+  result: HashMap<Vector3, NodeVisibleStatus> | null;
+  prev: Const<HashMap<Vector3, NodeVisibleStatus>>;
+  prevGameState: Const<GameState>;
+  nodeLocation: Vector3;
+}): HashMap<Vector3, NodeVisibleStatus> | null {
+  const { prev, prevGameState, nodeLocation } = args;
+  let { result } = args;
+
+  if ((result || prev).get(nodeLocation) !== 'revealed') {
+    result = result || prev.clone(); // clone if we haven't already
+    result.put(nodeLocation, 'revealed');
+  }
+
+  // make sure locks within distance 1 are set to visible
+  getWithinDistance(nodeLocation, 1).forEach((n) => {
+    if (
+      prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+    ) {
+      return;
+    }
+    if ((result || prev).get(n) !== 'revealed') {
+      result = result || prev.clone();
+      result.put(n, 'revealed');
+    }
+  });
+
+  // make sure we make use of lock state
+  const validLocks: IReadonlySet<Vector3> = {
+    // TODO(bowei): optimize this?
+    contains: (v: Vector3) => {
+      const lockData = prevGameState.worldGen.lockMap.get(v);
+      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+      const isAccessible =
+        !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
+      if (isLocked || !isAccessible) {
+        return true;
+      }
+      return false;
+    },
+  };
+
+  // flow fog of war, keeping in mind validLocks and accessibility restrictions
+  getWithinDistance(nodeLocation, FOG_OF_WAR_DISTANCE, 0, validLocks).forEach(
+    (n) => {
+      if (
+        prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+      ) {
+        return;
+      }
+
+      if (((result || prev).get(n) || 'obscured') !== 'revealed') {
+        result = result || prev.clone();
+        result.put(n, 'revealed');
+      }
+    }
+  );
+
+  // convert obscured nodes just outside fog of war to hinted, but only if they are accessible
+  // if they are locked, instead convert them to revealed -- feels bad if hinted things get revealed to be locks
+  getWithinDistance(
+    nodeLocation,
+    FOG_OF_WAR_DISTANCE + 1,
+    FOG_OF_WAR_DISTANCE + 1,
+    validLocks
+  ).forEach((n) => {
+    if (
+      prevGameState.computed.accessibleStatusMap?.get(n)?.accessible !== true
+    ) {
+      return;
+    }
+
+    if (validLocks.contains(n)) {
+      if (((result || prev).get(n) || 'obscured') !== 'revealed') {
+        result = result || prev.clone();
+        result.put(n, 'revealed');
+      }
+      return;
+    }
+
+    if (((result || prev).get(n) || 'obscured') === 'obscured') {
+      result = result || prev.clone();
+      result.put(n, 'hinted');
+    }
+  });
+
+  return result;
 }

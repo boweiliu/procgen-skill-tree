@@ -9,21 +9,28 @@ import {
   NodeReactData,
 } from './computeVirtualNodeDataMap';
 import { GameAreaCell } from './GameAreaCell';
-import { NodeAllocatedStatus } from '../../data/NodeStatus';
-import { GameAreaSubState } from './GameAreaInterface';
+import { NodeTakenStatus } from '../../data/NodeStatus';
 import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
+import { AllocateNodeResult } from '../../game/actions/AllocateNode';
+import { GameState } from '../../data/GameState';
 
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractGameGridSubState(gameState: GameAreaSubState) {
+export function extractGameGridSubState(g: GameGridSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: GameState) {
   return {
     playerUI: {
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -33,10 +40,11 @@ export function extractGameGridSubState(gameState: GameAreaSubState) {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
     },
   };
 }
-export type GameGridSubState = ReturnType<typeof extractGameGridSubState>;
+export type GameGridSubState = ReturnType<typeof _extract>;
 export const depsGameGridSubState = extractDeps(extractGameGridSubState);
 
 export const GameAreaGrid = React.memo(Component);
@@ -58,8 +66,9 @@ function Component(props: {
   virtualCoordsToLocation: (v: Vector2) => Vector3;
   updateNodeStatusByLocationCb: (args: {
     nodeLocation: Vector3;
-    newStatus: NodeAllocatedStatus;
-  }) => void;
+    newStatus: NodeTakenStatus;
+    action: 'allocate' | 'deallocate';
+  }) => AllocateNodeResult;
   cursoredVirtualNode: Vector2 | null;
   setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
@@ -130,6 +139,7 @@ function Component(props: {
                       // key={nodeData.id}
                       key={key}
                       id={key}
+                      currentEra={gameState.playerSave.currentEra}
                       // key={x.toString() + "," + y.toString()} // stupid debug??
                       // key={x} // debug??
                       nodeData={nodeData}

@@ -2,8 +2,9 @@ import React, { useMemo } from 'react';
 import { GameState } from '../../data/GameState';
 import { appSizeFromWindowSize } from '../../data/WindowState';
 import { AllocateNodeAction } from '../../game/actions/AllocateNode';
+import { DeallocateNodeAction } from '../../game/actions/DeallocateNode';
 import { Vector2 } from '../../lib/util/geometry/vector2';
-import { extractDeps } from '../../lib/util/misc';
+import { EnumInvalidError, extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import COLORS from '../../pixi/colors';
 import { UiScale } from '../../pixi/textures/SimpleTextures';
@@ -21,7 +22,11 @@ export const virtualAreaScaleMultiplier = 2.0;
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractGameAreaSubState(gameState: GameState) {
+export function extractGameAreaSubState(g: GameAreaSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: GameState) {
   return {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -31,6 +36,9 @@ export function extractGameAreaSubState(gameState: GameState) {
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
+      deallocationPoints: gameState.playerSave.deallocationPoints,
     },
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
@@ -40,6 +48,7 @@ export function extractGameAreaSubState(gameState: GameState) {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
     },
     intent: gameState.intent,
     debug: {
@@ -52,7 +61,8 @@ export function extractGameAreaSubState(gameState: GameState) {
     },
   };
 }
-export type GameAreaSubState = ReturnType<typeof extractGameAreaSubState>;
+
+export type GameAreaSubState = ReturnType<typeof _extract>;
 export const depsGameAreaSubState = extractDeps(extractGameAreaSubState);
 
 export function uiScaleFromAppSize(appSize: Vector2): UiScale {
@@ -114,7 +124,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return new Vector2(75, 65); // TODO(bowei): change text font size to xx-small
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 
@@ -131,7 +141,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return 20;
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 
@@ -148,7 +158,7 @@ export function GameAreaInterface(props: {
     } else if (uiScale === 'x-small') {
       return 1;
     } else {
-      throw new Error(''); // should never get here
+      throw new EnumInvalidError();
     }
   }, [uiScale]);
 
@@ -178,7 +188,10 @@ export function GameAreaInterface(props: {
 
   // TODO(bowei): improve this abstraction??
   const actions = useMemo(() => {
-    return { allocateNode: new AllocateNodeAction(props.updaters) };
+    return {
+      allocateNode: new AllocateNodeAction(props.updaters),
+      deallocateNode: new DeallocateNodeAction(props.updaters),
+    };
   }, [props.updaters]);
 
   return (

@@ -5,7 +5,6 @@ import {
   LockStatus,
   NodeReachableStatus,
   NodeTakenStatus,
-  NodeVisibleStatus,
 } from '../../data/NodeStatus';
 import { StrategicSearchState } from '../../data/PlayerUIState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
@@ -42,7 +41,11 @@ type Props = {
 /**
  * The subset of the game state that is relevant to game area components.
  */
-export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
+export function extractStrategicHexGridSubState(g: StrategicHexGridSubState) {
+  return _extract(g as GameState);
+}
+
+function _extract(gameState: Const<GameState>) {
   return {
     playerUI: {
       virtualGridLocation: gameState.playerUI.virtualGridLocation,
@@ -52,6 +55,8 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
+      bookmarkedStatusMap: gameState.playerSave.bookmarkedStatusMap,
+      currentEra: gameState.playerSave.currentEra,
     },
     intent: {
       newIntent: {
@@ -64,6 +69,7 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
       lockStatusMap: gameState.computed.lockStatusMap,
     },
     worldGen: {
@@ -72,9 +78,7 @@ export function extractStrategicHexGridSubState(gameState: Const<GameState>) {
     },
   };
 }
-export type StrategicHexGridSubState = ReturnType<
-  typeof extractStrategicHexGridSubState
->;
+export type StrategicHexGridSubState = ReturnType<typeof _extract>;
 export const depsStrategicHexGridSubState = extractDeps(
   extractStrategicHexGridSubState
 );
@@ -312,6 +316,10 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
 
   protected renderSelf(props: Props) {
     const { gameState } = props;
+    const {
+      playerSave: { currentEra },
+    } = gameState;
+
     this.container.position = PixiPointFrom(props.args.position);
     // this.graphics.position = PixiPointFrom(props.appSize.divide(2));
 
@@ -332,20 +340,25 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
           )
         );
       // graphics.position = PixiPointFrom(basePosition);
-      let baseTint: number = 0x000000;
+      let baseTint: number;
 
       const nodeLocation = gameState.playerUI.virtualGridLocation.add(
         Vector3.FromVector2(v)
       );
       const nodeVisibleStatus =
-        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) ||
-        NodeVisibleStatus.false;
+        gameState.computed.fogOfWarStatusMap?.get(nodeLocation) || 'obscured';
       const nodeTakenStatus =
         gameState.playerSave.allocationStatusMap.get(nodeLocation) ||
         NodeTakenStatus.false;
+      const nodeBookmarkedStatus = gameState.playerSave.bookmarkedStatusMap.get(
+        nodeLocation
+      ) || { bookmarked: false };
       const nodeReachableStatus =
         gameState.computed.reachableStatusMap?.get(nodeLocation) ||
         NodeReachableStatus.false;
+      const nodeAccessibleStatus = gameState.computed.accessibleStatusMap?.get(
+        nodeLocation
+      ) || { accessible: false };
       const lockData = gameState.worldGen.lockMap.get(nodeLocation);
       const lockStatus = gameState.computed.lockStatusMap?.get(nodeLocation);
       const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
@@ -355,25 +368,43 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.visible = true;
         baseTint = COLORS.borderBlack;
         // graphics.tint = COLORS.borderBlack;
-      } else if (nodeReachableStatus.reachable) {
-        // only recolor if it is not locked
-        if (isLocked) {
-          graphics.visible = true;
-          baseTint = COLORS.nodeLavender;
-          // graphics.tint = COLORS.nodeLavender;
-        } else {
-          // use the ordinary visible-but-unreachable coloring
-          graphics.visible = true;
-          baseTint = COLORS.nodePink;
-          // graphics.tint = COLORS.nodePink;
-        }
-      } else if (nodeVisibleStatus.visible) {
+      } else if (currentEra.type === 'A' && nodeBookmarkedStatus.bookmarked) {
         graphics.visible = true;
+        baseTint = COLORS.borderBlack;
+        // graphics.tint = COLORS.borderBlack;
+        // } else if (currentEra.type === 'B' && nodeBookmarkedStatus.bookmarked) {
+        //   // TODO(bowei): what to show here if bookmarked in B era?
+        //   graphics.visible = true;
+        //   baseTint = COLORS.nodePink;
+        //   // graphics.tint = COLORS.borderBlack;
+      } else if (
+        nodeReachableStatus.reachable &&
+        !isLocked &&
+        currentEra.type === 'B'
+      ) {
+        // only recolor if it is not locked and era is in allocation era
+        graphics.visible = true;
+        baseTint = COLORS.nodeLavender;
+        // graphics.tint = COLORS.nodeLavender;
+      } else if (nodeVisibleStatus === 'revealed') {
+        // default - visible but nothing else special
+        graphics.visible = true;
+        visible = true;
+        baseTint = COLORS.nodePink;
+        // graphics.tint = COLORS.nodePink;
+      } else if (
+        currentEra.type === 'A' &&
+        nodeVisibleStatus === 'hinted' &&
+        nodeAccessibleStatus.accessible
+      ) {
+        // hinted - smaller circle and empty contents
+        graphics.visible = true;
+        visible = false;
         baseTint = COLORS.nodePink;
         // graphics.tint = COLORS.nodePink;
       } else {
         // hidden
-        graphics.visible = true;
+        graphics.visible = false;
         visible = false;
         baseTint = COLORS.nodePink;
       }
@@ -406,7 +437,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       // graphics.anchor = PixiPointFrom(Vector2.Zero);
       // graphics.pivot = PixiPointFrom(Vector2.Zero);
       const textures = props.args.textures.get();
-      if (!nodeVisibleStatus.visible) {
+      if (
+        currentEra.type === 'A' &&
+        nodeVisibleStatus === 'hinted' &&
+        nodeAccessibleStatus.accessible
+      ) {
         graphics.texture = textures.dot;
         graphics.position = PixiPointFrom(basePosition);
         graphics.position.x -= textures.dot.width / 2;
@@ -417,6 +452,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         graphics.position.x -= textures.rect.width / 2;
         graphics.position.y -= textures.rect.height / 2;
         // graphics.tint = COLORS.borderBlack;
+      } else if (nodeBookmarkedStatus.bookmarked) {
+        graphics.texture = textures.square;
+        graphics.position = PixiPointFrom(basePosition);
+        graphics.position.x -= textures.square.width / 2;
+        graphics.position.y -= textures.square.height / 2;
       } else {
         graphics.texture = textures.circle;
         graphics.position = PixiPointFrom(basePosition);

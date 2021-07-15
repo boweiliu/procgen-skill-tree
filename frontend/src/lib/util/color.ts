@@ -161,3 +161,7 @@ function hsvToHexHelper(colorDirection: number, hsv: Hsv) {
   // console.log({ h, s, v , colorDirection, k, colorPercentUnclamped, colorPercent, })
   return Math.round(v * (1 - s * colorPercent) * COLOR_MAX);
 }
+
+export function invertColor(c: number): number {
+  return 0xffffff - c;
+}

@@ -222,6 +222,16 @@ export function enumMapValues<T extends string, U, V>(
   return result;
 }
 
+/**
+ * Error if a value is expected to be in an enum, but somehow is not -- deserialization error?
+ */
+export class EnumInvalidError extends Error {}
+
+/**
+ * Error for a WIP feature that has not been implemented yet
+ */
+export class NotImplementedError extends Error {}
+
 // export function enumKeys<T extends string>(enm: { [key: string]: string }) : T[] {
 //   return Object.keys(enm) as T[];
 // }

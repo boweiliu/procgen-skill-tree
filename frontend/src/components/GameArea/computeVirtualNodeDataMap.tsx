@@ -1,5 +1,11 @@
 import React from 'react';
-import { LockStatus, NodeAllocatedStatus } from '../../data/NodeStatus';
+import {
+  LockStatus,
+  NodeAccessibleStatus,
+  NodeAllocatedStatus,
+  NodeBookmarkedStatus,
+  NodeVisibleStatus,
+} from '../../data/NodeStatus';
 import { LockData } from '../../data/PlayerSaveState';
 import { NodeContents } from '../../game/worldGen/nodeContents/NodeContentsFactory';
 import {
@@ -22,6 +28,11 @@ export type NodeReactData = {
   lockData?: (LockData | undefined) & { status: LockStatus | undefined };
   nodeContents: NodeContents;
   status: NodeAllocatedStatus;
+  statuses: {
+    bookmarkedStatus: NodeBookmarkedStatus;
+    accessibleStatus: NodeAccessibleStatus;
+    fogOfWarStatus: NodeVisibleStatus;
+  };
   nodeLocation: Vector3;
   id: string;
 };
@@ -42,19 +53,32 @@ export function computeNodeReactData(args: {
   const {
     fogOfWarStatusMap,
     reachableStatusMap,
+    accessibleStatusMap,
     // lockStatusMap,
   } = args.gameState.computed;
-  const { allocationStatusMap } = args.gameState.playerSave;
+  const { allocationStatusMap, bookmarkedStatusMap, currentEra } =
+    args.gameState.playerSave;
   const { lockMap, nodeContentsMap } = args.gameState.worldGen;
 
-  const fogOfWarStatus = fogOfWarStatusMap?.get(location);
+  const fogOfWarStatus = fogOfWarStatusMap?.get(location) || 'obscured';
   const reachableStatus = reachableStatusMap?.get(location);
   const takenStatus = allocationStatusMap.get(location);
+  const bookmarkedStatus = bookmarkedStatusMap.get(location) || {
+    bookmarked: false,
+  };
+
+  const accessibleStatus = accessibleStatusMap?.get(location) || {
+    accessible: false,
+  };
+
   const nodeStatus = takenStatus?.taken
-    ? NodeAllocatedStatus.TAKEN
-    : reachableStatus?.reachable
+    ? NodeAllocatedStatus.TAKEN_OR_MARKED
+    : currentEra.type === 'A' && bookmarkedStatus?.bookmarked
+    ? NodeAllocatedStatus.TAKEN_OR_MARKED
+    : // TODO(bowei): what to show here if bookmarked in B era?
+    reachableStatus?.reachable
     ? NodeAllocatedStatus.AVAILABLE
-    : fogOfWarStatus?.visible
+    : fogOfWarStatus === 'revealed'
     ? NodeAllocatedStatus.UNREACHABLE
     : NodeAllocatedStatus.HIDDEN;
   const id = location.hash();
@@ -129,6 +153,17 @@ export function computeNodeReactData(args: {
     );
   }
 
+  let toolTipText = <div>{tooltipHeader}</div>;
+  if (nodeContents.lines.length && accessibleStatus.accessible) {
+    toolTipText = (
+      <>
+        <div>{tooltipHeader}</div>
+        <br />
+        {nodeContentsToDom(nodeContents)}
+      </>
+    );
+  }
+
   const nodeData: NodeReactData = {
     nodeLocation: location,
     shortText: shortText2 ? (
@@ -140,13 +175,7 @@ export function computeNodeReactData(args: {
     ) : (
       <>{shortText1}</>
     ),
-    toolTipText: (
-      <>
-        <div>{tooltipHeader}</div>
-        {nodeContents.lines[0] ? <br /> : <></>}
-        {nodeContentsToDom(nodeContents)}
-      </>
-    ),
+    toolTipText,
     nodeContents,
     fullText: <> </>,
     status: nodeStatus,
@@ -157,6 +186,11 @@ export function computeNodeReactData(args: {
         }
       : undefined,
     id,
+    statuses: {
+      bookmarkedStatus,
+      accessibleStatus,
+      fogOfWarStatus,
+    },
   };
   return nodeData;
 }

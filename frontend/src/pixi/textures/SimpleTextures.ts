@@ -1,5 +1,4 @@
 import * as Pixi from 'pixi.js';
-import COLORS from '../colors';
 
 export interface SimpleTextureSet {
   circle: Pixi.Texture;
@@ -8,6 +7,8 @@ export interface SimpleTextureSet {
   square: Pixi.Texture;
   verticalLine: Pixi.Texture;
 }
+
+const WHITE = 0xffffff;
 
 export type UiScale = 'x-small' | 'small' | 'medium' | 'large' | 'x-large';
 
@@ -28,7 +29,7 @@ export function generateSimpleTextures(
       : uiScale === 'medium' || uiScale === 'large'
       ? 16
       : 24;
-  circle.beginFill(COLORS.white);
+  circle.beginFill(WHITE);
   circle.drawCircle(0, 0, diameter / 2);
   // circle.drawCircle(0, 0, 6);
   // circle.pivot = PixiPointFrom(Vector2.Zero);
@@ -52,7 +53,7 @@ export function generateSimpleTextures(
         : uiScale === 'medium' || uiScale === 'large'
         ? 5
         : 8;
-    rect.beginFill(COLORS.white);
+    rect.beginFill(WHITE);
     // rect.drawRect(-6, -10, 12, 20);
     rect.drawRect(0, 0, width, height);
     // rect.pivot = PixiPointFrom(Vector2.Zero);
@@ -77,19 +78,19 @@ export function generateSimpleTextures(
         ? 6
         : 8;
 
-    verticalLine.beginFill(COLORS.white);
+    verticalLine.beginFill(WHITE);
     verticalLine.drawRect(0, 0, thickness, height);
     verticalLine.drawRect(0, 0, width, thickness);
     verticalLine.drawRect(0, height - thickness, width, thickness);
   }
 
   let square = new Pixi.Graphics();
-  square.beginFill(COLORS.white);
+  square.beginFill(WHITE);
   square.drawRect(0, 0, diameter, diameter);
   // square.pivot = PixiPointFrom(Vector2.Zero);
 
   let dot = new Pixi.Graphics();
-  dot.beginFill(COLORS.white);
+  dot.beginFill(WHITE);
   dot.drawCircle(0, 0, diameter / 4);
 
   return {

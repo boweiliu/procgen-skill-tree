@@ -65,7 +65,12 @@ export function loadOrCreate(
     worldGen: worldGenStateFactory.tryLoad({ seed: mySeed }),
     playerSave: PlayerSaveState.tryLoad(),
     playerUI: PlayerUIState.tryLoad(),
-    computed: {},
+    computed: {
+      lockStatusMap: null,
+      fogOfWarStatusMap: null,
+      reachableStatusMap: null,
+      accessibleStatusMap: null,
+    },
     intent: newPlayerIntentState(),
     windowState: newWindowState(),
     debug: newDebugState(),
