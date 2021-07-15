@@ -111,9 +111,13 @@ function Component(props: {
       return new HashSet<Vector3>();
     }
 
-    const target = gameState.playerUI.hoverPathTarget;
+    // prefer using the hovered path target, otherwise use selected node
+    let target = gameState.playerUI.hoverPathTarget;
     if (!target) {
-      return new HashSet<Vector3>();
+      target = gameState.playerUI.cursoredNodeLocation;
+      if (!target) {
+        return new HashSet<Vector3>();
+      }
     }
 
     // compute shortest path from node hover/selection to allocated sector (DFS)
