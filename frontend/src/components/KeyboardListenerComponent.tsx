@@ -44,9 +44,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
     document.addEventListener('keyup', this.handleKeyup);
   }
 
-  // NOTE(bowei): does using e.repeat here break when window loses focus??
-  handleKeydown = (e: KeyboardEvent) => {
-    const { keyIntentConfig } = this.state;
+  transformKey(e: KeyboardEvent): BrowserKeys {
     let key: BrowserKeys = e.key;
     // special case to handle left/right control and alt keys
     if (
@@ -75,6 +73,14 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
         key = 'Ctrl-' + key;
       }
     }
+    return key;
+  }
+
+  // NOTE(bowei): does using e.repeat here break when window loses focus??
+  handleKeydown = (e: KeyboardEvent) => {
+    const { keyIntentConfig } = this.state;
+    let key: BrowserKeys = this.transformKey(e);
+
     const configuredIntent = keyIntentConfig[key];
     if (configuredIntent) {
       if (this.props.isTextBoxFocused) {
@@ -109,7 +115,7 @@ export class KeyboardListenerComponent extends React.Component<Props, State> {
 
   handleKeyup = (e: KeyboardEvent) => {
     const { keyIntentConfig } = this.state;
-    const key: BrowserKeys = e.key;
+    let key: BrowserKeys = this.transformKey(e);
     const configuredIntent = keyIntentConfig[key];
     if (
       configuredIntent !== undefined &&
