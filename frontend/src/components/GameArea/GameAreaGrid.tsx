@@ -15,7 +15,12 @@ import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { GameState } from '../../data/GameState';
 import { HashMap, HashSet } from '../../lib/util/data_structures/hash';
-import { getCoordNeighbors, IReadonlySet } from '../../game/lib/HexGrid';
+import {
+  bfsAllPaths,
+  getCoordNeighbors,
+  IReadonlySet,
+} from '../../game/lib/HexGrid';
+import { getValidLocks } from '../../game/GameStateFactory';
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -106,120 +111,29 @@ function Component(props: {
   }, [gameState]);
 
   const nodesInHoverPathMap = useMemo(() => {
-    const result = new HashSet<Vector3>();
-
     if (!gameState.intent.activeIntent.TEMP_SHOW_PATHS) {
-      return result;
+      return new HashSet<Vector3>();
     }
 
     const target = gameState.playerUI.hoverPathTarget;
-
     if (!target) {
-      return result;
+      return new HashSet<Vector3>();
     }
 
-    // TODO(bowei): compute shortest path from node hover/selection to allocated sector (DFS)
-    // TODO(bowei); replace this boilerplate
-    // make sure we make use of lock state
-    const validLocks: IReadonlySet<Vector3> = {
-      // TODO(bowei): optimize this?
-      contains: (v: Vector3) => {
-        const lockData = gameState.worldGen.lockMap.get(v);
-        const lockStatus = gameState.computed.lockStatusMap?.get(v);
-        const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-        const isAccessible =
-          !!gameState.computed.accessibleStatusMap?.get(v)?.accessible;
-        if (isLocked || !isAccessible) {
-          return true;
-        }
-        return false;
-      },
-    };
-    {
-      let source = target;
-      let destinations = new HashSet<Vector3>(
+    // compute shortest path from node hover/selection to allocated sector (DFS)
+    return bfsAllPaths({
+      source: target, // BFS backwards for more efficiency
+      destinations: new HashSet<Vector3>(
         gameState.playerSave.allocationStatusMap
           .entries()
           .filter(([v, status]) => {
             return status.taken === true;
           })
           .map((it) => it[0])
-      );
-      let shortestPathDist = Infinity;
-
-      if (destinations.contains(source)) {
-        result.put(source);
-        return result;
-      }
-
-      let touched = new HashMap<Vector3, [number, HashSet<Vector3>]>();
-      touched.put(source, [0, new HashSet()]);
-      let queue = [source];
-      while (queue.length) {
-        // let currentPath = queue.shift()!;
-        // let currentNode = currentPath[currentPath.length - 1];
-        let currentNode = queue.shift()!;
-        let [currentDist] = touched.get(currentNode)!; // state: we have already examined currentNode and now need to process its neighbors
-        // if (touched.contains(currentNode)) { continue; }
-
-        if (currentDist >= shortestPathDist) {
-          // we found everything; now just need to extract data
-
-          // first iterate through destinations that are in the touched set
-          let considering = destinations
-            .values()
-            .filter((it) => touched.contains(it));
-          while (considering.length) {
-            considering.forEach((it) => result.put(it));
-            let newConsidering = new HashSet<Vector3>();
-            considering.forEach((it) =>
-              touched
-                .get(it)?.[1]
-                .values()
-                .forEach((predecessor) => newConsidering.put(predecessor))
-            );
-            considering = newConsidering.values();
-          }
-
-          return result;
-        }
-
-        const nbors = Object.values(getCoordNeighbors(currentNode));
-        for (let nbor of nbors) {
-          const maybeGotThereAlready = touched.get(nbor);
-          if (maybeGotThereAlready) {
-            // we got there already. still need to determine if we got there just as quickly through this route, and if so, record predecessors
-            if (maybeGotThereAlready[0] === currentDist + 1) {
-              // we are tied; append to the predecessors
-              maybeGotThereAlready[1].put(currentNode);
-            }
-            continue;
-          }
-
-          touched.put(nbor, [currentDist + 1, new HashSet([currentNode])]);
-
-          if (validLocks.contains(nbor)) {
-            continue;
-          }
-
-          // const newPath = [...currentPath, nbor];
-          if (destinations.contains(nbor)) {
-            // we have found a shortest path, now to find the rest
-            // shortestPathDist = newPath.length;
-            shortestPathDist = currentDist + 1;
-            // record it
-            // newPath.forEach(it => result.put(it));
-            // return result;
-          }
-
-          queue.push(nbor);
-        }
-        // touched.put(currentNode);
-      }
-      console.log('did not find a valid path!');
-    }
-
-    return result;
+      ),
+      // make sure we make use of lock state
+      validLocks: getValidLocks(gameState),
+    });
   }, [gameState]);
 
   /**

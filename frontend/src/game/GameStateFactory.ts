@@ -164,18 +164,7 @@ export function markAccessibleNodes(args: {
   // let result: typeof prev | null = null;
 
   // make sure we make use of lock state
-  const validLocks: IReadonlySet<Vector3> = {
-    // TODO(bowei): optimize this?
-    contains: (v: Vector3) => {
-      const lockData = prevGameState.worldGen.lockMap.get(v);
-      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
-      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-      if (isLocked) {
-        return true;
-      }
-      return false;
-    },
-  };
+  const validLocks = getValidLocks(prevGameState);
 
   getWithinDistance(
     Vector3.Zero,
@@ -300,6 +289,40 @@ export function markVisibleNodes(
   return result || prev;
 }
 
+function _validLocksExtract(gameState: GameState) {
+  return {
+    worldGen: {
+      lockMap: gameState.worldGen.lockMap,
+    },
+    computed: {
+      lockStatusMap: gameState.computed.lockStatusMap,
+      accessibleStatusMap: gameState.computed.accessibleStatusMap,
+    },
+  };
+}
+export type ValidLocksSubState = ReturnType<typeof _validLocksExtract>;
+
+export function getValidLocks(
+  prevGameState: Const<ValidLocksSubState>
+): IReadonlySet<Vector3> {
+  // make sure we make use of lock state
+  const validLocks: IReadonlySet<Vector3> = {
+    // TODO(bowei): optimize this?
+    contains: (v: Vector3) => {
+      const lockData = prevGameState.worldGen.lockMap.get(v);
+      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+      const isAccessible =
+        !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
+      if (isLocked || !isAccessible) {
+        return true;
+      }
+      return false;
+    },
+  };
+  return validLocks;
+}
+
 /**
  *
  * @param result mutable temporary storage. null if the state is intended to be the same as prev
@@ -339,20 +362,7 @@ export function flowFogOfWarFromNode(args: {
   });
 
   // make sure we make use of lock state
-  const validLocks: IReadonlySet<Vector3> = {
-    // TODO(bowei): optimize this?
-    contains: (v: Vector3) => {
-      const lockData = prevGameState.worldGen.lockMap.get(v);
-      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
-      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
-      const isAccessible =
-        !!prevGameState.computed.accessibleStatusMap?.get(v)?.accessible;
-      if (isLocked || !isAccessible) {
-        return true;
-      }
-      return false;
-    },
-  };
+  const validLocks = getValidLocks(prevGameState);
 
   // flow fog of war, keeping in mind validLocks and accessibility restrictions
   getWithinDistance(nodeLocation, FOG_OF_WAR_DISTANCE, 0, validLocks).forEach(
