@@ -67,6 +67,9 @@ function _extract(gameState: Const<GameState>) {
         PAN_SOUTH: gameState.intent.newIntent.PAN_SOUTH,
         PAN_WEST: gameState.intent.newIntent.PAN_WEST,
       },
+      activeIntent: {
+        TEMP_SHOW_PATHS: gameState.intent.activeIntent.TEMP_SHOW_PATHS,
+      },
     },
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
@@ -331,20 +334,22 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
     );
 
     // compute BFS paths
-    const nodesInHoverPathMap = gameState.playerUI.cursoredNodeLocation
-      ? bfsAllPaths({
-          source: gameState.playerUI.cursoredNodeLocation,
-          destinations: new HashSet<Vector3>(
-            gameState.playerSave.allocationStatusMap
-              .entries()
-              .filter(([v, status]) => {
-                return status.taken === true;
-              })
-              .map((it) => it[0])
-          ),
-          validLocks: getValidLocks(gameState),
-        })
-      : new HashSet<Vector3>();
+    const nodesInHoverPathMap =
+      gameState.playerUI.cursoredNodeLocation &&
+      gameState.intent.activeIntent.TEMP_SHOW_PATHS
+        ? bfsAllPaths({
+            source: gameState.playerUI.cursoredNodeLocation,
+            destinations: new HashSet<Vector3>(
+              gameState.playerSave.allocationStatusMap
+                .entries()
+                .filter(([v, status]) => {
+                  return status.taken === true;
+                })
+                .map((it) => it[0])
+            ),
+            validLocks: getValidLocks(gameState),
+          })
+        : new HashSet<Vector3>();
 
     // iterate through grid and set states
     for (let [v, data] of this.hexGrid.entries()) {
