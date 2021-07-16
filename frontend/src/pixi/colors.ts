@@ -34,6 +34,7 @@ export const COLORS = Object.fromEntries(
     grayBlack: 0x1d1d1d,
     borderBlack: 0x111111,
     borderWhite: 0x666666,
+    hoverPathWhite: 0xaaaaaa,
     black: 0x000000,
     textWhite: 0x888888,
   }).map(([k, v]) => [k, doInvertColors ? 0xffffff - v : v])

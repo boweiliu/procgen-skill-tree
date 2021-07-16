@@ -28,7 +28,7 @@
   border-color: var(--border-important-white);
 }
 .border-hoverpathed {
-  border-color: white;
+  border-color: var(--border-hovered-path);
 }
 
 .node-available {
