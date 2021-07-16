@@ -14,6 +14,9 @@ import { LazyHashMap } from '../../lib/util/lazy';
 import { extractDeps } from '../../lib/util/misc';
 import { AllocateNodeResult } from '../../game/actions/AllocateNode';
 import { GameState } from '../../data/GameState';
+import { HashSet } from '../../lib/util/data_structures/hash';
+import { bfsAllPaths } from '../../game/lib/HexGrid';
+import { getValidLocks } from '../../game/GameStateFactory';
 
 /**
  * The subset of the game state that is relevant to game area components.
@@ -26,6 +29,7 @@ function _extract(gameState: GameState) {
   return {
     playerUI: {
       cursoredNodeLocation: gameState.playerUI.cursoredNodeLocation,
+      hoverPathTarget: gameState.playerUI.hoverPathTarget,
     },
     playerSave: {
       allocationStatusMap: gameState.playerSave.allocationStatusMap,
@@ -35,6 +39,11 @@ function _extract(gameState: GameState) {
     worldGen: {
       nodeContentsMap: gameState.worldGen.nodeContentsMap,
       lockMap: gameState.worldGen.lockMap,
+    },
+    intent: {
+      activeIntent: {
+        TEMP_SHOW_PATHS: gameState.intent.activeIntent.TEMP_SHOW_PATHS,
+      },
     },
     computed: {
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
@@ -72,6 +81,7 @@ function Component(props: {
   cursoredVirtualNode: Vector2 | null;
   setCursoredLocation: (v: Vector3 | null) => void;
   debug?: any;
+  setHoverPathTarget: (v: Vector3 | null) => void;
 }) {
   const {
     gameState,
@@ -81,6 +91,7 @@ function Component(props: {
     cursoredVirtualNode,
     setCursoredLocation,
     debug,
+    setHoverPathTarget,
   } = props;
   const startTime = +new Date();
 
@@ -89,13 +100,41 @@ function Component(props: {
   const flipCursored = debug?.isFlipCursored?.() || false;
   // console.log('Game area grid rerender');
 
-  const nodeReactDataMap = useMemo(
-    () =>
-      new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
-        computeNodeReactData({ location, gameState })
+  const nodeReactDataMap = useMemo(() => {
+    return new LazyHashMap<Vector3, NodeReactData>((location: Vector3) =>
+      computeNodeReactData({ location, gameState })
+    );
+  }, [gameState]);
+
+  const nodesInHoverPathMap = useMemo(() => {
+    if (!gameState.intent.activeIntent.TEMP_SHOW_PATHS) {
+      return new HashSet<Vector3>();
+    }
+
+    // prefer using the hovered path target, otherwise use selected node
+    let target = gameState.playerUI.hoverPathTarget;
+    if (!target) {
+      target = gameState.playerUI.cursoredNodeLocation;
+      if (!target) {
+        return new HashSet<Vector3>();
+      }
+    }
+
+    // compute shortest path from node hover/selection to allocated sector (DFS)
+    return bfsAllPaths({
+      source: target, // BFS backwards for more efficiency
+      destinations: new HashSet<Vector3>(
+        gameState.playerSave.allocationStatusMap
+          .entries()
+          .filter(([v, status]) => {
+            return status.taken === true;
+          })
+          .map((it) => it[0])
       ),
-    [gameState]
-  );
+      // make sure we make use of lock state
+      validLocks: getValidLocks(gameState),
+    });
+  }, [gameState]);
 
   /**
    * See pointer/mouse, over/enter/out/leave, event propagation documentation
@@ -126,6 +165,7 @@ function Component(props: {
                   const virtualCoords = new Vector2(x, y);
                   const location = virtualCoordsToLocation(virtualCoords);
                   const nodeData = nodeReactDataMap.get(location);
+                  const isNodeInHoverPath = nodesInHoverPathMap.get(location);
                   let isCursored =
                     !!cursoredVirtualNode &&
                     cursoredVirtualNode.equals(virtualCoords);
@@ -147,6 +187,8 @@ function Component(props: {
                       isCursored={isCursored}
                       debugIsCursored={flipCursored ? !isCursored : isCursored}
                       onUpdateCursored={setCursoredLocation}
+                      isNodeInHoverPath={isNodeInHoverPath}
+                      setHoverPathTarget={setHoverPathTarget}
                     />
                   );
                 })

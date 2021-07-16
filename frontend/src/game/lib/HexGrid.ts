@@ -1,4 +1,4 @@
-import { HashSet } from '../../lib/util/data_structures/hash';
+import { HashMap, HashSet } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 
 export enum Direction {
@@ -117,5 +117,105 @@ export function getWithinDistance(
     }
   }
   result = result.concat(disallowedButTouched.values());
+  return result;
+}
+
+/**
+ * runs BFS from source to destinations, returning the union of all ties for shortest paths
+ * @param source the node to start BFS from
+ * @param destinations the set of nodes we are trying to reach
+ * @param validLocks the set of nodes we are not allowed to go through
+ * @returns finds all shortest paths with the same shortest path distance, and returns the union of all nodes contained in those paths
+ * includes the source node and all valid destination nodes.
+ */
+export function bfsAllPaths(args: {
+  source: Vector3;
+  destinations: HashSet<Vector3>;
+  validLocks: IReadonlySet<Vector3>;
+}): HashSet<Vector3> {
+  const { source, destinations, validLocks } = args;
+
+  // let source = target;
+  // let destinations = new HashSet<Vector3>(
+  //   gameState.playerSave.allocationStatusMap
+  //     .entries()
+  //     .filter(([v, status]) => {
+  //       return status.taken === true;
+  //     })
+  //     .map((it) => it[0])
+  // );
+  let shortestPathDist = Infinity;
+  const result = new HashSet<Vector3>();
+
+  if (destinations.contains(source)) {
+    result.put(source);
+    return result;
+  }
+
+  let touched = new HashMap<Vector3, [number, HashSet<Vector3>]>();
+  touched.put(source, [0, new HashSet()]);
+  let queue = [source];
+  while (queue.length) {
+    // let currentPath = queue.shift()!;
+    // let currentNode = currentPath[currentPath.length - 1];
+    let currentNode = queue.shift()!;
+    let [currentDist] = touched.get(currentNode)!; // state: we have already examined currentNode and now need to process its neighbors
+    // if (touched.contains(currentNode)) { continue; }
+
+    if (currentDist >= shortestPathDist) {
+      // we found everything; now just need to extract data
+
+      // first iterate through destinations that are in the touched set
+      let considering = destinations
+        .values()
+        .filter((it) => touched.contains(it));
+      while (considering.length) {
+        considering.forEach((it) => result.put(it));
+        let newConsidering = new HashSet<Vector3>();
+        considering.forEach((it) =>
+          touched
+            .get(it)?.[1]
+            .values()
+            .forEach((predecessor) => newConsidering.put(predecessor))
+        );
+        considering = newConsidering.values();
+      }
+
+      return result;
+    }
+
+    const nbors = Object.values(getCoordNeighbors(currentNode));
+    for (let nbor of nbors) {
+      const maybeGotThereAlready = touched.get(nbor);
+      if (maybeGotThereAlready) {
+        // we got there already. still need to determine if we got there just as quickly through this route, and if so, record predecessors
+        if (maybeGotThereAlready[0] === currentDist + 1) {
+          // we are tied; append to the predecessors
+          maybeGotThereAlready[1].put(currentNode);
+        }
+        continue;
+      }
+
+      touched.put(nbor, [currentDist + 1, new HashSet([currentNode])]);
+
+      if (validLocks.contains(nbor)) {
+        continue;
+      }
+
+      // const newPath = [...currentPath, nbor];
+      if (destinations.contains(nbor)) {
+        // we have found a shortest path, now to find the rest
+        // shortestPathDist = newPath.length;
+        shortestPathDist = currentDist + 1;
+        // record it
+        // newPath.forEach(it => result.put(it));
+        // return result;
+      }
+
+      queue.push(nbor);
+    }
+    // touched.put(currentNode);
+  }
+  console.log('did not find a valid path!');
   return result;
 }

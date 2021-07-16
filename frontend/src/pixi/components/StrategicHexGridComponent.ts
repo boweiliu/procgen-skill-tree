@@ -14,7 +14,7 @@ import {
   nodeContentsToColor,
 } from '../../game/worldGen/nodeContents/NodeContentsRendering';
 import { PixiPointFrom } from '../../lib/pixi/pixify';
-import { KeyedHashMap } from '../../lib/util/data_structures/hash';
+import { HashSet, KeyedHashMap } from '../../lib/util/data_structures/hash';
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { Const, extractDeps, extractAccessPaths } from '../../lib/util/misc';
@@ -26,6 +26,8 @@ import { engageLifecycle, LifecycleHandlerBase } from './LifecycleHandler';
 import { PIXI_TICKS_PER_SECOND } from '../PixiReactBridge';
 import { uiScaleFromAppSize } from '../../components/GameArea/GameAreaInterface';
 import { Lazy } from '../../lib/util/lazy';
+import { bfsAllPaths } from '../../game/lib/HexGrid';
+import { getValidLocks } from '../../game/GameStateFactory';
 
 type Props = {
   delta: number;
@@ -64,6 +66,9 @@ function _extract(gameState: Const<GameState>) {
         PAN_NORTH: gameState.intent.newIntent.PAN_NORTH,
         PAN_SOUTH: gameState.intent.newIntent.PAN_SOUTH,
         PAN_WEST: gameState.intent.newIntent.PAN_WEST,
+      },
+      activeIntent: {
+        TEMP_SHOW_PATHS: gameState.intent.activeIntent.TEMP_SHOW_PATHS,
       },
     },
     computed: {
@@ -328,6 +333,25 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
       uiScaleFromAppSize(props.appSize)
     );
 
+    // compute BFS paths
+    const nodesInHoverPathMap =
+      gameState.playerUI.cursoredNodeLocation &&
+      gameState.intent.activeIntent.TEMP_SHOW_PATHS
+        ? bfsAllPaths({
+            source: gameState.playerUI.cursoredNodeLocation,
+            destinations: new HashSet<Vector3>(
+              gameState.playerSave.allocationStatusMap
+                .entries()
+                .filter(([v, status]) => {
+                  return status.taken === true;
+                })
+                .map((it) => it[0])
+            ),
+            validLocks: getValidLocks(gameState),
+          })
+        : new HashSet<Vector3>();
+
+    // iterate through grid and set states
     for (let [v, data] of this.hexGrid.entries()) {
       const { node: graphics } = data;
 
@@ -523,8 +547,11 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
         data.animation = null;
       }
 
-      // put a cursor near the node if it has been selected
-      if (props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation)) {
+      // put a cursor near the node if it has been selected, or it is in the hover path
+      if (
+        props.gameState.playerUI.cursoredNodeLocation?.equals(nodeLocation) ||
+        nodesInHoverPathMap.get(nodeLocation)
+      ) {
         if (!data.cursor) {
           const cursor = new Pixi.Sprite();
           cursor.texture = textures.verticalLine;

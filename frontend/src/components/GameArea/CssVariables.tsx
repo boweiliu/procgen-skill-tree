@@ -1,8 +1,9 @@
 import { Vector2 } from '../../lib/util/geometry/vector2';
 import React, { useEffect } from 'react';
-import { colorToCss } from '../../pixi/colors';
+import COLORS, { colorToCss } from '../../pixi/colors';
 
 export const CssVariablesComponent = React.memo(Component);
+type ColorsType = typeof COLORS;
 
 /**
  * Handles loading display settings from props into css variables.
@@ -13,7 +14,7 @@ function Component(props: {
   hexGridPx: Vector2;
   borderWidth: number;
   hexCenterRadius: number;
-  COLORS: any;
+  COLORS: ColorsType;
   children?: any;
 }) {
   const { hexGridPx, borderWidth, hexCenterRadius, appSize, COLORS } = props;
@@ -59,6 +60,10 @@ function Component(props: {
     document.documentElement.style.setProperty(
       '--text-readable-white',
       colorToCss(COLORS.textWhite)
+    );
+    document.documentElement.style.setProperty(
+      '--border-hovered-path',
+      colorToCss(COLORS.hoverPathWhite)
     );
   }, [COLORS]);
   useEffect(() => {

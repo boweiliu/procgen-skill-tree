@@ -159,6 +159,13 @@ export class DeallocateNodeAction {
     gameState: DeallocateNodeCheckState
   ): DeallocateNodeResult {
     const { nodeLocation } = input;
+    if (nodeLocation.equals(Vector3.Zero)) {
+      console.log(
+        "can't do that, can't deallocate or otherwise touch starting node"
+      );
+      return false;
+    }
+
     if (gameState.playerSave.currentEra.type === 'A') {
       if (
         gameState.playerSave.allocationStatusMap.get(input.nodeLocation)
