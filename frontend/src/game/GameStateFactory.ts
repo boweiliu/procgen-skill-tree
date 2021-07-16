@@ -163,8 +163,18 @@ export function markAccessibleNodes(args: {
 
   // let result: typeof prev | null = null;
 
-  // make sure we make use of lock state
-  const validLocks = getValidLocks(prevGameState);
+  // make sure we make use of lock state, but NOT accessible state
+  const validLocks: IReadonlySet<Vector3> = {
+    contains: (v: Vector3) => {
+      const lockData = prevGameState.worldGen.lockMap.get(v);
+      const lockStatus = prevGameState.computed.lockStatusMap?.get(v);
+      const isLocked = !!lockData && lockStatus !== LockStatus.OPEN;
+      if (isLocked) {
+        return true;
+      }
+      return false;
+    },
+  };
 
   getWithinDistance(
     Vector3.Zero,
@@ -362,7 +372,7 @@ export function flowFogOfWarFromNode(args: {
   });
 
   // make sure we make use of lock state
-  const validLocks = getValidLocks(prevGameState);
+  const validLocks: IReadonlySet<Vector3> = getValidLocks(prevGameState);
 
   // flow fog of war, keeping in mind validLocks and accessibility restrictions
   getWithinDistance(nodeLocation, FOG_OF_WAR_DISTANCE, 0, validLocks).forEach(
