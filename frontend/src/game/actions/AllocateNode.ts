@@ -121,6 +121,42 @@ export class AllocateNodeAction {
           // result = { ...(result || prev), playerSave: { ...prev.playerSave, allocationStatusMap } };
         }
 
+        // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+
+        // before updating Fog of war, first unlock any lock whose statuses have changed
+        let bangResult = result!; // NOTE(bowei): only needed for typescript
+        let computed: typeof bangResult.computed | null = null;
+        let lockStatusMap: typeof prev.computed.lockStatusMap | null = null;
+        lockStatusMap = markLockStatus({
+          result: lockStatusMap,
+          prev: prev.computed.lockStatusMap,
+          prevGameState,
+        });
+        if (lockStatusMap) {
+          computed = computed || { ...(result || prev).computed };
+          computed.lockStatusMap = lockStatusMap;
+        }
+
+        // only bother to flow reachable status if we are in era B
+        // need to multi-flow-reachable if we are multiallocating!!!
+        let reachableStatusMap: typeof prev.computed.reachableStatusMap = null;
+        nodesToAllocate.forEach((nodeLocation) => {
+          reachableStatusMap = flowReachableFromNode({
+            result: reachableStatusMap,
+            prev: (result || prev).computed.reachableStatusMap,
+            prevGameState,
+            nodeLocation,
+          });
+        });
+        if (reachableStatusMap) {
+          computed = computed || { ...(result || prev).computed };
+          computed.reachableStatusMap = reachableStatusMap;
+        }
+        if (computed) {
+          result = result || { ...(prev as unknown as GameState) };
+          result.computed = computed;
+        }
+
         return result || prev;
       } else {
         return prev;
@@ -144,40 +180,40 @@ export class AllocateNodeAction {
     // );
 
     // before updating Fog of war, first unlock any lock whose statuses have changed
-    this.updaters.computed.lockStatusMap?.enqueueUpdate(
-      (prev, prevGameState) => {
-        if (prevGameState.playerSave.currentEra.type === 'B') {
-          let result: typeof prev | null = null;
-          result = markLockStatus({ result, prev, prevGameState });
-          return result || prev;
-        } else {
-          return prev;
-        }
-      }
-    );
+    // this.updaters.computed.lockStatusMap?.enqueueUpdate(
+    //   (prev, prevGameState) => {
+    //     if (prevGameState.playerSave.currentEra.type === 'B') {
+    //       let result: typeof prev | null = null;
+    //       result = markLockStatus({ result, prev, prevGameState });
+    //       return result || prev;
+    //     } else {
+    //       return prev;
+    //     }
+    //   }
+    // );
 
     // only bother to flow reachable status if we are in era B
     // TODO(bowei): need to multi-flow-reachable if we are multiallocating!!!
-    this.updaters.computed.reachableStatusMap?.enqueueUpdate(
-      (prev, prevGameState) => {
-        if (prevGameState.playerSave.currentEra.type === 'B') {
-          if (!prev) {
-            return prev;
-          }
+    // this.updaters.computed.reachableStatusMap?.enqueueUpdate(
+    //   (prev, prevGameState) => {
+    //     if (prevGameState.playerSave.currentEra.type === 'B') {
+    //       if (!prev) {
+    //         return prev;
+    //       }
 
-          return (
-            flowReachableFromNode({
-              result: null,
-              prev,
-              prevGameState,
-              nodeLocation,
-            }) || prev
-          );
-        } else {
-          return prev;
-        }
-      }
-    );
+    //       return (
+    //         flowReachableFromNode({
+    //           result: null,
+    //           prev,
+    //           prevGameState,
+    //           nodeLocation,
+    //         }) || prev
+    //       );
+    //     } else {
+    //       return prev;
+    //     }
+    //   }
+    // );
 
     // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
     this.updaters.playerSave.bookmarkedStatusMap.enqueueUpdate(

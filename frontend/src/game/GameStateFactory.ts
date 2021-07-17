@@ -238,12 +238,16 @@ export function markReachableNodes(
  */
 export function flowReachableFromNode(args: {
   result: HashMap<Vector3, NodeReachableStatus> | null;
-  prev: Const<HashMap<Vector3, NodeReachableStatus>>;
+  prev: Const<HashMap<Vector3, NodeReachableStatus>> | null;
   prevGameState: Const<GameState>;
   nodeLocation: Vector3;
 }): HashMap<Vector3, NodeReachableStatus> | null {
   const { prev, prevGameState, nodeLocation } = args;
   let { result } = args;
+
+  if (!prev) {
+    return result;
+  }
 
   getWithinDistance(nodeLocation, 1).forEach((n) => {
     if (
@@ -252,7 +256,7 @@ export function flowReachableFromNode(args: {
     ) {
       return;
     }
-    if (prev.get(n)?.reachable !== true) {
+    if ((result || prev).get(n)?.reachable !== true) {
       result = result || prev.clone();
       result.put(n, NodeReachableStatus.true);
     }
