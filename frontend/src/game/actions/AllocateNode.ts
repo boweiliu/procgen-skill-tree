@@ -301,9 +301,11 @@ export class AllocateNodeAction {
       return false;
     }
 
-    // only check for reachability in era *B
+    // only check for reachability in era *B, and only if entirePath is not specified
     if (gameState.playerSave.currentEra.type === 'B') {
-      if (
+      if (input.doEntirePath) {
+        // OK if it's not reachable since we are allocating the entire path
+      } else if (
         gameState.computed.reachableStatusMap?.get(input.nodeLocation)
           ?.reachable !== true
       ) {
@@ -329,7 +331,7 @@ export class AllocateNodeAction {
     if (input.doEntirePath) {
       // check to see if there is a UNIQUE shortest path
 
-      const [touchedSet, shortestPathDist] = bfsAllPaths({
+      const returned = bfsAllPaths({
         source: input.nodeLocation,
         destinations: new HashSet<Vector3>(
           gameState.playerSave.allocationStatusMap
@@ -341,9 +343,26 @@ export class AllocateNodeAction {
         ),
         validLocks: getValidLocks(gameState),
       });
+      const shortestPathDist = returned[1];
+      const touchedSet = returned[2];
 
-      if (touchedSet.size() !== shortestPathDist + 1) {
+      if (touchedSet.size() !== shortestPathDist) {
         console.log("can't do that, shortest path is not unique");
+        return false;
+      }
+
+      if (
+        touchedSet.size() >
+        ERA_SP_LIMITS[gameState.playerSave.currentEra.index] -
+          gameState.playerSave.allocationStatusMap.size()
+      ) {
+        console.log(
+          "can't do that, need ",
+          touchedSet.size(),
+          ' available SP but only have ',
+          ERA_SP_LIMITS[gameState.playerSave.currentEra.index] -
+            gameState.playerSave.allocationStatusMap.size()
+        );
         return false;
       }
     }

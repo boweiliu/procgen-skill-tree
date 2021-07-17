@@ -68,11 +68,16 @@ function Component(props: {
     (args: {
       nodeLocation: Vector3;
       newStatus: NodeTakenStatus;
-      action: 'allocate' | 'deallocate';
+      action: 'allocate' | 'allocate-path' | 'deallocate';
     }) => {
       if (args.action === 'allocate') {
         return props.actions.allocateNode.run(
           { ...args, doEntirePath: false },
+          gameState
+        );
+      } else if (args.action === 'allocate-path') {
+        return props.actions.allocateNode.run(
+          { ...args, doEntirePath: true },
           gameState
         );
       } else {
@@ -93,7 +98,7 @@ function Component(props: {
     (args: {
       virtualCoords: Vector2;
       newStatus: NodeTakenStatus;
-      action: 'allocate' | 'deallocate';
+      action: 'allocate' | 'allocate-path' | 'deallocate';
     }) => {
       const { virtualCoords } = args;
 
@@ -274,6 +279,15 @@ function Component(props: {
         });
       }
     }
+    if (props.gameState.intent.newIntent.SHIFT_INTERACT_WITH_NODE) {
+      if (cursoredVirtualNodeCoords) {
+        handleUpdateNodeStatus({
+          virtualCoords: cursoredVirtualNodeCoords,
+          newStatus: { taken: true },
+          action: 'allocate-path',
+        });
+      }
+    }
     if (props.gameState.intent.newIntent.DEALLOCATE_NODE) {
       if (cursoredVirtualNodeCoords) {
         handleUpdateNodeStatus({
@@ -285,6 +299,7 @@ function Component(props: {
     }
   }, [
     props.gameState.intent.newIntent.INTERACT_WITH_NODE,
+    props.gameState.intent.newIntent.SHIFT_INTERACT_WITH_NODE,
     props.gameState.intent.newIntent.MOVE_CURSOR_EAST,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTH,
     props.gameState.intent.newIntent.MOVE_CURSOR_NORTHNORTH,
