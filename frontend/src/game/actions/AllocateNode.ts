@@ -157,6 +157,7 @@ export class AllocateNodeAction {
     );
 
     // only bother to flow reachable status if we are in era B
+    // TODO(bowei): need to multi-flow-reachable if we are multiallocating!!!
     this.updaters.computed.reachableStatusMap?.enqueueUpdate(
       (prev, prevGameState) => {
         if (prevGameState.playerSave.currentEra.type === 'B') {

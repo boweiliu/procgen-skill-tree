@@ -37,7 +37,7 @@ function GameAreaCellComponent({
   onUpdateStatus: (args: {
     nodeLocation: Vector3;
     newStatus: NodeTakenStatus;
-    action: 'allocate' | 'deallocate';
+    action: 'allocate' | 'deallocate' | 'allocate-path';
   }) => AllocateNodeResult;
   nodeData: NodeReactData;
   isCursored: boolean;
@@ -51,7 +51,10 @@ function GameAreaCellComponent({
   const { nodeLocation } = nodeData;
 
   const handleClick = useCallback(
-    (e: React.MouseEvent) => {
+    (
+      e: React.MouseEvent,
+      action?: 'allocate' | 'deallocate' | 'allocate-path'
+    ) => {
       // TODO(bowei): debounce this so double-clicks dont double trigger this
       // if (e.shiftKey) {
       //   console.log('click with shift', { e });
@@ -59,15 +62,28 @@ function GameAreaCellComponent({
 
       e.stopPropagation();
       e.preventDefault();
-      // console.log(`clicked`);
-      // console.log({ idx, rowIdx, status: nodeData.status });
-      const updateStatusResult = onUpdateStatus({
-        nodeLocation,
-        newStatus: { taken: true },
-        action: 'allocate',
-      });
-      if (!updateStatusResult) {
-        onUpdateCursored(isCursored ? null : nodeLocation);
+
+      if (action === 'deallocate' || e.button === 2) {
+        const updateStatusResult = onUpdateStatus({
+          nodeLocation,
+          newStatus: { taken: true },
+          action: 'deallocate',
+        });
+        if (!updateStatusResult) {
+          onUpdateCursored(isCursored ? null : nodeLocation);
+        }
+      } else {
+        // let action = e.shiftKey ? 'allocate-path' : 'allocate';
+        // console.log(`clicked`);
+        // console.log({ idx, rowIdx, status: nodeData.status });
+        const updateStatusResult = onUpdateStatus({
+          nodeLocation,
+          newStatus: { taken: true },
+          action: e.shiftKey ? 'allocate-path' : 'allocate',
+        });
+        if (!updateStatusResult) {
+          onUpdateCursored(isCursored ? null : nodeLocation);
+        }
       }
     },
     [onUpdateStatus, nodeLocation, isCursored, onUpdateCursored]
@@ -132,7 +148,10 @@ function CellComponent({
 }: {
   id: string;
   currentEra: EraType;
-  onClickCenter: React.MouseEventHandler;
+  onClickCenter: (
+    e: React.MouseEvent,
+    action?: 'allocate' | 'deallocate' | 'allocate-path'
+  ) => void;
   onClickQuestionMark: React.MouseEventHandler;
   nodeData: NodeReactData;
   isCursored: boolean;
@@ -182,6 +201,11 @@ function CellComponent({
     setNodeHoverPathTarget(false);
   };
 
+  const onRightClick = useCallback(
+    (e: React.MouseEvent) => onClickCenter(e, 'deallocate'),
+    [onClickCenter]
+  );
+
   return (
     <div className="hex-block hex-full-block" key={id} id={id}>
       <div
@@ -202,6 +226,7 @@ function CellComponent({
             : 'hex-center-size-medium'
         )}
         onClick={onClickCenter}
+        onContextMenu={onRightClick}
         onDoubleClick={() => {
           console.log('double clicked');
         }}
@@ -227,6 +252,7 @@ function CellComponent({
           className="hex-center-lock"
           hidden={status === NodeAllocatedStatus.HIDDEN}
           onClick={onClickCenter}
+          onContextMenu={onRightClick}
           onDoubleClick={() => {
             console.log('double clicked');
           }}
