@@ -79,6 +79,36 @@ function SelectedNodeTabContentComponent(props: {
     }
   }, [location, allocateNodeCheckState]);
 
+  const onAllocatePath = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (location) {
+        props.actions.allocateNode.run(
+          {
+            nodeLocation: location,
+            newStatus: NodeTakenStatus.true,
+            doEntirePath: true,
+          },
+          allocateNodeCheckState
+        );
+      }
+    },
+    [props.actions.allocateNode, location, allocateNodeCheckState]
+  );
+
+  const canBePathAllocated = useMemo(() => {
+    if (location) {
+      return AllocateNodeAction.checkAction(
+        {
+          nodeLocation: location,
+          newStatus: { taken: true },
+          doEntirePath: true,
+        },
+        allocateNodeCheckState
+      );
+    }
+  }, [location, allocateNodeCheckState]);
+
   const onDeallocate = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -209,6 +239,9 @@ function SelectedNodeTabContentComponent(props: {
             <br></br>
             <button disabled={!canBeAllocated} onClick={onAllocate}>
               Allocate (hotkey: spacebar)
+            </button>
+            <button disabled={!canBePathAllocated} onClick={onAllocatePath}>
+              Allocate path (hotkey: shift-spacebar)
             </button>
             <button disabled={!canBeDeallocated} onClick={onDeallocate}>
               Deallocate (hotkey: backspace)
