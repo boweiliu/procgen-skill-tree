@@ -154,11 +154,14 @@ function CellComponent({
   const onHover = (e: React.PointerEvent) => {
     // console.log(`got pointer enter on ${id}`);
     setHovered(true);
+
+    // TODO(bowei): delay this if we're actively scrolling since it slows down scrolling
     setNodeHoverPathTarget(true);
   };
   const onUnhover = (e: React.PointerEvent) => {
     // console.log(`got pointer leave on ${id}`);
     setHovered(false);
+    // TODO(bowei): delay this if we're actively scrolling since it slows down scrolling
     setNodeHoverPathTarget(false);
   };
 
