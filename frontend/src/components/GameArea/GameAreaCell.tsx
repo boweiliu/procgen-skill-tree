@@ -53,6 +53,9 @@ function GameAreaCellComponent({
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       // TODO(bowei): debounce this so double-clicks dont double trigger this
+      // if (e.shiftKey) {
+      //   console.log('click with shift', { e });
+      // }
 
       e.stopPropagation();
       e.preventDefault();

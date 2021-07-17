@@ -1,6 +1,7 @@
 .game-area {
   overflow-x: scroll;
   overflow-y: scroll;
+  user-select: none;
   background-color: var(--background-black);
   width: var(--app-size-width);
   height: var(--app-size-height);
