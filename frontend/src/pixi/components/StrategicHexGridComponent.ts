@@ -320,6 +320,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
   }
 
   protected renderSelf(props: Props) {
+    console.log('strategic hex grid renderSelf');
     const { gameState } = props;
     const {
       playerSave: { currentEra },
