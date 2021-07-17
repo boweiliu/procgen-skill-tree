@@ -149,19 +149,33 @@ function CellComponent({
   const completelyHidden =
     status === NodeAllocatedStatus.HIDDEN && !accessibleButHidden;
 
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState<'no' | 'yes' | 'pending'>('no');
 
   const onHover = (e: React.PointerEvent) => {
     // console.log(`got pointer enter on ${id}`);
-    setHovered(true);
 
-    // TODO(bowei): delay this if we're actively scrolling since it slows down scrolling
-    setNodeHoverPathTarget(true);
+    // delayed set hover path state; since the computation slows down scrolling
+    setHovered('pending');
+    const timer = setTimeout(() => {
+      setHovered((prev) => {
+        if (prev === 'pending') {
+          // TODO(bowei): remove the delay if shift is pressed down or we know we're not scrolling actively
+          setNodeHoverPathTarget(true);
+          return 'yes';
+        } else {
+          return prev;
+        }
+      });
+    }, 100);
+
+    // setNodeHoverPathTarget(true);
+
+    return () => clearTimeout(timer);
   };
   const onUnhover = (e: React.PointerEvent) => {
     // console.log(`got pointer leave on ${id}`);
-    setHovered(false);
-    // TODO(bowei): delay this if we're actively scrolling since it slows down scrolling
+    setHovered('no');
+
     setNodeHoverPathTarget(false);
   };
 
@@ -230,7 +244,7 @@ function CellComponent({
         <div
           // className="hover-only absolute-positioned node-tooltip" // temp disabling this, the css is causing perf issues
           className="absolute-positioned node-tooltip"
-          hidden={!hovered}
+          hidden={hovered !== 'yes'}
         >
           {nodeData.toolTipText}
         </div>
