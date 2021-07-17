@@ -133,7 +133,7 @@ function Component(props: {
       ),
       // make sure we make use of lock state
       validLocks: getValidLocks(gameState),
-    });
+    })[0];
   }, [gameState]);
 
   /**

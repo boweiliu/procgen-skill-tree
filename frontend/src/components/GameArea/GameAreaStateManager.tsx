@@ -71,7 +71,10 @@ function Component(props: {
       action: 'allocate' | 'deallocate';
     }) => {
       if (args.action === 'allocate') {
-        return props.actions.allocateNode.run(args, gameState);
+        return props.actions.allocateNode.run(
+          { ...args, doEntirePath: false },
+          gameState
+        );
       } else {
         return props.actions.deallocateNode.run(args, gameState);
       }

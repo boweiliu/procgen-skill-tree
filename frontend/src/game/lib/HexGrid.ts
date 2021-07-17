@@ -125,14 +125,15 @@ export function getWithinDistance(
  * @param source the node to start BFS from
  * @param destinations the set of nodes we are trying to reach
  * @param validLocks the set of nodes we are not allowed to go through
- * @returns finds all shortest paths with the same shortest path distance, and returns the union of all nodes contained in those paths
- * includes the source node and all valid destination nodes.
+ * @returns array of 2 objects. the first is the union of all nodes contained in the shortest paths
+ * (includes the source node and all valid destination nodes.), or empty set, if no path was found.
+ * the second is the shortest path distance: 0 if the source == destination, -1 if no path was found.
  */
 export function bfsAllPaths(args: {
   source: Vector3;
   destinations: HashSet<Vector3>;
   validLocks: IReadonlySet<Vector3>;
-}): HashSet<Vector3> {
+}): [HashSet<Vector3>, number] {
   const { source, destinations, validLocks } = args;
 
   // let source = target;
@@ -149,7 +150,7 @@ export function bfsAllPaths(args: {
 
   if (destinations.contains(source)) {
     result.put(source);
-    return result;
+    return [result, 0];
   }
 
   let touched = new HashMap<Vector3, [number, HashSet<Vector3>]>();
@@ -181,7 +182,7 @@ export function bfsAllPaths(args: {
         considering = newConsidering.values();
       }
 
-      return result;
+      return [result, shortestPathDist];
     }
 
     const nbors = Object.values(getCoordNeighbors(currentNode));
@@ -217,5 +218,5 @@ export function bfsAllPaths(args: {
     // touched.put(currentNode);
   }
   console.log('did not find a valid path!');
-  return result;
+  return [result, -1];
 }

@@ -349,7 +349,7 @@ class StrategicHexGridComponent extends LifecycleHandlerBase<Props, State> {
                 .map((it) => it[0])
             ),
             validLocks: getValidLocks(gameState),
-          })
+          })[0]
         : new HashSet<Vector3>();
 
     // iterate through grid and set states

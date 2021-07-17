@@ -57,6 +57,7 @@ function SelectedNodeTabContentComponent(props: {
           {
             nodeLocation: location,
             newStatus: NodeTakenStatus.true,
+            doEntirePath: false,
           },
           allocateNodeCheckState
         );
@@ -68,7 +69,11 @@ function SelectedNodeTabContentComponent(props: {
   const canBeAllocated = useMemo(() => {
     if (location) {
       return AllocateNodeAction.checkAction(
-        { nodeLocation: location, newStatus: { taken: true } },
+        {
+          nodeLocation: location,
+          newStatus: { taken: true },
+          doEntirePath: false,
+        },
         allocateNodeCheckState
       );
     }

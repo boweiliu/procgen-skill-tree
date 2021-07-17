@@ -1,17 +1,24 @@
 import { GameState } from '../../data/GameState';
 import { NodeTakenStatus } from '../../data/NodeStatus';
+import { HashSet } from '../../lib/util/data_structures/hash';
 import { Vector3 } from '../../lib/util/geometry/vector3';
 import { extractDeps } from '../../lib/util/misc';
 import { UpdaterGeneratorType2 } from '../../lib/util/updaterGenerator';
 import {
   flowFogOfWarFromNode,
   flowReachableFromNode,
+  getValidLocks,
   markLockStatus,
 } from '../GameStateFactory';
+import { bfsAllPaths } from '../lib/HexGrid';
 
 export interface AllocateNodeInput {
   nodeLocation: Vector3;
   newStatus: NodeTakenStatus;
+  /**
+   * Whether or not to auto-allocate everything along the unique shortest path. default false
+   */
+  doEntirePath: boolean;
 }
 
 function _extract(gameState: GameState) {
@@ -22,6 +29,7 @@ function _extract(gameState: GameState) {
       currentEra: gameState.playerSave.currentEra,
     },
     computed: {
+      lockStatusMap: gameState.computed.lockStatusMap,
       reachableStatusMap: gameState.computed.reachableStatusMap,
       fogOfWarStatusMap: gameState.computed.fogOfWarStatusMap,
       accessibleStatusMap: gameState.computed.accessibleStatusMap,
@@ -263,6 +271,27 @@ export class AllocateNodeAction {
       return false;
     }
 
+    if (input.doEntirePath) {
+      // check to see if there is a UNIQUE shortest path
+
+      const [touchedSet, shortestPathDist] = bfsAllPaths({
+        source: input.nodeLocation,
+        destinations: new HashSet<Vector3>(
+          gameState.playerSave.allocationStatusMap
+            .entries()
+            .filter(([v, status]) => {
+              return status.taken === true;
+            })
+            .map((it) => it[0])
+        ),
+        validLocks: getValidLocks(gameState),
+      });
+
+      if (touchedSet.size() !== shortestPathDist + 1) {
+        console.log("can't do that, shortest path is not unique");
+        return false;
+      }
+    }
     return true;
   }
 
