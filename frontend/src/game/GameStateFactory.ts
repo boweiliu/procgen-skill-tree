@@ -89,10 +89,11 @@ export function loadComputed(gameState: GameState): GameState {
   // });
 
   // fill in lock statuses with computed statuses
-  gameState.computed.lockStatusMap = markLockStatus(
-    gameState.computed.lockStatusMap,
-    gameState
-  );
+  gameState.computed.lockStatusMap = markLockStatus({
+    prev: gameState.computed.lockStatusMap,
+    result: gameState.computed.lockStatusMap,
+    prevGameState: gameState,
+  });
 
   // accessible and visible computation makes use of lock information
   gameState.computed.accessibleStatusMap = markAccessibleNodes({
@@ -115,29 +116,34 @@ export function loadComputed(gameState: GameState): GameState {
   return gameState;
 }
 
-export function markLockStatus(
-  prev: Const<HashMap<Vector3, LockStatus | undefined>> | null,
-  prevGameState: Const<GameState>
-): HashMap<Vector3, LockStatus | undefined> | null {
+export function markLockStatus(args: {
+  result: HashMap<Vector3, LockStatus | undefined> | null;
+  prev: Const<HashMap<Vector3, LockStatus | undefined>> | null;
+  prevGameState: Const<GameState>;
+}): HashMap<Vector3, LockStatus | undefined> | null {
+  const { prev, prevGameState } = args;
+  let { result } = args;
+
   if (!prev) {
-    return prev;
+    return result;
   }
 
-  let result: HashMap<Vector3, LockStatus | undefined> | null = null;
+  // let result: typeof prev | null = null;
 
   for (let [location, lockData] of prevGameState.worldGen.lockMap.entries()) {
     if (lockData) {
       // TODO(bowei): compute lock status
       const newStatus = LockStatus.TICKING;
 
-      if (prev.get(location) !== newStatus) {
+      if ((result || prev).get(location) !== newStatus) {
         result = result || prev.clone();
         result.put(location, newStatus);
       }
     }
   }
 
-  return result || (prev as unknown as typeof result);
+  // return result || (prev as unknown as typeof result);
+  return result;
 }
 
 /**

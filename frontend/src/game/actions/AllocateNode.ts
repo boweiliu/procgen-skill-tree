@@ -74,27 +74,82 @@ export class AllocateNodeAction {
   enqueueAction(input: AllocateNodeInput) {
     const { nodeLocation } = input;
 
-    // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
-    this.updaters.playerSave.allocationStatusMap.enqueueUpdate(
-      (prev, prevGameState) => {
-        if (prevGameState.playerSave.currentEra.type === 'B') {
-          if (prev.get(nodeLocation)?.taken !== true) {
-            const result = prev.clone();
-            result.put(nodeLocation, { taken: true });
-            return result;
-          }
-          return prev;
+    this.updaters.enqueueUpdate((prev, prevGameState) => {
+      if (prev.playerSave.currentEra.type === 'B') {
+        let result: GameState | null = null;
+
+        // compute nodes to allocate
+        let nodesToAllocate: Vector3[];
+        if (input.doEntirePath) {
+          nodesToAllocate = bfsAllPaths({
+            source: input.nodeLocation,
+            destinations: new HashSet<Vector3>(
+              (result || prev).playerSave.allocationStatusMap
+                .entries()
+                .filter(([v, status]) => {
+                  return status.taken === true;
+                })
+                .map((it) => it[0])
+            ),
+            validLocks: getValidLocks(result || prev),
+          })[0].values();
         } else {
-          return prev;
+          nodesToAllocate = [nodeLocation];
         }
+
+        // we assume here that the check() passed so the path should be unqiue. allocate each of them
+        let allocationStatusMap:
+          | typeof prev.playerSave.allocationStatusMap
+          | null = null;
+        nodesToAllocate.forEach((nodeLocation) => {
+          if (
+            (
+              allocationStatusMap ||
+              (result || prev).playerSave.allocationStatusMap
+            ).get(nodeLocation)?.taken !== true
+          ) {
+            allocationStatusMap =
+              allocationStatusMap ||
+              (result || prev).playerSave.allocationStatusMap.clone();
+            allocationStatusMap.put(nodeLocation, { taken: true });
+          }
+        });
+        if (allocationStatusMap) {
+          result = result || { ...(prev as unknown as GameState) };
+          result.playerSave = { ...result.playerSave, allocationStatusMap };
+
+          // result = { ...(result || prev), playerSave: { ...prev.playerSave, allocationStatusMap } };
+        }
+
+        return result || prev;
+      } else {
+        return prev;
       }
-    );
+    });
+
+    // TODO(bowei): dont forget to update statsTab to compute off of saved as well as taken
+    // this.updaters.playerSave.allocationStatusMap.enqueueUpdate(
+    //   (prev, prevGameState) => {
+    //     if (prevGameState.playerSave.currentEra.type === 'B') {
+    //       if (prev.get(nodeLocation)?.taken !== true) {
+    //         const result = prev.clone();
+    //         result.put(nodeLocation, { taken: true });
+    //         return result;
+    //       }
+    //       return prev;
+    //     } else {
+    //       return prev;
+    //     }
+    //   }
+    // );
 
     // before updating Fog of war, first unlock any lock whose statuses have changed
     this.updaters.computed.lockStatusMap?.enqueueUpdate(
       (prev, prevGameState) => {
         if (prevGameState.playerSave.currentEra.type === 'B') {
-          return markLockStatus(prev, prevGameState);
+          let result: typeof prev | null = null;
+          result = markLockStatus({ result, prev, prevGameState });
+          return result || prev;
         } else {
           return prev;
         }
