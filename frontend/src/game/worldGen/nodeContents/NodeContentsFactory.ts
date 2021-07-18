@@ -95,18 +95,15 @@ export class NodeContentsFactory {
 
   private createSingle(args: {
     seed: number;
-    randInt: number;
     location: Vector3;
   }): NodeContentsLine {
     const attribute = randomValue<typeof Attribute>({
       seed: args.seed,
-      randInt: args.randInt,
       weights: WEIGHTS.SINGLE_COLORS,
     });
 
     const modifier = randomValue<typeof Modifier>({
       seed: args.seed + 1,
-      randInt: squirrel3(args.randInt),
       weights:
         taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
           ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
@@ -116,14 +113,13 @@ export class NodeContentsFactory {
     let amount = 0;
     if (modifier === Modifier.FLAT) {
       amount = randomDice({
-        randInt: squirrel3(args.randInt + 1),
+        seed: args.seed + 2,
         formula: '2d6',
         plus: 8,
       });
     } else {
       amount = randomUniform({
-        seed: args.randInt + 2,
-        randInt: squirrel3(args.randInt + 2),
+        seed: args.seed + 2,
         min: 4,
         max: 7,
         increment: 0.5,
@@ -140,44 +136,39 @@ export class NodeContentsFactory {
 
   private createNoSpend(args: {
     seed: number;
-    randInt: number;
     location: Vector3;
   }): NodeContents {
     const { location } = args;
 
+    // WIP
     const single = this.createSingle({
       seed: args.seed,
-      randInt: args.randInt,
       location,
     });
 
     return randomSwitch<NodeContents>({
       seed: args.seed,
-      randInt: args.randInt,
       weights: WEIGHTS.DECISION_1,
       behaviors: {
-        SINGLE: (randInt, seed) => {
+        SINGLE: (seed) => {
           return {
             lines: [
               this.createSingle({
                 seed,
-                randInt,
                 location,
               }),
             ],
           };
         },
-        DOUBLE: (randInt, seed) => {
+        DOUBLE: (seed) => {
           return {
             lines: [
               this.createSingle({
                 seed,
-                randInt,
                 location,
               }),
               this.createSingle({
                 seed: seed + 1,
-                randInt: squirrel3(randInt),
                 location,
               }),
             ],
@@ -222,7 +213,6 @@ export class NodeContentsFactory {
 
     const result = randomSwitch<NodeContents>({
       seed: seed + Vector3ToSeed(clusterCenter),
-      randInt: squirrel3(seed + Vector3ToSeed(clusterCenter)),
       weights:
         taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
           ? WEIGHTS.STARTER_AREA_ROOT
@@ -233,23 +223,20 @@ export class NodeContentsFactory {
             lines: [],
           };
         },
-        NO_SPEND: (randInt: number, seed: number) => {
+        NO_SPEND: (seed: number) => {
           return this.createNoSpend({
             seed,
-            randInt,
             location: clusterCenter,
           });
         },
-        SPEND: (randInt: number, seed: number) => {
+        SPEND: (seed: number) => {
           const base = this.createNoSpend({
             seed,
-            randInt,
             location: clusterCenter,
           });
 
           const attribute = randomValue<typeof Attribute>({
             seed: seed + 1,
-            randInt,
             weights: {
               [Attribute.RED0]: 100,
               [Attribute.RED1]: 100,
