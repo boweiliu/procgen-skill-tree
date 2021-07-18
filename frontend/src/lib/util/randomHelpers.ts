@@ -1,9 +1,17 @@
 import { INTMAX32, squirrel3 } from './random';
 
+/**
+ *
+ * @param randInt integer generated from random distribution. higher means the lower weights will be picked.
+ * @param weights associative array of keys to weights. each key has a probability of being selected proportional to its weight.
+ * @param behaviors mapping of keys to callbacks. which callback is called depends on which key was selected. the callback is called with a single argument, which will be the hash of the [randInt] provided to randomSwitch.
+ * @returns a value obtained from calling one of the behaviors.
+ */
 export function randomSwitch<T>(args: {
+  seed: number;
   randInt: number;
   weights: { [k: string]: number };
-  behaviors: { [k: string]: (randInt: number) => T };
+  behaviors: { [k: string]: (randInt: number, seed: number) => T };
 }): T {
   const { randInt, weights, behaviors } = args;
   const p = randInt / INTMAX32;
@@ -13,7 +21,7 @@ export function randomSwitch<T>(args: {
   for (const [key, weight] of Object.entries(weights)) {
     if (unusedWeight <= weight) {
       // use key
-      return behaviors[key](newRandInt);
+      return behaviors[key](newRandInt, newRandInt /* TODO */);
     } else {
       unusedWeight -= weight;
     }
@@ -21,7 +29,14 @@ export function randomSwitch<T>(args: {
   throw Error();
 }
 
+/**
+ *
+ * @param randInt integer generated from random distribution. higher means the lower weights will be picked.
+ * @param weights map of keys to weights; each key has a probability of being selected proportional to its weight.
+ * @returns the selected key
+ */
 export function randomValue<T>(args: {
+  seed: number;
   randInt: number;
   weights: { [k in keyof T]: number };
 }): keyof T {
@@ -43,6 +58,7 @@ export function randomValue<T>(args: {
 }
 
 export function randomUniform(args: {
+  seed: number;
   randInt: number;
   min: number;
   max: number;
@@ -70,6 +86,7 @@ export function randomDice(args: {
   let val = 0;
   for (let i = 0; i < numDice; i++) {
     val += randomUniform({
+      seed: randInt + i,
       randInt: squirrel3(randInt + i),
       min: 1,
       max: numPips,
