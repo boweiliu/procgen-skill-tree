@@ -62,7 +62,7 @@ const WEIGHTS = {
   },
   // how many different attributes are in the non-spend section
   DECISION_1: {
-    SINGLE: 500,
+    SINGLE: 200,
     DOUBLE: 500,
   },
   // if we are doing a single attribute, what attribute is it going to be
@@ -90,60 +90,60 @@ const RANGES = {
   [Modifier.FLAT]: {
     TIER_0: {
       dist: 'triangle',
-      min: 18,
-      max: 30,
+      min: 20,
+      max: 24,
       increment: 2,
       inclusive: true,
     },
     TIER_0b: {
       dist: 'triangle',
-      min: 5,
-      max: 15,
-      increment: 1,
+      min: 6,
+      max: 10,
+      increment: 2,
       inclusive: true,
     },
     TIER_1: {
       dist: 'triangle',
-      min: 30,
+      min: 40,
       max: 50,
       increment: 5,
       inclusive: true,
     },
     TIER_1b: {
       dist: 'triangle',
-      min: 8,
-      max: 24,
-      increment: 2,
+      min: 10,
+      max: 20,
+      increment: 5,
       inclusive: true,
     },
   },
   [Modifier.INCREASED]: {
     TIER_0: {
       dist: 'triangle',
-      min: 4.5,
-      max: 7.5,
-      increment: 0.5,
+      min: 5,
+      max: 7,
+      increment: 1,
       inclusive: true,
     },
     TIER_0b: {
       dist: 'triangle',
-      min: 0.5,
+      min: 1,
       max: 3,
-      increment: 0.5,
+      increment: 1,
       inclusive: true,
     },
     TIER_1: {
       dist: 'triangle',
-      min: 7,
+      min: 8,
       max: 10,
-      increment: 0.5,
+      increment: 1,
       inclusive: true,
     },
     TIER_1b: {
       dist: 'triangle',
-      min: 2,
+      min: 3,
       max: 5,
-      increment: 0.5,
+      increment: 1,
       inclusive: true,
     },
   },
@@ -228,8 +228,8 @@ export class NodeContentsFactory {
     });
 
     if (!isSingleton) {
-      // random 1/6 chance to be a larger node
-      if (randomFloat({ seed: seed + 4 + Vector3ToSeed(location) }) < 1 / 6) {
+      // random 1/3 chance to be a larger node
+      if (randomFloat({ seed: seed + 4 + Vector3ToSeed(location) }) < 1 / 3) {
         amount1 = randomTriangle({
           ...RANGES[modifier].TIER_1,
           seed: seed + 2 + Vector3ToSeed(location),
