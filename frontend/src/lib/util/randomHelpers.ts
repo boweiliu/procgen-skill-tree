@@ -55,6 +55,11 @@ export function randomValue<T>(args: {
   throw Error();
 }
 
+/**
+ *
+ * @param
+ * @returns random number between min and max
+ */
 export function randomUniform(args: {
   seed: number;
   min: number;

@@ -1,6 +1,7 @@
 import { HashMap } from '../../../lib/util/data_structures/hash';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
+import { roundToEven } from '../../../lib/util/misc';
 import { squirrel3 } from '../../../lib/util/random';
 import {
   randomDice,
@@ -112,11 +113,13 @@ export class NodeContentsFactory {
 
     let amount = 0;
     if (modifier === Modifier.FLAT) {
-      amount = randomDice({
-        seed: args.seed + 2,
-        formula: '2d6',
-        plus: 8,
-      });
+      amount =
+        2 *
+        randomDice({
+          seed: args.seed + 2,
+          formula: '2d4',
+          plus: 7,
+        });
     } else {
       amount = randomUniform({
         seed: args.seed + 2,
@@ -134,17 +137,86 @@ export class NodeContentsFactory {
     };
   }
 
+  private createDouble(args: {
+    seed: number;
+    location: Vector3;
+  }): NodeContentsLine[] {
+    const modifier = randomValue<typeof Modifier>({
+      seed: args.seed + 1,
+      weights:
+        taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
+          ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
+          : WEIGHTS.SINGLE_MODIFIERS,
+    });
+
+    let amount1: number, amount2: number;
+    if (modifier === Modifier.FLAT) {
+      // [18-30] = [9-15] * 2
+      amount1 =
+        2 *
+        randomDice({
+          seed: args.seed + 2,
+          formula: '2d4',
+          plus: 7,
+        });
+      amount2 =
+        amount1 / 2 +
+        randomUniform({
+          seed: args.seed + 3,
+          min: -2,
+          max: 2,
+          inclusive: true,
+        });
+    } else {
+      // [4.5-7.5] = [9-15]/2
+      amount1 =
+        0.5 *
+        randomDice({
+          seed: args.seed + 2,
+          formula: '2d4',
+          plus: 7,
+        });
+      // [2-4] but usually 3
+      amount2 =
+        roundToEven(amount1) / 2 +
+        randomUniform({
+          seed: args.seed + 3,
+          min: 0.5,
+          max: 0.5,
+          inclusive: true,
+        });
+    }
+
+    const attribute1 = randomValue<typeof Attribute>({
+      seed: args.seed,
+      weights: WEIGHTS.SINGLE_COLORS,
+    });
+
+    // guarantee distinct attributes
+    const attribute2 = randomValue<typeof Attribute>({
+      seed: args.seed,
+      weights: { ...WEIGHTS.SINGLE_COLORS, [attribute1]: 0 },
+    });
+
+    return [
+      {
+        attribute: Attribute[attribute1],
+        amount: amount1,
+        modifier: Modifier[modifier],
+      },
+      {
+        attribute: Attribute[attribute2],
+        amount: amount2,
+        modifier: Modifier[modifier],
+      },
+    ];
+  }
+
   private createNoSpend(args: {
     seed: number;
     location: Vector3;
   }): NodeContents {
     const { location } = args;
-
-    // WIP
-    const single = this.createSingle({
-      seed: args.seed,
-      location,
-    });
 
     return randomSwitch<NodeContents>({
       seed: args.seed,
@@ -162,16 +234,10 @@ export class NodeContentsFactory {
         },
         DOUBLE: (seed) => {
           return {
-            lines: [
-              this.createSingle({
-                seed,
-                location,
-              }),
-              this.createSingle({
-                seed: seed + 1,
-                location,
-              }),
-            ],
+            lines: this.createDouble({
+              seed,
+              location,
+            }),
           };
         },
       },

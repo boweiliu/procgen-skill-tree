@@ -295,3 +295,16 @@ export function extractDeps<T, U>(
 }
 
 export class DeserializationError extends Error {}
+
+export function roundToEven(x: number): number {
+  // check if x is something.5
+  if (!Number.isInteger(x) && Number.isInteger(x * 2)) {
+    if ((x + 0.5) % 2 === 0) {
+      return x + 0.5;
+    } else {
+      return x - 0.5;
+    }
+  } else {
+    return Math.round(x);
+  }
+}
