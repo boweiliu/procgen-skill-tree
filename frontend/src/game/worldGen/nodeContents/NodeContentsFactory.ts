@@ -5,7 +5,9 @@ import { roundToEven } from '../../../lib/util/misc';
 import { squirrel3 } from '../../../lib/util/random';
 import {
   randomDice,
+  randomFloat,
   randomSwitch,
+  randomTriangle,
   randomUniform,
   randomValue,
 } from '../../../lib/util/randomHelpers';
@@ -84,6 +86,69 @@ const WEIGHTS = {
   },
 };
 
+const RANGES = {
+  [Modifier.FLAT]: {
+    TIER_0: {
+      dist: 'triangle',
+      min: 18,
+      max: 30,
+      increment: 2,
+      inclusive: true,
+    },
+    TIER_0b: {
+      dist: 'triangle',
+      min: 5,
+      max: 15,
+      increment: 1,
+      inclusive: true,
+    },
+    TIER_1: {
+      dist: 'triangle',
+      min: 30,
+      max: 50,
+      increment: 5,
+      inclusive: true,
+    },
+    TIER_1b: {
+      dist: 'triangle',
+      min: 8,
+      max: 24,
+      increment: 2,
+      inclusive: true,
+    },
+  },
+  [Modifier.INCREASED]: {
+    TIER_0: {
+      dist: 'triangle',
+      min: 4.5,
+      max: 7.5,
+      increment: 0.5,
+      inclusive: true,
+    },
+    TIER_0b: {
+      dist: 'triangle',
+      min: 0.5,
+      max: 3,
+      increment: 0.5,
+      inclusive: true,
+    },
+    TIER_1: {
+      dist: 'triangle',
+      min: 7,
+      max: 10,
+      increment: 0.5,
+      inclusive: true,
+    },
+    TIER_1b: {
+      dist: 'triangle',
+      min: 2,
+      max: 5,
+      increment: 0.5,
+      inclusive: true,
+    },
+  },
+};
+
 export class NodeContentsFactory {
   public config: NodeContentsFactoryConfig;
 
@@ -97,38 +162,27 @@ export class NodeContentsFactory {
   private createSingle(args: {
     seed: number;
     location: Vector3;
+    clusterCenter: Vector3;
+    isSingleton: boolean;
   }): NodeContentsLine {
+    const { seed, clusterCenter, location, isSingleton } = args;
     const attribute = randomValue<typeof Attribute>({
-      seed: args.seed,
+      seed,
       weights: WEIGHTS.SINGLE_COLORS,
     });
 
     const modifier = randomValue<typeof Modifier>({
-      seed: args.seed + 1,
+      seed: seed + 1,
       weights:
-        taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
+        taxicabDistance(clusterCenter.pairXY()) <= STARTER_AREA_RADIUS
           ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
           : WEIGHTS.SINGLE_MODIFIERS,
     });
 
-    let amount = 0;
-    if (modifier === Modifier.FLAT) {
-      amount =
-        2 *
-        randomDice({
-          seed: args.seed + 2,
-          formula: '2d4',
-          plus: 7,
-        });
-    } else {
-      amount = randomUniform({
-        seed: args.seed + 2,
-        min: 4,
-        max: 7,
-        increment: 0.5,
-        inclusive: true,
-      });
-    }
+    let amount = randomTriangle({
+      ...RANGES[modifier].TIER_0,
+      seed: seed + 2 + Vector3ToSeed(location),
+    });
 
     return {
       attribute: Attribute[attribute],
@@ -140,63 +194,52 @@ export class NodeContentsFactory {
   private createDouble(args: {
     seed: number;
     location: Vector3;
+    clusterCenter: Vector3;
+    isSingleton: boolean;
   }): NodeContentsLine[] {
+    const { seed, clusterCenter, location, isSingleton } = args;
+
     const modifier = randomValue<typeof Modifier>({
-      seed: args.seed + 1,
+      seed: seed + 1,
       weights:
-        taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
+        taxicabDistance(clusterCenter.pairXY()) <= STARTER_AREA_RADIUS
           ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
           : WEIGHTS.SINGLE_MODIFIERS,
     });
 
-    let amount1: number, amount2: number;
-    if (modifier === Modifier.FLAT) {
-      // [18-30] = [9-15] * 2
-      amount1 =
-        2 *
-        randomDice({
-          seed: args.seed + 2,
-          formula: '2d4',
-          plus: 7,
-        });
-      amount2 =
-        amount1 / 2 +
-        randomUniform({
-          seed: args.seed + 3,
-          min: -2,
-          max: 2,
-          inclusive: true,
-        });
-    } else {
-      // [4.5-7.5] = [9-15]/2
-      amount1 =
-        0.5 *
-        randomDice({
-          seed: args.seed + 2,
-          formula: '2d4',
-          plus: 7,
-        });
-      // [2-4] but usually 3
-      amount2 =
-        roundToEven(amount1) / 2 +
-        randomUniform({
-          seed: args.seed + 3,
-          min: 0.5,
-          max: 0.5,
-          inclusive: true,
-        });
-    }
-
     const attribute1 = randomValue<typeof Attribute>({
-      seed: args.seed,
+      seed: seed,
       weights: WEIGHTS.SINGLE_COLORS,
     });
 
     // guarantee distinct attributes
     const attribute2 = randomValue<typeof Attribute>({
-      seed: args.seed,
+      seed: seed,
       weights: { ...WEIGHTS.SINGLE_COLORS, [attribute1]: 0 },
     });
+
+    let amount1 = randomTriangle({
+      ...RANGES[modifier].TIER_0,
+      seed: seed + 2 + Vector3ToSeed(location),
+    });
+    let amount2 = randomTriangle({
+      ...RANGES[modifier].TIER_0b,
+      seed: seed + 3 + Vector3ToSeed(location),
+    });
+
+    if (!isSingleton) {
+      // random 1/6 chance to be a larger node
+      if (randomFloat({ seed: seed + 4 + Vector3ToSeed(location) }) < 1 / 6) {
+        amount1 = randomTriangle({
+          ...RANGES[modifier].TIER_1,
+          seed: seed + 2 + Vector3ToSeed(location),
+        });
+        amount2 = randomTriangle({
+          ...RANGES[modifier].TIER_1b,
+          seed: seed + 3 + Vector3ToSeed(location),
+        });
+      }
+    }
 
     return [
       {
@@ -215,11 +258,13 @@ export class NodeContentsFactory {
   private createNoSpend(args: {
     seed: number;
     location: Vector3;
+    clusterCenter: Vector3;
+    isSingleton: boolean;
   }): NodeContents {
-    const { location } = args;
+    const { location, clusterCenter, seed, isSingleton } = args;
 
     return randomSwitch<NodeContents>({
-      seed: args.seed,
+      seed,
       weights: WEIGHTS.DECISION_1,
       behaviors: {
         SINGLE: (seed) => {
@@ -228,6 +273,8 @@ export class NodeContentsFactory {
               this.createSingle({
                 seed,
                 location,
+                clusterCenter,
+                isSingleton,
               }),
             ],
           };
@@ -237,6 +284,8 @@ export class NodeContentsFactory {
             lines: this.createDouble({
               seed,
               location,
+              clusterCenter,
+              isSingleton,
             }),
           };
         },
@@ -261,6 +310,7 @@ export class NodeContentsFactory {
 
     // find the closest cluster center - a 3x3 hexagonal region
     let clusterCenter: Vector3;
+    let isSingleton: boolean;
     let modulo3 = location.moduloPositive(3).pairXY();
     if (
       modulo3.equals(new Vector2(1, 2)) ||
@@ -268,13 +318,16 @@ export class NodeContentsFactory {
     ) {
       // not close to any cluster centers
       clusterCenter = location;
+      isSingleton = true;
     } else {
       clusterCenter = location.divide(3).round().multiply(3);
+      isSingleton = false;
     }
 
     // don't use the cluster for the starting cluster
     if (clusterCenter.equals(Vector3.Zero)) {
       clusterCenter = location;
+      isSingleton = true;
     }
 
     const result = randomSwitch<NodeContents>({
@@ -292,13 +345,17 @@ export class NodeContentsFactory {
         NO_SPEND: (seed: number) => {
           return this.createNoSpend({
             seed,
-            location: clusterCenter,
+            location,
+            clusterCenter,
+            isSingleton,
           });
         },
         SPEND: (seed: number) => {
           const base = this.createNoSpend({
             seed,
-            location: clusterCenter,
+            location,
+            clusterCenter,
+            isSingleton,
           });
 
           const attribute = randomValue<typeof Attribute>({
@@ -330,5 +387,5 @@ export class NodeContentsFactory {
 }
 
 export function Vector3ToSeed(v: Vector3) {
-  return v.x + v.y + squirrel3(v.x + v.z);
+  return v.x + squirrel3(v.y + squirrel3(v.z));
 }

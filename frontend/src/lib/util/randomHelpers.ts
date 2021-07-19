@@ -77,6 +77,38 @@ export function randomUniform(args: {
   return min + g * increment;
 }
 
+export function randomTriangle(args: {
+  seed: number;
+  min: number;
+  max: number;
+  increment?: number;
+  inclusive?: boolean;
+}): number {
+  const { seed, min, max, increment = 1, inclusive = true } = args;
+  let numBuckets = Math.ceil((max - min) / increment);
+  if (min + increment * numBuckets === max && inclusive === true) {
+    numBuckets += 1;
+  }
+
+  const p1 = squirrel3(seed) / INTMAX32;
+  const p2 = squirrel3(seed + 1) / INTMAX32; // TODO(bowei): what is the seed contract to prevent collisions?
+  // odd # of buckets -> generate 2 identical uniform distr's;
+  if (numBuckets % 2 === 1) {
+    const g1 = Math.floor((p1 * (numBuckets + 1)) / 2);
+    const g2 = Math.floor((p2 * (numBuckets + 1)) / 2);
+    return min + (g1 + g2) * increment;
+  } else {
+    // even # of buckets -> generate 1 bigger and 1 smaller
+    const g1 = Math.floor((p1 * numBuckets) / 2);
+    const g2 = Math.floor((p2 * numBuckets) / 2 + 1);
+    return min + (g1 + g2) * increment;
+  }
+}
+
+export function randomFloat(args: { seed: number }): number {
+  return squirrel3(args.seed) / INTMAX32;
+}
+
 export function randomDice(args: {
   seed: number;
   formula: string;
@@ -88,7 +120,7 @@ export function randomDice(args: {
   let val = 0;
   for (let i = 0; i < numDice; i++) {
     val += randomUniform({
-      seed: seed + i,
+      seed: seed + i, // TODO(bowei): what is the seed contract to prevent collisions?
       min: 1,
       max: numPips,
       inclusive: true,
