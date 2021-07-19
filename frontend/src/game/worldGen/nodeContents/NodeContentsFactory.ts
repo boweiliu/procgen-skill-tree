@@ -1,14 +1,11 @@
 import { HashMap } from '../../../lib/util/data_structures/hash';
 import { Vector2 } from '../../../lib/util/geometry/vector2';
 import { Vector3 } from '../../../lib/util/geometry/vector3';
-import { roundToEven } from '../../../lib/util/misc';
 import { squirrel3 } from '../../../lib/util/random';
 import {
-  randomDice,
   randomFloat,
   randomSwitch,
   randomTriangle,
-  randomUniform,
   randomValue,
 } from '../../../lib/util/randomHelpers';
 import { STARTER_AREA_RADIUS, taxicabDistance } from '../LockFactory';
@@ -165,7 +162,7 @@ export class NodeContentsFactory {
     clusterCenter: Vector3;
     isSingleton: boolean;
   }): NodeContentsLine {
-    const { seed, clusterCenter, location, isSingleton } = args;
+    const { seed, clusterCenter, location } = args;
     const attribute = randomValue<typeof Attribute>({
       seed,
       weights: WEIGHTS.SINGLE_COLORS,
