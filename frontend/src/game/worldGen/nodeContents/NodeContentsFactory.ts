@@ -10,6 +10,7 @@ import {
   randomUniform,
   randomValue,
 } from '../../../lib/util/randomHelpers';
+import { getCoordNeighbors } from '../../lib/HexGrid';
 import { STARTER_AREA_RADIUS, taxicabDistance } from '../LockFactory';
 
 type NodeContentsFactoryConfig = {};
@@ -374,10 +375,12 @@ export class NodeContentsFactory {
           });
 
           // generate an average amount for the cluster
-          let baseAmount = modifier === Modifier.FLAT ? 20 : 5;
+          let baseAmount = modifier === Modifier.FLAT ? 20 : 5; // +20, or 5%
+          const increment = baseAmount / 10; // increments of 2, or 0.5%
           let primaryAmount = baseAmount;
+
+          // single-color clusters should be slightly more concentrated
           if (attributeMixCount === '1' && clusterInfo.radius > 1) {
-            // increase it slightly - single-color clusters should be slightly more concentrated
             primaryAmount *= 1.6;
           }
 
@@ -386,7 +389,7 @@ export class NodeContentsFactory {
             seed: seed + 2,
             min: -baseAmount * 0.3,
             max: baseAmount * 0.3,
-            increment: baseAmount * 0.1,
+            increment,
             inclusive: true,
           });
 
@@ -412,14 +415,16 @@ export class NodeContentsFactory {
             // secondary amount should be at most primary amount, and on average, about half
             let min = baseAmount * 0.2;
             let max = primaryAmount + perturbation;
-            let avgAmount = (min + max) / 2;
             let secondaryAmount = randomTriangle({
               seed: seed + 3,
               min,
               max,
-              increment: baseAmount * 0.1,
+              increment,
               inclusive: true,
             });
+
+            // not quite the avg amount, but needs to be a round number
+            let avgAmount = primaryAmount / 2 + baseAmount * 0.2;
 
             lines.push({
               attribute: secondaryAttribute,
@@ -466,6 +471,25 @@ export class NodeContentsFactory {
         clusterContents.lines[1].amount =
           2.0 * clusterContents.lines[1].avgAmount +
           clusterContents.lines[1].perturbation;
+      }
+    } else {
+      // find the other random edge node. it's 1-in-6 chance
+      let idx = randomUniform({
+        seed,
+        min: 0,
+        max: 6,
+        inclusive: false,
+      });
+      let target = Object.values(getCoordNeighbors(Vector3.Zero))[idx];
+      if (relativeLocation.equals(target)) {
+        clusterContents.lines[0].amount =
+          1.5 * clusterContents.lines[0].avgAmount +
+          clusterContents.lines[0].perturbation;
+        if (clusterContents.lines[1]) {
+          clusterContents.lines[1].amount =
+            1.5 * clusterContents.lines[1].avgAmount +
+            clusterContents.lines[1].perturbation;
+        }
       }
     }
 
