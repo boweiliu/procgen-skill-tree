@@ -29,22 +29,22 @@ export function randomSwitch<T>(args: {
 }
 
 /**
- *
+ * @param T enum
  * @param randInt integer generated from random distribution. higher means the lower weights will be picked.
  * @param weights map of keys to weights; each key has a probability of being selected proportional to its weight.
  * @returns the selected key
  */
-export function randomValue<T>(args: {
+export function randomValue<T extends string | number>(args: {
   seed: number;
-  weights: { [k in keyof T]: number };
-}): keyof T {
+  weights: { [k in T]: number };
+}): T {
   const { seed, weights } = args;
   const p = squirrel3(seed) / INTMAX32;
   const weightTotal = (Object.values(weights) as number[]).reduce(
     (pv, cv) => pv + cv
   );
   let unusedWeight = p * weightTotal;
-  for (const [key, weight] of Object.entries(weights) as [keyof T, number][]) {
+  for (const [key, weight] of Object.entries(weights) as [T, number][]) {
     if (unusedWeight <= weight) {
       // use key
       return key;
