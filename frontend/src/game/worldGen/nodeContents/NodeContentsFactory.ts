@@ -4,7 +4,6 @@ import { Vector3 } from '../../../lib/util/geometry/vector3';
 import { NotImplementedError } from '../../../lib/util/misc';
 import { squirrel3 } from '../../../lib/util/random';
 import {
-  randomFloat,
   randomSwitch,
   randomTriangle,
   randomUniform,
@@ -50,20 +49,16 @@ export enum Modifier {
 const WEIGHTS = {
   // for any single node, what is in it
   ROOT: {
-    EMPTY: 150,
-    NO_SPEND: 100,
-    SPEND: 0,
-  },
-
-  STARTER_AREA_ROOT: {
-    EMPTY: 30,
-    NO_SPEND: 100,
-    SPEND: 0,
-  },
-  // how many different attributes are in the non-spend section
-  DECISION_1: {
-    SINGLE: 200,
-    DOUBLE: 500,
+    default: {
+      EMPTY: 150,
+      NO_SPEND: 100,
+      SPEND: 0,
+    },
+    starter: {
+      EMPTY: 30,
+      NO_SPEND: 100,
+      SPEND: 0,
+    },
   },
   // if we are doing a single attribute, what attribute is it going to be
   SINGLE_COLORS: {
@@ -74,16 +69,7 @@ const WEIGHTS = {
     [Attribute.DEL1]: 10,
     [Attribute.DEL2]: 10,
   },
-  // if we are doing a single attribute, what modifier is it going to be
-  SINGLE_MODIFIERS: {
-    [Modifier.FLAT]: 150,
-    [Modifier.INCREASED]: 100,
-  },
-  // same as above but in the starting region
-  STARTER_AREA_SINGLE_MODIFIERS: {
-    [Modifier.FLAT]: 400,
-    [Modifier.INCREASED]: 100,
-  },
+  // what modifier is it going to be (depends on biome)
   MODIFIER_TYPE: {
     starter: {
       [Modifier.FLAT]: 400,
@@ -94,6 +80,7 @@ const WEIGHTS = {
       [Modifier.INCREASED]: 100,
     },
   },
+  // how many different attributes are in the cluster - 1 or 2
   ATTRIBUTE_MIX_COUNT: {
     starter: {
       1: 200,
@@ -102,69 +89,6 @@ const WEIGHTS = {
     default: {
       1: 200,
       2: 600,
-    },
-  },
-};
-
-const RANGES = {
-  [Modifier.FLAT]: {
-    TIER_0: {
-      dist: 'triangle',
-      min: 20,
-      max: 24,
-      increment: 2,
-      inclusive: true,
-    },
-    TIER_0b: {
-      dist: 'triangle',
-      min: 6,
-      max: 10,
-      increment: 2,
-      inclusive: true,
-    },
-    TIER_1: {
-      dist: 'triangle',
-      min: 40,
-      max: 50,
-      increment: 5,
-      inclusive: true,
-    },
-    TIER_1b: {
-      dist: 'triangle',
-      min: 10,
-      max: 20,
-      increment: 5,
-      inclusive: true,
-    },
-  },
-  [Modifier.INCREASED]: {
-    TIER_0: {
-      dist: 'triangle',
-      min: 5,
-      max: 7,
-      increment: 1,
-      inclusive: true,
-    },
-    TIER_0b: {
-      dist: 'triangle',
-      min: 1,
-      max: 3,
-      increment: 1,
-      inclusive: true,
-    },
-    TIER_1: {
-      dist: 'triangle',
-      min: 8,
-      max: 10,
-      increment: 1,
-      inclusive: true,
-    },
-    TIER_1b: {
-      dist: 'triangle',
-      min: 3,
-      max: 5,
-      increment: 1,
-      inclusive: true,
     },
   },
 };
@@ -195,6 +119,7 @@ type ClusterContents = {
 export class NodeContentsFactory {
   public config: NodeContentsFactoryConfig;
 
+  // TODO(bowei): cache stuff
   private clusterCenterData: HashMap<Vector3, any>;
 
   constructor(config: NodeContentsFactoryConfig) {
@@ -202,153 +127,16 @@ export class NodeContentsFactory {
     this.clusterCenterData = new HashMap();
   }
 
-  private createSingle(args: {
-    seed: number;
-    location: Vector3;
-    clusterCenter: Vector3;
-    isSingleton: boolean;
-  }): NodeContentsLine {
-    const { seed, clusterCenter, location } = args;
-    const attribute = randomValue<Attribute>({
-      seed,
-      weights: WEIGHTS.SINGLE_COLORS,
-    });
-
-    const modifier = randomValue<Modifier>({
-      seed: seed + 1,
-      weights:
-        taxicabDistance(clusterCenter.pairXY()) <= STARTER_AREA_RADIUS
-          ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
-          : WEIGHTS.SINGLE_MODIFIERS,
-    });
-
-    let amount = randomTriangle({
-      ...RANGES[modifier].TIER_0,
-      seed: seed + 2 + Vector3ToSeed(location),
-    });
-
-    return {
-      attribute: Attribute[attribute],
-      amount,
-      modifier: Modifier[modifier],
-    };
-  }
-
-  private createDouble(args: {
-    seed: number;
-    location: Vector3;
-    clusterCenter: Vector3;
-    isSingleton: boolean;
-  }): NodeContentsLine[] {
-    const { seed, clusterCenter, location, isSingleton } = args;
-
-    const modifier = randomValue<Modifier>({
-      seed: seed + 1,
-      weights:
-        taxicabDistance(clusterCenter.pairXY()) <= STARTER_AREA_RADIUS
-          ? WEIGHTS.STARTER_AREA_SINGLE_MODIFIERS
-          : WEIGHTS.SINGLE_MODIFIERS,
-    });
-
-    const attribute1 = randomValue<Attribute>({
-      seed: seed,
-      weights: WEIGHTS.SINGLE_COLORS,
-    });
-
-    // guarantee distinct attributes
-    const attribute2 = randomValue<Attribute>({
-      seed: seed,
-      weights: { ...WEIGHTS.SINGLE_COLORS, [attribute1]: 0 },
-    });
-
-    let amount1 = randomTriangle({
-      ...RANGES[modifier].TIER_0,
-      seed: seed + 2 + Vector3ToSeed(location),
-    });
-    let amount2 = randomTriangle({
-      ...RANGES[modifier].TIER_0b,
-      seed: seed + 3 + Vector3ToSeed(location),
-    });
-
-    if (!isSingleton) {
-      // random 1/3 chance to be a larger node
-      if (randomFloat({ seed: seed + 4 + Vector3ToSeed(location) }) < 1 / 3) {
-        amount1 = randomTriangle({
-          ...RANGES[modifier].TIER_1,
-          seed: seed + 2 + Vector3ToSeed(location),
-        });
-        amount2 = randomTriangle({
-          ...RANGES[modifier].TIER_1b,
-          seed: seed + 3 + Vector3ToSeed(location),
-        });
-      }
-    }
-
-    return [
-      {
-        attribute: Attribute[attribute1],
-        amount: amount1,
-        modifier: Modifier[modifier],
-      },
-      {
-        attribute: Attribute[attribute2],
-        amount: amount2,
-        modifier: Modifier[modifier],
-      },
-    ];
-  }
-
-  private createNoSpend(args: {
-    seed: number;
-    location: Vector3;
-    clusterCenter: Vector3;
-    isSingleton: boolean;
-  }): NodeContents {
-    const { location, clusterCenter, seed, isSingleton } = args;
-
-    return randomSwitch<NodeContents>({
-      seed,
-      weights: WEIGHTS.DECISION_1,
-      behaviors: {
-        SINGLE: (seed) => {
-          return {
-            lines: [
-              this.createSingle({
-                seed,
-                location,
-                clusterCenter,
-                isSingleton,
-              }),
-            ],
-          };
-        },
-        DOUBLE: (seed) => {
-          return {
-            lines: this.createDouble({
-              seed,
-              location,
-              clusterCenter,
-              isSingleton,
-            }),
-          };
-        },
-      },
-    });
-  }
-
   private createCluster(args: {
     seed: number;
     location: Vector3;
     clusterInfo: ClusterInfo;
   }): ClusterContents {
-    const { seed, location, clusterInfo } = args;
+    const { seed, clusterInfo } = args;
 
     const result = randomSwitch<ClusterContents>({
       seed,
-      weights:
-        clusterInfo.biome === 'starter'
-          ? WEIGHTS.STARTER_AREA_ROOT
-          : WEIGHTS.ROOT,
+      weights: WEIGHTS.ROOT[clusterInfo.biome],
       behaviors: {
         EMPTY: () => {
           return { lines: [] };
@@ -505,13 +293,6 @@ export class NodeContentsFactory {
     clusterContents.lines[0].amount += perturbation;
 
     if (clusterContents.lines[1]) {
-      // let perturbation = randomTriangle({
-      //   seed: seed + Vector3ToSeed(relativeLocation) + 1,
-      //   min: -baseAmount * 0.1,
-      //   max: baseAmount * 0.1,
-      //   increment: baseAmount * 0.1,
-      //   inclusive: true,
-      // });
       clusterContents.lines[1].amount -= perturbation;
     }
     return clusterContents;
@@ -538,7 +319,6 @@ export class NodeContentsFactory {
     // find the closest cluster center
     let clusterCenter: Vector3;
     let clusterInfo: ClusterInfo = { radius: 0, biome: 'default' };
-    let isSingleton: boolean;
 
     let modulo3 = location.moduloPositive(3).pairXY();
     if (
@@ -547,18 +327,15 @@ export class NodeContentsFactory {
     ) {
       // not close to any cluster centers, so it's a singleton 1x1 filler cluster
       clusterCenter = location;
-      isSingleton = true;
       clusterInfo.radius = 1;
     } else {
       clusterCenter = location.divide(3).round().multiply(3);
       clusterInfo.radius = 2;
-      isSingleton = false;
     }
 
     // don't use the cluster for the starting cluster
     if (clusterCenter.equals(Vector3.Zero)) {
       clusterCenter = location;
-      isSingleton = true;
       clusterInfo.radius = 1;
     }
 
@@ -584,58 +361,6 @@ export class NodeContentsFactory {
       clusterInfo,
       relativeLocation: location.subtract(clusterCenter),
     });
-
-    // const result = randomSwitch<NodeContents>({
-    //   seed: seed + Vector3ToSeed(clusterCenter),
-    //   weights:
-    //     taxicabDistance(args.location.pairXY()) <= STARTER_AREA_RADIUS
-    //       ? WEIGHTS.STARTER_AREA_ROOT
-    //       : WEIGHTS.ROOT,
-    //   behaviors: {
-    //     EMPTY: (randInt: number) => {
-    //       return {
-    //         lines: [],
-    //       };
-    //     },
-    //     NO_SPEND: (seed: number) => {
-    //       return this.createNoSpend({
-    //         seed,
-    //         location,
-    //         clusterCenter,
-    //         isSingleton,
-    //       });
-    //     },
-    //     SPEND: (seed: number) => {
-    //       const base = this.createNoSpend({
-    //         seed,
-    //         location,
-    //         clusterCenter,
-    //         isSingleton,
-    //       });
-
-    //       const attribute = randomValue<Attribute>({
-    //         seed: seed + 1,
-    //         weights: {
-    //           [Attribute.RED0]: 100,
-    //           [Attribute.RED1]: 100,
-    //           [Attribute.RED2]: 100,
-    //           [Attribute.DEL0]: 0,
-    //           [Attribute.DEL1]: 0,
-    //           [Attribute.DEL2]: 0,
-    //         },
-    //       });
-
-    //       return {
-    //         ...base,
-    //         condition: {
-    //           type: 'SPEND',
-    //           amount: 12,
-    //           attribute: Attribute[attribute],
-    //         },
-    //       };
-    //     },
-    //   },
-    // });
 
     return result;
   }
