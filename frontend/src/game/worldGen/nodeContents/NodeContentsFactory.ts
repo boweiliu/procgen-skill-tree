@@ -460,11 +460,11 @@ export class NodeContentsFactory {
     // amplify the center node, and (TODO) another random edge node, by 50%
     if (relativeLocation.equals(Vector3.Zero)) {
       clusterContents.lines[0].amount =
-        1.5 * clusterContents.lines[0].avgAmount +
+        2.0 * clusterContents.lines[0].avgAmount +
         clusterContents.lines[0].perturbation;
       if (clusterContents.lines[1]) {
         clusterContents.lines[1].amount =
-          1.5 * clusterContents.lines[1].avgAmount +
+          2.0 * clusterContents.lines[1].avgAmount +
           clusterContents.lines[1].perturbation;
       }
     }
