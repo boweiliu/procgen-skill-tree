@@ -429,7 +429,7 @@ export class AllocateNodeAction {
 export const ERA_SP_LIMITS: { [x: number]: number } = {
   [-1]: 1,
   0: 11,
-  1: 31,
+  1: 41,
   2: 61,
   3: 91,
   4: 121,
