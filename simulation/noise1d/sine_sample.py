@@ -21,7 +21,8 @@ def generate_sine_wave(freq, sample_rate, duration):
     return x, y
 
 # Generate a 2 hertz sine wave that lasts for 5 seconds
-x, y = generate_sine_wave(2, SAMPLE_RATE, DURATION)
-plt.plot(x, y)
-plt.show()
+if __name__ == '__main__':
+    x, y = generate_sine_wave(2, SAMPLE_RATE, DURATION)
+    plt.plot(x, y)
+    plt.show()
 
