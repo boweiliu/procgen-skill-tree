@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# source: https://realpython.com/python-scipy-fft/
+
 # linux sigh
 #import matplotlib
 #matplotlib.use('TkAgg')
