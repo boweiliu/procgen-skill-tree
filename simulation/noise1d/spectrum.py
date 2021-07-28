@@ -8,21 +8,23 @@ from matplotlib import pyplot as plt
 from util import N, SAMPLE_RATE, DURATION, nfft
 from noise import generate_bernoulli_noise
 
-NUM_BUCKETS = 300 # this should divide N
-BUCKET_SIZE = int(N / NUM_BUCKETS)
+# number of buckets to divde the frequencies into. note that # of frequencies == N/2
+NUM_BUCKETS = 300 # this should divide N/2
+BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
 
 if __name__ == '__main__':
     xs, ys = generate_bernoulli_noise()
     yf = nfft(ys)
-    xf = fftfreq(N, 1 / SAMPLE_RATE)
+    xf = fftfreq(N, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
     #plt.plot(xf, np.abs(yf))
 
-    # compute squared power, and divide into buckets
+    # computed squared power
     unbucketed_power_f = np.abs(yf) * np.abs(yf) 
+    # divide inot buckets and cut off the redundant negative frequencies
     bucketed_p_f = np.array([ np.sum(unbucketed_power_f[ i * BUCKET_SIZE : ( i+1 ) * BUCKET_SIZE]) for i in range(NUM_BUCKETS) ]) # percent power
     bucketed_xf = np.array([ 1/BUCKET_SIZE * np.sum(xf[i * BUCKET_SIZE:(i+1) * BUCKET_SIZE]) for i in range(NUM_BUCKETS) ]) # avg
     # also we should normalize so on average each data point == 1
-    bucketed_pp_f = bucketed_p_f * 1/N * NUM_BUCKETS
+    bucketed_pp_f = bucketed_p_f / BUCKET_SIZE
 
     plt.plot(bucketed_xf, bucketed_pp_f)
     plt.show()
