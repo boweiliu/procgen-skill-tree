@@ -10,8 +10,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-SAMPLE_RATE = 44100  # Hertz
-DURATION = 5  # Seconds
+#SAMPLE_RATE = 44100  # Hertz
+#DURATION = 4  # Seconds
+
+SAMPLE_RATE = 10000  # Hertz
+DURATION = 9  # Seconds
 
 def generate_sine_wave(freq, sample_rate, duration):
     x = np.linspace(0, duration, sample_rate * duration, endpoint=False)
