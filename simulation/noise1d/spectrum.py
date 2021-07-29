@@ -47,13 +47,15 @@ def generate_averaged_spectrum(generator):
     return xf, unbucketed_power_f
 
 if __name__ == '__main__':
-    x, y_b = generate_bucketed_spectrum(noise.generate_bernoulli_noise)
-    _, y_g = generate_bucketed_spectrum(noise.generate_gaussian_noise)
+    x, y_wb = generate_bucketed_spectrum(noise.generate_bernoulli_noise)
+    _, y_wg = generate_bucketed_spectrum(noise.generate_gaussian_noise)
     _, y_bb = generate_bucketed_spectrum(noise.generate_brownian_bernoulli_noise)
     _, y_bw = generate_bucketed_spectrum(noise.generate_brownian_warmstart_noise)
+    _, y_b2 = generate_bucketed_spectrum(noise.generate_brownian_2way_noise)
     _, y_lb = generate_bucketed_spectrum(noise.generate_blue_bernoulli_noise)
-    #plt.plot(x, y_b, label='bernoulli white')
-    #plt.plot(x, y_g, label='gaussian white')
+
+    #plt.plot(x, y_wb, label='bernoulli white')
+    #plt.plot(x, y_wg, label='gaussian white')
     #plt.plot(x, y_bb, label='bernoulli brown')
 
 # full spectrum
@@ -70,10 +72,11 @@ if __name__ == '__main__':
     #plt.plot(np.log(x), np.log(y_bb), label='bernoulli brown (log-log)')
 
 # cut off low and high frequencies
-    plt.plot(np.log(x[2:NUM_BUCKETS//2]),  np.log(y_b[2:NUM_BUCKETS//2]), label='white bernoulli (log-log)')
-    plt.plot(np.log(x[2:NUM_BUCKETS//2]),  np.log(y_g[2:NUM_BUCKETS//2]), label='white gaussian (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_wb[2:NUM_BUCKETS//2]), label='white bernoulli (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_wg[2:NUM_BUCKETS//2]), label='white gaussian (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bb[2:NUM_BUCKETS//2]), label='brown bernoulli (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bw[2:NUM_BUCKETS//2]), label='brown warm start (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_b2[2:NUM_BUCKETS//2]), label='brown 2way (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_lb[2:NUM_BUCKETS//2]), label='blue bernoulli (log-log)')
     plt.legend()
     #plt.ylim((0, 10))

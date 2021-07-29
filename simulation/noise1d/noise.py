@@ -26,6 +26,24 @@ def generate_brownian_bernoulli_noise(iterations = 1):
     ys = ys/np.sqrt((N+1)/2)
     return xs, ys
 
+def generate_brownian_2way_noise(iterations = 1):
+    xs = np.linspace(0, DURATION, N, endpoint=False)
+    ds1 = np.random.randint(2, size=(N, iterations)) # 0 or 1
+    ds1 = ds1 * 2 - 1 # -1 or 1
+    #padding = np.array([0 for _ in range(iterations)]).reshape((1, iterations))
+    #ds = np.concatenate((padding, ds), axis=0)
+    ys1 = np.cumsum(ds1, axis=0)
+    ds2 = np.random.randint(2, size=(N, iterations)) # 0 or 1
+    ds2 = ds2 * 2 - 1 # -1 or 1
+    #padding = np.array([0 for _ in range(iterations)]).reshape((1, iterations))
+    #ds = np.concatenate((padding, ds), axis=0)
+    ys2 = np.cumsum(ds2, axis=0)
+    ys2 = np.flip(ys2, axis=0)
+    ys = ys1 + ys2
+    # normalizagion
+    ys = ys/np.sqrt(N+1)
+    return xs, ys
+
 def generate_brownian_warmstart_noise(iterations = 1):
     xs = np.linspace(0, DURATION, N, endpoint=False)
     ds = np.random.randint(2, size=(N * 2, iterations)) # 0 or 1
@@ -52,9 +70,14 @@ def generate_blue_bernoulli_noise(iterations = 1):
 
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
-    x, y = generate_blue_bernoulli_noise(100)
-    plt.plot(x[:100], y[:100,0])
-    #plt.plot(x,y[:,0])
+
+    # x, y = generate_blue_bernoulli_noise(100)
+    x, y = generate_brownian_2way_noise(100)
+    # x, y = generate_brownian_bernoulli_noise(100)
+    #plt.plot(x[:100], y[:100,0])
+    plt.plot(x,y[:,0])
     plt.show()
+# verify normalization. this should be close to 1
+    print(np.mean(np.mean(y * y, axis=0)))
 
 
