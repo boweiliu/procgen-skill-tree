@@ -56,6 +56,10 @@ def generate_brownian_warmstart_noise(iterations = 1):
     ys = ys/np.sqrt((2*N + N+1)/2)
     return xs, ys
 
+# other types of brown noise
+# TODO: start with bb but normalize so t=0 and t=9 are both 0, and normalize power to 1 per-iteration
+# TODO: like 2way but instead of starting on the 2 ends, also start in the middle, and at the quartiles, etc.?
+
 def generate_blue_bernoulli_noise(iterations = 1):
     xs = np.linspace(0, DURATION, N, endpoint=False)
     ds = np.random.randint(2, size=(N, iterations)) # 0 or 1
