@@ -12,9 +12,9 @@ import noise
 NUM_BUCKETS = 300 # this should divide N/2
 BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
 
-NUM_ITER = 20
+NUM_ITER = 100
 
-def generate_averaged_spectrum(generator):
+def generate_bucketed_spectrum(generator):
     xs, ys = generator(NUM_ITER)
     #yf = nfft(ys[:,0], axis=0)
     yf = nfft(ys, axis=0)
@@ -34,14 +34,48 @@ def generate_averaged_spectrum(generator):
     rerun_bucketed_pp_f = np.mean(bucketed_pp_f, axis=1)
     return bucketed_xf, rerun_bucketed_pp_f
 
+def generate_averaged_spectrum(generator):
+    xs, ys = generator(NUM_ITER)
+    #yf = nfft(ys[:,0], axis=0)
+    yf = nfft(ys, axis=0)
+    xf = fftfreq(N, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
+    #plt.plot(xf, np.abs(yf))
+
+    # computed squared power
+    unbucketed_power_f = np.abs(yf) * np.abs(yf) 
+    unbucketed_power_f = np.mean(unbucketed_power_f, axis=1)
+    return xf, unbucketed_power_f
+
 if __name__ == '__main__':
-    x, y_b = generate_averaged_spectrum(noise.generate_bernoulli_noise)
-    _, y_g = generate_averaged_spectrum(noise.generate_gaussian_noise)
-    _, y_bb = generate_averaged_spectrum(noise.generate_brownian_bernoulli_noise)
-    plt.plot(x, y_b, label='bernoulli white')
-    plt.plot(x, y_g, label='gaussian white')
-    plt.plot(x, y_bb, label='bernoulli brown')
+    x, y_b = generate_bucketed_spectrum(noise.generate_bernoulli_noise)
+    _, y_g = generate_bucketed_spectrum(noise.generate_gaussian_noise)
+    _, y_bb = generate_bucketed_spectrum(noise.generate_brownian_bernoulli_noise)
+    _, y_bw = generate_bucketed_spectrum(noise.generate_brownian_warmstart_noise)
+    _, y_lb = generate_bucketed_spectrum(noise.generate_blue_bernoulli_noise)
+    #plt.plot(x, y_b, label='bernoulli white')
+    #plt.plot(x, y_g, label='gaussian white')
+    #plt.plot(x, y_bb, label='bernoulli brown')
+
+# full spectrum
+    #xf, yf_b  = generate_averaged_spectrum(noise.generate_bernoulli_noise)
+    #xf, yf_g  = generate_averaged_spectrum(noise.generate_gaussian_noise)
+    #xf, yf_bb = generate_averaged_spectrum(noise.generate_brownian_bernoulli_noise)
+    #xf, yf_bw = generate_averaged_spectrum(noise.generate_brownian_warmstart_noise)
+    #plt.plot(xf, np.log(yf_bb), label='brown (log)')
+    #plt.plot(xf, np.log(yf_bw), label='brown warm start (log)')
+    #plt.xlim(100,6000)
+
+# log -log
+    #plt.plot(np.log(x), np.log(y_bw), label='warm start brown (log-log)')
+    #plt.plot(np.log(x), np.log(y_bb), label='bernoulli brown (log-log)')
+
+# cut off low and high frequencies
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]),  np.log(y_b[2:NUM_BUCKETS//2]), label='white bernoulli (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]),  np.log(y_g[2:NUM_BUCKETS//2]), label='white gaussian (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bb[2:NUM_BUCKETS//2]), label='brown bernoulli (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bw[2:NUM_BUCKETS//2]), label='brown warm start (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_lb[2:NUM_BUCKETS//2]), label='blue bernoulli (log-log)')
     plt.legend()
-    plt.ylim((0, 10))
+    #plt.ylim((0, 10))
     plt.show()
 
