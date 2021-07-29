@@ -6,7 +6,7 @@ from scipy.fft import fft, fftfreq
 from matplotlib import pyplot as plt
 
 from util import N, SAMPLE_RATE, DURATION, nfft
-from noise import generate_bernoulli_noise
+import noise
 
 # number of buckets to divde the frequencies into. note that # of frequencies == N/2
 NUM_BUCKETS = 300 # this should divide N/2
@@ -14,8 +14,8 @@ BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
 
 NUM_ITER = 20
 
-if __name__ == '__main__':
-    xs, ys = generate_bernoulli_noise(NUM_ITER)
+def generate_averaged_spectrum(generator):
+    xs, ys = generator(NUM_ITER)
     #yf = nfft(ys[:,0], axis=0)
     yf = nfft(ys, axis=0)
     xf = fftfreq(N, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
@@ -32,9 +32,16 @@ if __name__ == '__main__':
 
     # finally, average over iterations
     rerun_bucketed_pp_f = np.mean(bucketed_pp_f, axis=1)
-    
-    #plt.plot(bucketed_xf, bucketed_pp_f[:,0])
-    plt.plot(bucketed_xf, rerun_bucketed_pp_f)
-    plt.ylim((0, 2))
+    return bucketed_xf, rerun_bucketed_pp_f
+
+if __name__ == '__main__':
+    x, y_b = generate_averaged_spectrum(noise.generate_bernoulli_noise)
+    _, y_g = generate_averaged_spectrum(noise.generate_gaussian_noise)
+    _, y_bb = generate_averaged_spectrum(noise.generate_brownian_bernoulli_noise)
+    plt.plot(x, y_b, label='bernoulli white')
+    plt.plot(x, y_g, label='gaussian white')
+    plt.plot(x, y_bb, label='bernoulli brown')
+    plt.legend()
+    plt.ylim((0, 10))
     plt.show()
 
