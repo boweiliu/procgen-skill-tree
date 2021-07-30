@@ -52,6 +52,7 @@ if __name__ == '__main__':
     _, y_bb = generate_bucketed_spectrum(noise.generate_brownian_bernoulli_noise)
     _, y_bw = generate_bucketed_spectrum(noise.generate_brownian_warmstart_noise)
     _, y_b2 = generate_bucketed_spectrum(noise.generate_brownian_2way_noise)
+    _, y_bn = generate_bucketed_spectrum(noise.generate_brownian_normalized_noise)
     _, y_lb = generate_bucketed_spectrum(noise.generate_blue_bernoulli_noise)
 
     #plt.plot(x, y_wb, label='bernoulli white')
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bb[2:NUM_BUCKETS//2]), label='brown bernoulli (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bw[2:NUM_BUCKETS//2]), label='brown warm start (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_b2[2:NUM_BUCKETS//2]), label='brown 2way (log-log)')
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_bn[2:NUM_BUCKETS//2]), label='brown normalized (log-log)')
     plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y_lb[2:NUM_BUCKETS//2]), label='blue bernoulli (log-log)')
     plt.legend()
     #plt.ylim((0, 10))
