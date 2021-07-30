@@ -71,6 +71,16 @@ def generate_brownian_normalized_noise(iterations = 1):
     power = np.mean(ys * ys, axis=0)
     ys = np.divide(ys, np.sqrt(power))
     return xs, ys
+
+# quantized to zero one
+def generate_brownian_quantized_noise(iterations = 1):
+    # start with gaussian and accumulate it
+    xs = np.linspace(0, DURATION, N, endpoint=False)
+    ds = np.random.normal(0, 1, size=(N, iterations))
+    ys = np.cumsum(ds, axis=0)
+    # now quantize
+    ys = np.where(np.greater_equal(ys, 0),1,-1)
+    return xs, ys
     
 # TODO: start with bb but normalize so t=0 and t=9 are both 0, and normalize power to 1 per-iteration
 # TODO: like 2way but instead of starting on the 2 ends, also start in the middle, and at the quartiles, etc.?
@@ -91,7 +101,8 @@ if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
     # x, y = generate_blue_bernoulli_noise(100)
-    x, y = generate_brownian_normalized_noise(100)
+    #x, y = generate_brownian_normalized_noise(100)
+    x, y = generate_brownian_quantized_noise(100)
     # x, y = generate_brownian_bernoulli_noise(100)
     #plt.plot(x[:100], y[:100,0])
     plt.plot(x,y[:,0])
