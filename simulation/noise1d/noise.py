@@ -26,6 +26,16 @@ def generate_brownian_bernoulli_noise(iterations = 1):
     ys = ys/np.sqrt((N+1)/2)
     return xs, ys
 
+def generate_brownian_gaussian_noise(iterations = 1):
+    xs = np.linspace(0, DURATION, N, endpoint=False)
+    ds = np.random.normal(0, 1, size=(N, iterations))
+    #padding = np.array([0 for _ in range(iterations)]).reshape((1, iterations))
+    #ds = np.concatenate((padding, ds), axis=0)
+    ys = np.cumsum(ds, axis=0)
+    # normalization
+    ys = ys/np.sqrt((N+1)/2)
+    return xs, ys
+
 def generate_brownian_2way_noise(iterations = 1):
     xs = np.linspace(0, DURATION, N, endpoint=False)
     ds1 = np.random.randint(2, size=(N, iterations)) # 0 or 1
