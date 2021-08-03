@@ -109,7 +109,6 @@ def generate_brownian_normalized_clamped_noise(iterations = 1):
     ys = np.where(np.greater_equal(ys, 0),1,-1)
     return xs, ys
 
-# TODO: start with bb but normalize so t=0 and t=9 are both 0, and normalize power to 1 per-iteration
 # TODO: like 2way but instead of starting on the 2 ends, also start in the middle, and at the quartiles, etc.?
 
 def generate_blue_bernoulli_noise(iterations = 1):
