@@ -5,6 +5,8 @@ import sys
 import numpy as np
 import spectrum
 import noise
+import scipy
+import scipy.signal as signal
 from util import DURATION, N
 from spectrum import NUM_BUCKETS
 
@@ -18,8 +20,10 @@ def main():
     plot_helper(brown_bernoulli_2waynormalized_quantized)
     plot_helper(brown_bernoulli_2waynormalized_clamp)
     plot_helper(brown_bernoulli_2waynormalized_clampquarter)
+    plot_helper(brown_bernoulli_2waynormalized_clampquarter2)
     plot_helper(brown_bernoulli_2waynormalized_softmax)
     plot_helper(brown_bernoulli_2waynormalized_whiteditherquarter)
+    plot_helper(brown_bernoulli_2waynormalized_selfdither)
     plt.legend()
     #mng = plt.get_current_fig_manager()
     #mng.frame.Maximize(True)
@@ -34,8 +38,11 @@ def test():
     #x, y = brown_bernoulli_powernormalized_clampquarter(100)
     #x, y = brown_bernoulli_powernormalized_softmax(100)
     #x, y = brown_bernoulli_2waynormalized(100)
+    #x, y = brown_bernoulli_2waynormalized_clampquarter(100)
+    x, y = brown_bernoulli_2waynormalized_clampquarter2(100)
     #x, y = brown_bernoulli_2waynormalized_quantized(100)
-    x, y = brown_bernoulli_2waynormalized_whiteditherquarter(100)
+    #x, y = brown_bernoulli_2waynormalized_whiteditherquarter(100)
+    #x, y = brown_bernoulli_2waynormalized_selfdither(100)
     #x, y = brown_bernoulli_powernormalized(100)
     #plt.plot(x[:100], y[:100, 0])
     plt.plot(x[:], y[:, 0])
@@ -131,9 +138,29 @@ def brown_bernoulli_2waynormalized_softmax(iterations = 1):
 def brown_bernoulli_2waynormalized_whiteditherquarter(iterations = 1):
     return brown_bernoulli_powernormalized_quantized(iterations, normalization='uniform', quantization='whiteditherquarter')
 
+def brown_bernoulli_2waynormalized_selfdither(iterations = 1):
+    xs, os = brown_bernoulli_2waynormalized(iterations)
+    _, os2 = brown_bernoulli_2waynormalized(iterations)
+    ys = np.where(np.greater_equal(os, os2), 1, -1)
+    return xs, ys
+
+# clamp then moving avg window 2 then quantize
+def brown_bernoulli_2waynormalized_clampquarter3(iterations = 1):
+    xs, os = brown_bernoulli_powernormalized_quantized(iterations, normalization='uniform', quantization='clamp')
+    avs = signal.fftconvolve(os, np.ones((2, iterations)), mode='same', axes=0) / 2
+    ys = np.where(np.greater_equal(avs, 0), 1, -1)
+    return xs, ys
+
+# clamp then quantize then moving avg window 3 then quantizeagain
+def brown_bernoulli_2waynormalized_clampquarter2(iterations = 1):
+    xs, os = brown_bernoulli_powernormalized_quantized(iterations, normalization='uniform', quantization='hard')
+    avs = signal.fftconvolve(os, np.ones((5, iterations)), mode='same', axes=0) / 5
+    ys = np.where(np.greater_equal(avs, 0), 1, -1)
+    return xs, ys
+
 def plot_helper(fn, label='log-log'):
     x, y = spectrum.generate_bucketed_spectrum(fn)
-    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
+    plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
