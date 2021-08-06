@@ -21,6 +21,7 @@ def main():
     plot_helper(white_bernoulli_gaussblur3)
     plot_helper(white_bernoulli_invsqrtblur3)
     plot_helper(white_bernoulli_invsqrtblur300)
+    plot_helper(white_bernoulli_diff)
     #plot_helper(white_bernoulli_gaussblur9)
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -84,6 +85,11 @@ def invsqrt_window(window = 3, sigma = 1, iterations = 1):
     ys = np.repeat(y[:, np.newaxis], iterations, axis=1) / ysum
     return ys
 
+def diff_window(window = None, sigma = None, iterations = 1):
+    y = np.array([ 1, -1 ])
+    ys = np.repeat(y[:, np.newaxis], iterations, axis=1)
+    return ys
+
 def white_bernoulli_expblur3(iterations = 1, window=3):
     xs, ys = white_bernoulli_powernormalized(iterations)
     ys = signal.fftconvolve(ys, exponential_window(window, 0.5, iterations), mode='same', axes=0)
@@ -104,6 +110,11 @@ def white_bernoulli_invsqrtblur3(iterations = 1, window=3):
 
 def white_bernoulli_invsqrtblur300(iterations = 1):
     return white_bernoulli_invsqrtblur3(iterations, window=300)
+
+def white_bernoulli_diff(iterations = 1, window=3):
+    xs, ys = white_bernoulli_powernormalized(iterations)
+    ys = signal.fftconvolve(ys, diff_window(window, 1, iterations), mode='same', axes=0)
+    return xs, ys
 
 def plot_helper(fn, label=''):
     x, y = spectrum.generate_bucketed_spectrum(fn)
