@@ -11,14 +11,16 @@ import scipy.signal as signal
 from util import DURATION, N
 from spectrum import NUM_BUCKETS
 #from brownian_quantization import plot_helper
-from blur_filter import white_bernoulli_powernormalized, diff_window
+from blur_filter import white_bernoulli_powernormalized, diff_window, white_bernoulli_diff
+from brownian_quantization import brown_bernoulli_2waynormalized
 
 def main():
     plot_helper(white_bernoulli_powernormalized)
     plot_helper(white_bernoulli_invsqrtblur300)
     plot_helper(white_bernoulli_invsqrt_accumulate)
     plot_helper(white_bernoulli_invsqrt_diff)
-    #plot_helper(white_bernoulli_diff)
+    plot_helper(white_bernoulli_diff)
+    plot_helper(brown_bernoulli_2waynormalized_scaled)
     #plot_helper(white_bernoulli_gaussblur9)
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -29,6 +31,7 @@ def main():
 
 def test():
     #x, y = white_bernoulli_powernormalized(100)
+    #x, y = brown_bernoulli_2waynormalized(100)
     #x, y = white_bernoulli_invsqrt_accumulate(100)
     x, y = white_bernoulli_invsqrt_diff(100)
     #x, y = white_bernoulli_gaussblur9(100)
@@ -79,6 +82,10 @@ def white_bernoulli_invsqrt_diff(iterations = 1):
     ypow = np.mean(ys * ys, axis=0)
     ys = np.divide(ys, np.sqrt(ypow))
     return xs, ys
+
+def brown_bernoulli_2waynormalized_scaled(iterations = 1):
+    xs, ys = brown_bernoulli_2waynormalized(iterations)
+    return xs, ys * 20
 
 def plot_helper(fn, label=''):
     x, y = spectrum.generate_bucketed_spectrum(fn)
