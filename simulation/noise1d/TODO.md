@@ -11,3 +11,4 @@
   - one-sided vs two-sided? also explore two-sided analogue of heaviside step function which is log|t|
 6. binary search-like algorithm for context free brownian
   - this doesnt really work due to lack of a uniform distribution on the reals. but we can work on tying down the 2 ends of the brownian and then how do we compute the insides.
+7. apply gaussian smoothing, and then resample at a higher sample rate <- this should allow us to quantize better. otherwise e.g. brownian quantization sucks
