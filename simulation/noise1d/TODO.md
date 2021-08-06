@@ -8,5 +8,6 @@
 4. ordinary gaussian blur filter - how does variance affect frequency spectrum
 5. half-integrate the ordinary gaussian blur filter, then take the limit to dirac delta
   - make sure the thingy is sharper than the heaviside step function (1 discontinuity) but not as sharp as the dirac delta (2 discontinuity and 1 undefined). should be halfway in between in the lipschitz sense
+  - one-sided vs two-sided? also explore two-sided analogue of heaviside step function which is log|t|
 6. binary search-like algorithm for context free brownian
   - this doesnt really work due to lack of a uniform distribution on the reals. but we can work on tying down the 2 ends of the brownian and then how do we compute the insides.
