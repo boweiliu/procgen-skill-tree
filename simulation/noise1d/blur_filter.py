@@ -16,9 +16,11 @@ def main():
     plot_helper(white_gaussian_powernormalized)
     #plot_helper(white_bernoulli_uniformblur3)
     #plot_helper(white_bernoulli_uniformblur2)
-    #plot_helper(white_bernoulli_uniformblur9)
+    plot_helper(white_bernoulli_uniformblur300)
     plot_helper(white_bernoulli_expblur3)
     plot_helper(white_bernoulli_gaussblur3)
+    plot_helper(white_bernoulli_invsqrtblur3)
+    plot_helper(white_bernoulli_invsqrtblur300)
     #plot_helper(white_bernoulli_gaussblur9)
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -58,8 +60,8 @@ def white_bernoulli_uniformblur3(iterations = 1, window=3):
 def white_bernoulli_uniformblur2(iterations = 1):
     return white_bernoulli_uniformblur3(iterations, window=2)
 
-def white_bernoulli_uniformblur9(iterations = 1):
-    return white_bernoulli_uniformblur3(iterations, window=9)
+def white_bernoulli_uniformblur300(iterations = 1):
+    return white_bernoulli_uniformblur3(iterations, window=300)
 
 def exponential_window(window = 5, ratio = 0.5, iterations = 1):
     x = np.linspace(0, window, window, endpoint=False) # 0 ... window
@@ -76,6 +78,12 @@ def gaussian_window(window = 3, sigma = 1, iterations = 1):
     ys = np.repeat(y[:, np.newaxis], iterations, axis=1) / ysum
     return ys
 
+def invsqrt_window(window = 3, sigma = 1, iterations = 1):
+    y = np.array([ 1/np.sqrt(x) for x in range(1, window + 1) ])
+    ysum = np.sum(y)
+    ys = np.repeat(y[:, np.newaxis], iterations, axis=1) / ysum
+    return ys
+
 def white_bernoulli_expblur3(iterations = 1, window=3):
     xs, ys = white_bernoulli_powernormalized(iterations)
     ys = signal.fftconvolve(ys, exponential_window(window, 0.5, iterations), mode='same', axes=0)
@@ -88,6 +96,14 @@ def white_bernoulli_gaussblur3(iterations = 1, window=3):
 
 def white_bernoulli_gaussblur9(iterations = 1):
     return white_bernoulli_gaussblur3(iterations, window=9)
+
+def white_bernoulli_invsqrtblur3(iterations = 1, window=3):
+    xs, ys = white_bernoulli_powernormalized(iterations)
+    ys = signal.fftconvolve(ys, invsqrt_window(window, 1, iterations), mode='same', axes=0)
+    return xs, ys
+
+def white_bernoulli_invsqrtblur300(iterations = 1):
+    return white_bernoulli_invsqrtblur3(iterations, window=300)
 
 def plot_helper(fn, label=''):
     x, y = spectrum.generate_bucketed_spectrum(fn)
