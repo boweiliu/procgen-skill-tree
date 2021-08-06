@@ -29,8 +29,8 @@ def main():
 
 def test():
     #x, y = white_bernoulli_powernormalized(100)
-    x, y = white_bernoulli_invsqrt_accumulate(100)
-    #x, y = white_bernoulli_invsqrt_diff(100)
+    #x, y = white_bernoulli_invsqrt_accumulate(100)
+    x, y = white_bernoulli_invsqrt_diff(100)
     #x, y = white_bernoulli_gaussblur9(100)
     #plt.plot(x[:100], y[:100, 0])
     print(np.mean(np.mean(y * y, axis=0)))
@@ -41,11 +41,11 @@ def test():
     fig = plt.figure()
     def anim(i):
         plt.clf()
-        plt.ylim(-0.005, 0.005)
-        #plt.plot(x[100 * i:100*(i+5)], y[100 * i:100*(i+5), 0])
-        plt.plot(x[50 * i:50*(i+5)], y[50 * i:50*(i+5), 0])
+        plt.ylim(-2, 2)
+        plt.plot(x[100 * i:100*(i+5)], y[100 * i:100*(i+5), 0])
+        #plt.plot(x[50 * i:50*(i+5)], y[50 * i:50*(i+5), 0])
         #plt.show()
-    animator = ani.FuncAnimation(fig, anim, interval = 50)
+    animator = ani.FuncAnimation(fig, anim, interval = 100)
     plt.show()
 
 def white_bernoulli_invsqrtblur3(iterations = 1, window=3):
