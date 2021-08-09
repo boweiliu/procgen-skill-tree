@@ -11,5 +11,6 @@
   - one-sided vs two-sided? also explore two-sided analogue of heaviside step function which is log|t|
 6. binary search-like algorithm for context free brownian
   - this doesnt really work due to lack of a uniform distribution on the reals. but we can work on tying down the 2 ends of the brownian and then how do we compute the insides.
-7. apply gaussian smoothing, and then resample at a higher sample rate <- this should allow us to quantize better. otherwise e.g. brownian quantization sucks
+7. apply gaussian smoothing, and then resample at a higher sample rate <- this should allow us to quantize/dither better. otherwise e.g. brownian quantization sucks
+  - note that it's obviously impossible to preserve the spectrum at higher frequencies if you upsample like that. decide on a freq cutoff to match
 8. binary scale the inv sqrt accumulation (i.e. 1, 2, 2, 4, 4, 4, 4, 8x8, etc.) so it's actually computable
