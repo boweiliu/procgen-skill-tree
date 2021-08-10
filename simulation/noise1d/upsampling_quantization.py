@@ -30,15 +30,20 @@ def main():
 
 def test():
     #x, y = gaussian_white(100)
-    #x, y = gaussian_brown(100)
+    x, y = gaussian_brown(100)
     #x, y = gaussian_violet(100)
     #x, y = gaussian_pink(100)
-    x, y = gaussian_pink_warm(100)
+    #x, y = gaussian_pink_warm(100)
     #x, y = gaussian_azure(100)
     print(np.mean(np.mean(y * y, axis=0)))
+    variances = np.mean(y * y, axis=1)
     plt.plot(x[:100], y[:100, 0])
     #plt.plot(x[100:150], y[100:150, 0])
     #plt.plot(x[:], y[:, 0])
+    plt.show()
+    plt.clf()
+
+    plt.plot(x[:100], variances[:100])
     plt.show()
     plt.clf()
 
