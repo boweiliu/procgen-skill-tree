@@ -22,6 +22,7 @@ def main():
     #plot_helper(gaussian_azure)
 
     plot_helper(gaussian_white_upflat, tN = UP_N)
+    plot_helper(gaussian_white_upzero, tN = UP_N)
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -32,7 +33,8 @@ def main():
 
 def test():
     #x, y = gaussian_white(100)
-    x, y = gaussian_white_upflat(100)
+    #x, y = gaussian_white_upflat(100)
+    x, y = gaussian_white_upzero(100)
     #x, y = gaussian_brown(100)
     #x, y = gaussian_violet(100)
     #x, y = gaussian_pink(100)
@@ -60,12 +62,25 @@ def test():
     animator = ani.FuncAnimation(fig, anim, interval = 100)
     plt.show()
 
-# upflat == upsampled by repetition
+# upzero == upsampled and new values are zero
+def gaussian_white_upzero(iterations = 1, base = 'gaussian'):
+    length = UP_N
+    xs = np.linspace(0, DURATION, length, endpoint=False)
+    _, ys = gaussian_white(iterations, base) # shape = (N, iterations)
+    mys = ys.reshape( (N, 1, iterations) )
+    zs = np.zeros( (N, UP_RATIO - 1, iterations) )
+    mys = np.concatenate( (mys, zs), axis=1).reshape( (N * UP_RATIO, iterations) )
+    mys = mys * np.sqrt(UP_RATIO)
+    #mys = ys.repeat(UP_RATIO, axis=0)
+    return xs, mys
+
+# upflat == upsampled by repetition, then normalized
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
     length = UP_N
     xs = np.linspace(0, DURATION, length, endpoint=False)
     _, ys = gaussian_white(iterations, base) # shape = (N, iterations)
     mys = ys.repeat(UP_RATIO, axis=0)
+    mys = mys / np.sqrt(UP_RATIO)
     return xs, mys
 
 def gaussian_white(iterations = 1, base = 'gaussian', length=N):
