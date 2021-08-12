@@ -13,7 +13,7 @@ from spectrum import NUM_BUCKETS
 from invsqrt import invsqrt_window
 
 def main():
-    #plot_helper(gaussian_white)
+    plot_helper(gaussian_white)
     #plot_helper(gaussian_brown_scaled)
     ##plot_helper(gaussian_brown)
     #plot_helper(gaussian_violet)
@@ -136,7 +136,7 @@ def plot_helper(fn, label='log-log', tN = N):
     x, y = spectrum.generate_bucketed_spectrum(fn, tN = tN)
     y = y[np.abs(x) < SAMPLE_RATE//2] # if we are upsampling, only take pre-upsampled freqs
     x = x[np.abs(x) < SAMPLE_RATE//2]
-    plt.plot(x, y, label=fn.__name__ + ' ' + label)
+    plt.plot(x, y, '-o', label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], y[2:NUM_BUCKETS//1], label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)

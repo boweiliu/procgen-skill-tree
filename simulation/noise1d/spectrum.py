@@ -11,9 +11,11 @@ import noise
 # number of buckets to divde the frequencies into. note that # of frequencies == N/2
 NUM_BUCKETS = 300 # this should divide N/2
 NUM_ITER = 100 # of iterations
+BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
 
 def generate_bucketed_spectrum(generator, tN = N):
-    BUCKET_SIZE = int(tN /2 / NUM_BUCKETS)
+    NUM_BUCKETS = int(tN / 2 / BUCKET_SIZE) # if upsampling, keep bucket size the same
+    #BUCKET_SIZE = int(tN /2 / NUM_BUCKETS) # if upsampling, keep num buckets the same
     SAMPLE_RATE = tN / DURATION
     xs, ys = generator(NUM_ITER)
     yf = nfft(tN, ys, axis=0)
