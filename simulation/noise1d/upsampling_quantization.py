@@ -8,18 +8,20 @@ import spectrum
 import noise
 import scipy
 import scipy.signal as signal
-from util import DURATION, N
+from util import DURATION, N, UP_RATIO, UP_N, SAMPLE_RATE
 from spectrum import NUM_BUCKETS
 from invsqrt import invsqrt_window
 
 def main():
-    plot_helper(gaussian_white)
-    plot_helper(gaussian_brown_scaled)
-    #plot_helper(gaussian_brown)
-    plot_helper(gaussian_violet)
-    plot_helper(gaussian_pink)
-    plot_helper(gaussian_pink_warm)
-    plot_helper(gaussian_azure)
+    #plot_helper(gaussian_white)
+    #plot_helper(gaussian_brown_scaled)
+    ##plot_helper(gaussian_brown)
+    #plot_helper(gaussian_violet)
+    #plot_helper(gaussian_pink)
+    #plot_helper(gaussian_pink_warm)
+    #plot_helper(gaussian_azure)
+
+    plot_helper(gaussian_white_upflat, tN = UP_N)
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -30,7 +32,8 @@ def main():
 
 def test():
     #x, y = gaussian_white(100)
-    x, y = gaussian_brown(100)
+    x, y = gaussian_white_upflat(100)
+    #x, y = gaussian_brown(100)
     #x, y = gaussian_violet(100)
     #x, y = gaussian_pink(100)
     #x, y = gaussian_pink_warm(100)
@@ -56,6 +59,14 @@ def test():
         #plt.show()
     animator = ani.FuncAnimation(fig, anim, interval = 100)
     plt.show()
+
+# upflat == upsampled by repetition
+def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
+    length = UP_N
+    xs = np.linspace(0, DURATION, length, endpoint=False)
+    _, ys = gaussian_white(iterations, base) # shape = (N, iterations)
+    mys = ys.repeat(UP_RATIO, axis=0)
+    return xs, mys
 
 def gaussian_white(iterations = 1, base = 'gaussian', length=N):
     xs = np.linspace(0, DURATION, length, endpoint=False)
@@ -121,12 +132,15 @@ def normalize(data):
     ys = ys / np.sqrt(ypow)
     return ys
 
-def plot_helper(fn, label='log-log'):
-    x, y = spectrum.generate_bucketed_spectrum(fn)
+def plot_helper(fn, label='log-log', tN = N):
+    x, y = spectrum.generate_bucketed_spectrum(fn, tN = tN)
+    y = y[np.abs(x) < SAMPLE_RATE//2] # if we are upsampling, only take pre-upsampled freqs
+    x = x[np.abs(x) < SAMPLE_RATE//2]
+    plt.plot(x, y, label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], y[2:NUM_BUCKETS//1], label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)
-    plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
+    #plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(np.abs(np.log(y[2:NUM_BUCKETS//2]))), label=fn.__name__ + ' ' + label)
 

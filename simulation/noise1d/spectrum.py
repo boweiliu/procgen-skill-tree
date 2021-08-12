@@ -14,6 +14,7 @@ NUM_ITER = 100 # of iterations
 
 def generate_bucketed_spectrum(generator, tN = N):
     BUCKET_SIZE = int(tN /2 / NUM_BUCKETS)
+    SAMPLE_RATE = tN / DURATION
     xs, ys = generator(NUM_ITER)
     yf = nfft(tN, ys, axis=0)
     xf = fftfreq(tN, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
