@@ -10,23 +10,21 @@ import noise
 
 # number of buckets to divde the frequencies into. note that # of frequencies == N/2
 NUM_BUCKETS = 300 # this should divide N/2
-BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
+NUM_ITER = 100 # of iterations
 
-NUM_ITER = 100
-
-def generate_bucketed_spectrum(generator):
+def generate_bucketed_spectrum(generator, tN = N):
+    BUCKET_SIZE = int(tN /2 / NUM_BUCKETS)
     xs, ys = generator(NUM_ITER)
-    #yf = nfft(ys[:,0], axis=0)
-    yf = nfft(ys, axis=0)
-    xf = fftfreq(N, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
+    yf = nfft(tN, ys, axis=0)
+    xf = fftfreq(tN, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
     #plt.plot(xf, np.abs(yf))
 
     # computed squared power
     unbucketed_power_f = np.abs(yf) * np.abs(yf) 
     # divide inot buckets and cut off the redundant negative frequencies
     
-    bucketed_p_f = np.sum((unbucketed_power_f[0:N//2]).reshape(NUM_BUCKETS, BUCKET_SIZE, NUM_ITER), axis=1)
-    bucketed_xf = np.mean((xf[0:N//2]).reshape(NUM_BUCKETS, BUCKET_SIZE), axis=1)
+    bucketed_p_f = np.sum((unbucketed_power_f[0:tN//2]).reshape(NUM_BUCKETS, BUCKET_SIZE, NUM_ITER), axis=1)
+    bucketed_xf = np.mean((xf[0:tN//2]).reshape(NUM_BUCKETS, BUCKET_SIZE), axis=1)
     # also we should normalize so on average each data point == 1
     bucketed_pp_f = bucketed_p_f / BUCKET_SIZE
 
@@ -34,11 +32,10 @@ def generate_bucketed_spectrum(generator):
     rerun_bucketed_pp_f = np.mean(bucketed_pp_f, axis=1)
     return bucketed_xf, rerun_bucketed_pp_f
 
-def generate_averaged_spectrum(generator):
+def generate_averaged_spectrum(generator, tN = N):
     xs, ys = generator(NUM_ITER)
-    #yf = nfft(ys[:,0], axis=0)
-    yf = nfft(ys, axis=0)
-    xf = fftfreq(N, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
+    yf = nfft(tN, ys, axis=0)
+    xf = fftfreq(tN, 1 / SAMPLE_RATE) # 0 .... 4999, -5000, .... -1 order
     #plt.plot(xf, np.abs(yf))
 
     # computed squared power
