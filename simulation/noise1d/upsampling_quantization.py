@@ -15,14 +15,18 @@ from invsqrt import invsqrt_window
 def main():
     plot_helper(gaussian_white)
     #plot_helper(gaussian_brown_scaled)
-    ##plot_helper(gaussian_brown)
-    #plot_helper(gaussian_violet)
-    #plot_helper(gaussian_pink)
-    #plot_helper(gaussian_pink_warm)
-    #plot_helper(gaussian_azure)
+    #plot_helper(gaussian_brown)
+    plot_helper(gaussian_violet)
+    plot_helper(gaussian_pink)
+    plot_helper(gaussian_pink_warm)
+    plot_helper(gaussian_azure)
 
-    plot_helper(gaussian_white_upflat, tN = UP_N)
-    plot_helper(gaussian_white_upzero, tN = UP_N)
+    #plot_helper(gaussian_white_upflat, tN = UP_N)
+    plot_helper(apply_upflat(gaussian_white), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
+    plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
+    plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
+    #plot_helper(gaussian_white_upzero, tN = UP_N)
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -75,13 +79,25 @@ def gaussian_white_upzero(iterations = 1, base = 'gaussian'):
     return xs, mys
 
 # upflat == upsampled by repetition, then normalized
-def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
+def apply_upflat(generator):
     length = UP_N
     xs = np.linspace(0, DURATION, length, endpoint=False)
-    _, ys = gaussian_white(iterations, base) # shape = (N, iterations)
-    mys = ys.repeat(UP_RATIO, axis=0)
-    mys = mys / np.sqrt(UP_RATIO)
-    return xs, mys
+    def f(*args, **kwargs):
+        _, ys = generator(*args, **kwargs)
+        mys = ys.repeat(UP_RATIO, axis=0)
+        mys = mys / np.sqrt(UP_RATIO)
+        return xs, mys
+    f.__name__ = generator.__name__ + '_upflat'
+    return f
+
+def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
+    return apply_upflat(gaussian_white)(iterations, base)
+    #length = UP_N
+    #xs = np.linspace(0, DURATION, length, endpoint=False)
+    #_, ys = gaussian_white(iterations, base) # shape = (N, iterations)
+    #mys = ys.repeat(UP_RATIO, axis=0)
+    #mys = mys / np.sqrt(UP_RATIO)
+    #return xs, mys
 
 def gaussian_white(iterations = 1, base = 'gaussian', length=N):
     xs = np.linspace(0, DURATION, length, endpoint=False)
@@ -151,12 +167,12 @@ def plot_helper(fn, label='log-log', tN = N):
     x, y = spectrum.generate_bucketed_spectrum(fn, tN = tN)
     y = y[np.abs(x) < SAMPLE_RATE//2] # if we are upsampling, only take pre-upsampled freqs
     x = x[np.abs(x) < SAMPLE_RATE//2]
-    plt.plot(x, y, '-o', label=fn.__name__ + ' ' + label)
+    #plt.plot(x, y, '-', label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], y[2:NUM_BUCKETS//1], label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
-    #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(np.abs(np.log(y[2:NUM_BUCKETS//2]))), label=fn.__name__ + ' ' + label)
 
 if __name__ == '__main__':
