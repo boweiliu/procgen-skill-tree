@@ -14,19 +14,24 @@ from invsqrt import invsqrt_window
 
 def main():
     plot_helper(gaussian_white)
-    #plot_helper(gaussian_brown_scaled)
     #plot_helper(gaussian_brown)
-    plot_helper(gaussian_violet)
-    plot_helper(gaussian_pink)
-    plot_helper(gaussian_pink_warm)
-    plot_helper(gaussian_azure)
+    #plot_helper(gaussian_pink)
+    #plot_helper(gaussian_pink_warm)
+    #plot_helper(gaussian_brown_scaled)
+    #plot_helper(gaussian_azure)
+    #plot_helper(gaussian_violet)
 
     #plot_helper(gaussian_white_upflat, tN = UP_N)
     plot_helper(apply_upflat(gaussian_white), tN = UP_N)
+    plot_helper(apply_upzero(gaussian_white), tN = UP_N)
+    plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
     #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
-    plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
-    plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
     #plot_helper(gaussian_white_upzero, tN = UP_N)
+    #plot_helper(apply_hardquant(gaussian_white))
+    #plot_helper(apply_hardquant(gaussian_pink_warm))
+    #plot_helper(apply_hardquant(gaussian_azure))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -67,16 +72,36 @@ def test():
     plt.show()
 
 # upzero == upsampled and new values are zero
-def gaussian_white_upzero(iterations = 1, base = 'gaussian'):
+def apply_upzero(generator):
     length = UP_N
     xs = np.linspace(0, DURATION, length, endpoint=False)
-    _, ys = gaussian_white(iterations, base) # shape = (N, iterations)
-    mys = ys.reshape( (N, 1, iterations) )
-    zs = np.zeros( (N, UP_RATIO - 1, iterations) )
-    mys = np.concatenate( (mys, zs), axis=1).reshape( (N * UP_RATIO, iterations) )
-    mys = mys * np.sqrt(UP_RATIO)
-    #mys = ys.repeat(UP_RATIO, axis=0)
-    return xs, mys
+    def f(*args, **kwargs):
+        _, ys = generator(*args, **kwargs)
+        iterations = ys.shape[1]
+        mys = ys.reshape((N, 1, iterations))
+        zs = np.zeros((N, UP_RATIO - 1, iterations))
+        mys = np.concatenate( (mys, zs), axis=1).reshape( (N * UP_RATIO, iterations) )
+        mys = mys * np.sqrt(UP_RATIO)
+        return xs, mys
+    f.__name__ = generator.__name__ + '_upzero'
+    return f
+
+# uphalf == half of the new values are repeated, other half are zero. UP_RATIO should be ODD
+def apply_uphalf(generator):
+    length = UP_N
+    xs = np.linspace(0, DURATION, length, endpoint=False)
+    def f(*args, **kwargs):
+        _, ys = generator(*args, **kwargs)
+        iterations = ys.shape[1]
+        HALF_RATIO = (UP_RATIO + 1)//2
+        mys = ys.repeat(HALF_RATIO, axis=0)
+        mys = mys.reshape((N, HALF_RATIO, iterations))
+        zs = np.zeros((N, UP_RATIO - HALF_RATIO, iterations))
+        mys = np.concatenate( (mys, zs), axis=1).reshape( (N * UP_RATIO, iterations) )
+        mys = mys * np.sqrt(UP_RATIO) / HALF_RATIO
+        return xs, mys
+    f.__name__ = generator.__name__ + '_uphalf'
+    return f
 
 # upflat == upsampled by repetition, then normalized
 def apply_upflat(generator):
@@ -88,6 +113,14 @@ def apply_upflat(generator):
         mys = mys / np.sqrt(UP_RATIO)
         return xs, mys
     f.__name__ = generator.__name__ + '_upflat'
+    return f
+
+def apply_hardquant(generator):
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        ys = np.where(np.greater_equal(ys, 0), 1, -1)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_hardquant'
     return f
 
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
@@ -167,12 +200,12 @@ def plot_helper(fn, label='log-log', tN = N):
     x, y = spectrum.generate_bucketed_spectrum(fn, tN = tN)
     y = y[np.abs(x) < SAMPLE_RATE//2] # if we are upsampling, only take pre-upsampled freqs
     x = x[np.abs(x) < SAMPLE_RATE//2]
-    #plt.plot(x, y, '-', label=fn.__name__ + ' ' + label)
+    plt.plot(x, y, '-', label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], y[2:NUM_BUCKETS//1], label=fn.__name__ + ' ' + label)
     #plt.plot(x[2:NUM_BUCKETS//1], np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
-    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
+    #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(np.abs(np.log(y[2:NUM_BUCKETS//2]))), label=fn.__name__ + ' ' + label)
 
 if __name__ == '__main__':
