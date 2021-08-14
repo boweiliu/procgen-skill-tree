@@ -30,11 +30,11 @@ def main():
     #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
     #plot_helper(gaussian_white_upzero, tN = UP_N)
     plot_helper(apply_hardquant(gaussian_white))
-    #plot_helper(apply_hardquant(gaussian_pink_warm))
-    #plot_helper(apply_hardquant(gaussian_azure))
+    plot_helper(apply_hardquant(gaussian_pink_warm))
+    plot_helper(apply_hardquant(gaussian_azure))
     plot_helper(apply_softmax(gaussian_white))
-    #plot_helper(apply_softmax(gaussian_pink_warm))
-    #plot_helper(apply_softmax(gaussian_azure))
+    plot_helper(apply_softmax(gaussian_pink_warm))
+    plot_helper(apply_softmax(gaussian_azure))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -219,7 +219,7 @@ def plot_helper(fn, label='log-log', tN = N):
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     # log-log with 50% cutoff on high & low frequencies
-    #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
+    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
 
     # log vs loglog. used for exp & gaussians
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(np.abs(np.log(y[2:NUM_BUCKETS//2]))), label=fn.__name__ + ' ' + label)
