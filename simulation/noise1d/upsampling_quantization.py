@@ -8,6 +8,7 @@ import spectrum
 import noise
 import scipy
 import scipy.signal as signal
+from scipy.stats import norm
 from util import DURATION, N, UP_RATIO, UP_N, SAMPLE_RATE
 from spectrum import NUM_BUCKETS
 from invsqrt import invsqrt_window
@@ -16,25 +17,31 @@ def main():
     plot_helper(gaussian_white)
     #plot_helper(gaussian_brown)
     #plot_helper(gaussian_pink)
-    plot_helper(gaussian_pink_warm)
+    #plot_helper(gaussian_pink_warm)
     #plot_helper(gaussian_brown_scaled)
-    plot_helper(gaussian_azure)
+    #plot_helper(gaussian_azure)
+    plot_helper(gaussian_azure_warm)
     #plot_helper(gaussian_violet)
 
     #plot_helper(gaussian_white_upflat, tN = UP_N)
-    plot_helper(apply_upflat(gaussian_white), tN = UP_N)
-    plot_helper(apply_upzero(gaussian_white), tN = UP_N)
-    plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_white), tN = UP_N)
+    #plot_helper(apply_upzero(gaussian_white), tN = UP_N)
+    #plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
     #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
     #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
-    #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
+    plot_helper(apply_upflat(gaussian_azure_warm), tN = UP_N)
+    plot_helper(apply_upzero(gaussian_azure_warm), tN = UP_N)
+    plot_helper(apply_uphalf(gaussian_azure_warm), tN = UP_N)
     #plot_helper(gaussian_white_upzero, tN = UP_N)
     plot_helper(apply_hardquant(gaussian_white))
-    plot_helper(apply_hardquant(gaussian_pink_warm))
-    plot_helper(apply_hardquant(gaussian_azure))
+    #plot_helper(apply_hardquant(gaussian_pink_warm))
+    plot_helper(apply_hardquant(gaussian_azure_warm))
     plot_helper(apply_softmax(gaussian_white))
-    plot_helper(apply_softmax(gaussian_pink_warm))
-    plot_helper(apply_softmax(gaussian_azure))
+    #plot_helper(apply_softmax(gaussian_pink_warm))
+    plot_helper(apply_softmax(gaussian_azure_warm))
+    plot_helper(apply_quantile(gaussian_white))
+    #plot_helper(apply_quantile(gaussian_pink_warm))
+    plot_helper(apply_quantile(gaussian_azure_warm))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -46,21 +53,23 @@ def main():
 def test():
     #x, y = gaussian_white(100)
     #x, y = gaussian_white_upflat(100)
-    x, y = gaussian_white_upzero(100)
+    #x, y = gaussian_white_upzero(100)
     #x, y = gaussian_brown(100)
     #x, y = gaussian_violet(100)
     #x, y = gaussian_pink(100)
     #x, y = gaussian_pink_warm(100)
-    #x, y = gaussian_azure(100)
+    x, y = gaussian_azure_warm(200)
     print(np.mean(np.mean(y * y, axis=0)))
-    variances = np.mean(y * y, axis=1)
     plt.plot(x[:100], y[:100, 0])
     #plt.plot(x[100:150], y[100:150, 0])
     #plt.plot(x[:], y[:, 0])
     plt.show()
     plt.clf()
 
-    plt.plot(x[:100], variances[:100])
+    means = np.mean(y, axis=1)[:, np.newaxis]
+    variances = np.mean((y - means) * (y - means), axis=1)
+    #plt.plot(x[:100], variances[:100])
+    plt.plot(x[:], variances[:], '.')
     plt.show()
     plt.clf()
 
@@ -134,6 +143,21 @@ def apply_softmax(generator):
     f.__name__ = generator.__name__ + '_softmax'
     return f
 
+def apply_quantile(generator):
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        # use inv normal CDF to compute breakpoints. 0-indexed, first is -inf
+        breakpoints = [ norm.ppf(i / UP_RATIO) for i in range(UP_RATIO) ]
+        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO-1)
+        # move to range -1 to 1
+        ys = ys / ((UP_RATIO - 1)/2)
+        ys = ys - 1
+        # hmmm that didnt work.. just renormalize again?
+        ys = normalize(ys)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_quantile'
+    return f
+
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
     return apply_upflat(gaussian_white)(iterations, base)
     #length = UP_N
@@ -160,10 +184,11 @@ def gaussian_pink(iterations = 1):
 
 def gaussian_pink_warm(iterations = 1):
     length=2*N
-    xs, ys = gaussian_white(iterations, length=length)
+    _, ys = gaussian_white(iterations, length=length)
     ys = signal.fftconvolve(ys, invsqrt_window(window=N, sigma=1, iterations=iterations), mode='full', axes=0)[:length]
     ys = ys[-N:]
     ys = normalize(ys)
+    xs = np.linspace(0, DURATION, length, endpoint=False)
     return xs, ys
 
 def gaussian_pink_warm2way(iterations = 1):
@@ -192,7 +217,10 @@ def gaussian_azure(iterations = 1):
     return xs, ys
 
 def gaussian_azure_warm(iterations = 1):
-    pass
+    xs, ys = gaussian_pink_warm(iterations)
+    ys = np.diff(ys, axis=0, prepend=0)
+    ys = normalize(ys)
+    return xs, ys
 
 def gaussian_violet(iterations = 1):
     xs, ds = gaussian_white(iterations)
