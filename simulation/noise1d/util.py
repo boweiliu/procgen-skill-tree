@@ -4,7 +4,7 @@ import scipy
 from scipy.fft import fft, fftfreq
 
 DURATION = 9 # seconds
-SAMPLE_RATE = 10000 # Hz
+SAMPLE_RATE = 2500 # Hz
 N = DURATION * SAMPLE_RATE
 normalization  = 1 / np.sqrt(N)
 

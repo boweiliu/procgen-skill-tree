@@ -9,7 +9,7 @@ from util import N, SAMPLE_RATE, DURATION, nfft
 import noise
 
 # number of buckets to divde the frequencies into. note that # of frequencies == N/2
-NUM_BUCKETS = 300 # this should divide N/2
+NUM_BUCKETS = 250 # this should divide N/2
 NUM_ITER = 100 # of iterations
 BUCKET_SIZE = int(N /2 / NUM_BUCKETS)
 
