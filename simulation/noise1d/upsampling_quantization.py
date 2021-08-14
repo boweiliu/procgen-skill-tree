@@ -16,9 +16,9 @@ def main():
     plot_helper(gaussian_white)
     #plot_helper(gaussian_brown)
     #plot_helper(gaussian_pink)
-    #plot_helper(gaussian_pink_warm)
+    plot_helper(gaussian_pink_warm)
     #plot_helper(gaussian_brown_scaled)
-    #plot_helper(gaussian_azure)
+    plot_helper(gaussian_azure)
     #plot_helper(gaussian_violet)
 
     #plot_helper(gaussian_white_upflat, tN = UP_N)
@@ -29,9 +29,12 @@ def main():
     #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
     #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
     #plot_helper(gaussian_white_upzero, tN = UP_N)
-    #plot_helper(apply_hardquant(gaussian_white))
+    plot_helper(apply_hardquant(gaussian_white))
     #plot_helper(apply_hardquant(gaussian_pink_warm))
     #plot_helper(apply_hardquant(gaussian_azure))
+    plot_helper(apply_softmax(gaussian_white))
+    #plot_helper(apply_softmax(gaussian_pink_warm))
+    #plot_helper(apply_softmax(gaussian_azure))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -121,6 +124,14 @@ def apply_hardquant(generator):
         ys = np.where(np.greater_equal(ys, 0), 1, -1)
         return xs, ys
     f.__name__ = generator.__name__ + '_hardquant'
+    return f
+
+def apply_softmax(generator):
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        ys = (2 / (1 + np.exp(-ys)) - 1) * 2.4 # experimentally measured to be the avg power
+        return xs, ys
+    f.__name__ = generator.__name__ + '_softmax'
     return f
 
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
