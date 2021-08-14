@@ -182,13 +182,13 @@ def gaussian_pink(iterations = 1):
     ys = normalize(ys)
     return xs, ys
 
-def gaussian_pink_warm(iterations = 1):
-    length=2*N
-    _, ys = gaussian_white(iterations, length=length)
+def gaussian_pink_warm(iterations = 1, length=N):
+    xs = np.linspace(0, DURATION, length, endpoint=False)
+    newlength=2*length # use a length==length warmup period
+    _, ys = gaussian_white(iterations, length=newlength)
     ys = signal.fftconvolve(ys, invsqrt_window(window=N, sigma=1, iterations=iterations), mode='full', axes=0)[:length]
     ys = ys[-N:]
     ys = normalize(ys)
-    xs = np.linspace(0, DURATION, length, endpoint=False)
     return xs, ys
 
 def gaussian_pink_warm2way(iterations = 1):
