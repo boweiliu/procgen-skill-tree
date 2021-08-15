@@ -160,19 +160,20 @@ def apply_quantile(generator):
     f.__name__ = generator.__name__ + '_quantile'
     return f
 
-def apply_softquantile(generator):
+
+def apply_upquantile(generator):
+    upsample_chart = np.array([ [ 1 if i <= mass else 0 for i in range(UP_RATIO) ] for mass in range(-1, UP_RATIO) ])
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
         ys = 1 / (1 + np.exp(-ys))
-        breakpoints = [ norm.ppf(i / UP_RATIO) for i in range(UP_RATIO) ] # WIP
-        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO-1)
-        # move to range -1 to 1
-        ys = ys / ((UP_RATIO - 1)/2)
-        ys = ys - 1
-        # hmmm that didnt work.. just renormalize again?
+        breakpoints = [ norm.ppf(i / (UP_RATIO+1)) for i in range(UP_RATIO+1) ]
+        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO) incl
+        # lookup against upsampling
+        ys = upsample_chart[ys] # shape is now (N, iterations, UP_RATIO)
+        ys = np.transpose(ys, (0, 2, 1)).reshape((N * UP_RATIO, 3))
         ys = normalize(ys)
         return xs, ys
-    f.__name__ = generator.__name__ + '_softquantile'
+    f.__name__ = generator.__name__ + '_upquantile'
     return f
 
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
