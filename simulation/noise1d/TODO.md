@@ -14,3 +14,5 @@
 7. apply gaussian smoothing, and then resample at a higher sample rate <- this should allow us to quantize/dither better. otherwise e.g. brownian quantization sucks
   - note that it's obviously impossible to preserve the spectrum at higher frequencies if you upsample like that. decide on a freq cutoff to match
 8. binary scale the inv sqrt accumulation (i.e. 1, 2, 2, 4, 4, 4, 4, 8x8, etc.) so it's actually computable
+
+9. check histogram of noise pre- and post quantization (i.e. make sure normal CDF bin breakpoints are helping, and same for softmax)

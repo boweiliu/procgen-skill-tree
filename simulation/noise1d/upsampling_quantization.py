@@ -159,6 +159,21 @@ def apply_quantile(generator):
     f.__name__ = generator.__name__ + '_quantile'
     return f
 
+def apply_softquantile(generator)
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        ys = 1 / (1 + np.exp(-ys))
+        breakpoints = [ norm.ppf(i / UP_RATIO) for i in range(UP_RATIO) ] # WIP
+        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO-1)
+        # move to range -1 to 1
+        ys = ys / ((UP_RATIO - 1)/2)
+        ys = ys - 1
+        # hmmm that didnt work.. just renormalize again?
+        ys = normalize(ys)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_softquantile'
+    return f
+
 def gaussian_white_upflat(iterations = 1, base = 'gaussian'):
     return apply_upflat(gaussian_white)(iterations, base)
     #length = UP_N
