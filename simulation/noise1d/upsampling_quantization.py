@@ -17,31 +17,38 @@ def main():
     plot_helper(gaussian_white)
     #plot_helper(gaussian_brown)
     #plot_helper(gaussian_pink)
-    #plot_helper(gaussian_pink_warm)
-    #plot_helper(gaussian_brown_scaled)
-    plot_helper(gaussian_azure)
-    #plot_helper(gaussian_azure_warm)
-    #plot_helper(gaussian_violet)
+    plot_helper(gaussian_pink_warm)
+    plot_helper(gaussian_brown_scaled)
+    #plot_helper(gaussian_azure)
+    plot_helper(gaussian_azure_warm)
+    plot_helper(gaussian_blue)
+    plot_helper(gaussian_violet_scaled)
 
-    #plot_helper(gaussian_white_upflat, tN = UP_N)
-    #plot_helper(apply_upflat(gaussian_white), tN = UP_N)
-    #plot_helper(apply_upzero(gaussian_white), tN = UP_N)
-    #plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
-    #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
-    #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
-    plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
-    plot_helper(apply_upzero(gaussian_azure), tN = UP_N)
-    plot_helper(apply_uphalf(gaussian_azure), tN = UP_N)
-    #plot_helper(gaussian_white_upzero, tN = UP_N)
-    plot_helper(apply_hardquant(gaussian_white))
-    #plot_helper(apply_hardquant(gaussian_pink_warm))
-    plot_helper(apply_hardquant(gaussian_azure))
-    plot_helper(apply_softmax(gaussian_white))
-    #plot_helper(apply_softmax(gaussian_pink_warm))
-    plot_helper(apply_softmax(gaussian_azure))
-    plot_helper(apply_quantile(gaussian_white))
-    #plot_helper(apply_quantile(gaussian_pink_warm))
-    plot_helper(apply_quantile(gaussian_azure))
+#    #plot_helper(gaussian_white_upflat, tN = UP_N)
+#    #plot_helper(apply_upflat(gaussian_white), tN = UP_N)
+#    #plot_helper(apply_upzero(gaussian_white), tN = UP_N)
+#    #plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
+#    plot_helper(apply_upquantile(gaussian_white), tN = UP_N)
+#
+#    #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
+#    #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
+#    #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
+#    #plot_helper(apply_upzero(gaussian_azure), tN = UP_N)
+#    #plot_helper(apply_uphalf(gaussian_azure), tN = UP_N)
+#    plot_helper(apply_upquantile(gaussian_azure), tN = UP_N)
+#    plot_helper(apply_upquantile(gaussian_pink_warm), tN = UP_N)
+#    #plot_helper(gaussian_white_upzero, tN = UP_N)
+#    plot_helper(apply_hardquant(gaussian_white))
+#    plot_helper(apply_hardquant(gaussian_pink_warm))
+#    plot_helper(apply_hardquant(gaussian_azure))
+#    #plot_helper(apply_hardquant(gaussian_violet))
+#    #plot_helper(apply_hardquant(gaussian_brown_scaled))
+#    plot_helper(apply_softmax(gaussian_white))
+#    plot_helper(apply_softmax(gaussian_pink_warm))
+#    plot_helper(apply_softmax(gaussian_azure))
+#    plot_helper(apply_quantile(gaussian_white))
+#    plot_helper(apply_quantile(gaussian_pink_warm))
+#    plot_helper(apply_quantile(gaussian_azure))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -59,7 +66,7 @@ def test():
     #x, y = gaussian_pink(1000)
     #x, y = gaussian_pink_warm(100)
     #x, y = gaussian_azure(1000)
-    x, y = apply_quantile(gaussian_azure_warm)(1000)
+    x, y = apply_upquantile(gaussian_azure_warm)(1000)
     #x, y = gaussian_azure_warm(600)
     print(np.mean(np.mean(y * y, axis=0)))
     plt.plot(x[:100], y[:100, 0])
@@ -148,13 +155,9 @@ def apply_softmax(generator):
 def apply_quantile(generator):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
-        # use inv normal CDF to compute breakpoints. 0-indexed, first is -inf
-        breakpoints = [ norm.ppf(i / UP_RATIO) for i in range(UP_RATIO) ]
-        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO-1)
-        # move to range -1 to 1
-        ys = ys / ((UP_RATIO - 1)/2)
-        ys = ys - 1
-        # hmmm that didnt work.. just renormalize again?
+        # use inv normal CDF to compute breakpoints. the length of breakpoints must be UP_RATIO-1
+        breakpoints = [ norm.ppf(i / (UP_RATIO)) for i in range(1, UP_RATIO) ]
+        ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO-1) incl
         ys = normalize(ys)
         return xs, ys
     f.__name__ = generator.__name__ + '_quantile'
@@ -165,13 +168,15 @@ def apply_upquantile(generator):
     upsample_chart = np.array([ [ 1 if i <= mass else 0 for i in range(UP_RATIO) ] for mass in range(-1, UP_RATIO) ])
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
-        ys = 1 / (1 + np.exp(-ys))
-        breakpoints = [ norm.ppf(i / (UP_RATIO+1)) for i in range(UP_RATIO+1) ]
+        iterations = ys.shape[1]
+        breakpoints = [ norm.ppf(i / (UP_RATIO+1)) for i in range(1, UP_RATIO+1) ]
         ys = np.digitize(ys, breakpoints) # shape = (N, iterations); values are 0-(UP_RATIO) incl
+# WIP DEBUG
         # lookup against upsampling
         ys = upsample_chart[ys] # shape is now (N, iterations, UP_RATIO)
-        ys = np.transpose(ys, (0, 2, 1)).reshape((N * UP_RATIO, 3))
+        ys = np.transpose(ys, (0, 2, 1)).reshape((N * UP_RATIO, iterations))
         ys = normalize(ys)
+        ys = ys * 0.66 # experimentally determined normalization factor to account for longer length
         return xs, ys
     f.__name__ = generator.__name__ + '_upquantile'
     return f
@@ -246,6 +251,18 @@ def gaussian_violet(iterations = 1):
     ys = normalize(ys)
     return xs, ys
 
+def gaussian_violet_scaled(iterations = 1):
+    xs, ys = gaussian_violet(iterations)
+    ys = ys * 10
+    return xs, ys
+
+# invsqrt'd violet, rather than azure which is diff'd pink
+def gaussian_blue(iterations = 1):
+    xs, ys = gaussian_violet(iterations)
+    ys = signal.fftconvolve(ys, invsqrt_window(window=N, sigma=1, iterations=iterations), mode='full', axes=0)[:N]
+    ys = normalize(ys)
+    return xs, ys
+
 def normalize(data):
     yavg = np.mean(data, axis=0)
     ys = data - yavg
@@ -265,7 +282,7 @@ def plot_helper(fn, label='log-log', tN = N):
     #plt.plot(np.log(x[:]), np.log(y[:]), label=fn.__name__ + ' ' + label)
     #plt.plot(np.log(x[2:NUM_BUCKETS//1]), np.log(y[2:NUM_BUCKETS//1]), label=fn.__name__ + ' ' + label)
     # log-log with 50% cutoff on high & low frequencies
-    plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(y[2:NUM_BUCKETS//2]), label=fn.__name__ + ' ' + label)
+    plt.plot(np.log(x[3:NUM_BUCKETS//3]), np.log(y[3:NUM_BUCKETS//3]), label=fn.__name__ + ' ' + label)
 
     # log vs loglog. used for exp & gaussians
     #plt.plot(np.log(x[2:NUM_BUCKETS//2]), np.log(np.abs(np.log(y[2:NUM_BUCKETS//2]))), label=fn.__name__ + ' ' + label)
