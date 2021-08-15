@@ -52,13 +52,14 @@ def main():
 
 def test():
     #x, y = gaussian_white(100)
-    #x, y = gaussian_white_upflat(100)
+    #x, y = apply_quantile(gaussian_white)(100)
     #x, y = gaussian_white_upzero(100)
     #x, y = gaussian_brown(100)
     #x, y = gaussian_violet(100)
     #x, y = gaussian_pink(1000)
     #x, y = gaussian_pink_warm(100)
-    x, y = gaussian_azure(1000)
+    #x, y = gaussian_azure(1000)
+    x, y = apply_quantile(gaussian_azure_warm)(1000)
     #x, y = gaussian_azure_warm(600)
     print(np.mean(np.mean(y * y, axis=0)))
     plt.plot(x[:100], y[:100, 0])
@@ -159,7 +160,7 @@ def apply_quantile(generator):
     f.__name__ = generator.__name__ + '_quantile'
     return f
 
-def apply_softquantile(generator)
+def apply_softquantile(generator):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
         ys = 1 / (1 + np.exp(-ys))
