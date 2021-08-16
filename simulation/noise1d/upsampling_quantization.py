@@ -51,6 +51,8 @@ def main():
     plot_helper(apply_quantile(gaussian_azure))
     plot_helper(apply_clampquarter(gaussian_azure))
     plot_helper(apply_anticlampquarter(gaussian_azure))
+    plot_helper(apply_clampquarter(gaussian_azure), QUARTER=0.25)
+    plot_helper(apply_anticlampquarter(gaussian_azure), QUARTER=0.25)
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -165,25 +167,25 @@ def apply_quantile(generator):
     f.__name__ = generator.__name__ + '_quantile'
     return f
 
-def apply_clampquarter(generator):
+def apply_clampquarter(generator, QUARTER=1.0):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
         # clamp to +/- 0.25 if abs value is greater
-        ys = np.where(ys > 0.25, 0.25, ys)
-        ys = np.where(ys < -0.25, -0.25, ys)
+        ys = np.where(ys > QUARTER, QUARTER, ys)
+        ys = np.where(ys < -QUARTER, -QUARTER, ys)
         ys = normalize(ys)
         return xs, ys
-    f.__name__ = generator.__name__ + '_clampquarter'
+    f.__name__ = generator.__name__ + '_clampquarter' + str(QUARTER)
     return f
 
-def apply_anticlampquarter(generator):
+def apply_anticlampquarter(generator, QUARTER=1.0):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
         # set to 0 if abs value is too small
-        ys = np.where(np.abs(ys) < 0.25, ys, 0)
+        ys = np.where(np.abs(ys) > QUARTER, ys, 0)
         ys = normalize(ys)
         return xs, ys
-    f.__name__ = generator.__name__ + '_anticlampquarter'
+    f.__name__ = generator.__name__ + '_anticlampquarter' + str(QUARTER)
     return f
 
 def apply_upquantile(generator):
