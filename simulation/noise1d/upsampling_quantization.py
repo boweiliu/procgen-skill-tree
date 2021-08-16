@@ -43,6 +43,9 @@ def main():
     plot_helper(apply_hardquant(gaussian_azure))
     #plot_helper(apply_hardquant(gaussian_violet))
     #plot_helper(apply_hardquant(gaussian_brown_scaled))
+    plot_helper(apply_harddither(gaussian_azure, ditherer=gaussian_white))
+    plot_helper(apply_harddither(gaussian_azure, ditherer=gaussian_violet))
+    plot_helper(apply_harddither(gaussian_azure, ditherer=gaussian_ultraviolet))
     #plot_helper(apply_softmax(gaussian_white))
     #plot_helper(apply_softmax(gaussian_pink_warm))
     plot_helper(apply_softmax(gaussian_azure))
@@ -53,6 +56,8 @@ def main():
     plot_helper(apply_anticlampquarter(gaussian_azure))
     plot_helper(apply_clampquarter(gaussian_azure, QUARTER=0.25))
     plot_helper(apply_anticlampquarter(gaussian_azure, QUARTER=0.25))
+    plot_helper(apply_clampquarter(gaussian_azure, QUARTER=2.5))
+    plot_helper(apply_anticlampquarter(gaussian_azure, QUARTER=2.5))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -148,6 +153,18 @@ def apply_hardquant(generator):
     f.__name__ = generator.__name__ + '_hardquant'
     return f
 
+def apply_harddither(generator, ditherer, dither_scale = 0.5):
+    _, dither_baseline = ditherer(iterations = 1)
+    #dither_baseline = dither_baseline[:,0]
+    dither_baseline = dither_baseline * dither_scale
+
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        ys = np.where(np.greater_equal(ys, dither_baseline), 1, -1)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_harddither_' + ditherer.__name__ + str(dither_scale)
+    return f
+
 def apply_softmax(generator):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
@@ -181,8 +198,8 @@ def apply_clampquarter(generator, QUARTER=1.0):
 def apply_anticlampquarter(generator, QUARTER=1.0):
     def f(*args, **kwargs):
         xs, ys = generator(*args, **kwargs)
-        # set to 0 if abs value is too small
-        ys = np.where(np.abs(ys) > QUARTER, ys, 0)
+        # set to +/- 0.25 if abs value is too small
+        ys = np.where(np.abs(ys) > QUARTER, ys, np.where(ys < 0, -QUARTER, QUARTER))
         ys = normalize(ys)
         return xs, ys
     f.__name__ = generator.__name__ + '_anticlampquarter' + str(QUARTER)
@@ -278,6 +295,12 @@ def gaussian_violet(iterations = 1):
 def gaussian_violet_scaled(iterations = 1):
     xs, ys = gaussian_violet(iterations)
     ys = ys * 10
+    return xs, ys
+
+def gaussian_ultraviolet(iterations = 1):
+    xs, ds = gaussian_violet(iterations)
+    ys = np.diff(ds, axis=0, prepend=0)
+    ys = normalize(ys)
     return xs, ys
 
 # invsqrt'd violet, rather than azure which is diff'd pink
