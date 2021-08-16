@@ -14,41 +14,43 @@ from spectrum import NUM_BUCKETS
 from invsqrt import invsqrt_window
 
 def main():
-    plot_helper(gaussian_white)
+    #plot_helper(gaussian_white)
     #plot_helper(gaussian_brown)
     #plot_helper(gaussian_pink)
-    plot_helper(gaussian_pink_warm)
-    plot_helper(gaussian_brown_scaled)
-    #plot_helper(gaussian_azure)
-    plot_helper(gaussian_azure_warm)
-    plot_helper(gaussian_blue)
-    plot_helper(gaussian_violet_scaled)
+    #plot_helper(gaussian_pink_warm)
+    #plot_helper(gaussian_brown_scaled)
+    plot_helper(gaussian_azure)
+    #plot_helper(gaussian_azure_warm)
+    #plot_helper(gaussian_blue)
+    #plot_helper(gaussian_violet_scaled)
 
-#    #plot_helper(gaussian_white_upflat, tN = UP_N)
-#    #plot_helper(apply_upflat(gaussian_white), tN = UP_N)
-#    #plot_helper(apply_upzero(gaussian_white), tN = UP_N)
-#    #plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
-#    plot_helper(apply_upquantile(gaussian_white), tN = UP_N)
-#
-#    #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
-#    #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
-#    #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
-#    #plot_helper(apply_upzero(gaussian_azure), tN = UP_N)
-#    #plot_helper(apply_uphalf(gaussian_azure), tN = UP_N)
-#    plot_helper(apply_upquantile(gaussian_azure), tN = UP_N)
-#    plot_helper(apply_upquantile(gaussian_pink_warm), tN = UP_N)
-#    #plot_helper(gaussian_white_upzero, tN = UP_N)
-#    plot_helper(apply_hardquant(gaussian_white))
-#    plot_helper(apply_hardquant(gaussian_pink_warm))
-#    plot_helper(apply_hardquant(gaussian_azure))
-#    #plot_helper(apply_hardquant(gaussian_violet))
-#    #plot_helper(apply_hardquant(gaussian_brown_scaled))
-#    plot_helper(apply_softmax(gaussian_white))
-#    plot_helper(apply_softmax(gaussian_pink_warm))
-#    plot_helper(apply_softmax(gaussian_azure))
-#    plot_helper(apply_quantile(gaussian_white))
-#    plot_helper(apply_quantile(gaussian_pink_warm))
-#    plot_helper(apply_quantile(gaussian_azure))
+    #plot_helper(gaussian_white_upflat, tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_white), tN = UP_N)
+    #plot_helper(apply_upzero(gaussian_white), tN = UP_N)
+    #plot_helper(apply_uphalf(gaussian_white), tN = UP_N)
+    #plot_helper(apply_upquantile(gaussian_white), tN = UP_N)
+
+    #plot_helper(apply_upflat(gaussian_brown_scaled), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_pink_warm), tN = UP_N)
+    #plot_helper(apply_upflat(gaussian_azure), tN = UP_N)
+    #plot_helper(apply_upzero(gaussian_azure), tN = UP_N)
+    #plot_helper(apply_uphalf(gaussian_azure), tN = UP_N)
+    plot_helper(apply_upquantile(gaussian_azure), tN = UP_N)
+    #plot_helper(apply_upquantile(gaussian_pink_warm), tN = UP_N)
+    #plot_helper(gaussian_white_upzero, tN = UP_N)
+    #plot_helper(apply_hardquant(gaussian_white))
+    #plot_helper(apply_hardquant(gaussian_pink_warm))
+    plot_helper(apply_hardquant(gaussian_azure))
+    #plot_helper(apply_hardquant(gaussian_violet))
+    #plot_helper(apply_hardquant(gaussian_brown_scaled))
+    #plot_helper(apply_softmax(gaussian_white))
+    #plot_helper(apply_softmax(gaussian_pink_warm))
+    plot_helper(apply_softmax(gaussian_azure))
+    #plot_helper(apply_quantile(gaussian_white))
+    #plot_helper(apply_quantile(gaussian_pink_warm))
+    plot_helper(apply_quantile(gaussian_azure))
+    plot_helper(apply_clampquarter(gaussian_azure))
+    plot_helper(apply_anticlampquarter(gaussian_azure))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
@@ -163,6 +165,26 @@ def apply_quantile(generator):
     f.__name__ = generator.__name__ + '_quantile'
     return f
 
+def apply_clampquarter(generator):
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        # clamp to +/- 0.25 if abs value is greater
+        ys = np.where(ys > 0.25, 0.25, ys)
+        ys = np.where(ys < -0.25, -0.25, ys)
+        ys = normalize(ys)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_clampquarter'
+    return f
+
+def apply_anticlampquarter(generator):
+    def f(*args, **kwargs):
+        xs, ys = generator(*args, **kwargs)
+        # set to 0 if abs value is too small
+        ys = np.where(np.abs(ys) < 0.25, ys, 0)
+        ys = normalize(ys)
+        return xs, ys
+    f.__name__ = generator.__name__ + '_anticlampquarter'
+    return f
 
 def apply_upquantile(generator):
     upsample_chart = np.array([ [ 1 if i <= mass else 0 for i in range(UP_RATIO) ] for mass in range(-1, UP_RATIO) ])
