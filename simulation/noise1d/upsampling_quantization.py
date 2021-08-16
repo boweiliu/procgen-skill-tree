@@ -51,8 +51,8 @@ def main():
     plot_helper(apply_quantile(gaussian_azure))
     plot_helper(apply_clampquarter(gaussian_azure))
     plot_helper(apply_anticlampquarter(gaussian_azure))
-    plot_helper(apply_clampquarter(gaussian_azure), QUARTER=0.25)
-    plot_helper(apply_anticlampquarter(gaussian_azure), QUARTER=0.25)
+    plot_helper(apply_clampquarter(gaussian_azure, QUARTER=0.25))
+    plot_helper(apply_anticlampquarter(gaussian_azure, QUARTER=0.25))
 
     plt.legend()
     #mng = plt.get_current_fig_manager()
