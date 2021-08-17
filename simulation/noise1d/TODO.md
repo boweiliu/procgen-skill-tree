@@ -16,3 +16,6 @@
 8. binary scale the inv sqrt accumulation (i.e. 1, 2, 2, 4, 4, 4, 4, 8x8, etc.) so it's actually computable
 
 9. check histogram of noise pre- and post quantization (i.e. make sure normal CDF bin breakpoints are helping, and same for softmax)
+
+10. assuming that each individual value of pink noise is roughly normal(0,1) distributed, what is the best way to quantize to 2 values? ans: it's the average of the normal distribution conditioned on it being positive. then what's the best way to quantize to 5 values? it's a double optimization over the values and the distributions minimizing MSE. furthermore we want to ensure the 5 values are equally distributed so that we can represent them with a 5-wide resolution increase. 
+11. we can dither the above, but we should make that, say, if the normal distribution emits a value of .35 over a large region, the dithered result should match that on average.
